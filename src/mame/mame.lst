@@ -26081,7 +26081,6 @@ m4cashzn                        // Cash Zone (Barcrest)
 m4cashzna                       //
 m4celclb                        // Celebration Club (Barcrest)
 m4centpt                        // Centrepoint (Barcrest)
-m4centpta                       // Centrepoint (Barcrest)
 m4cheryo                        // Cherryo (Barcrest)
 m4class                         // First Class (Barcrest)
 m4classa                        //
@@ -26268,7 +26267,8 @@ m4suptub                        // Super Tubes (Barcrest)
 m4suptuba                       //
 m4suptwo                        // Super Two (Barcrest)
 m4swpnot                        // Swap-A-Note (Barcrest)
-m4swpnota                       // Swap-A-Note (Barcrest)
+m4swpnota                       // 
+m4swpnotb                       // 
 m4taj                           // Taj Mahal (Barcrest)
 m4take2                         // Take Two (Barcrest)
 m4take2a                        //

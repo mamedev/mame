@@ -1279,12 +1279,12 @@ ROM_START( m4celclb )
 	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
 ROM_END
 
-ROM_START( m4centpt )
+ROM_START( m4swpnotb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "centrepoint v1.6.bin", 0x0000, 0x010000, CRC(adcf0330) SHA1(b68b8c808b2dc1965d37d912adec714547466522) )
 ROM_END
 
-ROM_START( m4centpta )
+ROM_START( m4centpt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "centrepoint v1.3.bin", 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
 ROM_END
@@ -1748,8 +1748,10 @@ GAME(199?, m4bj,      0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::viz
 GAME(199?, m4flash,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Flash Cash (Barcrest) (MPU4, FC 1.0)",GAME_FLAGS )
 
 // 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 08 d0 cc dc b0 (actionbank)
-GAME(199?, m4swpnot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.3) (MPU4)",GAME_FLAGS )
-GAME(199?, m4swpnota, m4swpnot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.2D) (MPU4)",GAME_FLAGS)
+GAME(199?, m4swpnot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Swap-A-Note (Barcrest) (MPU4) (SN 3.3)",GAME_FLAGS )
+GAME(199?, m4swpnota, m4swpnot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Swap-A-Note (Barcrest) (MPU4) (SN 3.2)",GAME_FLAGS )
+GAME(199?, m4swpnotb, m4swpnot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Swap-A-Note (Barcrest) (MPU4) (SN 3.5)",GAME_FLAGS ) // was in a set named Centrepoint, but clearly fits here
+
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
 GAME(199?, m4actnot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Action Note (Barcrest) (MPU4) (AN 1.2)",GAME_FLAGS )
@@ -1888,7 +1890,7 @@ GAME(199?, m4suptub,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::alf
 GAME(199?, m4suptuba, m4suptub,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 2)",GAME_FLAGS )
 
 // 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 (actionbank)
-GAME(199?, m4suptwo,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",GAME_FLAGS ) // set % key
+GAME(199?, m4suptwo,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Two (Barcrest) (MPU4) (SUT 1.2)",GAME_FLAGS ) // set % key
 
 // 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 (tictak)
 GAME(199?, m4tiktak,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",GAME_FLAGS )
@@ -1994,8 +1996,7 @@ GAME(199?, m4loadmnb, m4loadmn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::and
 GAME(199?, m4celclb,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m_ccelbr,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",GAME_FLAGS ) // set stake
 
 // 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 08 d0 cc dc b0 cc (actionbank)
-GAME(199?, m4centpt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",GAME_FLAGS )
-GAME(199?, m4centpta, m4centpt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",GAME_FLAGS )
+GAME(199?, m4centpt, 0,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4) (DU 1.3)",GAME_FLAGS )
 
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4 8c f8 (m533)
 GAME(199?, m4clbcls,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake (still moans tho)
@@ -2094,7 +2095,7 @@ GAME(199?, m4wildms,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4d
 
 // REEL D ALARM
 // 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 08 (actionbank)
-GAME(199?, m4suptrn,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4suptrn,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Supatron (Barcrest) (MPU4) (DSU 2.1)",GAME_FLAGS )
 
 // REEL A ALARM
 // 00 60 60 a0 38 64 e0 30 c8 9c ac dc ec 94 d8 a4 38 ec (bjac)

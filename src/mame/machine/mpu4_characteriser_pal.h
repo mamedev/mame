@@ -423,6 +423,25 @@ public:
 	static constexpr uint8_t m533_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x20, 0x20, 0x10, 0x10, 0x00 }; // based on clbcls lamp patterns
 
 
+	// games with sequence starting
+	// 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
+	// used by
+	// Cash Lines (Barcrest) (MPU4) "CLS 0.3"
+	//                              "CLI 1.1"
+	//                              "CLI 1.0"
+	//                              "NCL 1.1"
+	//                              "NCC 1.0"
+	// Action Bank                  "ACT 0.7"
+	// Top Tenner                   "TTS 0.2"
+	// Top Tenner                   "TTH 1.0"
+	// Super Two                    "SUT 1.2"            
+	// Centrepoint                  " DU 1.3"
+	// Supatron                     "DSU 2.1"
+	// Swap-A-Note                  " SN 3.3"
+	//                              " SN 3.2"
+	//                              " SN 3.5"
+	static constexpr uint8_t actionbank_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x20, 0x20, 0x60, 0x60, 0x20 }; // matches unprotected sets for various games
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -432,15 +451,17 @@ public:
 
 
 
-	// games with sequence starting 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
+	// games with sequence starting
+	// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
+	// used by
+	// Viz          "VZ__1.0"
+	// Gold Strike  "G4S 2.0" (doesn't use lamp scramble)
+	// Magic Dragon "DMD 1.0" (doesn't use lamp scramble? doesn't boot)
 	static constexpr uint8_t magicdragon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
-	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
-	// games with sequence starting 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
-	static constexpr uint8_t actionbank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
 	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -573,6 +594,9 @@ public:
 	 Types below have no games using lamp scramble, so data is unknown / blank
 
 	***************************************************************/
+
+	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
+	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
 	static constexpr uint8_t crkpot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
