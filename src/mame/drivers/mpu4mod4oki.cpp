@@ -319,7 +319,7 @@ GAME_CUSTOM( 1991, m4andycpc5yd,       m4andycp, mod4oki_cheatchr_xxxx<mpu4_char
 
 // expects chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 (actclba) (same as some King & Queens + Pot Black sets?)
 // "(C)1991 BARCREST"  and "AN8 0.1"
-GAME_CUSTOM( 1991, m4andycp8,          m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4, init_m4andycp,  "an8s.p1",          0x0000, 0x010000, CRC(14ac28da) SHA1(0b4a3f997e10573f2c4c44daac344f4be52363a0), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AM8)" )
+GAME_CUSTOM( 1991, m4andycp8,          m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4, init_m4andycp,  "an8s.p1",          0x0000, 0x010000, CRC(14ac28da) SHA1(0b4a3f997e10573f2c4c44daac344f4be52363a0), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AN8)" )
 GAME_CUSTOM( 1991, m4andycp8d,         m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4, init_m4andycp,  "an8d.p1",          0x0000, 0x010000, CRC(ae01af1c) SHA1(7b2305480a318648a3cc6c3bc66f21ac327e25aa), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AN8 D)" ) // datapak
 GAME_CUSTOM( 1991, m4andycp8ad,        m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4, init_m4andycp,  "an8ad.p1",         0x0000, 0x010000, CRC(d0f9da00) SHA1(fb380897fffc33d238b8fe7d47ff4d9d97960283), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AN8 AD)" ) // datapak
 GAME_CUSTOM( 1991, m4andycp8b,         m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4, init_m4andycp,  "an8b.p1",          0x0000, 0x010000, CRC(fc4001ae) SHA1(b0cd795235e6f500f0150097b8f760165c17ca27), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AN8 B)" )
@@ -404,7 +404,7 @@ ROM_END
 
 // expects chr sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 (phr) (same as some Prize High Roller sets?)
 // blank copyright  and "DAC 1.3" (6 reel game, not the same as the UK version?)
-GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, "Barcrest", "Andy Capp (Barcrest) [DAC 1.3, Dutch] (MPU4)", GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, "Barcrest", "Andy Capp (Barcrest) (Dutch) (MPU4) (DAC 1.3)", GAME_FLAGS|MACHINE_NO_SOUND )
 
 
 /*****************************************************************************************************************************************************************************

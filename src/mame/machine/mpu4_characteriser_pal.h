@@ -205,7 +205,7 @@ public:
 
 
 	// Games with sequence starting
-	// 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4
+	// 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4 08 b0 ac bc d0 8c 9c f0 28 b0 8c 9c d0 08 14 00 44 e0 68 b0 08 94 88 9c 54 00 60 e4 ec 98 54 a4 e8 bc 54 a4 ec b8 d4 ac 98 d4 8c bc d0 8c 38 f4 00
 	// used by
 	// Classic Adders & Ladders  "A6L 0.1"
 	// Luxor                     "LUX 0.6"
@@ -215,7 +215,7 @@ public:
 
 
 	// Games with sequence starting
-	// 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
+	// 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30 20 c0 ec 7c f4 48 50 24 c0 a8 58 f4 08 10 20 c0 e8 7c f0 08 34 64 80 ac 58 90 68 14 64 c0 ec 78 b4 28 74 40 c0 ac 3c d4 4c 74 40 e4 c8 7c b4 08 74 00
 	// used by
 	// Classic Adders & Ladders  "ADD 1.0"
 	//                           "ADD 3.0"
@@ -304,7 +304,7 @@ public:
 
 
 	// Games with sequence starting
-	// 00 90 88 4c e0 b8 74 84 bc 74 00 b4
+	// 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c c0 1c f4 ac ec 68 c4 1c f0 88 ec ec 6c c0 98 74 00 14 a0 b8 74 00 94 28 60 90 08 60 b4 ac 68 c0 1c f4 ac 4c c4 bc f0 8c cc 4c 44 b4 88 68 44 90 ac 00
 	// used by
 	// Jewel In the Crown "CJE 1.0"
 	//                    "CJE 0.8"
@@ -354,7 +354,7 @@ public:
 
 
 	// Games with sequence starting
-	// 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24
+	// 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24 90 c8 ec ec a8 ec 28 20 14 c4 dc f0 8c 2c 64 14 40 94 cc a8 68 e0 9c f0 48 24 14 c4 d8 f0 48 60 14 c4 98 f0 c8 a8 e8 68 20 54 c0 9c b0 c8 2c e4 00
 	// used by
 	// Kings & Queens    "EE  2.0"
     //                   "EE  1.0"
@@ -366,7 +366,7 @@ public:
 
 
 	// Games with sequence starting
-	// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4
+	// 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 dc dc 58 d0 a0 30 04 9c d8 d8 58 50 88 64 94 2c 4c 4c c8 e8 6c 40 14 00 14 8c e8 68 44 94 ac ec e0 b0 a8 6c c8 e0 30 84 bc d4 24 94 20 9c 00
 	// used by
 	// Andy's Great Escape           "AG5 3.0"
 	//                               "AG__2.0"
@@ -403,7 +403,7 @@ public:
 	static constexpr uint8_t m574_characteriser_prot[8] = { 0x03, 0x9F, 0x17, 0x9B, 0x93, 0x1F, 0x17, 0x13 };
 
 	// games with sequence starting
-	// 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
+	// 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50 24 48 8c bc ec 98 e8 90 18 ec 94 38 e8 9c c0 70 00 60 44 64 4c a8 b8 cc b0 30 00 44 6c a4 58 e4 74 04 6c a0 70 28 84 74 2c 88 b8 e8 b4 14 2c 84 7c 00
 	// used by
 	// Prize Money          "FP8 0.1"
 	//                      "FPM 0.3"
@@ -415,7 +415,7 @@ public:
 	static constexpr uint8_t pzmoney_characteriser_prot[8] = { 0x00, 0x68, 0x40, 0x68, 0x60, 0x48, 0x40, 0x40 }; // based on przmoney lamp patterns
 
 	// games with sequence starting
-	// 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18
+	// 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4 8c f8 f4 18 64 04 14 90 b8 e4 3c 54 00 24 14 20 14 b0 a8 68 e0 9c e4 0c 50 10 b0 b8 e4 0c 70 10 b0 08 60 b4 98 e4 3c c4 ac f8 74 10 a0 1c f4 00
 	// used by
 	// Club Classic      "CI  1.1"
 	// Dutch Atlantis    "DAT 1.4"
@@ -424,7 +424,7 @@ public:
 
 
 	// games with sequence starting
-	// 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
+	// 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 08 d0 cc dc b0 cc 1c f0 48 54 84 6c 50 00 24 60 64 60 60 e0 28 94 88 9c 34 00 60 e4 ec 98 34 c4 6c d4 88 1c b4 c8 9c f4 08 14 84 e8 98 b4 08 d4 00
 	// used by
 	// Cash Lines (Barcrest) (MPU4) "CLS 0.3"
 	//                              "CLI 1.1"
@@ -452,33 +452,77 @@ public:
 
 
 	// games with sequence starting
-	// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
+	// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc dc 58 54 04 90 a8 e8 ec 6c c0 b0 2c c0 3c d4 a4 38 54 84 38 58 d4 20 90 ac ec 68 c0 34 88 ec 64 94 2c c0 b4 ac 68 c4 bc d4 a0 34 00 9c 00
 	// used by
 	// Viz          "VZ__1.0"
 	// Gold Strike  "G4S 2.0" (doesn't use lamp scramble)
 	// Magic Dragon "DMD 1.0" (doesn't use lamp scramble? doesn't boot)
 	static constexpr uint8_t magicdragon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-
-
-
-
-	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
+	// games with sequence starting
+	// 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68 a4 58 70 80 dc 74 84 58 30 44 90 4c e4 98 74 00 94 48 24 90 08 60 d4 4c e0 18 74 80 dc 74 c4 dc 70 84 9c 74 84 dc f4 88 2c a0 dc 00
+	// Top The Lot  "T4L 1.0"
+	// Monte Carlo  "MX052.0"
+	//              "MX102.0"
 	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58
+	// games with sequence starting
+	// 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c 64 18 7c 38 74 0c 20 18 74 00 14 48 2c 68 24 1c 30 40 18 30 08 6c 2c 68 28 24 58 7c 34 4c 6c 28 64 1c 74 0c 6c 2c 60 14 00 5c 00
+	// Tic Tak Cash " TC 1.1" (doesn't use lamp scramble)
+	// Cloud 999    "CLN 4.0"
+	// Boulder Dash "BO_ 2.0"
+	// Boulder Dash "BO_ 2.1"
 	static constexpr uint8_t tictak_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
+	// games with sequence starting
+	// 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 6c 10 4c 5c 7c 38 74 00 20 24 2c 5c 78 34 00 60 24 64 24 2c 1c 78 78 34 08 14 00 24 6c 54 4c 14 4c 54 4c 58 78 78 34 44 64 20 64 6c 54 04 64 24 6c 00
+	// Kings & Queens Classic     "CN4 / CN4 6.0"
+	//                            "CN4 5.0"
+	//                            "CN  / CN  3.0"
+	//                            "CN  / CN  2.0"
+	//                            "CN  1.4"
+	//                            "CNT / CN4 2.0"
+	//                            "CNT / CN4 1.0"
+	// Andy Capp                  "AN8 0.1"
+	//		                      "AND 0.4"
+	//		                      "AND 0.2"
+	// Pot Black                  "PBG 1.4"
+	//                            "PBG 1.5"
+	//                            "PBS 0.4"
+	//                            "PO  1.2"
+	//                            "PO  1.1"
+	// Action Club                "A2C 1.1"
+	// Nile Jewels (German)       "GJN 0.8"
+	// Oriental Diamonds (German) "RAB 0.1"
 	static constexpr uint8_t actclba_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0
+	// games with sequence starting
+	// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0 d8 64 94 c8 28 b0 58 e4 9c 64 14 d0 08 a0 1c f4 c8 e8 e8 78 24 14 00 14 d0 c8 68 30 c0 9c f4 08 a0 dc 64 94 d8 a4 dc e4 1c 64 94 08 f0 00
+	// Black Jack        "B2J 2.2"
+	//                   "BLA 2.0"
+	// Prize High Roller "PR3 0.1"
+	// Dutch Andy Capp   "DAC 1.3" (doesn't use lamp scramble? doesn't boot)
+	// Dutch Step Timer  "DST 1.1" (doesn't use lamp scramble? doesn't boot)
+	// Dutch Broadway    "DBR 1.1" (doesn't use lamp scramble? doesn't boot)
 	static constexpr uint8_t phr_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
+	// games with sequence starting
+	// 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
+	// Andy Loves Flo   "AL4 2.1"
+	// Andy Loves Flo   "AL_ 2.4"
+	// Dutch Cherryo    "DCH 1.4"
 	static constexpr uint8_t cheryo_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
+	// Tutti Fruity   "TFT 0.4 / TF4 0.4"
+	//                "CTU 0.1"
+	//                "TF4 0.2"
+	// 10 X 10        "T20 0.2"
+	//                "N25 0.3"
+	//                "T25 0.4"
+	// Cosmic Casinos "CC__3.0"
+	//                "CC__7.0"
+	// Dutch Express  "DXP 2.0"
 	static constexpr uint8_t cosmiccasino_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 

@@ -239,11 +239,6 @@ ROM_START( m4chaseie )
 	M4CHASEI_EXTRAS
 ROM_END
 
-ROM_START( m4chaseif )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "chase invaders 8.bin", 0x0000, 0x010000, BAD_DUMP CRC(0bf6a8a0) SHA1(cea5ea40d71484a455615e14f6708b1bc06bbbe8) ) // bad prg (no vectors?)
-	M4CHASEI_EXTRAS
-ROM_END
 
 ROM_START( m4chaseig )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2117,11 +2112,9 @@ GAME(199?, m4chaseic, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4chaseid, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 GAME(199?, m4chaseie, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
 // different protection, not original
-GAME(199?, m4chaseia, m4chasei,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 1)",GAME_FLAGS )
-GAME(199?, m4chaseib, m4chasei,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 2)",GAME_FLAGS )
-GAME(199?, m4chaseig, m4chasei,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 3)",GAME_FLAGS ) // copyright removed
-// vectors are missing?
-GAME(199?, m4chaseif, m4chasei,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 4)",GAME_FLAGS )
+GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 1)",GAME_FLAGS )
+GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 2)",GAME_FLAGS )
+GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 3)",GAME_FLAGS ) // copyright removed
 
 // 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44  (bluediamond)
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
@@ -2244,7 +2237,7 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4magrep,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 64 2c 14 4c 14 4c 58 (actclba)
-GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN0.8)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 (m683)
 GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millennium (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
@@ -2321,7 +2314,7 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 // bwb/nova?
 // 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 (actclba)
-GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )
+GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4) (RAB 0.1)",GAME_FLAGS )
 
 // 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 (fortune) (same as some jewel in the crown sets)  has lamp scramble
 GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4) (PO  1.2)",GAME_FLAGS )
