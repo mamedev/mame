@@ -97,21 +97,6 @@ IRQ_CALLBACK_MEMBER(mw8080bw_state::interrupt_vector)
 }
 
 
-void mw8080bw_state::mw8080bw_create_interrupt_timer(  )
-{
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::interrupt_trigger),this));
-}
-
-
-void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
-{
-	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
-
-	m_interrupt_time = attotime::zero;
-}
-
-
 
 /*************************************
  *
@@ -121,7 +106,7 @@ void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
 
 void mw8080bw_state::machine_start()
 {
-	mw8080bw_create_interrupt_timer();
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::interrupt_trigger),this));
 }
 
 
@@ -131,7 +116,10 @@ void mw8080bw_state::machine_start()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(mw8080bw_state,mw8080bw)
+void mw8080bw_state::machine_reset()
 {
-	mw8080bw_start_interrupt_timer();
+	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
+
+	m_interrupt_time = attotime::zero;
 }
