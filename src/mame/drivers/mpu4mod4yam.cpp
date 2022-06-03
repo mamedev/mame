@@ -984,6 +984,9 @@ GAME_CUSTOM( 199?, m4supst__bf, m4supst,    "stc02r.p1",            0x0000, 0x01
 GAME_CUSTOM( 199?, m4supst__bg, m4supst,    "stc02s.p1",            0x0000, 0x010000, CRC(9c50fff7) SHA1(3468340d2d04cbdecd669817f8a9c4028e301eeb), "Barcrest","Super Streak (Barcrest) (MPU4) (CS4 0.2 / STC 0.2, set 11)" )
 GAME_CUSTOM( 199?, m4supst__bh, m4supst,    "stc02y.p1",            0x0000, 0x010000, CRC(0ce65e71) SHA1(02ae1fd5a41ab5a96ddcfe1cf3e8567561291961), "Barcrest","Super Streak (Barcrest) (MPU4) (CS4 0.2 / STC 0.2, set 12)" )
 
+GAME_CUSTOM( 199?, m4stc, m4supst,    "stc01s", 0x0000, 0x010000, CRC(8371bb8f) SHA1(bd60825b3f5011c218b34f00886b6b54afe61b9f), "Barcrest","Super Streak (Barcrest) (MPU4) (STC 0.1)" )
+
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1286,10 +1289,7 @@ ROM_START( m4tst )
 	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
 ROM_END
 
-ROM_START( m4stc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "stc01s", 0x0000, 0x010000, CRC(8371bb8f) SHA1(bd60825b3f5011c218b34f00886b6b54afe61b9f) )
-ROM_END
+
 
 
 ROM_START( m4joljokd )
@@ -1319,8 +1319,6 @@ ROM_END
 
 GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec  (tri98)
-GAME(199?, m4stc,     0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS) // Hopper
 
 // 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4  (celclb)
 GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes

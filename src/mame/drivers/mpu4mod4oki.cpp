@@ -2517,6 +2517,9 @@ GAME_CUSTOM( 199?, m4nnwwc__9,  m4nnww,     "cnc03s.p1",        0x0000, 0x010000
 // "(C)1991 BARCREST" and "NN4 0.1" (CN3 0.1 on startup)
 GAME_CUSTOM( 199?, m4nnww__a,   m4nnww,     "cf301s",           0x0000, 0x010000, CRC(1d8abf59) SHA1(81e47797baddd777fbbb1b1e044df1bfe3d49cb2), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.1 / NN4 0.1)" )
 
+GAME_CUSTOM( 199?, m4nnww__ay,   m4nnww,        "ch301s", 0x0000, 0x010000, CRC(d31c9081) SHA1(21d1f4cc3de2343d830e3ee02e3a53abd12b6b9d), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.1)" )
+
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -3945,6 +3948,9 @@ GAME_CUSTOM( 199?, m4rhrc__4,    m4rhr,  "rrd03dy.p1",       0x0000, 0x010000, C
 GAME_CUSTOM( 199?, m4rhrc__5,    m4rhr,  "rrd03k.p1",        0x0000, 0x010000, CRC(31adc6d6) SHA1(ea68d0d13978bf6cfa7fb9aa1cf91ddfd6258a3a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RRD 0.3 K / CR4 0.3)" )
 GAME_CUSTOM( 199?, m4rhrc__6,    m4rhr,  "rrd03r.p1",        0x0000, 0x010000, CRC(11c61483) SHA1(66cd30096bca2f4356acaaa15179c00301c8bc3a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RRD 0.3 R / CR4 0.3)" )
 GAME_CUSTOM( 199?, m4rhrc__8,    m4rhr,  "rrd03y.p1",        0x0000, 0x010000, CRC(66fff07a) SHA1(586279533d6d85abf7e97124c9c5342a6a1b0496), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RRD 0.3 Y / CR4 0.3)" )
+
+GAME_CUSTOM( 199?, m4rhrc__9,    m4rhr,    "cru0_2.bin", 0x0000, 0x010000, CRC(e3c01944) SHA1(33a2b2c05686f53811349b2980e590fdc4b72756), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (CLD 0.2C)" )
+
 
 // do not boot with tri98.chr
 

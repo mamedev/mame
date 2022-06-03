@@ -1069,13 +1069,7 @@ ROM_END
 
 
 
-ROM_START( m4ch30 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ch301s", 0x0000, 0x010000, CRC(d31c9081) SHA1(21d1f4cc3de2343d830e3ee02e3a53abd12b6b9d) )
 
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// missing
-ROM_END
 
 
 ROM_START( m4czne )
@@ -1441,12 +1435,6 @@ ROM_START( m4sctagt )
 ROM_END
 
 
-ROM_START( m4cld02 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cru0_2.bin", 0x0000, 0x010000, CRC(e3c01944) SHA1(33a2b2c05686f53811349b2980e590fdc4b72756) )
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
-	// missing
-ROM_END
 
 ROM_START( m4barcrz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2058,8 +2046,6 @@ GAME(199?, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (same as tentendia)
 GAME(199?, m4c9c,     0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS ) // doesn't boot
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac  (just tri98)
-GAME(199?, m4ch30,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",GAME_FLAGS )
 
 // corrupt vfd (bwb?)
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80  (viva_characteriser_prot)
@@ -2238,10 +2224,10 @@ GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
-GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 4)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 6)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 7)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 8)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 3)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 1.1)",GAME_FLAGS ) // DM1 SW ALM
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 (lv)
 GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 // not standard protection
@@ -2354,7 +2340,7 @@ GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sun
 GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54 (tri98)
-GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 (mag7s)
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
@@ -2377,8 +2363,7 @@ GAME(1994, m4esctbg,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
 GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 (just tri98)  runs
-GAME(199?, m4cld02,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CLD 0.2C' (MPU4)",GAME_FLAGS )
+
 
 // runs, coins don't work, Dutch?
 // 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94 cc 98 b4 cc dc 34 c0 a8 18 f4 48 d4 c8 1c (blkcat)

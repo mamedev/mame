@@ -1760,10 +1760,10 @@ GAME(199?, m4actnot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4d
 GAME(199?, m4cardcs,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Card Cash (Barcrest) (MPU4) (CCS 1.9)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac  (tri98)
-GAME(199?, m4bnknot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",GAME_FLAGS )
+GAME(199?, m4bnknot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Bank A Note (Barcrest) (MPU4) (BN 1.0)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
-GAME(199?, m4moneym,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Money Maker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4moneym,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Money Maker (Barcrest) (MPU4) (MMK 1.6)",GAME_FLAGS )
 
 
 // this and Cash Counter might be swapped around
@@ -2088,7 +2088,7 @@ GAME(199?, m4tricol,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tri
 GAME(199?, m4twilgt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4) (DTL 2.2)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 (tri98)
-GAME(199?, m4wildms,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4wildms,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4) (DWM 1.8)",GAME_FLAGS )
 
 
 // these all have reel issues, but test mode produces ay sounds

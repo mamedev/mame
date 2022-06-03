@@ -24396,7 +24396,6 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4ch30                          // Unknown MPU4 'CH30' (Barcrest)
 m4chasei                        // Chase Invaders (Barcrest)
 m4chaseia                       //
 m4chaseib                       //
@@ -24411,7 +24410,6 @@ m4clbvegc                       //
 m4clbx                          // Club X (Barcrest)
 m4clbxa                         //
 m4clbxb                         //
-m4cld02                         // Unknown MPU4 'CLD 0.2C'
 m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
 m4crjwl                         // Crown Jewels Club (Barcrest)
@@ -28115,6 +28113,7 @@ m4nnww__ap                      //
 m4nnww__aq                      //
 m4nnww__ar                      //
 m4nnww__ax                      //
+m4nnww__ay                      //
 m4nnww__b                       //
 m4nnww__c                       //
 m4nnww__d                       //
@@ -28762,6 +28761,7 @@ m4rhrc__5                       //
 m4rhrc__6                       //
 m4rhrc__7                       //
 m4rhrc__8                       //
+m4rhrc__9                       //
 m4rhrc__a                       //
 m4rhrc__aa                      //
 m4rhrc__b                       //
@@ -29750,7 +29750,7 @@ m4sss__j                        //
 m4sss__k                        //
 m4sss__l                        //
 m4sstrek                        // Super Streak (bootleg)
-m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
+m4stc                           // 
 m4shv                           // Super Hyper Viper (Barcrest)
 m4shv__0
 m4shv__1
