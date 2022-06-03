@@ -826,13 +826,6 @@ ROM_START( m4magtbo )
 	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-ROM_START( m4reeltm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4wildtm
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-
-ROM_END
 
 ROM_START( m4ringfr )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -1068,10 +1061,7 @@ ROM_END
 
 ROM_START( m4wildtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4reeltm
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
+	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "wildtimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -2117,7 +2107,7 @@ GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 3)",GAME_FLAGS ) // copyright removed
 
 // 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44  (bluediamond)
-GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
+GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
 
 // 00 c4 c4 44 c4 44 44 c4 cc 3c 5c 7c 54 24 c4 4c (m462)
 GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
@@ -2222,9 +2212,6 @@ GAME(199?, m4steptm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 // 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c (wildtime)
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
 
-// 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c (wildtime)
-GAME(199?, m4reeltm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
-
 // 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 (fortune) (same as some jewel in the crown sets)
 GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 1)",GAME_FLAGS ) // INVALID ALARM
 GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 2)",GAME_FLAGS ) // INVALID ALARM
@@ -2245,9 +2232,9 @@ GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4jok300,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers 300 (Barcrest) (German?) (MPU4)",GAME_FLAGS ) // also contains crystal maze stuff??
 
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c (bankrollerclub) (same as v4adders?)
-GAME(199?, m4drac,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4drac,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
 
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
@@ -2373,13 +2360,13 @@ GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34 (bdash)
-GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4) (GCV 0.5)",GAME_FLAGS )
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98 (m683)
 GAME(199?, m4dragon,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54 (bagtel)
-GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
 
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68 (fruitfall scramble)
 GAME(199?, m4octo,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fruitfall_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
@@ -2571,13 +2558,13 @@ GAME( 199?, m4c2,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 
 // regular barcrest structure, keine tube (hopper issue)
 // 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74 (premier)
-GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4) (GLV 1.2)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74 (premier)
-GAME(199?, m4vivalvd, m4vivalv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Viva Las Vegas (Barcrest) [Dutch] (MPU4) (DLV)",GAME_FLAGS )
+GAME(199?, m4vivalvd, m4vivalv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (Dutch) (MPU4) (DLV 1.1)",GAME_FLAGS )
 
 // 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74 (premier)
-GAME(199?, m4prem,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Premier (Barcrest) (MPU4) (DPM)",GAME_FLAGS )
+GAME(199?, m4prem,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
 
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c (viva_characteriser_prot)  Shows Barcrest on display, but in German
 GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)

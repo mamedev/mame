@@ -171,6 +171,12 @@ public:
 	void init_m4actbnk();
 	void init_m4andybt();
 
+	void init_thestreak()
+	{
+		init_m4_showstring();
+		init_m4_small_extender();
+	}
+
 };
 
 
@@ -7086,7 +7092,7 @@ GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4THESTR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::thestreak_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::thestreak_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_thestreak, ROT0, company, title, GAME_FLAGS )
 
 // versioning here makes no sense, why do the higher revision numbers have earlier years?
 

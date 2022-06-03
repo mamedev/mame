@@ -458,6 +458,17 @@ public:
 	//                      "CDD 0.1"
 	static constexpr uint8_t doublediamond_characteriser_prot[8] = { 0x00, 0x18, 0x18, 0x28, 0x08, 0x58, 0x18, 0x08 }; // based on Double Diamond Club lamp patterns
 
+
+	// games with sequence starting
+	// 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00
+	// The Streak "TS  3.0"
+	//            "TST 3.0 / TS  3.0"
+	//            "TST 2.0 / TS  2.0"
+	//            "TS  1.4"
+	//            "TS  1.3"
+	static constexpr uint8_t thestreak_characteriser_prot[8] = { 0x00, 0x38, 0x30, 0x28, 0x20, 0x38, 0x30, 0x20 }; // some elements don't go through the scramble!
+
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -558,100 +569,208 @@ public:
 
 
 
-	// games with sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8
+	// games with sequence starting
+	// 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 b4 20 4c 90 a8 bc dc 58 d0 a0 60 44 c4 ec b8 5c 50 88 34 84 6c 14 8c b8 d8 58 d0 a0 64 44 cc b8 d8 d0 a8 3c dc d8 d8 d8 58 d8 d8 d0 a8 bc d4 24 c4 64 cc 00
+	// Lucky Las Vegas Classic "LLU 0.1"
+	//                         "LLU 3.0"
+	// Cash Encounters         "CA_ 5.0"
 	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 (NOTE, same sequence as v4addlad, which uses 4k table)
+	// games with sequence starting
+	// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
+	// Bank Roller Club         "CBR 0.5"
+	//                          "BR3 0.1"
+	// Dracula (Nova, German)   "DRA 2.1"
+	//                          "DRA 2.4"
+	//                          "DRA 2.7"
+	// Adders and Ladders (Vid) "v2.1"    (MPU4 Video quiz, using 4k table implementation instead)
+	//                          "v2.0"    (MPU4 Video quiz, using 4k table implementation instead)
 	static constexpr uint8_t bankrollerclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00
+	// games with sequence starting
+	// 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00 68 ac bc c8 9c cc b0 30 28 ac 9c c8 b0 1c c0 5c ec b0 1c cc 9c c8 94 14 00 60 6c a4 58 e4 74 20 6c 84 74 0c 80 74 2c 88 9c cc bc c8 94 10 2c 00
+	// Top Dog                   "TD4 7.1 / TD  7.1"
+	//                           "TDT 7.1 / TD  7.1"
+	//                           "TDT 8.3 / TD  8.3"
+	//                           "TDP 2.0 / TD  2.0"
+	//                           "TD  1.4"
+	// Copy Cat                  "CO  1.1"
+	//                           "CO  4.1"
+	//                           "CO  1.3"
+	//                           "CO  2.0"
+	//                           "CO  3.0"
+	//                           "CO  2.4"
+	//                           "CO  4.0"
 	static constexpr uint8_t copycat_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00
-	static constexpr uint8_t thestreak_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
+	// games with sequence starting
+	// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
+	// Action Club      "ABV 1.9"
+	// Kings & Queens   "EE2 1.0 / EE2 1.0"
 	static constexpr uint8_t kqee2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
+	// games with sequence starting
+	// 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
+	// Kings & Queens  "EE' 2.0 / EE_ 2.0"
 	static constexpr uint8_t kqee_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
+	// games with sequence starting
+	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
+
+	// Magnificent 7s       "M7  2.0"
+    // Prize Fruit & Loot   "PFR 0.3"
 	static constexpr uint8_t pfloot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 50 40 30 68 44 70 60 78 3c 34 28 64 10
+	// games with sequence starting
+	// 00 50 40 30 68 44 70 60 78 3c 34 28 64 10
+	// Berserk        "BE3 0.1"
+	// Flashlite      "BFL 0.5"
 	static constexpr uint8_t berseralt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 a0 e0 c4 c8 58 9c 94 6c 1c 9c 9c bc 94 6c 10
+	// games with sequence starting
+	// 00 a0 e0 c4 c8 58 9c 94 6c 1c 9c 9c bc 94 6c 10
+	// Berserk  "BE4 1.1"
 	static constexpr uint8_t berseralt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 24 24 a4 4c 10 c0 0c f0 a8 98
+	// games with sequence starting
+	// 00 24 24 a4 4c 10 c0 0c f0 a8 98
+	// Bagatelle           "BGT 0.5"
+	//                     "BG2 0.1"
+	// Hi Lo Casino (Nova) "HNC 0.2"
 	static constexpr uint8_t bagtel_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 84 c4 d4 58 24 94 50 98 3c 34 18 bc 34 88 78 bc
+	// games with sequence starting
+	// 00 84 c4 d4 58 24 94 50 98 3c 34 18 bc 34 88 78 bc
+	// Buccaneer    "BR_ 1.0"
 	static constexpr uint8_t bucalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 84 a4 b4 38 c4 b4 30 1c d8 d8 d8 dc
+	// games with sequence starting
+	// 00 84 a4 b4 38 c4 b4 30 1c d8 d8 d8 dc
+	// Luxor      "LX5 1.0"
+	//            "LX101.0"
+	// Hot Rod    "HR__1.0"
 	static constexpr uint8_t hotrodalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08
+	// games with sequence starting
+	// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08
+	// Boulder Dash        "BLS 0.1"
+	//                     "BLD 0.6"
+	//                     "BLD 0.7"
+	// Crazy Cavern (Nova) "GCV 0.5"
 	static constexpr uint8_t bdash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 44 44 4c d0 30 18 cc f8 9c 9c 9c dc 9c
+	// games with sequence starting
+	// 00 44 44 4c d0 30 18 cc f8 9c 9c 9c dc 9c
+	// Andy's Full House    "AFU 0.2"
+	// Say No More          "SNM 2.0"
 	static constexpr uint8_t saynomore_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
+	// games with sequence starting
+	// 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
+	// Lucky Strike    "LSS 1.0"
 	static constexpr uint8_t luckystrikealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
+	// games with sequence starting
+	// 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
+	// Cloud Nine     "SC9 5.0"
+	// Hit The Top    "H4T 2.0"
 	static constexpr uint8_t hittop_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting   00 30 20 14 a4 b8 d4 0c e4 3c 54 84 b8 54 24 90
+	// games with sequence starting
+	// 00 30 20 14 a4 b8 d4 0c e4 3c 54 84 b8 54 24 90
+	// Viva Espana  "VE105.0"
+	//              "VE5 4.0"
+	//              "VE104.0"
 	static constexpr uint8_t vivaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting    00 84 a4 e4 a8 3c dc d0 6c 58 d8 d8 dc d8 d4 60
+	// games with sequence starting
+	// 00 84 a4 e4 a8 3c dc d0 6c 58 d8 d8 dc d8 d4 60
+	// Make A Mint      "MA_ 3.1"
+	//                  "MA_ 3.0"
 	static constexpr uint8_t mintalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 24 24 34 b0 a8 58 74 b0 38 54 90
+	// games with sequence starting
+	// 00 24 24 34 b0 a8 58 74 b0 38 54 90
+	// Hit The Top  "HTT 0.5"
 	static constexpr uint8_t hittopalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 40 50 40 54 64 50 64 50 64 54 60 74 40 70 (unusual sequence)
+	// games with sequence starting
+	// 40 50 40 54 64 50 64 50 64 54 60 74 40 70 (unusual sequence)
+	// Hit The Top    "HI4 0.3"
+	//                "CHU 0.1"
 	static constexpr uint8_t hittopalt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
+	// games with sequence starting
+	// 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
+	// Andy Loves Flo  "AL3 0.1"
 	static constexpr uint8_t andyfloalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
+	// games with sequence starting
+	// 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
+	// Andy Capp    "AC101.0"
+	//              "AC5 1.0"
 	static constexpr uint8_t andycappalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
+	// games with sequence starting
+	// 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
+	// Monte Carlo   "MC 2.0"
 	static constexpr uint8_t montealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 50 10 a0 68 14 b0 88 bc e4 48
+	// games with sequence starting
+	// 00 50 10 a0 68 14 b0 88 bc e4 48
+	// Prize Monte Carlo "MT054.0"
+	//                   "MT104.0"
 	static constexpr uint8_t przmontealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
+	// games with sequence starting
+	// 00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
+	// Ace Chase     "AE5 2.0"
+	//               "AE10 2.0"
 	static constexpr uint8_t acechasealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
+	// games with sequence starting
+	// 00 14 04 54 64 14 64 14 64 54 20 74 04
+	// Super Hyper Viper   "HVC 1.0"
 	static constexpr uint8_t hypvipalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
+	// games with sequence starting
+	// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
+	// Sunset Boulevard "SB__ 1.1"
+	//                  "SB__ 1.0"
+	// The Hit          "DTH 1.7"
+	// Top Take         "TTK 1.1"
 	static constexpr uint8_t toptake_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c
+	// games with sequence starting
+	// 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c
+	// Sunset Boulevard    "BS__ 1.1"
+	//                     "BS__ 1.0"
 	static constexpr uint8_t sunsetbalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting  00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
+	// games with sequence starting
+	// 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
+	// Eighth Wonder     "BEW 0.3"
+	// Sunset Boulevard  "BSB 0.4"
+	//                   "BSB 0.3"
 	static constexpr uint8_t eighth_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
+	// games with sequence starting
+	// 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
+	// Pontoon Club          "PON 3.0"
+	//                       "PON 4.0"
+	// Dutch Twilight        "DTL 2.2"
 	static constexpr uint8_t pontoon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
+	// games with sequence starting
+	// 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
+	// Blue Flash  "TBF 0.3"
+	//             "BFL 0.3"
 	static constexpr uint8_t blueflash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 24 24 a4 1c 44 a4 14 a8 d8 cc f8 e4 14
+	// games with sequence starting
+	// 00 24 24 a4 1c 44 a4 14 a8 d8 cc f8 e4 14
+	// Winner Takes All  "WN4 1.1"
+	//                   "WN5 3.0"
 	static constexpr uint8_t wtaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
@@ -660,19 +779,32 @@ public:
 
 	***************************************************************/
 
-	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
+	// games with sequence starting
+	// 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
+	// German Viva Las Vegas   "GLV 1.2"
+	// Dutch Viva Las Vegas    "DLV 1.1"
+	// Dutch Premier           "DPM 1.4"
 	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
+	// games with sequence starting
+	// 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
+	// Dutch Liberty        "DLI 1.0"
+	// Crackpot 100 Club    "C1P 1.2"
+	//                      " CP 3.8"
+	//                      " CP 3.1"
+	// High Roller          " HR 3.0"
 	static constexpr uint8_t crkpot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
+	// Super Way In   "WS 1.0"
 	static constexpr uint8_t wayin_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44
+	// Dutch Blue Diamond  "DBD 1.0"
 	static constexpr uint8_t bluediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
+	// Dutch Wild Timer "DWT 1.3"
 	static constexpr uint8_t wildtime_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c

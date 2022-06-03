@@ -1666,14 +1666,14 @@ GAME(199?, m4stopcl,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::viv
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c 14 60 (crkpot)
-GAME(199?, m4crkpot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (set 1, C1P 1.2)",GAME_FLAGS )
-GAME(199?, m4crkpota, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (set 2, CP 3.8)",GAME_FLAGS )
-GAME(199?, m4crkpotb, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (set 3, CP 3.1)",GAME_FLAGS )
+GAME(199?, m4crkpot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (C1P 1.2)",GAME_FLAGS )
+GAME(199?, m4crkpota, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (CP 3.8)",GAME_FLAGS )
+GAME(199?, m4crkpotb, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (CP 3.1)",GAME_FLAGS )
 
 // not English
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c 14 60 (crkpot)
-GAME(199?, m4hiroll,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","High Roller (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4hiroll,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","High Roller (Barcrest) (MPU4) (HR 3.0)",GAME_FLAGS )
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 (m400)
@@ -1703,7 +1703,7 @@ GAME(199?, m4potlcka, m4potlck,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::gra
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
-GAME(199?, m4wayin,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::wayin_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Way In (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4wayin,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::wayin_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Way In (Barcrest) (MPU4) (WS 1.0)",GAME_FLAGS )
 // non-standard protection, hack?
 GAME(199?, m4wayina,  m4wayin,    mod2_bootleg_fixedret<0x40>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Way In Mk 2 (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
@@ -1905,7 +1905,7 @@ GAME(199?, m4topacta, m4topact,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m44
 GAME(199?, m4topst,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::du91_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",GAME_FLAGS )
 
 // 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 (toptake)
-GAME(199?, m4toptak,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4toptak,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Take (Barcrest) (MPU4) (TTK 1.1)",GAME_FLAGS )
 
 // 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c (tribank)
 GAME(199?, m4tribnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tribank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Bank (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -1951,12 +1951,12 @@ GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::gra
 GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (BFL 0.5)",GAME_FLAGS )
 
 // 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c (blueflash)
-GAME(199?, m4blflsh,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4blflsh,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (TBF 0.3)",GAME_FLAGS )
+GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 3)",GAME_FLAGS )
+GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 4)",GAME_FLAGS )
+GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 5)",GAME_FLAGS )
 
 // 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50 34 34 34 04 50 10 20 (clbveg)
 GAME(199?, m4ttak,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",GAME_FLAGS )
@@ -2045,7 +2045,7 @@ GAME(199?, m4giant,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::gia
 GAME(199?, m4holdon,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hold On (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c (crkpot)
-GAME(199?, m4libty,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Liberty (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4libty,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Liberty (Barcrest) (Dutch) (MPU4) (DLI 1.0)",GAME_FLAGS )
 
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c e0 94 58 ec 7c (andybt)
 GAME(199?, m4meglnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Megalink (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2085,7 +2085,7 @@ GAME(199?, m4taj,     0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::taj
 GAME(199?, m4tricol,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tricolor_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94 (pontoon)
-GAME(199?, m4twilgt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4twilgt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4) (DTL 2.2)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 (tri98)
 GAME(199?, m4wildms,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2134,7 +2134,7 @@ GAME(199?, m4frtlnka, m4frtlnk,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::fru
 
 // REEL D ALARM
 // 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 00 (toptake) (strange sequence, lots of 00s)
-GAME(199?, m4thehit,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4thehit,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","The Hit (Barcrest) (MPU4) (DTH 1.7)",GAME_FLAGS )
 
 // REEL A ALARM
 // 00 84 c4 e4 4c 10 28 90 e8 78 34 28 b0 40 a4 4c (vivlv)
