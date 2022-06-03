@@ -221,7 +221,7 @@ public:
 												   //    00    38    30    18    10    38    30    14
 
 
-												   // games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
+	// games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
 	// this seems to be the same sequence as the MPU4 Video game 'Strike It Lucky' where we're having to use a 4k table for the question scramble
 	// Road Hog 2 - I'm Back    "2RH 0.6"
 	// Red Hot Roll Club        "RH2 1.1"
@@ -269,7 +269,6 @@ public:
 
 
 	// games with sequence starting 00 90 C0 54 8C 68 24 90 CC 6C 24 9C BC 34 88 6C
-
 	// Supa Slot                "S4S 1.0"
 	// Dutch Stardust           "DSD 1.3"
 	// Road Hog                 "RR6 1.2"
@@ -328,23 +327,108 @@ public:
 	// we believe, or are there 2 parts with the same sequence and one value different?
 	static constexpr uint8_t viva_sss_characteriser_prot[8] = { 0x00, 0x40, 0x20, 0x40, 0x40, 0x20, 0x20, 0x40 };
 
-
-
+	// games with sequence starting
+	// 00 e0 a8 38 94 48 50 60 e4 e8 58 f0 68 14 60 c4 a8 5c f4 28 34 60 a0 e8 1c f0 68 30 04 c0 8c 1c b4 68 14 04 c0 a8 18 d0 0c 14 44 84 a8 5c d4 6c 74 04 c0 e8 38 d4 4c 14 44 e0 e8 3c b4 0c 74 00
+	// Super Hyper Viper           "HVP 3.0" 
+	//                             "HVP 4.0" 
+	// Calamari Club               "CAC 0.3"
+	//                             "CA3 0.1"
+	// Hi Jinx                     "JNS 0.2"
+	//                             "JNX 0.5"
 	static constexpr uint8_t m407_characteriser_prot[8] = { 0x03, 0xC7, 0x83, 0xC3, 0xC3, 0xA3, 0x83, 0xC3 };
 
 
-	// games with sequence starting 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68
+	// games with sequence starting
+	// 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68
+	// Andy Loves Flo              "AL8 0.1"
+	//                             "ALF 2.0"
+	// Duty Free                   "DF5 0.3"
+	//                             "DFT 0.1"
+	//                             "XD5 0.2"
+	//                             "XD5 0.1"
+	//                             "XFT 0.1"
+	// Give Us A Clue              "C20 0.2"
+	//                             "C25 0.4"
+	// Prize Spend Spend Spend     "PS3 0.2"
+ 	// Crown Jewels Club           "CJC 1.5"
+	//                             "CJN 0.2"
+	// Crown Jewels Mk II Club     "CJ2 1.4"
 	static constexpr uint8_t duty_characteriser_prot[8] = { 0x00, 0x38, 0x24, 0x18, 0x08, 0x34, 0x20, 0x00 };
 
-	// games with sequence starting 00 84 94 5c ec 3c ec 30 4c 68 60 cc
+
+	// games with sequence starting
+	// 00 84 94 5c ec 3c ec 30 4c 68 60 cc
+	// Andy's Big Time Club     "ABT 1.8"
+	//                          "ABT 1.5"
+	// Calamari Club            "BC3 0.2"
+	//                          "BCA 0.4"
+	//                          "BCA 0.2"
+	// Duty Free                "DUT 0.4"
+	//                          "DF8 0.1"
+	// Showcase Duty Free       "SDF 0.2"
+	//                          "SD8 0.1"
+	// Prize Duty Free          "PDU 0.2"
+	//                          "PD8 0.2"
+	// Run For Your Money       "AP1 0.1"
+	//                          "AP5 0.2"
+	//                          "RU5 0.1"
+	//                          "RUT 0.1"
+	// Loads A Money            "LA 1.0"
+	//                          "LA 1.1"
+	// Dutch Show Timer         "DSH 1.3"
+	// Dutch Megalink           "DML 2.0"
+	// Club Connect             "CON 1.2"
+	//                          "CON 1.1"
+	//                          "CON 1.0"
+	//                          "CON 1.5"
 	static constexpr uint8_t andybt_characteriser_prot[8] = { 0x00, 0x48, 0x00, 0x48, 0x44, 0x08, 0x00, 0x00 };
 
-	// games with sequence starting 00 50 40 90 a8 6c c4 30 c8
+
+	// games with sequence starting
+	// 00 50 40 90 a8 6c c4 30 c8
+	// Turbo Play                     "CTP 0.4"
+	//                                "ZTP 0.7"
+	// Golden Years (Nova) (German)   "TGY 0.1"
+	// Chase Invaders                 "CI2 0.1"
+	// Super Play (Czech)             "XSP 0.8"
+	// Up Up and Away                 "UPS 2.1"
+	//                                "UUA 2.1"
+	// Andy Loves Flo                 "ALT 0.4"
+	//                                "ALU 0.3"
+	// Road Hog                       "RO_ 2.0"
+	//                                "RO_ 1.0"
+	// Dennis The Menace              "DEN 1.2"
+	//                                "DM8 0.1"
+	// Let The Good Times Roll        "GTA 0.1"
+	//                                "GTR 1.0"
+	//                                "GTS 0.1"
+	//                                "GTK 0.2"
+	// Eighth Wonder                  "WON 2.2"
+	// Mirage                         "RAG 4.1"
+	// Super Tubes                    "S4T 1.0"
 	static constexpr uint8_t alf_characteriser_prot[8] = { 0x00, 0x58, 0x50, 0x1C, 0x10, 0x58, 0x50, 0x10 };
 												  //    03    DB    53    9B    93    5B    53    13
 
-	// games with sequence starting 00 84 A4 AC 70 80 2C C0 BC 5C
+
+	// games with sequence starting
+	// 00 84 A4 AC 70 80 2C C0 BC 5C
+	// California Club             "CA2 1.0"
+	//                             "CAL 2.0"
+	// Tropicana Club              "TRO 2.0"
+	//                             "TR2 1.1"
+	// Viva Espana                 "VE5 0.2"
+	//                             "VET 0.2"
+	// Berserk                     "BES 0.6"
+	//                             "BE8 0.1"
+	// Andy's Great Escape         "AN2 0.3"
+	//                             "A28 0.1"
+	// Winner Takes All            "WIN 0.6"
+	//                             "WN8 0.1"
+	// Prize Winner Takes All      "PWN 0.4"
+	//                             "PW8 0.2"
+	// Club Shuffle                "CSS 1.0"
 	static constexpr uint8_t shuffle_characteriser_prot[8] = { 0x00, 0x18, 0x00, 0x18, 0x08, 0x10, 0x00, 0x00 };
+
 
 	// games with sequence starting 00 44 44 54 34 04 54 14 34 14 20 74 04 60
 	static constexpr uint8_t clbveg_characteriser_prot[8] = { 0x00, 0x70, 0x40, 0x70, 0x50, 0x60, 0x40, 0x40 };

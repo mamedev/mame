@@ -203,7 +203,7 @@ ROM_END
 	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
 	ROM_LOAD( "cha.s2", 0x080000, 0x080000, CRC(542863fa) SHA1(501d66b2badb5036bb5dd8bac3cdb681f630a982) )
 
-ROM_START( m4chasei ) // alf_characteriser_prot
+ROM_START( m4chasei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ci2c.p1", 0x0000, 0x010000, CRC(fc49a2e1) SHA1(f4f02e168cd9bf0245c2b7340fe151da66f09c5c) )
 	M4CHASEI_EXTRAS
@@ -2061,14 +2061,14 @@ GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 // play but behavior isn't like barcrest
 // 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34 38 (mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot> scramble)
-GAME(199?, m4crjwl,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4crjwla,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4crjwlb,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4crjwlc,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4crjwl,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 1)",GAME_FLAGS )
+GAME(199?, m4crjwla,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 2)",GAME_FLAGS )
+GAME(199?, m4crjwlb,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 3)",GAME_FLAGS )
+GAME(199?, m4crjwlc,  m4crjwl,    mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJN 0.2)",GAME_FLAGS )
 // these don't read from the lamp scramble
-GAME(199?, m4crjwl2,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4crjwl2a, m4crjwl2,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4crjwl2,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 1)",GAME_FLAGS )
+GAME(199?, m4crjwl2a, m4crjwl2,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 2)",GAME_FLAGS )
+GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 3)",GAME_FLAGS )
 
 
 // won't boot with current reel setup, not even in test mode (REEL E ALM)
@@ -2083,14 +2083,14 @@ GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::clbveg_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::clbveg_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
 
-GAME(199?, m4chasei,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4chaseic, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4chaseid, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4chaseie, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4chasei,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 1)",GAME_FLAGS )
+GAME(199?, m4chaseic, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 2)",GAME_FLAGS )
+GAME(199?, m4chaseid, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 3)",GAME_FLAGS )
+GAME(199?, m4chaseie, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 4)",GAME_FLAGS )
 // different protection, not original
-GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 1)",GAME_FLAGS )
-GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 2)",GAME_FLAGS )
-GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (hack, set 3)",GAME_FLAGS ) // copyright removed
+GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 1)",GAME_FLAGS )
+GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 2)",GAME_FLAGS )
+GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 3)",GAME_FLAGS ) // copyright removed
 
 // 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44  (bluediamond)
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
@@ -2125,13 +2125,13 @@ GAME(199?, m4technoa, m4techno,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4twintm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 (alf scramble)
-GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Black Bull?) (Czech) (Barcrest) [XSP] (MPU4)",GAME_FLAGS ) // complains about coin dip
+GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Czech) (Barcrest) (MPU4) (XSP 0.8)",GAME_FLAGS ) // complains about coin dip
 
-GAME(199?, m4calicl,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4calicla, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4caliclb, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4caliclc, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4calicld, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4calicl,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4calicla, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4caliclb, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4caliclc, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4calicld, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 2)",GAME_FLAGS )
 
 // REEL E ALARM
 // 00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70 (bucksfizz)
@@ -2162,11 +2162,12 @@ GAME(199?, m4nspotb,  m4nspot,    mod2_cheatchr_xxxx<mpu4_characteriser_pal::cel
 
 
 // 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c cc 68 (shuffle)
-GAME(199?, m4tropcl,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4tropcla, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4tropclb, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4tropclc, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4tropcld, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4tropcl,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TRO 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4tropcld, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TRO 2.0, set 2)",GAME_FLAGS )
+GAME(199?, m4tropcla, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 1)",GAME_FLAGS )
+GAME(199?, m4tropclb, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 2)",GAME_FLAGS )
+GAME(199?, m4tropclc, m4tropcl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
+
 
 
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 (m400)
@@ -2190,7 +2191,7 @@ GAME(199?, m4brook,   0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::age_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
 
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c (andybt scramble)
-GAME(199?, m4showtm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
+GAME(199?, m4showtm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH 1.3)",GAME_FLAGS )
 
 // 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 (phr) (same as dutch andy capp + prize high roller)
 GAME(199?, m4steptm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::phr_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
@@ -2276,8 +2277,8 @@ GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
 GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP 1.3)",GAME_FLAGS )
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 (alf)
-GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
-GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
+GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (CTP 0.4)",GAME_FLAGS )
+GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (ZTP 0.7)",GAME_FLAGS )
 
 // unprotected?
 GAME(199?, m4toprn,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Run (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
@@ -2555,7 +2556,7 @@ GAME(199?, m4prem,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4) (GSP 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 38 (alf scramble) can run open door, lamps scrambled
-GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (German) (MPU4) (TGY 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // doesn't boot at all?
 GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
