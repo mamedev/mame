@@ -399,10 +399,10 @@ INPUT_PORTS_END
 	GAMEL( year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::gambal_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
 
 // 00 0c 50 90 b0 38 d4 a0 (gambal)
-GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4gambal__b,    m4gambal,   "gabx.p1",  0x0000, 0x010000, CRC(74a8ed7e) SHA1(7363031c8a634ac13de957c62f32611963f797bd), "Barcrest","Gamball (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4gambal__c,    m4gambal,   "gbll20-6", 0x0000, 0x010000, CRC(f34d233a) SHA1(3f13563b2821b2f36267470c36ba346879521bc9), "Barcrest","Gamball (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (GBB 2.0)" )
+GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (GAB 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4gambal__b,    m4gambal,   "gabx.p1",  0x0000, 0x010000, CRC(74a8ed7e) SHA1(7363031c8a634ac13de957c62f32611963f797bd), "Barcrest","Gamball (Barcrest) (MPU4) (GAB 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4gambal__c,    m4gambal,   "gbll20-6", 0x0000, 0x010000, CRC(f34d233a) SHA1(3f13563b2821b2f36267470c36ba346879521bc9), "Barcrest","Gamball (Barcrest) (MPU4) (GAB 2.0, set 3)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1321,7 +1321,7 @@ GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, 
 
 
 // 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4  (celclb)
-GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
+GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 
 // 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c (shuffle)
 GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)

@@ -430,69 +430,226 @@ public:
 	static constexpr uint8_t shuffle_characteriser_prot[8] = { 0x00, 0x18, 0x00, 0x18, 0x08, 0x10, 0x00, 0x00 };
 
 
-	// games with sequence starting 00 44 44 54 34 04 54 14 34 14 20 74 04 60
+	// games with sequence starting
+	// 00 44 44 54 34 04 54 14 34 14 20 74 04 60
+	// Andy's Great Escape   "AGC 2.0"
+	// Everyone's A Winner   "ER2 0.1"
+	//                       "ERT 0.2"
+	// Nudge Banker          "SBN 2.0"
+	//                       "NBN 1.0"
+	//                       "SBN 1.1"
+	// Club Vegas            "CLA 2.4"
+	// Tic Tac Take          "TIC 2.0"
+	// Dutch Nudge Up        "DNU 2.5"
+	// Dutch Big Chief       "BCH 1.5"
+	// Action Pack           "AP 0.4"
+	//                       "AP 0.5"
 	static constexpr uint8_t clbveg_characteriser_prot[8] = { 0x00, 0x70, 0x40, 0x70, 0x50, 0x60, 0x40, 0x40 };
 
-	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
+
+	// games with sequence starting
+	// 00 84 C4 E4 4C 10 28 90 E8 78 34
+	// Viva Las Vegas          "VLV 1.1"
+	//                         "VLV 1.0"
+	// Cash Counter            "C3 2.4"
+	//                         "C3 1.8"
+	//                         "CO 0.5"
+	//                         "C3 3.1"
+	//                         "C3 2.0"
+	// Dutch Black Jack Club   "DBC 1.1"
+	// Jackpot Jump            "VJC 2.0"
+	//                         "VJC 1.3"
 	static constexpr uint8_t vivlv_characteriser_prot[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
 													//    00    28    00    28    24    14    00    00   m4jpjmp has this lamp scramble for it
 
+
 	// games with sequence starting  00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4 4c e0 dc f4 88
+	// Celebration Club       "CEL 1.5"
+	// Dutch Jolly Joker      "DJJ 1.5"
+	// Night Spot Club        "NS2 2.2"
+	//                        "NIT 1.1"
 	static constexpr uint8_t celclb_characteriser_prot[8] = { 0x00, 0x50, 0x00, 0x50, 0x10, 0x40, 0x04, 0x00 };
 
+
 	// games with sequence starting 00 14 10 C0 8C A8 68 30 D0 58 E4 DC F4
+	// Nudge Nudge Wink Wink    "NNU 5.2"
+	//                          "NNU 4.0"
+	// Cash Matrix              "CM 1.7"
 	static constexpr uint8_t cashmx_characteriser_prot[8] = { 0x04, 0x50, 0x10, 0x60, 0x60, 0x30, 0x30, 0x14 };
 
+
 	// games with sequence 00 14 04 94 c8 68 a0 18 f4 8c e8 ec ac a8 6c 20 54 c4 dc
+	// Nickelodeon        "NIL 4.1"
+	// Dutch Black Jack   "BJ 1.6"
+	// Viz                "VIZ 0.6"
+	//                    "VIZ 0.3"
+	//                    "VIZ 0.2"
 	static constexpr uint8_t viz_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x54, 0x14, 0x50, 0x10, 0x14 };
 
-	// games with sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
+
+	// games with sequence
+	// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
+	// Nifty Fifty                     "NF 2.0"
+	//                                 "NF 2.1"
+	// Supa Silva                      "SS2V 1.0"
+	// Dutch Ambassador                "DAM 3.7"
+	// Nudge Nudge Wink Wink Classic   "CNN 2.0"
 	static constexpr uint8_t nifty_characteriser_prot[8] = { 0x03, 0xE7, 0xA7, 0x87, 0xE7, 0x07, 0xA7, 0xE7 };
 
-	// games with sequence 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20
+
+	// games with sequence
+	// 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20
+	// Millionaire's Club     "MI2 1.0"
+	//                        "MIL 5.0"
+	// Cash Attack            "CSA 1.1"
+	//                        "CAA 2.2"
+	// Ten Out Of Ten         "TOC 0.3"
+	//                        "TOT 0.5"
+	//                        "TOC 0.1"
 	static constexpr uint8_t milclb_characteriser_prot[8] = { 0x00, 0x54, 0x00, 0x54, 0x40, 0x10, 0x00, 0x00 };
 
+
 	// games with sequence 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38
+	// Nudge Quest             "NQ 2.0"
+	// Fruit Full Club         "FFC 0.3"
+	//                         "FFC 1.0"
+	//                         "FFC 1.2"
+	// Fruit Link Club         "FLC 1.8"
+	//                         "FLC 1.6"
+	// Octopus (Nova) (German) "OCT 0.3"
+	// Jolly Gems              "GEM 0.5"
+	//                         "GEM 0.6"
+	//                         "GMS 0.4"
+	//                         "GMS 0.3"
 	static constexpr uint8_t fruitfall_characteriser_prot[8] = { 0x03, 0xCF, 0x47, 0xCB, 0xC3, 0x4F, 0x47, 0x43 };
 
 
-	// games with sequence 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4
+	// games with sequence
+	// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4
+	// Multiplay Club          "MP 2.8"
+	// Stake Up Club           "SU 4.4"
+	//                         "SU 4.8"
+	// Dutch Hold Timer        "DHT 1.0"
+	// Extra Game              "CEG 2.0"
+	// Dutch Tomahawk          "DTK 2.3"
+	// Dutch Top Timer         "DTT 1.8"
+	// Dutch Universe          "DUN 2.0"
+	// Fruit Game              "FRU 2.0"
 	static constexpr uint8_t m400_characteriser_prot[8] = { 0x03, 0xE7, 0x43 ,0xC3, 0xC3 ,0xE3, 0x43, 0xC3 }; // does anything using this have lamp scramble or was this extracted with tests?
 
-	// games with sequence 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc 98 fc f8 f8
+
+	// games with sequence
+	// 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc 98 fc f8 f8
+	// Interceptor         "INT 3.0"
+	// Omega               "DOM 2.3"
+	// Grab The Bank       "G4B 2.0"
+	//                     "G4B 2.1"
+	// Smash 'n' Grab      "SAG 1.0"
+	//                     "SAG 3.4"
+	// Sun Club            "SUC 0.2"
+	// Dutch Top Deck      "DT 2.6"
 	static constexpr uint8_t intcep_characteriser_prot[8] = { 0x00, 0x1C, 0x38, 0x78, 0x7C, 0x78, 0x38, 0x7C };
 
-	// games with sequence 00 50 40 14 C4 B0 A4 30 C4 74 00 D4 E0 30 C0 34
+
+	// games with sequence
+	// 00 50 40 14 C4 B0 A4 30 C4 74 00 D4 E0 30 C0 34
+	// Top Tenner            "TP 2.7"
+	// Take Two              "TTO 1.2"
+	// Dutch First Class     "DFC 2.0"
+	// Red Hot Roll          "CR4 0.9"
+	//                       "CRT 0.3 / CR4 0.3"
+	//                       "CRU 0.1"
+	//                       "RH8 0.1"
+	//                       "RHR 0.3"
+	//                       "RHT 0.3"
+	//                       "RHU 0.2"
+	//                       "RHR 5.0"
+	//                       "RHR 2.0"
+	// Rich & Famous         "RFT 0.2"
+	//                       "RF5 0.2"
+	// Prize High Roller     "PRL 0.3"
 	static constexpr uint8_t take2_characteriser_prot[8] = { 0x00, 0x50, 0x50, 0x10, 0x10, 0x50, 0x50, 0x00 };
 
-	// games with sequence 00 50 40 14 4C 80 34 44 5C 9C 9C 9C DC 9C DC 94
+
+	// games with sequence
+	// 00 50 40 14 4C 80 34 44 5C 9C 9C 9C DC 9C DC 94
+	// Alphabet             "A4B 1.0"
+	// Dutch Voodoo 1000    "DDO 3.2"
+	// Monte Carlo          "NM8 0.1"
+	//                      "NMN 0.1"
+	// Prize Monte Carlo    "MSS 1.6"
+	//                      "MC 53.0"
+	//                      "MC103.0"
 	static constexpr uint8_t m435_characteriser_prot[8] = { 0x03, 0x5F, 0x53, 0x1F, 0x17, 0x5B, 0x53, 0x13 };
 
+
 	// games with sequence 00 84 8C D8 74 80 4C 90 E8 78 54 60 84
+	// Adders & Ladders Classic Club  "ADC 1.1"
+	//                                "ADC 0.5"
+	// Cash Zone                      "CAZ 1.2"
+	//                                "CAZ 1.5"
+	// Escalera Tobogan               "ESC1"
 	static constexpr uint8_t m578_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };
 
-	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
+
+	// games with sequence
+	// 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
+	// Hyper Viper Club             "HPC 0.5"
+	// Mega Bucks                   "BUC 4.1"
+	//                              "BUC 3.1"
+	// Action Bank                  "AC3.0"
+	//                              "ACT2.0"
+	// Dutch Road Runner            "DRO 1.9)
+	// Dutch Gun Smoke              "DGU 1.6"
+	// Andy Capp                    "ACC52.0"
+	// Andy's Great Escape          "A2T 0.1"
+	//                              "A5T 0.1"
 	static constexpr uint8_t age_characteriser_prot[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
 
+
 	// games with sequence starting 00 60 60 C0 58 44 E0 50 A8 9C CC BC E4 50 A0 58
+	// Sunset Boulevard            "SBU 2.0"
+	// Blackjack Super Multi       "SM H1.6"
 	static constexpr uint8_t sunsetb_characteriser_prot[8] = { 0x03, 0xEB, 0x63, 0xCB, 0xC3, 0x6B, 0x63, 0x43 };
 
+
 	// games with sequence starting 00 60 60 a0 38 64 e0 30 c8 9c ac dc ec 94 d8 a4 38 ec
+	// Blackjack Club   "C2J 1.8"
+	//                  "C2J 2.1"
 	static constexpr uint8_t bjac_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x28, 0x20, 0x68, 0x60, 0x20 };
 
+
 	// games with sequence starting 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 1c
+	// Magnificent 7s               "MAS 1.2"
+	//                              "MA7 1.4"
+	//                              "MA7 1.5"
+	// Crazy Casino (Nova) (German) "CRZ 0.3"
 	static constexpr uint8_t mag7s_characteriser_prot[8] = { 0x03, 0x9F, 0x0F, 0x17, 0x03, 0x1B, 0x8F, 0x87 };
 
+
 	// games with sequence starting 00 44 44 54 d0 88 38 74 d0 58
+	// Ooh Aah Dracula           "DR_ 2.0"
+	//                           "DR_ 2.1"
+	// Super Streak Classic      "CSS 6.0"
+	//                           "CSS 5.0"
+	//                           "CSS 2.0"
 	static constexpr uint8_t oad_characteriser_prot[8] = { 0x00, 0x50, 0x44, 0x14, 0x14, 0x44, 0x44, 0x00 };
 
+
 	// games with sequence starting 00 18 70 24 38 58 74 0c 6c 64
+	// Rocky Horror Show   "RH__4.0"
+	//                     "RH__6.0"
 	static constexpr uint8_t rhs_characteriser_prot[8] = { 0x00, 0x3C, 0x18, 0x30, 0x10, 0x3C, 0x18, 0x10 };
 
+
 	// games with sequence starting 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 (unusual sequence)
+	// Rocket Money      "ROK 0.6"
 	static constexpr uint8_t rockmn_characteriser_prot[8] = { 0x10, 0x34, 0x14, 0x34, 0x30, 0x30, 0x14, 0x30 };
 
+
 	// games with sequence starting 00 0c 50 90 b0 38 d4 a0 bc d4 30 90 38 c4 ac 70
+	// Gamball    "GBB 2.0"
+	//            "GAB 2.0"
 	static constexpr uint8_t gambal_characteriser_prot[8] = { 0x00, 0x18, 0x08, 0x10, 0x00, 0x18, 0x08, 0x00 };
 
 
