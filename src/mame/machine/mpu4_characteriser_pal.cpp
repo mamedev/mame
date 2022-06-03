@@ -503,9 +503,9 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 }
 
 /*
-	bootleg Characterisers
+    bootleg Characterisers
 
-	many sets have been hacked to use their own protection styles
+    many sets have been hacked to use their own protection styles
 */
 
 

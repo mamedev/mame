@@ -124,15 +124,15 @@
     some codes are only ever set on certain types of games, for example 'J' seems to only
     be allowed for 'Prize' games (although isn't required)
 
-	---------
+    ---------
 
-	Note for some bootlegs (Road Hog, Andy Capp + more?)
+    Note for some bootlegs (Road Hog, Andy Capp + more?)
 
-	These use different protection (these have both a startup check, and 2 checks after the reels have been initialized)
-	the first check (read at 814) must pass to avoid chr alarm?  the 2nd check (usual chr address) must pass to avoid scrambled lamps
-	the 3rd check (usual chr address) must pass to not reboot?
-	if the 2nd check fails, the 3rd check never happens and the lamps just scramble. the value to pass the 3rd check is the same as required for the 2nd check?
-	the code looks more complex, so there could be other pitfalls with payout etc?
+    These use different protection (these have both a startup check, and 2 checks after the reels have been initialized)
+    the first check (read at 814) must pass to avoid chr alarm?  the 2nd check (usual chr address) must pass to avoid scrambled lamps
+    the 3rd check (usual chr address) must pass to not reboot?
+    if the 2nd check fails, the 3rd check never happens and the lamps just scramble. the value to pass the 3rd check is the same as required for the 2nd check?
+    the code looks more complex, so there could be other pitfalls with payout etc?
 
 */
 
@@ -367,19 +367,19 @@ GAME_CUSTOM( 199?, m4andycp20_b,       m4andycp, mod4oki_bootleg_fixedret<0x1e>,
 
 // different protection, involving 814 and regular reads, see note at top of driver
 // "FATHER CHISTMAS" and "AC5 1.0" (hack?)
-GAME_CUSTOM( 1994, m4andycpac_a,       m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "acap_05_.8",       0x0000, 0x010000, CRC(a17dd8de) SHA1(963d39fdca7c7b54f5ecf723c982eb30a426ebae), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5, hack?)" ) 
-GAME_CUSTOM( 1994, m4andycpacc_a,      m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "acap_05_.4",       0x0000, 0x010000, CRC(ca00ee84) SHA1(f1fef3db3db5ca7f0eb72ccc1daba8446db02924), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 1)" ) 
-GAME_CUSTOM( 1994, m4andycpacc_c,      m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "ac058c",           0x0000, 0x010000, CRC(15204ccc) SHA1(ade376193bc2d53dd4c824ee35fbcc16da31330a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 3)" ) 
-GAME_CUSTOM( 1994, m4andycpacc_b,      m4andycp, mod4oki_bootleg_fixedret<0x47>, mpu4, init_m4andycp_bootleg814prot,  "ac056c",           0x0000, 0x010000, CRC(cdeaeb06) SHA1(5bfcfba614477f4df9f4b2e56e8448eb357c554a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 2)" ) 
-GAME_CUSTOM( 1994, m4andycpacc_d,      m4andycp, mod4oki_bootleg_fixedret<0x1f>, mpu4, init_m4andycp_bootleg814prot,  "acap05_11",        0x0000, 0x010000, CRC(fb1533a0) SHA1(814e5dd9c4fe3baf4ea3b22c7e02e30b07bd27a1), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 4)" ) 
-GAME_CUSTOM( 1994, m4andycpacc_e,      m4andycp, mod4oki_bootleg_fixedret<0x2b>, mpu4, init_m4andycp_bootleg814prot,  "acap55",           0x0000, 0x010000, CRC(8007c459) SHA1(b3b6213d89eb0d2cc2f7dab81e0f0f2fdd0f8776), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 5)" ) 
+GAME_CUSTOM( 1994, m4andycpac_a,       m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "acap_05_.8",       0x0000, 0x010000, CRC(a17dd8de) SHA1(963d39fdca7c7b54f5ecf723c982eb30a426ebae), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5, hack?)" )
+GAME_CUSTOM( 1994, m4andycpacc_a,      m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "acap_05_.4",       0x0000, 0x010000, CRC(ca00ee84) SHA1(f1fef3db3db5ca7f0eb72ccc1daba8446db02924), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 1)" )
+GAME_CUSTOM( 1994, m4andycpacc_c,      m4andycp, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4andycp_bootleg814prot,  "ac058c",           0x0000, 0x010000, CRC(15204ccc) SHA1(ade376193bc2d53dd4c824ee35fbcc16da31330a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 3)" )
+GAME_CUSTOM( 1994, m4andycpacc_b,      m4andycp, mod4oki_bootleg_fixedret<0x47>, mpu4, init_m4andycp_bootleg814prot,  "ac056c",           0x0000, 0x010000, CRC(cdeaeb06) SHA1(5bfcfba614477f4df9f4b2e56e8448eb357c554a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 2)" )
+GAME_CUSTOM( 1994, m4andycpacc_d,      m4andycp, mod4oki_bootleg_fixedret<0x1f>, mpu4, init_m4andycp_bootleg814prot,  "acap05_11",        0x0000, 0x010000, CRC(fb1533a0) SHA1(814e5dd9c4fe3baf4ea3b22c7e02e30b07bd27a1), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 4)" )
+GAME_CUSTOM( 1994, m4andycpacc_e,      m4andycp, mod4oki_bootleg_fixedret<0x2b>, mpu4, init_m4andycp_bootleg814prot,  "acap55",           0x0000, 0x010000, CRC(8007c459) SHA1(b3b6213d89eb0d2cc2f7dab81e0f0f2fdd0f8776), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 5)" )
 
 // "FATHER CHISTMAS" and  "AC101.0" (hack?)
 GAME_CUSTOM( 1994, m4andycp10_a,       m4andycp, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4andycp_bootleg814prot,  "acap_10_.8",       0x0000, 0x010000, CRC(614403a7) SHA1(b627c7c3c6f9a43a0cd9e064715aeee8834c717c), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10, hack?)" )
-GAME_CUSTOM( 1994, m4andycp10c_b,      m4andycp, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4andycp_bootleg814prot,  "acp8ac",           0x0000, 0x010000, CRC(d51997b5) SHA1(fe08b5a3832eeaa80f674893342c3baea1608a91), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 2)" ) 
-GAME_CUSTOM( 1994, m4andycp10c_d,      m4andycp, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4andycp_bootleg814prot,  "acap_10_.4",       0x0000, 0x010000, CRC(fffe742d) SHA1(f2ca45391690dc31662e2d97a3ee34473effa258), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 4)" ) 
-GAME_CUSTOM( 1994, m4andycp10c_c,      m4andycp, mod4oki_bootleg_fixedret<0x1d>, mpu4, init_m4andycp_bootleg814prot,  "acap10_11",        0x0000, 0x010000, CRC(c3a866e7) SHA1(4c18e5a26ad2885eb012fd3dd61aaf9cc7d3519a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 3)" ) 
-GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp, mod4oki_bootleg_fixedret<0x1c>, mpu4, init_m4andycp_bootleg814prot,  "acapp10p5.bin",    0x0000, 0x010000, CRC(de650e19) SHA1(c1b9cbad23a1eac9b3718f4f2457c97317f96be6), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 1)" ) 
+GAME_CUSTOM( 1994, m4andycp10c_b,      m4andycp, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4andycp_bootleg814prot,  "acp8ac",           0x0000, 0x010000, CRC(d51997b5) SHA1(fe08b5a3832eeaa80f674893342c3baea1608a91), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 2)" )
+GAME_CUSTOM( 1994, m4andycp10c_d,      m4andycp, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4andycp_bootleg814prot,  "acap_10_.4",       0x0000, 0x010000, CRC(fffe742d) SHA1(f2ca45391690dc31662e2d97a3ee34473effa258), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 4)" )
+GAME_CUSTOM( 1994, m4andycp10c_c,      m4andycp, mod4oki_bootleg_fixedret<0x1d>, mpu4, init_m4andycp_bootleg814prot,  "acap10_11",        0x0000, 0x010000, CRC(c3a866e7) SHA1(4c18e5a26ad2885eb012fd3dd61aaf9cc7d3519a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 3)" )
+GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp, mod4oki_bootleg_fixedret<0x1c>, mpu4, init_m4andycp_bootleg814prot,  "acapp10p5.bin",    0x0000, 0x010000, CRC(de650e19) SHA1(c1b9cbad23a1eac9b3718f4f2457c97317f96be6), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 1)" )
 
 
 /*****************************************************************************************************************************************************************************

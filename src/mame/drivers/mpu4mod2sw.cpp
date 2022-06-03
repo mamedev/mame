@@ -1818,7 +1818,7 @@ GAME(199?, m4grandsa, m4grands,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::gra
 GAME(199?, m4intcep,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0)",GAME_FLAGS ) // set % key
 GAME(199?, m4intcepa, m4intcep,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0X)",GAME_FLAGS ) // set % key
 // non-standard protection? hack?
-GAME(199?, m4intcepb, m4intcep,   mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Interceptor (Barcrest) (MPU4) (INT 1.1)",GAME_FLAGS ) 
+GAME(199?, m4intcepb, m4intcep,   mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Interceptor (Barcrest) (MPU4) (INT 1.1)",GAME_FLAGS )
 
 // 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60 80 a8 7c f4 (age)
 GAME(199?, m4megbks,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 4.1X)",GAME_FLAGS )
@@ -2051,7 +2051,7 @@ GAME(199?, m4libty,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crk
 GAME(199?, m4meglnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Megalink (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 e0 c8 (kingqn)
-GAME(199?, m4multwy,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::kingqn_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4multwy,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::kingqn_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4) (DMU 1.7)",GAME_FLAGS )
 
 // 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50 24 48 8c bc (pzmoney)
 GAME(199?, m4num1,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4) (DNO 1.7)",GAME_FLAGS )
@@ -2266,7 +2266,7 @@ GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC
 
 /*********************************************************************************************************
 
-	unknown 'RED'
+    unknown 'RED'
 
 *********************************************************************************************************/
 

@@ -59,7 +59,7 @@ public:
 	{
 		m_bootlegfixedreturn = ret;
 	}
-	
+
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -143,8 +143,8 @@ public:
 
 	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
 	static constexpr uint8_t vivlv_characteriser_prot[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
-	                                                //    00    28    00    28    24    14    00    00   m4jpjmp has this lamp scramble for it
-													 
+													//    00    28    00    28    24    14    00    00   m4jpjmp has this lamp scramble for it
+
 	// games with sequence starting  00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4 4c e0 dc f4 88
 	static constexpr uint8_t celclb_characteriser_prot[8] = { 0x00, 0x50, 0x00, 0x50, 0x10, 0x40, 0x04, 0x00 };
 
@@ -164,27 +164,27 @@ public:
 	static constexpr uint8_t fruitfall_characteriser_prot[8] = { 0x03, 0xCF, 0x47, 0xCB, 0xC3, 0x4F, 0x47, 0x43 };
 
 
-	// games with sequence 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 
+	// games with sequence 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4
 	static constexpr uint8_t m400_characteriser_prot[8] = { 0x03, 0xE7, 0x43 ,0xC3, 0xC3 ,0xE3, 0x43, 0xC3 }; // does anything using this have lamp scramble or was this extracted with tests?
 
 	// games with sequence 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc 98 fc f8 f8
-	static constexpr uint8_t intcep_characteriser_prot[8] = { 0x00, 0x1C, 0x38, 0x78, 0x7C, 0x78, 0x38, 0x7C };	
+	static constexpr uint8_t intcep_characteriser_prot[8] = { 0x00, 0x1C, 0x38, 0x78, 0x7C, 0x78, 0x38, 0x7C };
 
 	// games with sequence 00 50 40 14 C4 B0 A4 30 C4 74 00 D4 E0 30 C0 34
-	static constexpr uint8_t take2_characteriser_prot[8] = { 0x00, 0x50, 0x50, 0x10, 0x10, 0x50, 0x50, 0x00 };	
+	static constexpr uint8_t take2_characteriser_prot[8] = { 0x00, 0x50, 0x50, 0x10, 0x10, 0x50, 0x50, 0x00 };
 
 	// games with sequence 00 50 40 14 4C 80 34 44 5C 9C 9C 9C DC 9C DC 94
-	static constexpr uint8_t m435_characteriser_prot[8] = { 0x03, 0x5F, 0x53, 0x1F, 0x17, 0x5B, 0x53, 0x13 };	
+	static constexpr uint8_t m435_characteriser_prot[8] = { 0x03, 0x5F, 0x53, 0x1F, 0x17, 0x5B, 0x53, 0x13 };
 
 	// games with sequence 00 84 8C D8 74 80 4C 90 E8 78 54 60 84
-	static constexpr uint8_t m578_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };	
+	static constexpr uint8_t m578_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };
 
 	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
 	static constexpr uint8_t age_characteriser_prot[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
 
 	// games with sequence starting 00 60 60 C0 58 44 E0 50 A8 9C CC BC E4 50 A0 58
 	static constexpr uint8_t sunsetb_characteriser_prot[8] = { 0x03, 0xEB, 0x63, 0xCB, 0xC3, 0x6B, 0x63, 0x43 };
-	
+
 	// games with sequence starting 00 60 60 a0 38 64 e0 30 c8 9c ac dc ec 94 d8 a4 38 ec
 	static constexpr uint8_t bjac_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x28, 0x20, 0x68, 0x60, 0x20 };
 
@@ -233,7 +233,7 @@ public:
 	//                   "SX102.0"
 	// Super Hyper Viper "H6Y 0.3"
 	//                   "H6Y 0.2"
-	// Golden Gate       "DGG 2.2" (lamp scramble not used? currently not booting)	
+	// Golden Gate       "DGG 2.2" (lamp scramble not used? currently not booting)
 	static constexpr uint8_t m450_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x40, 0x30, 0x10, 0x00 };
 
 
@@ -276,7 +276,7 @@ public:
 	//                     "CT  4.0"
 	//                     "CTT 3.0" / "CT4 3.0"
 	//                     "CT  2.3"
-	//                     "CT  2.4"		 
+	//                     "CT  2.4"
 	// Top Action          " TA 2.2" (one set) (lamp scramble not used)
 	static constexpr uint8_t topaction_characteriser_prot[8] = { 0x00, 0x68, 0x20, 0x48, 0x40, 0x28, 0x20, 0x00 }; // lack of evidence, guessed based on logical lamp patterns
 
@@ -288,7 +288,7 @@ public:
 	//                   "GRA 2.1"
 	// Red Alert         "RA3 0.2"
 	// Pot Luck 100 Club "P1L 2.2"
-    //                   " PL 2.7"
+	//                   " PL 2.7"
 	// Flashlite         "FLT 1.0"
 	static constexpr uint8_t graff_characteriser_prot[8] = { 0x00, 0x60, 0x40, 0x60, 0x20, 0x40, 0x40, 0x20 }; // based on logical arrangements for m4ra__g set
 
@@ -299,7 +299,7 @@ public:
 	// Hot Rod                      "HRC_1.0"
 	// Buccaneer                    "BUG 0.4"
 	//                              "BUS 0.1"
-    // All Cash Advance             "C2B 6.0"
+	// All Cash Advance             "C2B 6.0"
 	static constexpr uint8_t buc_characteriser_prot[8] = { 0x00, 0x70, 0x50, 0x30, 0x10, 0x70, 0x50, 0x10 }; // based on matching m4hotrod__a and m4buc__2 with unprotected sets
 
 
@@ -357,11 +357,11 @@ public:
 	// 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24 90 c8 ec ec a8 ec 28 20 14 c4 dc f0 8c 2c 64 14 40 94 cc a8 68 e0 9c f0 48 24 14 c4 d8 f0 48 60 14 c4 98 f0 c8 a8 e8 68 20 54 c0 9c b0 c8 2c e4 00
 	// used by
 	// Kings & Queens    "EE  2.0"
-    //                   "EE  1.0"
+	//                   "EE  1.0"
 	// Lucky Strike      "LSS 0.6"
-    //                   "LST 0.9"
+	//                   "LST 0.9"
 	// Solid Silver Club "SOS 2.2"
-    // Solid Silver Club "SOS 2.1"
+	// Solid Silver Club "SOS 2.1"
 	static constexpr uint8_t luckystrike_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x50, 0x50, 0x10, 0x10, 0x10 }; // Lucky Strike matches unprotected sets
 
 
@@ -434,13 +434,29 @@ public:
 	// Action Bank                  "ACT 0.7"
 	// Top Tenner                   "TTS 0.2"
 	// Top Tenner                   "TTH 1.0"
-	// Super Two                    "SUT 1.2"            
+	// Super Two                    "SUT 1.2"
 	// Centrepoint                  " DU 1.3"
 	// Supatron                     "DSU 2.1"
 	// Swap-A-Note                  " SN 3.3"
 	//                              " SN 3.2"
 	//                              " SN 3.5"
 	static constexpr uint8_t actionbank_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x20, 0x20, 0x60, 0x60, 0x20 }; // matches unprotected sets for various games
+
+
+	// games with sequence starting
+	// 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10 2c 48 4c 6c 6c 48 60 10 08 6c 44 3c 78 54 00 30 00 30 04 3c 7c 70 24 14 28 44 14 04 3c 74 2c 44 34 0c 6c 60 30 28 44 34 2c 48 60 3c 74 04 34 00 3c 00
+	// used by
+	// Sunset Club    "SSC 3.0"
+	// Jolly Gems     "JGS 1.0"
+	static constexpr uint8_t sunsetclub_characteriser_prot[8] = { 0x00, 0x38, 0x10, 0x38, 0x30, 0x18, 0x10, 0x10 }; // matches Jolly Gems with the unprotected sets
+
+
+	// games with sequence starting
+	// 00 18 c8 a4 0c 80 0c 90 34 30 00 58 c8 84 4c a0 4c c0 3c c8 a4 4c 80 0c 80 0c e0 1c 88 a4 0c a0 0c 80 4c a0 3c 98 ec 84 0c c0 1c a8 84 0c a0 5c e8 a4 0c d0 04 38 a8 c4 2c 90 44 18 e8 84 3c 00
+	// used by
+	// Double Diamond Club  "CDD 0.5"
+	//                      "CDD 0.1"
+	static constexpr uint8_t doublediamond_characteriser_prot[8] = { 0x00, 0x18, 0x18, 0x28, 0x08, 0x58, 0x18, 0x08 }; // based on Double Diamond Club lamp patterns
 
 	/***************************************************************
 
@@ -484,8 +500,8 @@ public:
 	//                            "CNT / CN4 2.0"
 	//                            "CNT / CN4 1.0"
 	// Andy Capp                  "AN8 0.1"
-	//		                      "AND 0.4"
-	//		                      "AND 0.2"
+	//                            "AND 0.4"
+	//                            "AND 0.2"
 	// Pot Black                  "PBG 1.4"
 	//                            "PBG 1.5"
 	//                            "PBS 0.4"
@@ -513,7 +529,8 @@ public:
 	// Dutch Cherryo    "DCH 1.4"
 	static constexpr uint8_t cheryo_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
+	// games with sequence starting
+	// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
 	// Tutti Fruity   "TFT 0.4 / TF4 0.4"
 	//                "CTU 0.1"
 	//                "TF4 0.2"
@@ -525,17 +542,21 @@ public:
 	// Dutch Express  "DXP 2.0"
 	static constexpr uint8_t cosmiccasino_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 
+	// games with sequence starting
+	// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04
+	// Kings & Queens           "EE4 2.1/ EE  2.1"
+	//                          "EE8 2.2/ EE  2.2"
+	// Dutch Multiway           "DMU 1.7"
 	static constexpr uint8_t kingqn_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
+	// games with sequence starting
+	// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
+	// Dutch Magic Replay "DMR 1.3"
+	// Dutch Turbo Play   "DTP 1.3"
+	// Dutch Grafitti     "DGR 1.3"
 	static constexpr uint8_t turboplay_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 04 34 2c 44 34 24 3c 78 70 28 64
-	static constexpr uint8_t sunsetclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58
-	static constexpr uint8_t doublediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8
 	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -648,7 +669,7 @@ public:
 	// games with sequence starting 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
 	static constexpr uint8_t wayin_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	// games with sequence starting 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44 
+	// games with sequence starting 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44
 	static constexpr uint8_t bluediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
@@ -702,7 +723,7 @@ public:
 	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
 	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 
+	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94

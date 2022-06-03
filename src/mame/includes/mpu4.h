@@ -184,7 +184,7 @@ public:
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
-	
+
 	template<const uint8_t* Table> void mod2_cheatchr_xxxx(machine_config &config)
 	{
 		mod2(config);
@@ -402,7 +402,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
-	
+
 	uint8_t bootleg814_r(address_space &space, offs_t offset);
 	uint8_t bootleg814alt_r(address_space &space, offs_t offset);
 	uint8_t bootleg814alt2_r(address_space &space, offs_t offset);

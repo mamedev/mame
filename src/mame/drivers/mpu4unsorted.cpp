@@ -2234,7 +2234,7 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 // non-english sets
 
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 (turboplay)
-GAME(199?, m4magrep,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4magrep,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
 
 // 00 24 24 64 2c 14 4c 14 4c 58 (actclba)
 GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
@@ -2301,10 +2301,10 @@ GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
 
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
-GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
+GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP 1.3)",GAME_FLAGS )
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 (alf)
-GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
-GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 3)",GAME_FLAGS )
+GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
+GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
 
 // unprotected?
 GAME(199?, m4toprn,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Run (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
@@ -2362,9 +2362,9 @@ GAME(199?, m4topdk,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::int
 
 // REEL A ALM
 // 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10 (sunsetclub)
-GAME(199?, m4sunscl,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4sunscl,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54 (tri98)
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
