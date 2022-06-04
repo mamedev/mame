@@ -244,7 +244,7 @@ GFXDECODE_END
 
 void video21_state::machine_start()
 {
-	m_hopper_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(video21_state::hopper_coinout),this));
+	m_hopper_timer = timer_alloc(FUNC(video21_state::hopper_coinout), this);
 
 	m_lamps.resolve();
 

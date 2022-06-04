@@ -24,7 +24,7 @@ void triplhnt_state::video_start()
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(triplhnt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
-	m_hit_timer = timer_alloc(TIMER_HIT);
+	m_hit_timer = timer_alloc(FUNC(triplhnt_state::set_collision), this);
 
 	save_item(NAME(m_cmos));
 	save_item(NAME(m_da_latch));
@@ -32,19 +32,6 @@ void triplhnt_state::video_start()
 	save_item(NAME(m_hit_code));
 	save_item(NAME(m_sprite_zoom));
 	save_item(NAME(m_sprite_bank));
-}
-
-
-void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_HIT:
-		set_collision(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in triplhnt_state::device_timer");
-	}
 }
 
 

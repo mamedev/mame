@@ -91,16 +91,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(hrtc_update);
+	TIMER_CALLBACK_MEMBER(vrtc_update);
 
 private:
-	enum
-	{
-		TIMER_HRTC,
-		TIMER_VRTC,
-		TIMER_DRQ
-	};
-
 	void set_interrupt(int state);
 	void set_drq(int state);
 	void set_display(int state);
@@ -177,7 +172,6 @@ private:
 	// timers
 	emu_timer *m_hrtc_timer;
 	emu_timer *m_vrtc_timer;
-	emu_timer *m_drq_timer;
 };
 
 

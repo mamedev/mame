@@ -71,8 +71,8 @@ void esripsys_state::video_start()
 	line_buffer[1].priority_buf = std::make_unique<uint8_t[]>(512);
 
 	/* Create and initialise the HBLANK timers */
-	m_hblank_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_start_callback),this));
-	m_hblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_end_callback),this));
+	m_hblank_start_timer = timer_alloc(FUNC(esripsys_state::hblank_start_callback), this);
+	m_hblank_end_timer = timer_alloc(FUNC(esripsys_state::hblank_end_callback), this);
 	m_hblank_start_timer->adjust(m_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */

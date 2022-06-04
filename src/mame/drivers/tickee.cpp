@@ -69,6 +69,8 @@ private:
 	optional_shared_ptr<uint16_t> m_control;
 
 	emu_timer *m_setup_gun_timer = nullptr;
+	emu_timer *m_set_gun_int_timer[2]{};
+	emu_timer *m_clear_gun_int_timer[2]{};
 	int m_beamxadd = 0;
 	int m_beamyadd = 0;
 	int m_palette_bank = 0;
@@ -87,6 +89,7 @@ private:
 	void sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_RESET(tickee);
 	DECLARE_VIDEO_START(tickee);
+	DECLARE_VIDEO_RESET(tickee);
 	DECLARE_MACHINE_RESET(rapidfir);
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
@@ -101,8 +104,6 @@ private:
 	void mouseatk_map(address_map &map);
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -132,25 +133,6 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *  Light gun interrupts
  *
  *************************************/
-
-void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_TRIGGER_GUN_INTERRUPT:
-		trigger_gun_interrupt(param);
-		break;
-	case TIMER_CLEAR_GUN_INTERRUPT:
-		clear_gun_interrupt(param);
-		break;
-	case TIMER_SETUP_GUN_INTERRUPTS:
-		setup_gun_interrupts(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tickee_state::device_timer");
-	}
-}
-
 
 TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 {
@@ -186,13 +168,13 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(0, beamx, beamy);
-	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 0);
-	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 0);
+	m_set_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 0);
+	m_clear_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 0);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(1, beamx, beamy);
-	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 1);
-	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 1);
+	m_set_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 1);
+	m_clear_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 1);
 }
 
 
@@ -206,10 +188,24 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
-	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
-	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
+	m_setup_gun_timer = timer_alloc(FUNC(tickee_state::setup_gun_interrupts), this);
+
+	/* initialize gun set/clear interrupts for both players */
+	m_set_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
+	m_set_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
+	m_clear_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
+	m_clear_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
 }
 
+VIDEO_RESET_MEMBER(tickee_state,tickee)
+{
+	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
+
+	m_set_gun_int_timer[0]->adjust(attotime::never);
+	m_set_gun_int_timer[1]->adjust(attotime::never);
+	m_clear_gun_int_timer[0]->adjust(attotime::never);
+	m_clear_gun_int_timer[1]->adjust(attotime::never);
+}
 
 
 /*************************************
@@ -772,6 +768,7 @@ void tickee_state::tickee(machine_config &config)
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
+	MCFG_VIDEO_RESET_OVERRIDE(tickee_state,tickee)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);

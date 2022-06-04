@@ -289,10 +289,10 @@ void mc68328_device::device_start()
 {
 	m68000_device::device_start();
 
-	m_gptimer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer_tick<0>),this));
-	m_gptimer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer_tick<1>),this));
-	m_rtc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::rtc_tick),this));
-	m_pwm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::pwm_tick),this));
+	m_gptimer[0] = timer_alloc(FUNC(mc68328_device::timer_tick<0>), this);
+	m_gptimer[1] = timer_alloc(FUNC(mc68328_device::timer_tick<1>), this);
+	m_rtc = timer_alloc(FUNC(mc68328_device::rtc_tick), this);
+	m_pwm = timer_alloc(FUNC(mc68328_device::pwm_tick), this);
 
 	register_state_save();
 }

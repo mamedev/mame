@@ -526,7 +526,7 @@ void st_blitter_device::device_resolve_objects()
 
 void st_blitter_device::device_start()
 {
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_blitter_device::blitter_tick), this));
+	m_blitter_timer = timer_alloc(FUNC(st_blitter_device::blitter_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_halftone));

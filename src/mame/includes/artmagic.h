@@ -95,6 +95,7 @@ private:
 	void stonebal_map(address_map &map);
 	void stonebal_tms_map(address_map &map);
 	void tms_map(address_map &map);
+
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(irq_off);
 };

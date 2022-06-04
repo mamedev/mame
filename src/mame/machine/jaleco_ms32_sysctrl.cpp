@@ -130,8 +130,8 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_timer.irq_enable));
 	save_item(NAME(m_timer.interval));
 
-	m_timer.prg_irq = timer_alloc(PRG_TIMER);
-	m_timer_scanline = timer_alloc(SCANLINE_TIMER);
+	m_timer.prg_irq = timer_alloc(FUNC(jaleco_ms32_sysctrl_device::prg_timer_tick), this);
+	m_timer_scanline = timer_alloc(FUNC(jaleco_ms32_sysctrl_device::flush_scanline_timer), this);
 }
 
 
@@ -177,8 +177,10 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 	m_timer.prg_irq->adjust(step);
 }
 
-void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
+TIMER_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::flush_scanline_timer)
 {
+	int current_scanline = param;
+
 	// in typical Jaleco fashion (cfr. mega system 1), both irqs are somehow configurable (a pin?).
 	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs
 	// at half speed, but then their config can't possibly work with p47aces (i.e. wants 10 and 9 respectively),
@@ -197,18 +199,10 @@ void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
 	m_timer_scanline->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
-void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::prg_timer_tick)
 {
-	switch (id)
-	{
-		case SCANLINE_TIMER:
-			flush_scanline_timer(param);
-			break;
-		case PRG_TIMER:
-			m_prg_timer_cb(1);
-			flush_prg_timer();
-			break;
-	}
+	m_prg_timer_cb(1);
+	flush_prg_timer();
 }
 
 //*****************************************************************************

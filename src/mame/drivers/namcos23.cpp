@@ -3518,7 +3518,7 @@ void namcos23_state::machine_start()
 {
 	m_lamps.resolve();
 
-	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
+	m_c361.timer = timer_alloc(FUNC(namcos23_state::c361_timer_cb), this);
 	m_c361.timer->adjust(attotime::never);
 
 	m_maincpu->add_fastram(0, m_mainram.bytes()-1, false, reinterpret_cast<uint32_t *>(memshare("mainram")->ptr()));

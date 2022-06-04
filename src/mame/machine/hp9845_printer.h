@@ -31,7 +31,8 @@ public:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 
 	// PPU access
 	uint16_t printer_r(offs_t offset);

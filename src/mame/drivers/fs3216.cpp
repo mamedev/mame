@@ -119,7 +119,7 @@ void fs3216_state::machine_start()
 	m_fdc_select = 0;
 	m_fdc_dma_count = 0;
 
-	m_fdc_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fs3216_state::fdc_dma), this));
+	m_fdc_dma_timer = timer_alloc(FUNC(fs3216_state::fdc_dma), this);
 
 	save_item(NAME(m_mmu_reg));
 	save_item(NAME(m_from_reset));

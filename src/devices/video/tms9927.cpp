@@ -89,8 +89,8 @@ void tms9927_device::device_start()
 	m_write_hsyn.resolve();
 
 	// allocate timers
-	m_vsync_timer = timer_alloc(TIMER_VSYNC);
-	m_hsync_timer = timer_alloc(TIMER_HSYNC);
+	m_vsync_timer = timer_alloc(FUNC(tms9927_device::toggle_vsync), this);
+	m_hsync_timer = timer_alloc(FUNC(tms9927_device::toggle_hsync), this);
 
 	// register for state saving
 	save_item(NAME(m_reg));
@@ -137,46 +137,42 @@ void tms9927_device::device_stop()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms9927_device::toggle_vsync)
 {
-	switch (id)
+	m_vsyn = !m_vsyn;
+	m_write_vsyn(m_vsyn ? 1 : 0);
+
+	if (m_vsyn)
 	{
-	case TIMER_VSYNC:
-		m_vsyn = !m_vsyn;
-		m_write_vsyn(m_vsyn ? 1 : 0);
+		m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_end, m_hsyn_start));
+	}
+	else
+	{
+		m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
+	}
+}
 
-		if (m_vsyn)
-		{
-			m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_end, m_hsyn_start));
-		}
-		else
-		{
-			m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
-		}
-		break;
+TIMER_CALLBACK_MEMBER(tms9927_device::toggle_hsync)
+{
+	m_hsyn = !m_hsyn;
+	m_write_hsyn(m_hsyn ? 1 : 0);
 
-	case TIMER_HSYNC:
-		m_hsyn = !m_hsyn;
-		m_write_hsyn(m_hsyn ? 1 : 0);
-
-		uint16_t vpos = screen().vpos();
-		if (m_hsyn)
-		{
-			screen().update_now();
-			if (screen().hpos() > m_hsyn_end)
-				vpos = (vpos + 1) % m_total_vpix;
-			m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_end));
-		}
-		else
-		{
-			if (screen().hpos() > m_hsyn_start)
-				vpos = (vpos + 1) % m_total_vpix;
-			m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_start));
-		}
-		break;
+	uint16_t vpos = screen().vpos();
+	if (m_hsyn)
+	{
+		screen().update_now();
+		if (screen().hpos() > m_hsyn_end)
+			vpos = (vpos + 1) % m_total_vpix;
+		m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_end));
+	}
+	else
+	{
+		if (screen().hpos() > m_hsyn_start)
+			vpos = (vpos + 1) % m_total_vpix;
+		m_hsync_timer->adjust(screen().time_until_pos(vpos, m_hsyn_start));
 	}
 }
 

@@ -122,10 +122,9 @@ void cdp1864_device::device_start()
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 
 	// allocate timers
-	m_int_timer = timer_alloc(TIMER_INT);
-	m_efx_timer = timer_alloc(TIMER_EFX);
-	m_dma_timer = timer_alloc(TIMER_DMA);
-	m_hsync_timer = timer_alloc(TIMER_HSYNC);
+	m_int_timer = timer_alloc(FUNC(cdp1864_device::int_tick), this);
+	m_efx_timer = timer_alloc(FUNC(cdp1864_device::efx_tick), this);
+	m_dma_timer = timer_alloc(FUNC(cdp1864_device::dma_tick), this);
 
 	// find devices
 	screen().register_screen_bitmap(m_bitmap);
@@ -163,91 +162,88 @@ void cdp1864_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cdp1864_device::int_tick)
+{
+	if (screen().vpos() == SCANLINE_INT_START)
+	{
+		if (m_disp)
+		{
+			m_write_int(ASSERT_LINE);
+		}
+
+		m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_END, 0));
+	}
+	else
+	{
+		if (m_disp)
+		{
+			m_write_int(CLEAR_LINE);
+		}
+
+		m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(cdp1864_device::efx_tick)
 {
 	int scanline = screen().vpos();
-
-	switch (id)
+	switch (scanline)
 	{
-	case TIMER_INT:
-		if (scanline == SCANLINE_INT_START)
-		{
-			if (m_disp)
-			{
-				m_write_int(ASSERT_LINE);
-			}
-
-			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_END, 0));
-		}
-		else
-		{
-			if (m_disp)
-			{
-				m_write_int(CLEAR_LINE);
-			}
-
-			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
-		}
+	case SCANLINE_EFX_TOP_START:
+		m_write_efx(ASSERT_LINE);
+		m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_END, 0));
 		break;
 
-	case TIMER_EFX:
-		switch (scanline)
-		{
-		case SCANLINE_EFX_TOP_START:
-			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_END, 0));
-			break;
-
-		case SCANLINE_EFX_TOP_END:
-			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_START, 0));
-			break;
-
-		case SCANLINE_EFX_BOTTOM_START:
-			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_END, 0));
-			break;
-
-		case SCANLINE_EFX_BOTTOM_END:
-			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_START, 0));
-			break;
-		}
+	case SCANLINE_EFX_TOP_END:
+		m_write_efx(CLEAR_LINE);
+		m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_START, 0));
 		break;
 
-	case TIMER_DMA:
-		if (m_dmaout)
-		{
-			if (m_disp)
-			{
-				if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
-				{
-					m_write_dma_out(CLEAR_LINE);
-				}
-			}
-
-			m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_WAIT));
-
-			m_dmaout = 0;
-		}
-		else
-		{
-			if (m_disp)
-			{
-				if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
-				{
-					m_write_dma_out(ASSERT_LINE);
-				}
-			}
-
-			m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
-
-			m_dmaout = 1;
-		}
+	case SCANLINE_EFX_BOTTOM_START:
+		m_write_efx(ASSERT_LINE);
+		m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_END, 0));
 		break;
+
+	case SCANLINE_EFX_BOTTOM_END:
+		m_write_efx(CLEAR_LINE);
+		m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_START, 0));
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(cdp1864_device::dma_tick)
+{
+	int scanline = screen().vpos();
+	if (m_dmaout)
+	{
+		if (m_disp)
+		{
+			if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
+			{
+				m_write_dma_out(CLEAR_LINE);
+			}
+		}
+
+		m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_WAIT));
+
+		m_dmaout = 0;
+	}
+	else
+	{
+		if (m_disp)
+		{
+			if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
+			{
+				m_write_dma_out(ASSERT_LINE);
+			}
+		}
+
+		m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
+
+		m_dmaout = 1;
 	}
 }
 

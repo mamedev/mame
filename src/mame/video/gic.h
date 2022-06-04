@@ -68,7 +68,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -77,7 +76,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	/* timers */
-	static const device_timer_id TIMER_VBLANK = 0;
+	TIMER_CALLBACK_MEMBER(vblank_tick);
 
 	void draw_char_left (int x, int y, uint8_t code, bitmap_ind16 &bitmap);
 	void draw_char_right(int x, int y, uint8_t code, bitmap_ind16 &bitmap,int bg_col);

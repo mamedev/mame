@@ -236,7 +236,7 @@ void tekigw_state_base::machine_start()
 
 	m_parity_check = false;
 
-	m_buserror = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tek4132_state::buserror), this));
+	m_buserror = timer_alloc(FUNC(tek4132_state::buserror), this);
 }
 
 void tekigw_state_base::machine_reset()

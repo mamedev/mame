@@ -176,8 +176,8 @@ void targeth_state::machine_start()
 {
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 
-	m_gun_irq_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun1_irq), this));
-	m_gun_irq_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun2_irq), this));
+	m_gun_irq_timer[0] = timer_alloc(FUNC(targeth_state::gun1_irq), this);
+	m_gun_irq_timer[1] = timer_alloc(FUNC(targeth_state::gun2_irq), this);
 
 	m_gun_irq_timer[0]->adjust(m_screen->time_until_pos(128, 0));
 	m_gun_irq_timer[1]->adjust(m_screen->time_until_pos(160, 0));

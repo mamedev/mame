@@ -10753,7 +10753,7 @@ void cps2_state::init_digital_volume()
 	m_cps2disabledigitalvolume = 0;
 
 	// create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity
-	m_digital_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cps2_state::cps2_update_digital_volume), this));
+	m_digital_volume_timer = timer_alloc(FUNC(cps2_state::cps2_update_digital_volume), this);
 	m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
 }
 

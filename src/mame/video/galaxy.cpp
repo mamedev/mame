@@ -106,7 +106,7 @@ void galaxy_state::machine_start()
 {
 	m_gal_cnt = 0;
 
-	m_gal_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxy_state::gal_video),this));
+	m_gal_video_timer = timer_alloc(FUNC(galaxy_state::gal_video), this);
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
 	m_screen->register_screen_bitmap(m_bitmap);

@@ -14,11 +14,6 @@ class gp9001vdp_device : public device_t,
 							public device_video_interface,
 							public device_memory_interface
 {
-	enum
-	{
-		TIMER_RAISE_IRQ
-	};
-
 public:
 	typedef device_delegate<void (u8 layer, u32 &code)> gp9001_cb_delegate;
 
@@ -66,9 +61,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	TIMER_CALLBACK_MEMBER(raise_irq);
 
 	address_space_config        m_space_config;
 

@@ -65,14 +65,10 @@ public:
 	void positron(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_FUSE
-	};
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(fuse_update); // TODO: Does nothing
 
 	// disassembly override
 	offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
@@ -125,7 +121,7 @@ void positron_state::machine_start()
 	// select task 0
 	m_mmu.active_key = 0;
 
-	m_fuse_timer = timer_alloc(TIMER_FUSE);
+	m_fuse_timer = timer_alloc(FUNC(positron_state::fuse_update), this);
 	m_fuse_timer->adjust(attotime::never);
 	m_fuse_timer_running = false;
 	m_irq_ack = false;
@@ -180,18 +176,11 @@ void positron_state::machine_reset()
 }
 
 
-void positron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(positron_state::fuse_update)
 {
-	switch (id)
-	{
-	case TIMER_FUSE:
-		//m_mmu.active_key = m_mmu.operate_key;
-		//m_mmu.sbit = false;
-		m_fuse_timer->adjust(attotime::never);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in positron_state::device_timer");
-	}
+	//m_mmu.active_key = m_mmu.operate_key;
+	//m_mmu.sbit = false;
+	m_fuse_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------

@@ -52,8 +52,15 @@ iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const ch
 
 void iq151_staper_device::device_start()
 {
-	m_printer_timer = timer_alloc(TIMER_PRINTER);
-	m_printer_timer->reset();
+	m_printer_timer = timer_alloc(FUNC(iq151_staper_device::pc2_low_tick), this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void iq151_staper_device::device_reset()
+{
 }
 
 //-------------------------------------------------
@@ -71,13 +78,12 @@ void iq151_staper_device::device_add_mconfig(machine_config &config)
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  pc2_low_tick - lower PPI Port C bit 2
 //-------------------------------------------------
 
-void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(iq151_staper_device::pc2_low_tick)
 {
-	if (id == TIMER_PRINTER)
-		m_ppi->pc2_w(0);
+	m_ppi->pc2_w(0);
 }
 
 

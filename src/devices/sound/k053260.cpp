@@ -126,7 +126,7 @@ void k053260_device::device_start()
 	for (int i = 0; i < 4; i++)
 		m_voice[i].voice_start(i);
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(k053260_device::update_state_outputs), this);
 }
 
 
@@ -164,7 +164,7 @@ void k053260_device::rom_bank_updated()
 }
 
 
-void k053260_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 {
 	switch(m_timer_state) {
 	case 0: m_sh1_cb(ASSERT_LINE); break;

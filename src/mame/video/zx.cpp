@@ -22,23 +22,7 @@
 #include "includes/zx.h"
 
 
-void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_TAPE_INPUT:
-		zx_tape_input();
-		break;
-	case TIMER_ULA_HSYNC:
-		zx_ula_hsync();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in zx_state::device_timer");
-	}
-}
-
-
-void zx_state::zx_ula_hsync()
+TIMER_CALLBACK_MEMBER(zx_state::zx_ula_hsync)
 {
 	m_hsync_active = !m_hsync_active;
 	if(m_hsync_active)
@@ -136,7 +120,7 @@ uint8_t zx_state::ula_high_r(offs_t offset)
 
 void zx_state::video_start()
 {
-	m_ula_hsync = timer_alloc(TIMER_ULA_HSYNC);
+	m_ula_hsync = timer_alloc(FUNC(zx_state::zx_ula_hsync), this);
 	m_ula_char_buffer = 0xffff;
 
 	m_bitmap_render = std::make_unique<bitmap_ind16>(384, 311);

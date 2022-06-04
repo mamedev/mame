@@ -51,7 +51,7 @@ c64_super_explode_cartridge_device::c64_super_explode_cartridge_device(const mac
 void c64_super_explode_cartridge_device::device_start()
 {
 	// allocate timer
-	m_exrom_timer = timer_alloc();
+	m_exrom_timer = timer_alloc(FUNC(c64_super_explode_cartridge_device::update_exrom), this);
 
 	// state saving
 	save_item(NAME(m_bank));
@@ -72,10 +72,10 @@ void c64_super_explode_cartridge_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_exram - update exrom flag for banking
 //-------------------------------------------------
 
-void c64_super_explode_cartridge_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c64_super_explode_cartridge_device::update_exrom)
 {
 	m_exrom = 1;
 }

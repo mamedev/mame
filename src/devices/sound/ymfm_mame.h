@@ -138,7 +138,7 @@ protected:
 	{
 		// allocate our timers
 		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym_generic_device::fm_timer_handler), this));
+			m_timer[tnum] = timer_alloc(FUNC(ym_generic_device::fm_timer_handler), this);
 
 		// resolve the handlers
 		m_update_irq.resolve();

@@ -48,19 +48,6 @@ READ_LINE_MEMBER(ultratnk_state::joystick_r)
 }
 
 
-void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_NMI:
-		nmi_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in ultratnk_state::device_timer");
-	}
-}
-
-
 TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 {
 	int scanline = param + 64;
@@ -81,7 +68,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 
 void ultratnk_state::machine_start()
 {
-	m_nmi_timer = timer_alloc(TIMER_NMI);
+	m_nmi_timer = timer_alloc(FUNC(ultratnk_state::nmi_callback), this);
 
 	save_item(NAME(m_da_latch));
 	save_item(NAME(m_collision));

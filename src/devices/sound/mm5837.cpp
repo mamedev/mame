@@ -47,7 +47,7 @@ void mm5837_device::device_start()
 	m_output_cb.resolve_safe();
 
 	// get timer
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(mm5837_device::update_clock_output), this);
 
 	// register for save states
 	save_item(NAME(m_source.m_shift));
@@ -70,10 +70,10 @@ void mm5837_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer callbacks
+//  update_clock_output -
 //-------------------------------------------------
 
-void mm5837_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm5837_device::update_clock_output)
 {
 	m_output_cb(m_source.clock());
 }

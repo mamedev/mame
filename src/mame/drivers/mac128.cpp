@@ -282,8 +282,8 @@ void mac128_state::machine_start()
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u16*)memregion("bootrom")->base();
 
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_hblank), this));
+	m_scan_timer = timer_alloc(FUNC(mac128_state::mac_scanline), this);
+	m_hblank_timer = timer_alloc(FUNC(mac128_state::mac_hblank), this);
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_irq_count));

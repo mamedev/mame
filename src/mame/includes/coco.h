@@ -132,11 +132,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
 	virtual void pia1_pb_changed(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(diecom_lightgun_hit);
+	TIMER_CALLBACK_MEMBER(joystick_update);
 
 	// accessors
 	pia6821_device &pia_0() { return *m_pia_0; }
@@ -150,11 +152,6 @@ protected:
 	virtual void update_cart_base(uint8_t *cart_base) { }
 
 protected:
-	// timer constants
-	static const device_timer_id TIMER_HIRES_JOYSTICK_X = 0;
-	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;
-	static const device_timer_id TIMER_DIECOM_LIGHTGUN = 2;
-
 	enum soundmux_status_t
 	{
 		SOUNDMUX_SEL1 = 1,

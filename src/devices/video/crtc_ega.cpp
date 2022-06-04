@@ -38,7 +38,8 @@ crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag,
 	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0)
 	, m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0)
 	, m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0)
-	, m_line_timer(nullptr), m_de_off_timer(nullptr), m_cur_on_timer(nullptr), m_cur_off_timer(nullptr), m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr)
+	, m_line_timer(nullptr), m_de_off_timer(nullptr), m_cursor_on_timer(nullptr), m_cursor_off_timer(nullptr)
+	, m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr)
 	, m_horiz_pix_total(0), m_vert_pix_total(0), m_max_visible_x(0), m_max_visible_y(0)
 	, m_hsync_on_pos(0), m_hsync_off_pos(0), m_vsync_on_pos(0), m_vsync_off_pos(0)
 	, m_current_disp_addr(0), m_light_pen_latched(0), m_has_valid_parameters(false)
@@ -298,7 +299,7 @@ void crtc_ega_device::set_cur(int state)
 }
 
 
-void crtc_ega_device::handle_line_timer()
+TIMER_CALLBACK_MEMBER(crtc_ega_device::handle_line_timer)
 {
 	int new_vsync = m_vsync;
 
@@ -375,7 +376,7 @@ void crtc_ega_device::handle_line_timer()
 			m_cursor_x = m_cursor_addr - m_line_address;
 
 			/* Schedule CURSOR ON signal */
-			m_cur_on_timer->adjust( attotime::from_ticks( m_cursor_x, m_clock ) );
+			m_cursor_on_timer->adjust( attotime::from_ticks( m_cursor_x, m_clock ), 1 );
 		}
 	}
 
@@ -396,56 +397,49 @@ void crtc_ega_device::handle_line_timer()
 	set_de( m_line_enable_ff ? true : false );
 }
 
-
-void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(crtc_ega_device::de_off_tick)
 {
-	switch (id)
+	set_de( false );
+}
+
+TIMER_CALLBACK_MEMBER(crtc_ega_device::cursor_on)
+{
+	set_cur( true );
+
+	/* Schedule CURSOR off signal */
+	m_cursor_off_timer->adjust( attotime::from_ticks( 1, m_clock ), 0 );
+}
+
+TIMER_CALLBACK_MEMBER(crtc_ega_device::cursor_off)
+{
+	set_cur( false );
+}
+
+TIMER_CALLBACK_MEMBER(crtc_ega_device::hsync_on)
+{
+	int8_t hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
+
+	if ( hsync_width <= 0 )
 	{
-	case TIMER_LINE:
-		handle_line_timer();
-		break;
-
-	case TIMER_DE_OFF:
-		set_de( false );
-		break;
-
-	case TIMER_CUR_ON:
-		set_cur( true );
-
-		/* Schedule CURSOR off signal */
-		m_cur_off_timer->adjust( attotime::from_ticks( 1, m_clock ) );
-		break;
-
-	case TIMER_CUR_OFF:
-		set_cur( false );
-		break;
-
-	case TIMER_HSYNC_ON:
-		{
-			int8_t hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
-
-			if ( hsync_width <= 0 )
-			{
-				hsync_width += 0x20;
-			}
-
-			m_hsync_width_counter = 0;
-			set_hsync( true );
-
-			/* Schedule HSYNC off signal */
-			m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
-		}
-		break;
-
-	case TIMER_HSYNC_OFF:
-		set_hsync( false );
-		break;
-
-	case TIMER_LIGHT_PEN_LATCH:
-		m_light_pen_addr = get_ma();
-		m_light_pen_latched = true;
-		break;
+		hsync_width += 0x20;
 	}
+
+	m_hsync_width_counter = 0;
+	set_hsync( true );
+
+	/* Schedule HSYNC off signal */
+	m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
+}
+
+TIMER_CALLBACK_MEMBER(crtc_ega_device::hsync_off)
+{
+	set_hsync( false );
+}
+
+TIMER_CALLBACK_MEMBER(crtc_ega_device::latch_light_pen)
+{
+	m_light_pen_addr = get_ma();
+	m_light_pen_latched = true;
 }
 
 
@@ -605,13 +599,13 @@ void crtc_ega_device::device_start()
 	m_end_update_cb.resolve();
 
 	/* create the timers */
-	m_line_timer = timer_alloc(TIMER_LINE);
-	m_de_off_timer = timer_alloc(TIMER_DE_OFF);
-	m_cur_on_timer = timer_alloc(TIMER_CUR_ON);
-	m_cur_off_timer = timer_alloc(TIMER_CUR_OFF);
-	m_hsync_on_timer = timer_alloc(TIMER_HSYNC_ON);
-	m_hsync_off_timer = timer_alloc(TIMER_HSYNC_OFF);
-	m_light_pen_latch_timer = timer_alloc(TIMER_LIGHT_PEN_LATCH);
+	m_line_timer = timer_alloc(FUNC(crtc_ega_device::handle_line_timer), this);
+	m_de_off_timer = timer_alloc(FUNC(crtc_ega_device::de_off_tick), this);
+	m_cursor_on_timer = timer_alloc(FUNC(crtc_ega_device::cursor_on), this);
+	m_cursor_off_timer = timer_alloc(FUNC(crtc_ega_device::cursor_off), this);
+	m_hsync_on_timer = timer_alloc(FUNC(crtc_ega_device::hsync_on), this);
+	m_hsync_off_timer = timer_alloc(FUNC(crtc_ega_device::hsync_off), this);
+	m_light_pen_latch_timer = timer_alloc(FUNC(crtc_ega_device::latch_light_pen), this);
 
 	/* Use some large startup values */
 	m_horiz_char_total = 0xff;

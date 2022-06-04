@@ -41,10 +41,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	static const device_timer_id TIMER_RPSS = 0;
-	static const device_timer_id TIMER_DMA = 1;
 
 private:
 	enum
@@ -57,7 +53,8 @@ private:
 	};
 
 	uint32_t dma_translate(uint32_t address);
-	void dma_immediate();
+	TIMER_CALLBACK_MEMBER(perform_dma);
+	TIMER_CALLBACK_MEMBER(rpss_tick);
 
 	uint32_t get_line_count() { return m_dma_size >> 16; }
 	uint32_t get_line_width() { return (uint16_t)m_dma_size; }

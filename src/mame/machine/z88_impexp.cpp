@@ -51,7 +51,7 @@ z88_impexp_device::z88_impexp_device(const machine_config &mconfig, const char *
 
 void z88_impexp_device::device_start()
 {
-	m_timer_poll = timer_alloc();
+	m_timer_poll = timer_alloc(FUNC(z88_impexp_device::poll_queue), this);
 }
 
 //-------------------------------------------------
@@ -74,10 +74,10 @@ void z88_impexp_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  poll_queue - periodically update the queue
 //-------------------------------------------------
 
-void z88_impexp_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(z88_impexp_device::poll_queue)
 {
 	queue();
 }

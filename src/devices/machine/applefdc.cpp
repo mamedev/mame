@@ -55,10 +55,6 @@
 #define IWM_Q6              0x40
 #define IWM_Q7              0x80
 
-const device_timer_id TIMER_MOTOR_ONOFF = 1;
-
-
-
 
 
 /***************************************************************************
@@ -122,7 +118,7 @@ applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_
 void applefdc_base_device::device_start()
 {
 	// timer
-	m_motor_timer = timer_alloc(TIMER_MOTOR_ONOFF);
+	m_motor_timer = timer_alloc(FUNC(applefdc_base_device::turn_motor_onoff), this);
 
 	// state
 	m_write_byte        = 0x00;
@@ -150,22 +146,6 @@ void applefdc_base_device::device_reset(void)
 	m_lines = 0x00;
 	m_mode = 0x1F;  /* default value needed by Lisa 2 - no, I don't know if it is true */
 	m_motor_timer->reset();
-}
-
-
-
-//-------------------------------------------------
-//  device_timer - device-specific timer callbacks
-//-------------------------------------------------
-
-void applefdc_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_MOTOR_ONOFF:
-			turn_motor_onoff(param != 0);
-			break;
-	}
 }
 
 
@@ -345,12 +325,12 @@ void applefdc_base_device::write_reg(uint8_t data)
 //  motor on or off
 //-------------------------------------------------
 
-void applefdc_base_device::turn_motor_onoff(bool status)
+TIMER_CALLBACK_MEMBER(applefdc_base_device::turn_motor_onoff)
 {
 	const applefdc_interface *intf = get_interface();
 	int enable_lines;
 
-	if (status)
+	if (param)
 	{
 		m_lines |= IWM_MOTOR;
 		enable_lines = (m_lines & IWM_DRIVE) ? 2 : 1;
@@ -370,7 +350,7 @@ void applefdc_base_device::turn_motor_onoff(bool status)
 		intf->set_enable_lines(this, enable_lines);
 
 	if (LOG_APPLEFDC_EXTRA)
-		logerror("iwm_turnmotor_onoff(): Turning motor %s\n", status ? "on" : "off");
+		logerror("iwm_turnmotor_onoff(): Turning motor %s\n", param ? "on" : "off");
 }
 
 

@@ -103,7 +103,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(bit_timer_tick);
+	TIMER_CALLBACK_MEMBER(tacho_timer_tick);
+	TIMER_CALLBACK_MEMBER(hole_timer_tick);
+	TIMER_CALLBACK_MEMBER(motion_timer_tick);
 
 private:
 	devcb_write_line m_cart_out_handler;

@@ -210,7 +210,7 @@ void gcm394_base_video_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 
-	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
+	m_screenpos_timer = timer_alloc(FUNC(gcm394_base_video_device::screen_pos_reached), this);
 	m_screenpos_timer->adjust(attotime::never);
 
 	save_item(NAME(m_page0_addr_lsb));
@@ -1132,27 +1132,20 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 	}
 }
 
-void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gcm394_base_video_device::screen_pos_reached)
 {
-	switch (id)
+	if (m_video_irq_enable & 2)
 	{
-		case TIMER_SCREENPOS:
-		{
-			if (m_video_irq_enable & 2)
-			{
-				m_video_irq_status |= 2;
-				check_video_irq();
-			}
-
-			//printf("firing irq timer\n");
-
-			m_screen->update_partial(m_screen->vpos());
-
-			// fire again, jak_dbz pinball needs this
-			m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-19, m_xirqpos));
-			break;
-		}
+		m_video_irq_status |= 2;
+		check_video_irq();
 	}
+
+	//printf("firing irq timer\n");
+
+	m_screen->update_partial(m_screen->vpos());
+
+	// fire again, jak_dbz pinball needs this
+	m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos-19, m_xirqpos));
 }
 
 

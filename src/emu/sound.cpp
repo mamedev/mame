@@ -602,7 +602,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 
 	// create an update timer for synchronous streams
 	if (synchronous())
-		m_sync_timer = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_stream::sync_update), this));
+		m_sync_timer = m_device.timer_alloc(FUNC(sound_stream::sync_update), this);
 
 	// force an update to the sample rates
 	sample_rate_changed();

@@ -140,10 +140,6 @@ void esqvfd_device::device_reset()
 	memset(m_dirty, 1, sizeof(m_attrs));
 }
 
-void esqvfd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-}
-
 // generic display update; can override from child classes if not good enough
 void esqvfd_device::update_display()
 {

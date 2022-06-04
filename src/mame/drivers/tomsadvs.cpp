@@ -82,7 +82,7 @@ void tomsadvs_state::tomsadvs(machine_config &config)
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", 12.288_MHz_XTAL/16, okim6295_device::PIN7_HIGH)); // Clock frequency & pin 7 not verified
 	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45); // Guess
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guessgit checkout 
+	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guess
 }
 
 ROM_START(tomsadvs)

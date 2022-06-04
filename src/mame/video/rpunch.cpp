@@ -77,7 +77,7 @@ VIDEO_START_MEMBER(rpunch_state,rpunch)
 	m_pixmap->fill(0xf, pixmap_rect);
 
 	/* reset the timer */
-	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rpunch_state::crtc_interrupt_gen),this));
+	m_crtc_timer = timer_alloc(FUNC(rpunch_state::crtc_interrupt_gen), this);
 
 	save_item(NAME(*m_pixmap));
 }

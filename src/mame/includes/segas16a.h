@@ -127,21 +127,17 @@ private:
 	typedef delegate<void ()> i8751_sim_delegate;
 	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
 
-	// timer IDs
-	enum
-	{
-		TID_INIT_I8751,
-		TID_PPI_WRITE
-	};
-
 	// driver overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(i8751_sync);
+	TIMER_CALLBACK_MEMBER(ppi_sync);
 
 	// custom I/O handlers
 	uint16_t aceattaca_custom_io_r(offs_t offset);
@@ -173,20 +169,21 @@ private:
 	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
 
 	// configuration
-	read16sm_delegate         m_custom_io_r;
+	read16sm_delegate       m_custom_io_r;
 	write16s_delegate       m_custom_io_w;
 	i8751_sim_delegate      m_i8751_vblank_hook;
 	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	uint8_t                   m_video_control = 0;
-	uint8_t                   m_mcu_control = 0;
-	uint8_t                   m_n7751_command = 0;
-	uint32_t                  m_n7751_rom_address = 0;
-	uint8_t                   m_last_buttons1 = 0;
-	uint8_t                   m_last_buttons2 = 0;
-	uint8_t                   m_read_port = 0;
-	uint8_t                   m_mj_input_num = 0;
+	emu_timer              * m_i8751_sync_timer = nullptr;
+	uint8_t                  m_video_control = 0;
+	uint8_t                  m_mcu_control = 0;
+	uint8_t                  m_n7751_command = 0;
+	uint32_t                 m_n7751_rom_address = 0;
+	uint8_t                  m_last_buttons1 = 0;
+	uint8_t                  m_last_buttons2 = 0;
+	uint8_t                  m_read_port = 0;
+	uint8_t                  m_mj_input_num = 0;
 	optional_ioport_array<6> m_mj_inputs;
 	output_finder<2> m_lamps;
 };

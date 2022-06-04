@@ -210,21 +210,6 @@ void gaplus_base_state::machine_reset()
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_NAMCOIO0_RUN:
-		namcoio0_run(param);
-		break;
-	case TIMER_NAMCOIO1_RUN:
-		namcoio1_run(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in gaplus_base_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(gaplus_base_state::namcoio0_run)
 {
 	m_namco58xx->customio_run();
@@ -499,8 +484,8 @@ void gaplus_state::out_lamps1(uint8_t data)
 
 void gaplus_base_state::machine_start()
 {
-	m_namcoio0_run_timer = timer_alloc(TIMER_NAMCOIO0_RUN);
-	m_namcoio1_run_timer = timer_alloc(TIMER_NAMCOIO1_RUN);
+	m_namcoio0_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio0_run), this);
+	m_namcoio1_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio1_run), this);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));

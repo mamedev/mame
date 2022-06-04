@@ -16,7 +16,7 @@ public:
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
@@ -24,9 +24,10 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void set_chr();
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	u8 m_latch;
 	u8 m_mmc_vrom_bank[8];
@@ -41,7 +42,6 @@ private:
 
 	u8 m_mmc_prg_bank[3];
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 	attotime timer_freq;
 };

@@ -67,6 +67,7 @@ private:
 	uint8_t m_buffer[128]{};
 	int m_buf_pos = 0;
 
+	emu_timer *m_command_timer = nullptr;
 	uint16_t m_rxcs = 0; // Command and Status Register
 	uint16_t m_rxdb = 0; // Data Buffer Register
 	uint16_t m_rxta = 0; // RX Track Address

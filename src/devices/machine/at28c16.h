@@ -35,7 +35,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -57,6 +56,7 @@ private:
 	// I/O operations
 	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
 	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
+	TIMER_CALLBACK_MEMBER( write_complete );
 
 	void at28c16_map8(address_map &map);
 };

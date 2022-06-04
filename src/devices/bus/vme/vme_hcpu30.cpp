@@ -44,12 +44,6 @@
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 
 #define DUSCC_CLOCK XTAL(14'745'600) /* XXX Unverified */
 #define RS232P1_TAG      "rs232p1"
@@ -117,24 +111,24 @@ void vme_hcpu30_card_device::oscpu_space_map(address_map &map)
 
 static INPUT_PORTS_START(hcpu30)
 	PORT_START("SA1")
-	PORT_DIPNAME(0x03, 0x00, "Console port speed")
+	PORT_DIPNAME(0x03, 0x00, "Console Port Speed")
 	PORT_DIPSETTING(0x00, "9600")
 	PORT_DIPSETTING(0x01, "19200")
 	PORT_DIPSETTING(0x02, "38400")
 	PORT_DIPSETTING(0x03, "4800")
-	PORT_DIPNAME(0x04, 0x04, "Boot into...")
+	PORT_DIPNAME(0x04, 0x04, "Boot Mode")
 	PORT_DIPSETTING(0x00, "UNIX")
 	PORT_DIPSETTING(0x04, "Monitor")
 	PORT_DIPNAME(0x08, 0x00, "Undefined 1")
 	PORT_DIPSETTING(0x00, "Off")
 	PORT_DIPSETTING(0x08, "On")
-	PORT_DIPNAME(0x10, 0x00, "VME bus width")
+	PORT_DIPNAME(0x10, 0x00, "VME Bus Width")
 	PORT_DIPSETTING(0x00, "32 bits")
 	PORT_DIPSETTING(0x10, "16 bits")
-	PORT_DIPNAME(0x20, 0x00, "VME bus free")
+	PORT_DIPNAME(0x20, 0x00, "VME Bus Free")
 	PORT_DIPSETTING(0x00, "ROR")
 	PORT_DIPSETTING(0x20, "REC")
-	PORT_DIPNAME(0x40, 0x00, "Cache burst mode")
+	PORT_DIPNAME(0x40, 0x00, "Cache Burst Mode")
 	PORT_DIPSETTING(0x00, "Off")
 	PORT_DIPSETTING(0x40, "On")
 	PORT_DIPNAME(0x80, 0x00, "Undefined 2")
@@ -265,20 +259,20 @@ uint32_t vme_hcpu30_card_device::rtc_r(offs_t offset)
 	if (offset == 0)
 	{
 		data &= 0xffffff;
-		data |= ioport("SA1")->read() << 24;
+		data |= m_dips->read() << 24;
 	}
 	if (offset == 7)
 	{
 		data &= 0xff00ffff;
 		data |= (m_cent_status_in->read() ^ 0xff) << 16;
 	}
-	LOG("%s(%02x)==%08x%s\n", FUNCNAME, offset, data, m_rtc_hack ? " hacked" : "");
+	LOG("vme_hcpu30_card_device::rtc_r(%02x) == %08x %s\n", offset, data, m_rtc_hack ? "(hacked)" : "");
 	return data;
 }
 
 void vme_hcpu30_card_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOG("%s(%02x,%08x)<-%08x\n", FUNCNAME, offset, mem_mask, data);
+	LOG("vme_hcpu30_card_device::rtc_w(%02x, %08x)<-%08x\n", offset, mem_mask, data);
 	if (mem_mask == 0xffff0000)
 	{
 		m_rtc->write(offset << 1, (data >> 4) & 15);
@@ -293,7 +287,7 @@ void vme_hcpu30_card_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		m_rtc->write((offset << 1) + 1, (data >> 20) & 15);
 		m_rtc_reg[(offset << 1) + 1] = (data >> 20) & 15;
 	}
-	if (offset < 6 || (offset == 6 && mem_mask == 0xffff0000)) m_rtc_hack = true; else m_rtc_hack = false;
+	m_rtc_hack = (offset < 6 || (offset == 6 && mem_mask == 0xffff0000));
 }
 
 uint32_t vme_hcpu30_card_device::dma_r(offs_t offset)
@@ -333,46 +327,46 @@ uint32_t vme_hcpu30_card_device::trap_r(offs_t offset, uint32_t mem_mask)
 
 void vme_hcpu30_card_device::trap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOG("%s(%08x,%08X)\n", FUNCNAME, offset << 2, data);
+	LOG("vme_hcpu30_card_device::trap_w(%08x, %08X)\n", offset << 2, data);
 	if (!machine().side_effects_disabled()) set_bus_error((offset << 2), false, mem_mask);
 }
 
-// AH?
+// Active High?
 WRITE_LINE_MEMBER(vme_hcpu30_card_device::dusirq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
-	m_irq_state &= ~(1 << (8+4));
-	m_irq_state |= (state << (8+4));
+	LOGINT("vme_hcpu30_card_device::dusirq_callback(%02x)\n", state);
+	m_irq_state &= ~(1 << 12);
+	m_irq_state |= (state << 12);
 }
 
-// AL?
+// Active Low?
 WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsiirq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
+	LOGINT("vme_hcpu30_card_device::scsiirq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << 8);
 	m_irq_state |= (state << 8);
 }
 
-// AL?
+// Active Low?
 WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsidrq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
+	LOGINT("vme_hcpu30_card_device::scsidrq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << 7);
 	m_irq_state |= (state << 7);
 }
 
-// AL?
+// Active Low?
 WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcirq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
+	LOGINT("vme_hcpu30_card_device::fdcirq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << (8+2));
 	m_irq_state |= (state << (8+2));
 }
 
-// AL?
+// Active Low?
 WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcdrq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
+	LOGINT("vme_hcpu30_card_device::fdcdrq_callback(%02x)\n", state);
 #if 0
 	if (state)
 	{
@@ -455,12 +449,10 @@ void vme_hcpu30_card_device::update_030_irq(int irq, line_state state)
 // 15   - INTENA*   "enable input" pin of LS148 priority encoder
 void vme_hcpu30_card_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint16_t diff;
-
 	data >>= 16;
-	diff = data ^ m_irq_mask;
+	uint16_t diff = data ^ m_irq_mask;
 
-	LOG("%s(%04x,%04x)\n", FUNCNAME, data, diff);
+	LOG("vme_hcpu30_card_device::irq_mask_w(%04x,%04x)\n", data, diff);
 
 	if (BIT(diff, 15))
 	{
@@ -551,8 +543,9 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, de
 	, m_mailbox(*this, "mailbox")
 	, m_p_ram(*this, "dram")
 	, m_sysrom(*this, "user1")
+	, m_dips(*this, "SA1")
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_hcpu30_card_device::vme_hcpu30_card_device ctor: %s\n", tag);
 	m_slot = 1;
 }
 
@@ -565,16 +558,16 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, co
 
 void vme_hcpu30_card_device::device_start()
 {
-	LOG("%s %s\n", tag(), FUNCNAME);
+	LOG("vme_hcpu30_card_device::device_start %s\n", tag());
 
-	m_bus_error_timer = timer_alloc(0);
+	m_bus_error_timer = timer_alloc(FUNC(vme_hcpu30_card_device::bus_error_off), this);
 }
 
 void vme_hcpu30_card_device::device_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	LOG("%s %s\n", tag(), FUNCNAME);
+	LOG("vme_hcpu30_card_device::device_reset %s\n", tag());
 	m_irq_state = (1 << 10) | (1 << 6); // fdcirq | irq30*
 	m_irq_mask = 0;
 	m_rtc_hack = false;
@@ -600,7 +593,7 @@ void vme_hcpu30_card_device::device_reset()
 			&m_rom_shadow_tap);
 }
 
-void vme_hcpu30_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vme_hcpu30_card_device::bus_error_off)
 {
 	m_bus_error = false;
 }

@@ -37,7 +37,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::interrupt_timer)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	machine().scheduler().timer_set(m_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),this));
+	m_irq_off_timer->adjust(m_screen->time_until_pos(param, BALSENTE_HBSTART));
 
 	/* if this is Grudge Match, update the steering */
 	if (m_grudge_steering_result & 0x80)
@@ -78,6 +78,9 @@ void balsente_state::machine_start()
 	save_item(NAME(m_spiker_expand_bits));
 	save_item(NAME(m_grudge_steering_result));
 	save_item(NAME(m_grudge_last_steering));
+
+	m_irq_off_timer = timer_alloc(FUNC(balsente_state::irq_off), this);
+	m_adc_timer = timer_alloc(FUNC(balsente_state::adc_finished), this);
 }
 
 
@@ -100,6 +103,9 @@ void balsente_state::machine_reset()
 
 	/* start a timer to generate interrupts */
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+
+	m_irq_off_timer->adjust(attotime::never);
+	m_adc_timer->adjust(attotime::never);
 }
 
 
@@ -318,7 +324,7 @@ void balsente_state::adc_select_w(offs_t offset, uint8_t data)
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 	logerror("adc_select %d\n", offset & 7);
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(balsente_state::adc_finished),this), offset & 7);
+	m_adc_timer->adjust(attotime::from_usec(50), offset & 7);
 }
 
 uint8_t balsente_state::teamht_extra_r()

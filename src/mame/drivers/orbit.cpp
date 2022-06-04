@@ -248,7 +248,7 @@ GFXDECODE_END
 
 void orbit_state::machine_start()
 {
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(orbit_state::irq_off), this));
+	m_irq_off_timer = timer_alloc(FUNC(orbit_state::irq_off), this);
 
 	save_item(NAME(m_flip_screen));
 }

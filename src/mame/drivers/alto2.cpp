@@ -26,12 +26,12 @@ public:
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	void init_alto2();
-
 	void alto2(machine_config &config);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void driver_init() override;
+
+	TIMER_CALLBACK_MEMBER(handle_vblank);
 
 private:
 	u16 kb_r(offs_t offset);
@@ -41,7 +41,6 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_io_row;
 	optional_ioport m_io_config;
-	static const device_timer_id TIMER_VBLANK = 0;
 	emu_timer* m_vblank_timer;
 };
 
@@ -297,23 +296,16 @@ void alto2_state::alto2(machine_config &config)
 	DIABLO_HD(config, DIABLO_HD_1, 3333333);
 }
 
-/* Driver Init */
-
-void alto2_state::init_alto2()
+void alto2_state::driver_init()
 {
 	// Create a timer which fires twice per frame, once for each field
-	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
+	m_vblank_timer = timer_alloc(FUNC(alto2_state::handle_vblank), this);
+	m_vblank_timer->adjust(attotime::from_hz(30*2), 0, attotime::from_hz(30*2));
 }
 
-void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(alto2_state::handle_vblank)
 {
-	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	switch (id) {
-	case TIMER_VBLANK:
-		cpu->screen_vblank();
-		break;
-	}
+	m_maincpu->screen_vblank();
 }
 
 } // Anonymous namespace
@@ -321,4 +313,4 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 /* Game Drivers */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, init_alto2, "Xerox", "Alto-II", 0 )
+COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, empty_init, "Xerox", "Alto-II", 0 )

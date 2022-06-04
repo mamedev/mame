@@ -75,6 +75,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void s11_main_map(address_map &map);
+	void s11_audio_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(irq_timer);
 
 	u8 sound_r();
 	void bank_w(u8 data);
@@ -110,13 +117,6 @@ protected:
 	void switch_w(u8 data);
 	u8 pia28_w7_r();
 
-	void s11_main_map(address_map &map);
-	void s11_audio_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -151,9 +151,6 @@ protected:
 	void set_segment1(u32 s) { m_segment1 = s; }
 	u32 get_segment2() { return m_segment2; }
 	void set_segment2(u32 s) { m_segment2 = s; }
-	void set_timer(emu_timer* t) { m_irq_timer = t; }
-
-	static const device_timer_id TIMER_IRQ = 0;
 
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;

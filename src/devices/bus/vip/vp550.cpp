@@ -4,39 +4,17 @@
 
     RCA VIP Super Sound System VP550 emulation
 
+    TODO: Implement VP551 variant
+
 **********************************************************************/
-
-/*
-
-    TODO:
-
-    - VP551
-
-*/
 
 #include "emu.h"
 #include "vp550.h"
-
 #include "speaker.h"
 
+#define VERBOSE	(0)
+#include "logmacro.h"
 
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
-
-#define CDP1863_A_TAG   "u1"
-#define CDP1863_B_TAG   "u2"
-
-
-enum
-{
-	CHANNEL_A = 0,
-	CHANNEL_B
-};
 
 
 //**************************************************************************
@@ -47,20 +25,20 @@ DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 
 
 //-------------------------------------------------
-//  machine_config( vp550 )
+//  device_add_mconfig
 //-------------------------------------------------
 
 void vp550_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	CDP1863(config, m_pfg_a, 0);
-	m_pfg_a->set_clock2(0);
-	m_pfg_a->add_route(ALL_OUTPUTS, "mono", 1.0);
+	CDP1863(config, m_pfg[0], 0);
+	m_pfg[0]->set_clock2(0);
+	m_pfg[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	CDP1863(config, m_pfg_b, 0);
-	m_pfg_b->set_clock2(0);
-	m_pfg_b->add_route(ALL_OUTPUTS, "mono", 1.0);
+	CDP1863(config, m_pfg[1], 0);
+	m_pfg[1]->set_clock2(0);
+	m_pfg[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -76,8 +54,7 @@ void vp550_device::device_add_mconfig(machine_config &config)
 vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP550, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
-	m_pfg_a(*this, CDP1863_A_TAG),
-	m_pfg_b(*this, CDP1863_B_TAG),
+	m_pfg(*this, "u%u", 1U),
 	m_sync_timer(nullptr)
 {
 }
@@ -90,19 +67,19 @@ vp550_device::vp550_device(const machine_config &mconfig, const char *tag, devic
 void vp550_device::device_start()
 {
 	// allocate timers
-	m_sync_timer = timer_alloc();
+	m_sync_timer = timer_alloc(FUNC(vp550_device::sync_tick), this);
 	m_sync_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 	m_sync_timer->enable(0);
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  sync_timer - fire an interrupt on host
 //-------------------------------------------------
 
-void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vp550_device::sync_tick)
 {
-	if (LOG) logerror("VP550 '%s' Interrupt\n", tag());
+	LOG("VP550 '%s' Interrupt\n", tag());
 
 	m_slot->interrupt_w(ASSERT_LINE);
 }
@@ -120,8 +97,8 @@ void vp550_device::vip_program_w(offs_t offset, uint8_t data, int cdef, int *min
 
 		switch (offset & 0x03)
 		{
-		case 1: m_pfg_a->str_w(data); break;
-		case 2: m_pfg_b->str_w(data); break;
+		case 1: m_pfg[0]->str_w(data); break;
+		case 2: m_pfg[1]->str_w(data); break;
 		case 3: octave_w(data); break;
 		}
 
@@ -143,7 +120,7 @@ void vp550_device::vip_sc_w(int n, int sc)
 {
 	if (BIT(sc, 1))
 	{
-		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag());
+		LOG("VP550 '%s' Clear Interrupt\n", tag());
 
 		m_slot->interrupt_w(CLEAR_LINE);
 	}
@@ -156,8 +133,8 @@ void vp550_device::vip_sc_w(int n, int sc)
 
 void vp550_device::vip_q_w(int state)
 {
-	m_pfg_a->oe_w(state);
-	m_pfg_b->oe_w(state);
+	m_pfg[0]->oe_w(state);
+	m_pfg[1]->oe_w(state);
 }
 
 
@@ -169,8 +146,8 @@ void vp550_device::vip_run_w(int state)
 {
 	if (!state)
 	{
-		m_pfg_a->reset();
-		m_pfg_b->reset();
+		m_pfg[0]->reset();
+		m_pfg[1]->reset();
 	}
 }
 
@@ -184,24 +161,14 @@ void vp550_device::octave_w(uint8_t data)
 	int channel = (data >> 2) & 0x03;
 	int clock2 = 0;
 
-	if (data & 0x10)
+	if (BIT(data, 4))
 	{
-		switch (data & 0x03)
-		{
-		case 0: clock2 = m_slot->clock() / 8; break;
-		case 1: clock2 = m_slot->clock() / 4; break;
-		case 2: clock2 = m_slot->clock() / 2; break;
-		case 3: clock2 = m_slot->clock();     break;
-		}
+		clock2 = m_slot->clock() >> (3 - (data & 0x03));
 	}
 
-	switch (channel)
-	{
-	case CHANNEL_A: m_pfg_a->set_clk2(clock2); break;
-	case CHANNEL_B: m_pfg_b->set_clk2(clock2); break;
-	}
+	m_pfg[BIT(data, 2)]->set_clk2(clock2);
 
-	if (LOG) logerror("VP550 '%s' Clock %c: %u Hz\n", tag(), 'A' + channel, clock2);
+	LOG("VP550 '%s' Clock %c: %u Hz\n", tag(), 'A' + channel, clock2);
 }
 
 
@@ -211,11 +178,10 @@ void vp550_device::octave_w(uint8_t data)
 
 void vp550_device::vlmna_w(uint8_t data)
 {
-	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
+	LOG("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
 
-	float gain = (data & 0x0f) * 0.0666;
-
-	m_pfg_a->set_output_gain(0, gain);
+	float gain = (data & 0x0f) / 15.0f;
+	m_pfg[0]->set_output_gain(0, gain);
 }
 
 
@@ -225,11 +191,10 @@ void vp550_device::vlmna_w(uint8_t data)
 
 void vp550_device::vlmnb_w(uint8_t data)
 {
-	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
+	LOG("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
 
-	float gain = (data & 0x0f) * 0.0666;
-
-	m_pfg_b->set_output_gain(0, gain);
+	float gain = (data & 0x0f) / 15.0f;
+	m_pfg[1]->set_output_gain(0, gain);
 }
 
 
@@ -239,7 +204,7 @@ void vp550_device::vlmnb_w(uint8_t data)
 
 void vp550_device::sync_w(uint8_t data)
 {
-	if (LOG) logerror("VP550 '%s' Interrupt Enable: %u\n", tag(), BIT(data, 0));
+	LOG("VP550 '%s' Interrupt Enable: %u\n", tag(), BIT(data, 0));
 
 	m_sync_timer->enable(BIT(data, 0));
 }

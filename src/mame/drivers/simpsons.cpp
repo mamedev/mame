@@ -128,15 +128,15 @@ void simpsons_state::main_map(address_map &map)
 	map(0x1f93, 0x1f93).portr("P4");
 	map(0x1fa0, 0x1fa7).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x1fb0, 0x1fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x1fc0, 0x1fc0).w(FUNC(simpsons_state::simpsons_coin_counter_w));
-	map(0x1fc2, 0x1fc2).w(FUNC(simpsons_state::simpsons_eeprom_w));
-	map(0x1fc4, 0x1fc4).r(FUNC(simpsons_state::simpsons_sound_interrupt_r));
+	map(0x1fc0, 0x1fc0).w(FUNC(simpsons_state::coin_counter_w));
+	map(0x1fc2, 0x1fc2).w(FUNC(simpsons_state::eeprom_w));
+	map(0x1fc4, 0x1fc4).r(FUNC(simpsons_state::sound_interrupt_r));
 	map(0x1fc6, 0x1fc7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x1fc8, 0x1fc9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x1fca, 0x1fca).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x2000, 0x3fff).view(m_video_view);
-	m_video_view[0](0x2000, 0x3fff).rw(FUNC(simpsons_state::simpsons_k052109_r), FUNC(simpsons_state::simpsons_k052109_w));
-	m_video_view[1](0x2000, 0x2fff).rw(FUNC(simpsons_state::simpsons_k053247_r), FUNC(simpsons_state::simpsons_k053247_w));
+	m_video_view[0](0x2000, 0x3fff).rw(FUNC(simpsons_state::k052109_r), FUNC(simpsons_state::k052109_w));
+	m_video_view[1](0x2000, 0x2fff).rw(FUNC(simpsons_state::k053247_r), FUNC(simpsons_state::k053247_w));
 	m_video_view[1](0x3000, 0x3fff).ram();
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x7fff).bankr("bank1");
@@ -149,20 +149,15 @@ void simpsons_state::z80_bankswitch_w(uint8_t data)
 }
 
 
-void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(simpsons_state::dma_start)
 {
-	switch (id)
-	{
-	case TIMER_DMASTART:
-		if (m_firq_enabled)
-			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, ASSERT_LINE);
-		break;
-	case TIMER_DMAEND:
-		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in simpsons_state::device_timer");
-	}
+	if (m_firq_enabled)
+		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(simpsons_state::dma_end)
+{
+	m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -283,7 +278,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void simpsons_state::simpsons_objdma(  )
+void simpsons_state::object_dma()
 {
 	int counter, num_inactive;
 	uint16_t *src, *dst;
@@ -307,13 +302,13 @@ void simpsons_state::simpsons_objdma(  )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
+INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
 {
 	if (m_k053246->k053246_is_irq_enabled())
 	{
-		simpsons_objdma();
-		timer_set(attotime::from_ticks(256, XTAL(24'000'000)/4), TIMER_DMASTART);
-		timer_set(attotime::from_ticks(256+2048, XTAL(24'000'000)/4), TIMER_DMAEND);
+		object_dma();
+		m_dma_start_timer->adjust(attotime::from_ticks(256, XTAL(24'000'000)/4));
+		m_dma_end_timer->adjust(attotime::from_ticks(256+2048, XTAL(24'000'000)/4));
 	}
 }
 
@@ -322,7 +317,7 @@ void simpsons_state::simpsons(machine_config &config)
 	/* basic machine hardware */
 	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpsons_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::simpsons_irq)); /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
+	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::periodic_irq)); /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 	m_maincpu->line().set(FUNC(simpsons_state::banking_callback));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
@@ -341,7 +336,7 @@ void simpsons_state::simpsons(machine_config &config)
 	// vertical: 16 lines front porch, 8 lines sync, 16 lines back porch
 	screen.set_raw(XTAL(24'000'000)/4, 384, 0+16, 320-16, 264, 0, 224);
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_screen_update(FUNC(simpsons_state::screen_update_simpsons));
+	screen.set_screen_update(FUNC(simpsons_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_hilights();

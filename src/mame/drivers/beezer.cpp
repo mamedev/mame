@@ -69,8 +69,8 @@ public:
 		m_dac_data[0] = m_dac_data[1] = m_dac_data[2] = m_dac_data[3] = 0;
 	}
 
-	void scanline_cb();
-	void dac_update_cb();
+	TIMER_CALLBACK_MEMBER(scanline_cb);
+	TIMER_CALLBACK_MEMBER(dac_update_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);
 	void palette_w(offs_t offset, uint8_t data);
@@ -99,14 +99,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	enum
-	{
-		TIMER_DAC,
-		TIMER_SCANLINE
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -228,7 +220,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-void beezer_state::scanline_cb()
+TIMER_CALLBACK_MEMBER( beezer_state::scanline_cb )
 {
 	const int scanline = m_screen->vpos();
 
@@ -291,17 +283,7 @@ uint8_t beezer_state::line_r()
 //  AUDIO
 //**************************************************************************
 
-void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_DAC: dac_update_cb(); break;
-	case TIMER_SCANLINE: scanline_cb(); break;
-	default: throw emu_fatalerror("Unknown id in beezer_state::device_timer");
-	}
-}
-
-void beezer_state::dac_update_cb()
+TIMER_CALLBACK_MEMBER( beezer_state::dac_update_cb )
 {
 	// channel multiplexer at u52
 	int ch = m_count++ & 3;
@@ -458,8 +440,8 @@ void beezer_state::machine_start()
 		m_rombank[i]->configure_entries(0, 2, m_banked_roms->base() + (i * 0x2000), 0x1000);
 
 	// allocate timers
-	m_dac_timer = timer_alloc(TIMER_DAC);
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_dac_timer = timer_alloc(FUNC(beezer_state::dac_update_cb), this);
+	m_scanline_timer = timer_alloc(FUNC(beezer_state::scanline_cb), this);
 
 	// register for state saving
 	save_item(NAME(m_ch_sign));

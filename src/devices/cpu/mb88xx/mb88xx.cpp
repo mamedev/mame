@@ -193,7 +193,7 @@ void mb88_cpu_device::device_start()
 	m_read_si.resolve_safe(0);
 	m_write_so.resolve_safe();
 
-	m_serial = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb88_cpu_device::serial_timer), this));
+	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
 	m_ctr = 0;
 

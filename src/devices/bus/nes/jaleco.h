@@ -135,7 +135,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	optional_device<samples_device> m_samples;
 
@@ -144,7 +145,6 @@ private:
 	u8 m_irq_mode;
 	u8 m_irq_enable;
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 
 	u8 m_mmc_prg_bank[3];

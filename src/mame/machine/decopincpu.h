@@ -29,13 +29,13 @@ class decocpu_type1_device : public device_t
 {
 public:
 	template <typename T>
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpuregion_tag)
+	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
 		: decocpu_type1_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// callbacks
 	auto display_read_callback() { return m_read_display.bind(); }
@@ -52,16 +52,16 @@ public:
 	template <typename T> void set_cpuregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); } // region for cpu board code and data
 
 protected:
-	static constexpr device_timer_id TIMER_IRQ = 0;
-	void solenoid0_w(uint8_t data);
+	void solenoid0_w(u8 data);
 
-	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_trigger);
 
 	void decocpu1_map(address_map &map);
 
@@ -72,7 +72,8 @@ protected:
 	required_device<pia6821_device> m_pia2c;
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
-	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<u8> m_rom;
+	required_ioport m_diags;
 
 private:
 	emu_timer* m_irq_timer = 0;
@@ -98,37 +99,37 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[17] = state; }
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; }
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[16] = state; }
-	void lamp0_w(uint8_t data);
-	void lamp1_w(uint8_t data);
-	uint8_t display_strobe_r();
-	void display_strobe_w(uint8_t data);
-	void display_out1_w(uint8_t data);
-	void display_out2_w(uint8_t data);
-	void display_out3_w(uint8_t data);
-	void display_out4_w(uint8_t data);
-	uint8_t display_in3_r();
-	void switch_w(uint8_t data);
-	uint8_t switch_r();
-	uint8_t dmdstatus_r();
-	void sound_w(uint8_t data);
-	void solenoid1_w(uint8_t data);
+	void lamp0_w(u8 data);
+	void lamp1_w(u8 data);
+	u8 display_strobe_r();
+	void display_strobe_w(u8 data);
+	void display_out1_w(u8 data);
+	void display_out2_w(u8 data);
+	void display_out3_w(u8 data);
+	void display_out4_w(u8 data);
+	u8 display_in3_r();
+	void switch_w(u8 data);
+	u8 switch_r();
+	u8 dmdstatus_r();
+	void sound_w(u8 data);
+	void solenoid1_w(u8 data);
 };
 
 class decocpu_type2_device : public decocpu_type1_device
 {
 public:
 	template <typename T>
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpuregion_tag)
+	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
 		: decocpu_type2_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void decocpu2_map(address_map &map);
 protected:
-	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -139,16 +140,16 @@ class decocpu_type3_device : public decocpu_type2_device
 {
 public:
 	template <typename T>
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpuregion_tag)
+	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
 		: decocpu_type3_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
 	virtual void device_start() override;
@@ -158,13 +159,13 @@ class decocpu_type3b_device : public decocpu_type3_device
 {
 public:
 	template <typename T>
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpuregion_tag)
+	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
 		: decocpu_type3b_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// overrides

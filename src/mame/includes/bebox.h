@@ -59,13 +59,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	enum
-	{
-		TIMER_GET_DEVICES
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 private:
 	required_device_array<ppc_device, 2> m_ppc;
 	required_device<lsi53c810_device> m_lsi53c810;

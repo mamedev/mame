@@ -29,11 +29,12 @@ protected:
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 	virtual void device_stop(void) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
+
+	TIMER_CALLBACK_MEMBER(step_programming);
 
 	int        get_sector_number(offs_t address) { return address / m_sector_size; }
 

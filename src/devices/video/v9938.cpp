@@ -172,11 +172,11 @@ void v99x8_device::device_config_complete()
 }
 
 
-void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(v99x8_device::update_line)
 {
 	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 
-	update_command ();
+	update_command();
 
 	// set flags
 	if (m_scanline == (m_scanline_start + m_offset_y))
@@ -626,7 +626,7 @@ void v99x8_device::device_start()
 		for (int addr = m_vram_size; addr < 0x30000; addr++) m_vram_space->write_byte(addr, 0xff);
 	}
 
-	m_line_timer = timer_alloc(TIMER_LINE);
+	m_line_timer = timer_alloc(FUNC(v99x8_device::update_line), this);
 
 	palette_init();
 

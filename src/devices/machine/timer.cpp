@@ -102,8 +102,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 
 void timer_device::device_start()
 {
-	// allocate the timer
-	m_timer = timer_alloc();
+	if (m_type == TIMER_TYPE_SCANLINE)
+		m_timer = timer_alloc(FUNC(timer_device::scanline_tick), this);
+	else
+		m_timer = timer_alloc(FUNC(timer_device::generic_tick), this);
 
 	m_callback.resolve();
 
@@ -153,44 +155,31 @@ void timer_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_timer - handle timer expiration events
-//-------------------------------------------------
-
-void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(timer_device::generic_tick)
 {
-	switch (m_type)
+	if (!m_callback.isnull())
+		(m_callback)(*this, param);
+}
+
+TIMER_CALLBACK_MEMBER(timer_device::scanline_tick)
+{
+	// by default, we fire at the first position
+	int next_vpos = m_first_vpos;
+
+	// the first time through we just go with the default position
+	if (!m_first_time)
 	{
-		// general periodic timers just call through
-		case TIMER_TYPE_GENERIC:
-		case TIMER_TYPE_PERIODIC:
-			if (!m_callback.isnull())
-				(m_callback)(*this, param);
-			break;
+		// call the real callback
+		int vpos = m_screen->vpos();
+		if (!m_callback.isnull())
+			(m_callback)(*this, vpos);
 
-		// scanline timers have to do some additional bookkeeping
-		case TIMER_TYPE_SCANLINE:
-		{
-			// by default, we fire at the first position
-			int next_vpos = m_first_vpos;
-
-			// the first time through we just go with the default position
-			if (!m_first_time)
-			{
-				// call the real callback
-				int vpos = m_screen->vpos();
-				if (!m_callback.isnull())
-					(m_callback)(*this, vpos);
-
-				// advance by the increment only if we will still be within the screen bounds
-				if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
-					next_vpos = vpos + m_increment;
-			}
-			m_first_time = false;
-
-			// adjust the timer
-			m_timer->adjust(m_screen->time_until_pos(next_vpos));
-			break;
-		}
+		// advance by the increment only if we will still be within the screen bounds
+		if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
+			next_vpos = vpos + m_increment;
 	}
+	m_first_time = false;
+
+	// adjust the timer
+	m_timer->adjust(m_screen->time_until_pos(next_vpos));
 }

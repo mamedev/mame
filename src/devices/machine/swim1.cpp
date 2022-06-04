@@ -22,7 +22,7 @@ void swim1_device::device_start()
 {
 	applefdintf_device::device_start();
 
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(swim1_device::update), this);
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_flux_write_start));
 	save_item(NAME(m_flux_write));
@@ -381,7 +381,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	}
 }
 
-void swim1_device::device_timer(emu_timer &, device_timer_id, int)
+TIMER_CALLBACK_MEMBER(swim1_device::update)
 {
 	if(m_iwm_active == MODE_DELAY) {
 		flush_write();

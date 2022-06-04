@@ -62,7 +62,7 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 void kaneko_calc3_device::device_start()
 {
 	initial_scan_tables();
-	m_runtimer = timer_alloc(MCU_RUN_TIMER);
+	m_runtimer = timer_alloc(FUNC(kaneko_calc3_device::mcu_run_trigger), this);
 
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_mcu_command_offset));
@@ -95,17 +95,10 @@ void kaneko_calc3_device::reset_run_timer()
 	m_runtimer->adjust(attotime::from_hz(59.1854));
 }
 
-void kaneko_calc3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(kaneko_calc3_device::mcu_run_trigger)
 {
-	switch(id)
-	{
-	case MCU_RUN_TIMER:
-		mcu_run();
-		reset_run_timer();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in kaneko_calc3_device::device_timer");
-	}
+	mcu_run();
+	reset_run_timer();
 }
 
 /*

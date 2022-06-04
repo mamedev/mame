@@ -33,7 +33,7 @@ void xavix_adc_device::device_start()
 	m_in6_cb.resolve_safe(0xff);
 	m_in7_cb.resolve_safe(0xff);
 
-	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_adc_device::adc_timer_done), this));
+	m_adc_timer = timer_alloc(FUNC(xavix_adc_device::adc_timer_done), this);
 
 	save_item(NAME(m_adc_control));
 	save_item(NAME(m_adc_inlatch));

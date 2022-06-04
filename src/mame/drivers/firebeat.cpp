@@ -1216,7 +1216,7 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 void firebeat_spu_state::machine_start()
 {
 	firebeat_state::machine_start();
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
+	m_dma_timer = timer_alloc(FUNC(firebeat_spu_state::spu_dma_callback), this);
 }
 
 void firebeat_spu_state::machine_reset()
@@ -1814,7 +1814,7 @@ void firebeat_kbm_state::init_kbm_overseas()
 void firebeat_kbm_state::init_keyboard()
 {
 	// set keyboard timer
-//  m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
+//  m_keyboard_timer = timer_alloc(FUNC(firebeat_state::keyboard_timer_callback), this);
 //  m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 

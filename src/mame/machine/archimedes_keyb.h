@@ -36,7 +36,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -47,6 +46,8 @@ protected:
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
+
+	TIMER_CALLBACK_MEMBER(update_mouse);
 
 private:
 	void tx_w(uint8_t data);

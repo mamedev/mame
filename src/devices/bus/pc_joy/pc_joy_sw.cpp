@@ -24,7 +24,7 @@ pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char
 
 void pc_mssw_pad_device::device_start()
 {
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(pc_mssw_pad_device::timer_tick), this);
 }
 
 void pc_mssw_pad_device::device_reset()
@@ -35,7 +35,7 @@ void pc_mssw_pad_device::device_reset()
 	m_timer->adjust(attotime::never, 0);
 }
 
-void pc_mssw_pad_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(pc_mssw_pad_device::timer_tick)
 {
 	uint16_t pad_state = 0;
 	// only multibit mode for now

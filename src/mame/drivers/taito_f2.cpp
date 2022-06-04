@@ -528,16 +528,9 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 ******************************************************************/
 
-void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(taitof2_state::trigger_int6)
 {
-	switch (id)
-	{
-	case TIMER_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in taitof2_state::device_timer");
-	}
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitof2_state::interrupt)
@@ -2775,7 +2768,7 @@ void taitof2_state::machine_start()
 		}
 	}
 
-	m_int6_timer = timer_alloc(TIMER_INTERRUPT6);
+	m_int6_timer = timer_alloc(FUNC(taitof2_state::trigger_int6), this);
 }
 
 void taitof2_state::taito_f2(machine_config &config)

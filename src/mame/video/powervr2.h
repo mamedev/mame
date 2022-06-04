@@ -374,6 +374,14 @@ private:
 	// PD DMA registers
 	uint32_t sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;
 
+	// Timer callbacks
+	emu_timer *opaque_irq_timer = nullptr;
+	emu_timer *opaque_modifier_volume_irq_timer = nullptr;
+	emu_timer *translucent_irq_timer = nullptr;
+	emu_timer *translucent_modifier_volume_irq_timer = nullptr;
+	emu_timer *punch_through_irq_timer = nullptr;
+	emu_timer *dma_irq_timer = nullptr;
+
 	static uint32_t (*const blend_functions[64])(uint32_t s, uint32_t d);
 
 	static int uv_wrap(float uv, int size);
