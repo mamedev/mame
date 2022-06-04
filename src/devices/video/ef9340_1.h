@@ -70,8 +70,8 @@ protected:
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	inline u16 get_c_addr(u8 x, u8 y);
-	inline void inc_c();
+	inline u16 ef9340_get_c_addr(u8 x, u8 y);
+	inline void ef9340_inc_c();
 
 	TIMER_CALLBACK_MEMBER(draw_scanline);
 	TIMER_CALLBACK_MEMBER(blink_update);
