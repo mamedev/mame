@@ -47,11 +47,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(frame_timer);
 
 private:
-	static constexpr device_timer_id TIMER_FRAME = 0;
-
 	bitmap_argb32 *m_frame;
 	avi_file::ptr m_avi;
 

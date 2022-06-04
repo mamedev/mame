@@ -2047,8 +2047,8 @@ void hng64_state::machine_start()
 
 	m_irq_pending = 0;
 
-	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
-	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
+	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
+	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	init_io();
 }
@@ -2350,8 +2350,8 @@ TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
 
 void hng64_state::init_io()
 {
-	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
-	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
+	m_tempio_irqon_timer = timer_alloc(FUNC(hng64_state::tempio_irqon_callback), this);
+	m_tempio_irqoff_timer = timer_alloc(FUNC(hng64_state::tempio_irqoff_callback), this);
 
 	m_port7 = 0x00;
 	m_port1 = 0x00;

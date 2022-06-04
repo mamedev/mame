@@ -34,8 +34,8 @@
 #define REG_SX                  m_regsir[0]
 #define REG_SY                  m_regsir[1]
 #define REG_SZ                  m_regsir[2]
-#define READ_SREG(a)            (m_regsir[((a)>>5) & 0x03] & 0x1f)
-#define WRITE_SREG(a,d)         (m_regsir[((a)>>5) & 0x03] = (d) & 0x1f)
+#define READ_SREG(a)            (m_regsir[((a) >> 5) & 0x03] & 0x1f)
+#define WRITE_SREG(a,d)         (m_regsir[((a) >> 5) & 0x03] = (d) & 0x1f)
 
 // 8 bit registers
 #define REG_PE                  m_reg8bit[0]
@@ -60,14 +60,14 @@
 #define READ_REG(a)             (m_regmain[(a) & 0x1f])
 #define WRITE_REG(a,d)          (m_regmain[(a) & 0x1f] = d)
 #define COPY_REG(d,s)           (m_regmain[(d) & 0x1f] = m_regmain[(s) & 0x1f])
-#define REG_GET16(r)            (((m_regmain[((r)) & 0x1f]<<0)) | (m_regmain[((r) + 1) & 0x1f]<<8))
-#define REG_PUT16(r,d)          do{(m_regmain[(r) & 0x1f] = (((d)>>0) & 0xff)); (m_regmain[((r)+1)&0x1f]=(((d)>>8)&0xff));}while(0)
+#define REG_GET16(r)            (m_regmain[(r) & 0x1f] | (m_regmain[((r) + 1) & 0x1f] << 8))
+#define REG_PUT16(r,d)          do { m_regmain[(r) & 0x1f] = (uint8_t)(d); m_regmain[((r) + 1) & 0x1f] = (uint8_t)((d) >> 8); } while(0)
 
 // opcode
-#define GET_REG_IDX(a,b)        (((a<<2) & 0x04) | ((b>>5) & 0x03))
-#define RESTORE_REG(o,r,pr)     r = (o&0x02) ? r : pr
-#define COND_WRITE_REG(o,a,d)   if (o&0x08) WRITE_REG(a,d)
-#define GET_IM3(d)              (((d>>5)&0x07) + 1)
+#define GET_REG_IDX(a,b)        (((a << 2) & 0x04) | ((b >> 5) & 0x03))
+#define RESTORE_REG(o,r,pr)     r = (o & 0x02) ? r : pr
+#define COND_WRITE_REG(o,a,d)   if (o & 0x08) WRITE_REG(a,d)
+#define GET_IM3(d)              (((d >> 5) & 0x07) + 1)
 
 // flags
 #define SET_FLAG_C              m_flags |= FLAG_C
@@ -77,20 +77,20 @@
 #define CLEAR_FLAGS             m_flags &= ~(FLAG_Z | FLAG_C | FLAG_LZ | FLAG_UZ)
 
 #define CHECK_FLAG_Z(d)         if((d) != 0) CLEAR_FLAG_Z
-#define CHECK_FLAG_C(d,l)       if (d > l) SET_FLAG_C
+#define CHECK_FLAG_C(d,l)       if ((d) > l) SET_FLAG_C
 #define CHECK_FLAGB_LZ(d)       if(((d) & 0x0f) != 0) CLEAR_FLAG_LZ
 #define CHECK_FLAGB_UZ(d)       if(((d) & 0xf0) != 0) CLEAR_FLAG_UZ
 #define CHECK_FLAGW_LZ(d)       if(((d) & 0x0f00) != 0) CLEAR_FLAG_LZ
 #define CHECK_FLAGW_UZ(d)       if(((d) & 0xf000) != 0) CLEAR_FLAG_UZ
-#define CHECK_FLAGB_UZ_LZ(d)    do{CHECK_FLAGB_LZ(d); CHECK_FLAGB_UZ(d);}while(0)
-#define CHECK_FLAGW_UZ_LZ(d)    do{CHECK_FLAGW_LZ(d); CHECK_FLAGW_UZ(d);}while(0)
+#define CHECK_FLAGB_UZ_LZ(d)    do{ CHECK_FLAGB_LZ(d); CHECK_FLAGB_UZ(d); } while(0)
+#define CHECK_FLAGW_UZ_LZ(d)    do{ CHECK_FLAGW_LZ(d); CHECK_FLAGW_UZ(d); } while(0)
 
 //CPU state
 #define CPU_FAST                0x01
 #define CPU_SLP                 0x02
 
 /* HD61700 IRQ vector */
-static const uint16_t irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
+static const uint16_t irq_vector[] = { 0x0032, 0x0042, 0x0052, 0x0062, 0x0072 };
 
 //**************************************************************************
 //  HD61700 DEVICE
@@ -135,7 +135,7 @@ void hd61700_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	m_sec_timer = timer_alloc(SEC_TIMER);
+	m_sec_timer = timer_alloc(FUNC(hd61700_cpu_device::second_tick), this);
 	m_sec_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	m_lcd_ctrl_cb.resolve_safe();
@@ -223,33 +223,23 @@ void hd61700_cpu_device::device_reset()
 		elem = CLEAR_LINE;
 }
 
-
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-void hd61700_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hd61700_cpu_device::second_tick)
 {
-	switch(id)
+	REG_TM++;
+	if ((REG_TM & 0x3f) == 60)
 	{
-		case SEC_TIMER:
-			REG_TM++;
-			if ((REG_TM&0x3f) == 60)
+		REG_TM = (REG_TM & 0xc0) + 0x40;
+
+		if (((REG_IE >> 3) & (1 << HD61700_TIMER_INT)))
+		{
+			REG_IB |= (1 << HD61700_TIMER_INT);
+
+			if (REG_IB & 0x20)
 			{
-				REG_TM = (REG_TM & 0xc0) + 0x40;
-
-				if (((REG_IE>>3) & (1<<HD61700_TIMER_INT)))
-				{
-					REG_IB |= (1<<HD61700_TIMER_INT);
-
-					if (REG_IB & 0x20)
-					{
-						m_state &= ~CPU_SLP;
-						m_flags |= FLAG_APO;
-					}
-				}
+				m_state &= ~CPU_SLP;
+				m_flags |= FLAG_APO;
 			}
-			break;
+		}
 	}
 }
 
@@ -310,13 +300,13 @@ std::unique_ptr<util::disasm_interface> hd61700_cpu_device::create_disassembler(
 
 bool hd61700_cpu_device::check_irqs()
 {
-	for (int i=4; i>=0; i--)
+	for (int i = 4; i >= 0; i--)
 	{
-		if (REG_IB & (1<<i) && !(m_irq_status & (1<<i)))
+		if (BIT(REG_IB, i) && !BIT(m_irq_status, i))
 		{
-			m_irq_status |= (1<<i);
-			push(REG_SS, (m_pc>>8)&0xff);
-			push(REG_SS, (m_pc>>0)&0xff);
+			m_irq_status |= (1 << i);
+			push(REG_SS, (uint8_t)(m_pc >> 8));
+			push(REG_SS, (uint8_t)m_pc);
 
 			set_pc(irq_vector[i]);
 			m_icount -= 12;
@@ -348,15 +338,13 @@ void hd61700_cpu_device::execute_run()
 		}
 		else
 		{
-			uint8_t op;
-
 			check_irqs();
 
 			// instruction fetch
-			op = read_op();
+			uint8_t op = read_op();
 
 			// execute the instruction
-			switch ( op )
+			switch (op)
 			{
 				case 0x00:  //adc
 				case 0x01:  //sbc
@@ -365,12 +353,12 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint8_t src = READ_REG(get_sir_im8(arg));
-						uint16_t res = READ_REG(arg) + ((op&1) ? -src : +src);
+						uint16_t res = READ_REG(arg) + ((op & 1) ? -src : +src);
 
-						COND_WRITE_REG(op, arg, res & 0xff);
+						COND_WRITE_REG(op, arg, (uint8_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -405,11 +393,11 @@ void hd61700_cpu_device::execute_run()
 						COND_WRITE_REG(op, arg, res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 
 						//na(c) and or(c) always set C flag
-						if ((op&3) == 1 || (op&3) == 2)
+						if ((op & 3) == 1 || (op & 3) == 2)
 							SET_FLAG_C;
 
 						check_optional_jr(arg);
@@ -431,7 +419,7 @@ void hd61700_cpu_device::execute_run()
 						WRITE_REG(arg, res & 0xff);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -446,7 +434,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 						uint16_t offset = REG_GET16(src);
 
-						mem_writebyte(REG_UA>>4, offset, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, offset, READ_REG(arg));
 
 						check_optional_jr(arg);
 						m_icount -= 8;
@@ -459,7 +447,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 						uint16_t offset = REG_GET16(src);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>4, offset));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, offset));
 
 						check_optional_jr(arg);
 						m_icount -= 8;
@@ -469,7 +457,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x12:  //stl
 					{
 						uint8_t arg = read_op();
-						m_lcd_write_cb((offs_t)0, READ_REG(arg));
+						m_lcd_write_cb(0, READ_REG(arg));
 
 						check_optional_jr(arg);
 						m_icount -= 11;
@@ -498,7 +486,7 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							m_lcd_ctrl_cb((offs_t)0, READ_REG(arg));
+							m_lcd_ctrl_cb(READ_REG(arg));
 						}
 
 						check_optional_jr(arg);
@@ -528,7 +516,7 @@ void hd61700_cpu_device::execute_run()
 							case 0:     //PE
 							case 1:     //PD
 								WRITE_REG8(idx, src);
-								m_port_write_cb((offs_t)0, REG_PD & REG_PE);
+								m_port_write_cb(REG_PD & REG_PE);
 								break;
 							case 2:     //IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -537,12 +525,12 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:     //IA
-								m_kb_write_cb((offs_t)0, src);
+								m_kb_write_cb(src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:     //IE
-								REG_IB &= (((src>>3)&0x1f) | 0xe0);
-								m_irq_status &= ((src>>3)&0x1f);
+								REG_IB &= 0xe0 | (src >> 3);
+								m_irq_status &= src >> 3;
 								WRITE_REG8(idx, src);
 								break;
 							case 6:     //TM
@@ -559,24 +547,24 @@ void hd61700_cpu_device::execute_run()
 				case 0x18:
 					{
 						uint8_t arg = read_op();
-						uint8_t op1 = (arg>>5) & 0x03;
+						uint8_t op1 = (arg >> 5) & 0x03;
 						switch (op1)
 						{
 							case 0x00:  //rod
 							case 0x02:  //bid
 								{
 									uint8_t src = READ_REG(arg);
-									uint8_t res = (src>>1)&0x7f;
+									uint8_t res = src >> 1;
 
-									if (!(op1&0x02))
-										res = res | ((m_flags&FLAG_C) !=0 )<<7;
+									if (!(op1 & 0x02))
+										res = res | ((m_flags & FLAG_C) ? 0x80 : 0x00);
 
 									WRITE_REG(arg, res);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(res & 0xff);
+									CHECK_FLAG_Z((uint8_t)res);
 									CHECK_FLAGB_UZ_LZ(res);
-									if (src&0x01) SET_FLAG_C;
+									if (src & 0x01) SET_FLAG_C;
 								}
 								break;
 
@@ -584,15 +572,15 @@ void hd61700_cpu_device::execute_run()
 							case 0x03:  //biu
 								{
 									uint8_t src = READ_REG(arg);
-									uint8_t res = (src<<1)&0xfe;
+									uint8_t res = src << 1;
 
-									if (!(op1&0x02))
-										res = res | ((m_flags&FLAG_C) !=0 )<<0;
+									if (!(op1 & 0x02))
+										res = res | ((m_flags & FLAG_C) ? 0x01 : 0x00);
 
 									WRITE_REG(arg, res);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(res & 0xff);
+									CHECK_FLAG_Z((uint8_t)res);
 									CHECK_FLAGB_UZ_LZ(res);
 									if (src&0x80) SET_FLAG_C;
 								}
@@ -607,7 +595,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x1a:
 					{
 						uint8_t arg = read_op();
-						uint8_t op1 = (arg>>5) & 0x03;
+						uint8_t op1 = (arg >> 5) & 0x03;
 						switch (op1)
 						{
 							case 0x00:  //did
@@ -615,15 +603,15 @@ void hd61700_cpu_device::execute_run()
 								{
 									uint8_t res;
 
-									if (op1&0x01)
-										res = (READ_REG(arg)<<4)&0xf0;
+									if (op1 & 0x01)
+										res = READ_REG(arg) << 4;
 									else
-										res = (READ_REG(arg)>>4)&0x0f;
+										res = READ_REG(arg) >> 4;
 
 									WRITE_REG(arg, res);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(res & 0xff);
+									CHECK_FLAG_Z((uint8_t)res);
 									CHECK_FLAGB_UZ_LZ(res);
 								}
 								break;
@@ -644,13 +632,13 @@ void hd61700_cpu_device::execute_run()
 				case 0x1b:  //cmp/inv
 					{
 						uint8_t arg = read_op();
-						uint8_t res = ~(READ_REG(arg));
+						uint8_t res = ~READ_REG(arg);
 						if (!(arg & 0x40)) res++;
 
 						WRITE_REG(arg, res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						if (res || (arg & 0x40)) SET_FLAG_C;
 
@@ -664,14 +652,14 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						uint8_t src;
 
-						if (arg&0x40)
+						if (arg & 0x40)
 						{
 							src = m_flags;
 						}
 						else
 						{
-							src = m_port_read_cb(0);
-							src&=(~REG_PE);
+							src = m_port_read_cb();
+							src &= ~REG_PE;
 						}
 
 						WRITE_REG(arg, src);
@@ -708,7 +696,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IX;
 						REG_IX += get_sign_mreg(arg);
 
-						mem_writebyte(REG_UA>>4, REG_IX++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX++, READ_REG(arg));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 
@@ -723,7 +711,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IZ;
 						REG_IZ += get_sign_mreg(arg);
 
-						mem_writebyte(REG_UA>>6, REG_IZ++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ++, READ_REG(arg));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 
@@ -736,7 +724,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IX += get_sign_mreg(arg);
 
-						mem_writebyte(REG_UA>>4, REG_IX, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX, READ_REG(arg));
 						m_icount -= 6;
 					}
 					break;
@@ -746,26 +734,18 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IZ += get_sign_mreg(arg);
 
-						mem_writebyte(REG_UA>>6, REG_IZ, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ, READ_REG(arg));
 						m_icount -= 6;
 					}
 					break;
 
 				case 0x26:  //phs
-					{
-						uint8_t arg = read_op();
-
-						push(REG_SS, READ_REG(arg));
-						m_icount -= 9;
-					}
+					push(REG_SS, READ_REG(read_op()));
+					m_icount -= 9;
 					break;
 				case 0x27:  //phu
-					{
-						uint8_t arg = read_op();
-
-						push(REG_US, READ_REG(arg));
-						m_icount -= 9;
-					}
+					push(REG_US, READ_REG(read_op()));
+					m_icount -= 9;
 					break;
 
 				case 0x28:  //ld
@@ -775,7 +755,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IX;
 						REG_IX += get_sign_mreg(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>4, REG_IX++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX++));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 
@@ -790,7 +770,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IZ;
 						REG_IZ += get_sign_mreg(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>6, REG_IZ++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ++));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 
@@ -803,7 +783,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IX += get_sign_mreg(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>4, REG_IX));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX));
 
 						m_icount -= 6;
 					}
@@ -814,7 +794,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IZ += get_sign_mreg(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>6, REG_IZ));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ));
 
 						m_icount -= 6;
 					}
@@ -824,7 +804,6 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						WRITE_REG(arg, pop(REG_SS));
-
 						m_icount -= 11;
 					}
 					break;
@@ -832,7 +811,6 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						WRITE_REG(arg, pop(REG_US));
-
 						m_icount -= 11;
 					}
 					break;
@@ -851,7 +829,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t msb = read_op();
 
 						if (check_cond(op))
-							set_pc((msb<<8) | lsb);
+							set_pc((msb << 8) | lsb);
 						m_icount -= 3;
 					}
 					break;
@@ -863,15 +841,15 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint16_t offset = REG_IX + get_sign_mreg(arg);
-						uint8_t src = mem_readbyte(REG_UA>>4, offset);
+						uint8_t src = mem_readbyte(REG_UA >> 4, offset);
 
 						uint16_t res = src + ((op & 2) ? -READ_REG(arg) : +READ_REG(arg)) ;
 
-						if ((op & 4))
-							mem_writebyte(REG_UA>>4, offset, res & 0xff);
+						if (op & 4)
+							mem_writebyte(REG_UA >> 4, offset, res & 0xff);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -886,15 +864,15 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint16_t offset = REG_IZ + get_sign_mreg(arg);
-						uint8_t src = mem_readbyte(REG_UA>>6, offset);
+						uint8_t src = mem_readbyte(REG_UA >> 6, offset);
 
 						uint16_t res = src + ((op & 2) ? -READ_REG(arg) : +READ_REG(arg)) ;
 
-						if ((op & 4))
-							mem_writebyte(REG_UA>>6, offset, res & 0xff);
+						if (op & 4)
+							mem_writebyte(REG_UA >> 6, offset, res & 0xff);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -909,12 +887,12 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint8_t src = read_op();
-						uint16_t res = READ_REG(arg) + ((op&1) ? -src : +src);
+						uint16_t res = READ_REG(arg) + ((op & 1) ? -src : +src);
 
-						COND_WRITE_REG(op, arg, res & 0xff);
+						COND_WRITE_REG(op, arg, (uint8_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -926,7 +904,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x42:  //ld
 					{
 						uint8_t arg = read_op();
-						uint8_t src = read_op() ;
+						uint8_t src = read_op();
 
 						WRITE_REG(arg, src);
 
@@ -952,11 +930,11 @@ void hd61700_cpu_device::execute_run()
 						COND_WRITE_REG(op, arg, res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 
 						//na(c) and or(c) always set C flag
-						if ((op&3) == 1 || (op&3) == 2)
+						if ((op & 3) == 1 || (op & 3) == 2)
 							SET_FLAG_C;
 
 						check_optional_jr(arg);
@@ -976,10 +954,10 @@ void hd61700_cpu_device::execute_run()
 						else
 							res = make_bcd_add(READ_REG(arg), src);
 
-						WRITE_REG(arg, res & 0xff);
+						WRITE_REG(arg, (uint8_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -994,7 +972,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = read_op();
 						uint16_t offset = REG_GET16(READ_SREG(arg));
 
-						mem_writebyte(REG_UA>>4, offset, src);
+						mem_writebyte(REG_UA >> 4, offset, src);
 						m_icount -= 8;
 					}
 					break;
@@ -1012,7 +990,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x52:  //stl
 					{
 						uint8_t arg = read_op();
-						m_lcd_write_cb((offs_t)0, arg);
+						m_lcd_write_cb(0, arg);
 
 						m_icount -= 12;
 					}
@@ -1029,7 +1007,7 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							m_lcd_ctrl_cb((offs_t)0, src);
+							m_lcd_ctrl_cb(src);
 						}
 
 						m_icount -= 3;
@@ -1057,7 +1035,7 @@ void hd61700_cpu_device::execute_run()
 							case 0:     //PE
 							case 1:     //PD
 								WRITE_REG8(idx, src);
-								m_port_write_cb((offs_t)0, REG_PD & REG_PE);
+								m_port_write_cb(REG_PD & REG_PE);
 								break;
 							case 2:     //IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -1066,12 +1044,12 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:     //IA
-								m_kb_write_cb((offs_t)0, src);
+								m_kb_write_cb(src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:     //IE
-								REG_IB &= (((src>>3)&0x1f) | 0xe0);
-								m_irq_status &= ((src>>3)&0x1f);
+								REG_IB &= 0xe0 | (src >> 3);
+								m_irq_status &= src >> 3;
 								WRITE_REG8(idx, src);
 								break;
 							case 6:     //TM
@@ -1088,25 +1066,24 @@ void hd61700_cpu_device::execute_run()
 				case 0x59:  //bdns
 					{
 						uint8_t arg = read_op();
-						uint8_t tmp;
 						uint16_t res;
 
 						for(;;)
 						{
-							tmp = mem_readbyte(REG_UA>>4, REG_IX);
-							mem_writebyte(REG_UA>>6, REG_IZ, tmp);
+							uint8_t tmp = mem_readbyte(REG_UA >> 4, REG_IX);
+							mem_writebyte(REG_UA >> 6, REG_IZ, tmp);
 
 							res = tmp - arg;
 							if (REG_IX == REG_IY || !res)
 								break;
 
-							REG_IX += ((op&1) ? -1 : +1);
-							REG_IZ += ((op&1) ? -1 : +1);
+							REG_IX += ((op & 1) ? -1 : +1);
+							REG_IZ += ((op & 1) ? -1 : +1);
 							m_icount -= 6;
 						}
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -1122,17 +1099,17 @@ void hd61700_cpu_device::execute_run()
 
 						for(;;)
 						{
-							res = mem_readbyte(REG_UA>>4, REG_IX) - arg;
+							res = mem_readbyte(REG_UA >> 4, REG_IX) - arg;
 
 							if (REG_IX == REG_IY || !res)
 								break;
 
-							REG_IX += ((op&1) ? -1 : +1);
+							REG_IX += ((op & 1) ? -1 : +1);
 							m_icount -= 6;
 						}
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -1147,7 +1124,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IX;
 						REG_IX += get_sign_im8(arg);
 
-						mem_writebyte(REG_UA>>4, REG_IX++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX++, READ_REG(arg));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 
@@ -1162,7 +1139,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IZ;
 						REG_IZ += get_sign_im8(arg);
 
-						mem_writebyte(REG_UA>>6, REG_IZ++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ++, READ_REG(arg));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 						m_icount -= 8;
@@ -1174,7 +1151,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IX += get_sign_im8(arg);
 
-						mem_writebyte(REG_UA>>4, REG_IX, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX, READ_REG(arg));
 						m_icount -= 6;
 					}
 					break;
@@ -1184,7 +1161,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IZ += get_sign_im8(arg);
 
-						mem_writebyte(REG_UA>>6, REG_IZ, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ, READ_REG(arg));
 						m_icount -= 6;
 					}
 					break;
@@ -1196,7 +1173,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IX;
 						REG_IX += get_sign_im8(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>4, REG_IX++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX++));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 						m_icount -= 8;
@@ -1210,7 +1187,7 @@ void hd61700_cpu_device::execute_run()
 						uint16_t prev_ir = REG_IZ;
 						REG_IZ += get_sign_im8(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>6, REG_IZ++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ++));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 						m_icount -= 8;
@@ -1222,7 +1199,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IX += get_sign_im8(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>4, REG_IX));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX));
 						m_icount -= 6;
 					}
 					break;
@@ -1232,7 +1209,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						REG_IZ += get_sign_im8(arg);
 
-						WRITE_REG(arg, mem_readbyte(REG_UA>>6, REG_IZ));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ));
 						m_icount -= 6;
 					}
 					break;
@@ -1253,10 +1230,10 @@ void hd61700_cpu_device::execute_run()
 						if (check_cond(op))
 						{
 							m_pc--;
-							push(REG_SS, (m_pc>>8)&0xff);
-							push(REG_SS, (m_pc>>0)&0xff);
+							push(REG_SS, (uint8_t)(m_pc >> 8));
+							push(REG_SS, (uint8_t)m_pc);
 
-							set_pc((msb<<8) | lsb);
+							set_pc((msb << 8) | lsb);
 							m_icount -= 6;
 						}
 						m_icount -= 3;
@@ -1270,15 +1247,15 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint16_t offset = REG_IX + get_sign_im8(arg);
-						uint8_t src = mem_readbyte(REG_UA>>4, offset);
+						uint8_t src = mem_readbyte(REG_UA >> 4, offset);
 
 						uint16_t res = src + ((op & 2) ? -READ_REG(arg) : +READ_REG(arg)) ;
 
-						if ((op & 4))
-							mem_writebyte(REG_UA>>4, offset, res & 0xff);
+						if (op & 4)
+							mem_writebyte(REG_UA >> 4, offset, (uint8_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -1293,15 +1270,15 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint16_t offset = REG_IZ + get_sign_im8(arg);
-						uint8_t src = mem_readbyte(REG_UA>>6, offset);
+						uint8_t src = mem_readbyte(REG_UA >> 6, offset);
 
 						uint16_t res = src + ((op & 2) ? -READ_REG(arg) : +READ_REG(arg)) ;
 
-						if ((op & 4))
-							mem_writebyte(REG_UA>>6, offset, res & 0xff);
+						if (op & 4)
+							mem_writebyte(REG_UA >> 6, offset, (uint8_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -1318,10 +1295,10 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 						uint32_t res = REG_GET16(arg) + ((op & 0x01) ? -REG_GET16(src) : +REG_GET16(src));
 
-						if (op & 0x08)  REG_PUT16(arg, res&0xffff);
+						if (op & 0x08)  REG_PUT16(arg, (uint16_t)res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xffff);
+						CHECK_FLAG_Z((uint16_t)res);
 						CHECK_FLAGW_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xffff);
 
@@ -1336,7 +1313,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 
 						COPY_REG(arg, src);
-						COPY_REG(arg+1, src+1);
+						COPY_REG(arg + 1, src + 1);
 
 						check_optional_jr(arg);
 						m_icount -= 8;
@@ -1358,7 +1335,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t res0 = make_logic(op, READ_REG(arg), READ_REG(src));
 						COND_WRITE_REG(op, arg, res0);
 
-						uint8_t res1 = make_logic(op, READ_REG(arg+1), READ_REG(src+1));
+						uint8_t res1 = make_logic(op, READ_REG(arg + 1), READ_REG(src + 1));
 						COND_WRITE_REG(op, arg+1, res1);
 
 						CLEAR_FLAGS;
@@ -1366,7 +1343,7 @@ void hd61700_cpu_device::execute_run()
 						CHECK_FLAGB_UZ_LZ(res1);
 
 						//na(c) and or(c) always set C flag
-						if ((op&3) == 1 || (op&3) == 2)
+						if ((op & 3) == 1 || (op & 3) == 2)
 							SET_FLAG_C;
 
 						check_optional_jr(arg);
@@ -1386,16 +1363,16 @@ void hd61700_cpu_device::execute_run()
 						else
 							res0 = make_bcd_add(READ_REG(arg), READ_REG(src));
 
-						WRITE_REG(arg, res0 & 0xff);
+						WRITE_REG(arg, (uint8_t)res0);
 
-						res1 = (res0>0xff) ? 1 : 0 ;
+						res1 = (res0 > 0xff) ? 1 : 0;
 
 						if (op & 0x01)
-							res1 = make_bcd_sub(READ_REG(arg+1), READ_REG(src+1) + res1);
+							res1 = make_bcd_sub(READ_REG(arg + 1), READ_REG(src + 1) + res1);
 						else
-							res1 = make_bcd_add(READ_REG(arg+1), READ_REG(src+1) + res1);
+							res1 = make_bcd_add(READ_REG(arg + 1), READ_REG(src + 1) + res1);
 
-						WRITE_REG(arg+1, res1 & 0xff);
+						WRITE_REG(arg + 1, (uint8_t)res1);
 
 						CLEAR_FLAGS;
 						CHECK_FLAG_Z(res0 || res1);
@@ -1413,8 +1390,8 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 						uint16_t offset = REG_GET16(src);
 
-						mem_writebyte(REG_UA>>4, offset+0, READ_REG(arg+0));
-						mem_writebyte(REG_UA>>4, offset+1, READ_REG(arg+1));
+						mem_writebyte(REG_UA >> 4, offset, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, offset + 1, READ_REG(arg + 1));
 
 						check_optional_jr(arg);
 						m_icount -= 11;
@@ -1427,8 +1404,8 @@ void hd61700_cpu_device::execute_run()
 						uint8_t src = get_sir_im8(arg);
 						uint16_t offset = REG_GET16(src);
 
-						WRITE_REG(arg+0, mem_readbyte(REG_UA>>4, offset+0));
-						WRITE_REG(arg+1, mem_readbyte(REG_UA>>4, offset+1));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, offset));
+						WRITE_REG(arg + 1, mem_readbyte(REG_UA >> 4, offset + 1));
 
 						check_optional_jr(arg);
 						m_icount -= 11;
@@ -1439,8 +1416,8 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 
-						m_lcd_write_cb((offs_t)0, READ_REG(arg));
-						m_lcd_write_cb((offs_t)0, READ_REG(arg+1));
+						m_lcd_write_cb(0, READ_REG(arg));
+						m_lcd_write_cb(0, READ_REG(arg + 1));
 
 						check_optional_jr(arg);
 						m_icount -= 19;
@@ -1450,13 +1427,12 @@ void hd61700_cpu_device::execute_run()
 				case 0x93:  //ldcw
 					{
 						uint8_t arg = read_op();
-						uint8_t reg0, reg1;
 
-						reg0 = m_lcd_read_cb(0);
-						reg1 = m_lcd_read_cb(0);
+						uint8_t reg0 = m_lcd_read_cb(0);
+						uint8_t reg1 = m_lcd_read_cb(0);
 
-						WRITE_REG(arg+0, reg0);
-						WRITE_REG(arg+1, reg1);
+						WRITE_REG(arg, reg0);
+						WRITE_REG(arg + 1, reg1);
 
 						check_optional_jr(arg);
 						m_icount -= 19;
@@ -1480,22 +1456,22 @@ void hd61700_cpu_device::execute_run()
 				case 0x98:  //rodw
 					{
 						uint8_t arg = read_op();
-						uint8_t op1 = (arg>>5) & 0x03;
+						uint8_t op1 = (arg >> 5) & 0x03;
 						switch (op1)
 						{
 							case 0x00:  //rodw
 							case 0x02:  //bidw
 								{
-									uint16_t src = REG_GET16(arg-1);
-									uint16_t res = (src>>1)&0x7fff;
+									uint16_t src = REG_GET16(arg - 1);
+									uint16_t res = src >> 1;
 
-									if (!(op1&0x02))
-										res = res | ((m_flags&FLAG_C) !=0 )<<15;
+									if (!(op1 & 0x02))
+										res = res | ((m_flags & FLAG_C) ? 0x8000 : 0x0000);
 
-									REG_PUT16(arg-1, res);
+									REG_PUT16(arg - 1, res);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(res & 0xffff);
+									CHECK_FLAG_Z((uint16_t)res);
 									CHECK_FLAGB_UZ_LZ(res);
 									if (src&0x01) SET_FLAG_C;
 								}
@@ -1505,15 +1481,15 @@ void hd61700_cpu_device::execute_run()
 							case 0x03:  //biuw
 								{
 									uint16_t src = REG_GET16(arg);
-									uint16_t res = (src<<1)&0xfffe;
+									uint16_t res = src << 1;
 
-									if (!(op1&0x02))
-										res = res | ((m_flags&FLAG_C) !=0 )<<0;
+									if (!(op1 & 0x02))
+										res = res | ((m_flags & FLAG_C) ? 0x0001 : 0x0000);
 
 									REG_PUT16(arg, res);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(res & 0xffff);
+									CHECK_FLAG_Z((uint16_t)res);
 									CHECK_FLAGW_UZ_LZ(res);
 									if (src&0x8000) SET_FLAG_C;
 								}
@@ -1528,27 +1504,27 @@ void hd61700_cpu_device::execute_run()
 				case 0x9a:
 					{
 						uint8_t arg = read_op();
-						uint8_t op1 = (arg>>5) & 0x03;
+						uint8_t op1 = (arg >> 5) & 0x03;
 						switch (op1)
 						{
 							case 0x00:  //didw
 								{
-									uint16_t src = (REG_GET16(arg-1)>>4)&0x0fff;
-									REG_PUT16(arg-1, src);
+									uint16_t src = REG_GET16(arg - 1) >> 4;
+									REG_PUT16(arg - 1, src);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(src & 0xffff);
+									CHECK_FLAG_Z((uint16_t)src);
 									CHECK_FLAGB_UZ_LZ(src);
 								}
 								break;
 
 							case 0x01:  //diuw
 								{
-									uint16_t src = (REG_GET16(arg)<<4)&0xfff0;
+									uint16_t src = REG_GET16(arg) << 4;
 									REG_PUT16(arg, src);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(src & 0xffff);
+									CHECK_FLAG_Z((uint16_t)src);
 									CHECK_FLAGW_UZ_LZ(src);
 								}
 								break;
@@ -1558,10 +1534,10 @@ void hd61700_cpu_device::execute_run()
 									uint8_t src = READ_REG(arg);
 
 									WRITE_REG(arg, 0);
-									WRITE_REG(arg-1, src);
+									WRITE_REG(arg - 1, src);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(src & 0xff);
+									CHECK_FLAG_Z((uint8_t)src);
 									CHECK_FLAGB_UZ_LZ(src);
 								}
 								break;
@@ -1571,10 +1547,10 @@ void hd61700_cpu_device::execute_run()
 									uint8_t src = READ_REG(arg);
 
 									WRITE_REG(arg, 0);
-									WRITE_REG(arg+1, src);
+									WRITE_REG(arg + 1, src);
 
 									CLEAR_FLAGS;
-									CHECK_FLAG_Z(src & 0xff);
+									CHECK_FLAG_Z((uint8_t)src);
 									CHECK_FLAGB_UZ_LZ(src);
 								}
 								break;
@@ -1588,13 +1564,13 @@ void hd61700_cpu_device::execute_run()
 				case 0x9b:  //cmpw/invw
 					{
 						uint8_t arg = read_op();
-						uint16_t res = ~(REG_GET16(arg));
+						uint16_t res = ~REG_GET16(arg);
 						if (!(arg & 0x40)) res++;
 
 						REG_PUT16(arg, res);
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xffff);
+						CHECK_FLAG_Z((uint16_t)res);
 						CHECK_FLAGW_UZ_LZ(res);
 
 						if (res || (arg & 0x40)) SET_FLAG_C;
@@ -1615,16 +1591,12 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							reg0 = m_port_read_cb(0);
-							reg1 = m_port_read_cb(0);
-
-							reg0&=(~REG_PE);
-							reg1&=(~REG_PE);
-
+							reg0 = m_port_read_cb() & ~REG_PE;
+							reg1 = m_port_read_cb() & ~REG_PE;
 						}
 
-						WRITE_REG(arg+0, reg0);
-						WRITE_REG(arg+1, reg1);
+						WRITE_REG(arg, reg0);
+						WRITE_REG(arg + 1, reg1);
 
 						check_optional_jr(arg);
 						m_icount -= 8;
@@ -1662,8 +1634,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						mem_writebyte(REG_UA>>4, REG_IX++, READ_REG(arg+0));
-						mem_writebyte(REG_UA>>4, REG_IX++, READ_REG(arg+1));
+						mem_writebyte(REG_UA >> 4, REG_IX++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX++, READ_REG(arg + 1));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 						m_icount -= 11;
@@ -1679,8 +1651,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						mem_writebyte(REG_UA>>6, REG_IZ++, READ_REG(arg+0));
-						mem_writebyte(REG_UA>>6, REG_IZ++, READ_REG(arg+1));
+						mem_writebyte(REG_UA >> 6, REG_IZ++, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ++, READ_REG(arg + 1));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 						m_icount -= 11;
@@ -1694,8 +1666,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						mem_writebyte(REG_UA>>4, REG_IX--, READ_REG(arg-0));
-						mem_writebyte(REG_UA>>4, REG_IX, READ_REG(arg-1));
+						mem_writebyte(REG_UA >> 4, REG_IX--, READ_REG(arg));
+						mem_writebyte(REG_UA >> 4, REG_IX, READ_REG(arg - 1));
 
 						m_icount -= 9;
 					}
@@ -1707,8 +1679,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						mem_writebyte(REG_UA>>6, REG_IZ--, READ_REG(arg-0));
-						mem_writebyte(REG_UA>>6, REG_IZ, READ_REG(arg-1));
+						mem_writebyte(REG_UA >> 6, REG_IZ--, READ_REG(arg));
+						mem_writebyte(REG_UA >> 6, REG_IZ, READ_REG(arg - 1));
 
 						m_icount -= 9;
 					}
@@ -1718,7 +1690,7 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						push(REG_SS, READ_REG(arg));
-						push(REG_SS, READ_REG(arg-1));
+						push(REG_SS, READ_REG(arg - 1));
 
 						m_icount -= 12;
 					}
@@ -1727,7 +1699,7 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						push(REG_US, READ_REG(arg));
-						push(REG_US, READ_REG(arg-1));
+						push(REG_US, READ_REG(arg - 1));
 
 						m_icount -= 12;
 					}
@@ -1742,8 +1714,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						WRITE_REG(arg+0, mem_readbyte(REG_UA>>4, REG_IX++));
-						WRITE_REG(arg+1, mem_readbyte(REG_UA>>4, REG_IX++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX++));
+						WRITE_REG(arg + 1, mem_readbyte(REG_UA >> 4, REG_IX++));
 
 						RESTORE_REG(op, REG_IX, prev_ir);
 
@@ -1760,8 +1732,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						WRITE_REG(arg+0, mem_readbyte(REG_UA>>6, REG_IZ++));
-						WRITE_REG(arg+1, mem_readbyte(REG_UA>>6, REG_IZ++));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ++));
+						WRITE_REG(arg + 1, mem_readbyte(REG_UA >> 6, REG_IZ++));
 
 						RESTORE_REG(op, REG_IZ, prev_ir);
 
@@ -1776,8 +1748,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						WRITE_REG(arg-0, mem_readbyte(REG_UA>>4, REG_IX--));
-						WRITE_REG(arg-1, mem_readbyte(REG_UA>>4, REG_IX));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 4, REG_IX--));
+						WRITE_REG(arg - 1, mem_readbyte(REG_UA >> 4, REG_IX));
 
 						m_icount -= 9;
 					}
@@ -1790,8 +1762,8 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						WRITE_REG(arg-0, mem_readbyte(REG_UA>>6, REG_IZ--));
-						WRITE_REG(arg-1, mem_readbyte(REG_UA>>6, REG_IZ));
+						WRITE_REG(arg, mem_readbyte(REG_UA >> 6, REG_IZ--));
+						WRITE_REG(arg - 1, mem_readbyte(REG_UA >> 6, REG_IZ));
 
 						m_icount -= 9;
 					}
@@ -1802,8 +1774,8 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 
-						WRITE_REG(arg, pop((op&1) ? REG_US : REG_SS));
-						WRITE_REG(arg+1, pop((op&1) ? REG_US : REG_SS));
+						WRITE_REG(arg, pop((op & 1) ? REG_US : REG_SS));
+						WRITE_REG(arg + 1, pop((op & 1) ? REG_US : REG_SS));
 
 						m_icount -= 14;
 					}
@@ -1819,7 +1791,7 @@ void hd61700_cpu_device::execute_run()
 				case 0xb7:  //unconditional jr
 					{
 						uint8_t arg = read_op();
-						uint32_t new_pc = m_pc-1 + get_im_7(arg);
+						uint32_t new_pc = (m_pc - 1) + get_im_7(arg);
 
 						if (check_cond(op))
 							set_pc(new_pc);
@@ -1835,13 +1807,13 @@ void hd61700_cpu_device::execute_run()
 
 						uint16_t offset = REG_IX + ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						uint16_t src0 = mem_readbyte(REG_UA>>4, offset) + READ_REG(arg);
-						uint16_t src1 = mem_readbyte(REG_UA>>4, offset+1) + READ_REG(arg+1) + ((src0>0xff) ? 1 : 0);
+						uint16_t src0 = mem_readbyte(REG_UA >> 4, offset) + READ_REG(arg);
+						uint16_t src1 = mem_readbyte(REG_UA >> 4, offset + 1) + READ_REG(arg + 1) + ((src0 > 0xff) ? 1 : 0);
 
 						if (op&0x04)
 						{
-							mem_writebyte(REG_UA>>4, offset+0, src0 & 0xff);
-							mem_writebyte(REG_UA>>4, offset+1, src1 & 0xff);
+							mem_writebyte(REG_UA >> 4, offset, (uint8_t)src0);
+							mem_writebyte(REG_UA >> 4, offset + 1, (uint8_t)src1);
 						}
 
 						CLEAR_FLAGS;
@@ -1861,13 +1833,13 @@ void hd61700_cpu_device::execute_run()
 
 						uint16_t offset = REG_IX + ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						uint16_t src0 = mem_readbyte(REG_UA>>4, offset) - READ_REG(arg);
-						uint16_t src1 = mem_readbyte(REG_UA>>4, offset+1) - READ_REG(arg+1) - ((src0>0xff) ? 1 : 0);
+						uint16_t src0 = mem_readbyte(REG_UA >> 4, offset) - READ_REG(arg);
+						uint16_t src1 = mem_readbyte(REG_UA >> 4, offset+1) - READ_REG(arg + 1) - ((src0 > 0xff) ? 1 : 0);
 
 						if (op&0x04)
 						{
-							mem_writebyte(REG_UA>>4, offset+0, src0 & 0xff);
-							mem_writebyte(REG_UA>>4, offset+1, src1 & 0xff);
+							mem_writebyte(REG_UA >> 4, offset, (uint8_t)src0);
+							mem_writebyte(REG_UA >> 4, offset + 1, (uint8_t)src1);
 						}
 
 						CLEAR_FLAGS;
@@ -1887,13 +1859,13 @@ void hd61700_cpu_device::execute_run()
 
 						uint16_t offset = REG_IZ + ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						uint16_t src0 = mem_readbyte(REG_UA>>6, offset) + READ_REG(arg);
-						uint16_t src1 = mem_readbyte(REG_UA>>6, offset+1) + READ_REG(arg+1) + ((src0>0xff) ? 1 : 0);
+						uint16_t src0 = mem_readbyte(REG_UA >> 6, offset) + READ_REG(arg);
+						uint16_t src1 = mem_readbyte(REG_UA >> 6, offset + 1) + READ_REG(arg + 1) + ((src0 > 0xff) ? 1 : 0);
 
-						if (op&0x04)
+						if (op & 0x04)
 						{
-							mem_writebyte(REG_UA>>6, offset+0, src0 & 0xff);
-							mem_writebyte(REG_UA>>6, offset+1, src1 & 0xff);
+							mem_writebyte(REG_UA >> 6, offset, (uint8_t)src0);
+							mem_writebyte(REG_UA >> 6, offset + 1, (uint8_t)src1);
 						}
 
 						CLEAR_FLAGS;
@@ -1913,13 +1885,13 @@ void hd61700_cpu_device::execute_run()
 
 						uint16_t offset = REG_IZ + ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						uint16_t src0 = mem_readbyte(REG_UA>>6, offset) - READ_REG(arg);
-						uint16_t src1 = mem_readbyte(REG_UA>>6, offset+1) - READ_REG(arg+1) - ((src0>0xff) ? 1 : 0);
+						uint16_t src0 = mem_readbyte(REG_UA >> 6, offset) - READ_REG(arg);
+						uint16_t src1 = mem_readbyte(REG_UA >> 6, offset + 1) - READ_REG(arg + 1) - ((src0 > 0xff) ? 1 : 0);
 
 						if (op&0x04)
 						{
-							mem_writebyte(REG_UA>>6, offset+0, src0 & 0xff);
-							mem_writebyte(REG_UA>>6, offset+1, src1 & 0xff);
+							mem_writebyte(REG_UA >> 6, offset, (uint8_t)src0);
+							mem_writebyte(REG_UA >> 6, offset + 1, (uint8_t)src1);
 						}
 
 						CLEAR_FLAGS;
@@ -1940,11 +1912,11 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg1 = read_op();
 						uint8_t dst = arg;
 						uint8_t src = get_sir_im8(arg, arg1);
-						uint8_t c, f;
 						uint16_t res = 0;
 
-						c = f = 0;
-						for (int n=GET_IM3(arg1); n>0; n--)
+						uint8_t c = 0;
+						uint8_t f = 0;
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
 							if (op & 0x01)
 								res = make_bcd_sub(READ_REG(dst), READ_REG(src) + c);
@@ -1953,10 +1925,11 @@ void hd61700_cpu_device::execute_run()
 
 							c = (res > 0xff) ? 1 : 0;
 
-							COND_WRITE_REG(op, dst, res&0xff);
+							COND_WRITE_REG(op, dst, (uint8_t)res);
 
-							f |= (res&0xff);
-							dst++; src++;
+							f |= (uint8_t)res;
+							dst++;
+							src++;
 
 							m_icount -= 5;
 						}
@@ -1978,7 +1951,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t dst = arg;
 						uint8_t src = get_sir_im8(arg, arg1);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
 							COPY_REG(dst++, src++);
 							m_icount -= 5;
@@ -2002,9 +1975,10 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg1 = read_op();
 						uint8_t dst = arg;
 						uint8_t src = get_sir_im8(arg, arg1);
-						uint8_t res = 0, f = 0;
+						uint8_t res = 0;
+						uint8_t f = 0;
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
 							res = make_logic(op, READ_REG(dst), READ_REG(src));
 
@@ -2012,7 +1986,8 @@ void hd61700_cpu_device::execute_run()
 
 							f |= res;
 
-							dst++; src++;
+							dst++;
+							src++;
 
 							m_icount -= 3;
 						}
@@ -2022,7 +1997,7 @@ void hd61700_cpu_device::execute_run()
 						CHECK_FLAGB_UZ_LZ(res);
 
 						//na(c) and or(c) always set C flag
-						if ((op&3) == 1 || (op&3) == 2)
+						if ((op & 3) == 1 || (op & 3) == 2)
 							SET_FLAG_C;
 
 						check_optional_jr(arg);
@@ -2036,11 +2011,10 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg1 = read_op();
 						uint8_t dst = arg;
 						uint16_t res = 0;
-						uint8_t src, f;
-						src = arg1 & 0x1f;
-						f = 0;
+						uint8_t src = arg1 & 0x1f;
+						uint8_t f = 0;
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
 							if (op & 0x01)
 								res = make_bcd_sub(READ_REG(dst), src);
@@ -2049,9 +2023,9 @@ void hd61700_cpu_device::execute_run()
 
 							src = (res > 0xff) ? 1 : 0;
 
-							COND_WRITE_REG(op, dst, res&0xff);
+							COND_WRITE_REG(op, dst, (uint8_t)res);
 
-							f |= (res&0xff);
+							f |= (uint8_t)res;
 							dst++;
 
 							m_icount -= 5;
@@ -2072,8 +2046,8 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						uint16_t offset = REG_GET16(READ_SREG(arg));
 
-						mem_writebyte(REG_UA>>4, offset+0, read_op());
-						mem_writebyte(REG_UA>>4, offset+1, read_op());
+						mem_writebyte(REG_UA >> 4, offset, read_op());
+						mem_writebyte(REG_UA >> 4, offset + 1, read_op());
 
 						m_icount -= 11;
 					}
@@ -2085,8 +2059,8 @@ void hd61700_cpu_device::execute_run()
 						uint8_t reg0 = read_op();
 						uint8_t reg1 = read_op();
 
-						WRITE_REG(arg+0, reg0);
-						WRITE_REG(arg+1, reg1);
+						WRITE_REG(arg, reg0);
+						WRITE_REG(arg + 1, reg1);
 						m_icount -= 11;
 					}
 					break;
@@ -2096,9 +2070,9 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						uint8_t arg1 = read_op();
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							m_lcd_write_cb((offs_t)0, READ_REG(arg));
+							m_lcd_write_cb(0, READ_REG(arg));
 
 							arg++;
 							m_icount -= 8;
@@ -2112,11 +2086,10 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint8_t arg1 = read_op();
-						uint8_t src;
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							src = m_lcd_read_cb(0);
+							uint8_t src = m_lcd_read_cb(0);
 
 							WRITE_REG(arg, src++);
 
@@ -2136,7 +2109,7 @@ void hd61700_cpu_device::execute_run()
 						uint8_t idx = GET_REG_IDX(op, arg);
 
 						if (idx < 5)
-							m_reg16bit[idx] = (msb<<8) | lsb;
+							m_reg16bit[idx] = (msb << 8) | lsb;
 
 						m_icount -= 8;
 					}
@@ -2144,41 +2117,39 @@ void hd61700_cpu_device::execute_run()
 
 				case 0xd8:  //bup
 				case 0xd9:  //bdn
+					for(;;)
 					{
-						uint8_t src;
-						for(;;)
-						{
-							src = mem_readbyte(REG_UA>>4, REG_IX);
-							mem_writebyte(REG_UA>>6, REG_IZ, src);
+						uint8_t src = mem_readbyte(REG_UA >> 4, REG_IX);
+						mem_writebyte(REG_UA >> 6, REG_IZ, src);
 
-							if (REG_IX == REG_IY)
-								break;
+						if (REG_IX == REG_IY)
+							break;
 
-							REG_IX += ((op&1) ? -1 : +1);
-							REG_IZ += ((op&1) ? -1 : +1);
-							m_icount -= 6;
-						}
-
-						m_icount -= 9;
+						REG_IX += ((op & 1) ? -1 : +1);
+						REG_IZ += ((op & 1) ? -1 : +1);
+						m_icount -= 6;
 					}
+
+					m_icount -= 9;
 					break;
 
 				case 0xda:
 					{
 						uint8_t arg = read_op();
-						uint8_t op1 = (arg>>5) & 0x03;
+						uint8_t op1 = (arg >> 5) & 0x03;
 						switch (op1)
 						{
 							case 0x00:  //didm
 								{
 									uint8_t arg1 = read_op();
-									uint8_t r1 = 0, r2 = 0;
+									uint8_t r1 = 0;
+									uint8_t r2 = 0;
 
-									for (int n=GET_IM3(arg1); n>0; n--)
+									for (int n = GET_IM3(arg1); n > 0; n--)
 									{
 										r2 = r1;
 										r1 = READ_REG(arg);
-										r2 = ((r1>>4)&0x0f) | ((r2<<4)&0xf0);
+										r2 = (r1 >> 4) | (r2 << 4);
 										WRITE_REG(arg--, r2);
 										m_icount -= 5;
 									}
@@ -2192,13 +2163,14 @@ void hd61700_cpu_device::execute_run()
 							case 0x01:  //dium
 								{
 									uint8_t arg1 = read_op();
-									uint8_t r1 = 0, r2 = 0;
+									uint8_t r1 = 0;
+									uint8_t r2 = 0;
 
-									for (int n=GET_IM3(arg1); n>0; n--)
+									for (int n = GET_IM3(arg1); n > 0; n--)
 									{
 										r2 = r1;
 										r1 = READ_REG(arg);
-										r2 = ((r1<<4)&0xf0) | ((r2>>4)&0x0f);
+										r2 = (r1 << 4) | (r2 >> 4);
 										WRITE_REG(arg++, r2);
 										m_icount -= 5;
 									}
@@ -2212,9 +2184,11 @@ void hd61700_cpu_device::execute_run()
 							case 0x02:  //bydm
 								{
 									uint8_t arg1 = read_op();
-									uint8_t r1 = 0, r2 = 0, f = 0;
+									uint8_t r1 = 0;
+									uint8_t r2 = 0;
+									uint8_t f = 0;
 
-									for (int n=GET_IM3(arg1); n>0; n--)
+									for (int n = GET_IM3(arg1); n > 0; n--)
 									{
 										r2 = r1;
 										r1 = READ_REG(arg);
@@ -2232,9 +2206,11 @@ void hd61700_cpu_device::execute_run()
 							case 0x03:  //byum
 								{
 									uint8_t arg1 = read_op();
-									uint8_t r1 = 0, r2 = 0, f = 0;
+									uint8_t r1 = 0;
+									uint8_t r2 = 0;
+									uint8_t f = 0;
 
-									for (int n=GET_IM3(arg1); n>0; n--)
+									for (int n = GET_IM3(arg1); n > 0; n--)
 									{
 										r2 = r1;
 										r1 = READ_REG(arg);
@@ -2256,11 +2232,12 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint8_t arg1 = read_op();
-						uint8_t r1 = 0, r2, f = 0;
+						uint8_t r1 = 0;
+						uint8_t f = 0;
 
-						r2 = (arg&0x40) ? 0 : 1;
+						uint8_t r2 = BIT(~arg, 6);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
 							r1 = r2 + (~READ_REG(arg));
 							WRITE_REG(arg++, r1);
@@ -2274,7 +2251,7 @@ void hd61700_cpu_device::execute_run()
 						CLEAR_FLAGS;
 						CHECK_FLAG_Z(f);
 						CHECK_FLAGB_UZ_LZ(r1);
-						if (f != 0 || (arg & 0x40))
+						if (f != 0 || BIT(arg, 6))
 							SET_FLAG_C;
 					}
 					break;
@@ -2287,17 +2264,17 @@ void hd61700_cpu_device::execute_run()
 
 						for(;;)
 						{
-							res = mem_readbyte(REG_UA>>4, REG_IX) - READ_REG(arg);
+							res = mem_readbyte(REG_UA >> 4, REG_IX) - READ_REG(arg);
 
 							if (REG_IX == REG_IY || !res)
 								break;
 
-							REG_IX += ((op&1) ? -1 : +1);
+							REG_IX += ((op & 1) ? -1 : +1);
 							m_icount -= 6;
 						}
 
 						CLEAR_FLAGS;
-						CHECK_FLAG_Z(res & 0xff);
+						CHECK_FLAG_Z((uint8_t)res);
 						CHECK_FLAGB_UZ_LZ(res);
 						CHECK_FLAG_C(res, 0xff);
 
@@ -2309,7 +2286,6 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						set_pc(REG_GET16(arg));
-
 						m_icount -= 5;
 					}
 					break;
@@ -2318,10 +2294,10 @@ void hd61700_cpu_device::execute_run()
 					{
 						uint8_t arg = read_op();
 						uint16_t offset = REG_GET16(arg);
-						uint8_t lsb = mem_readbyte(REG_UA>>4, offset+0);
-						uint8_t msb = mem_readbyte(REG_UA>>4, offset+1);
+						uint8_t lsb = mem_readbyte(REG_UA >> 4, offset);
+						uint8_t msb = mem_readbyte(REG_UA >> 4, offset + 1);
 
-						set_pc((msb<<8) | lsb);
+						set_pc((msb << 8) | lsb);
 
 						m_icount -= 5;
 					}
@@ -2337,9 +2313,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							mem_writebyte(REG_UA>>4, REG_IX++, READ_REG(arg++));
+							mem_writebyte(REG_UA >> 4, REG_IX++, READ_REG(arg++));
 							m_icount -= 3;
 						}
 
@@ -2359,9 +2335,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							mem_writebyte(REG_UA>>6, REG_IZ++, READ_REG(arg++));
+							mem_writebyte(REG_UA >> 6, REG_IZ++, READ_REG(arg++));
 							m_icount -= 3;
 						}
 
@@ -2379,9 +2355,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							mem_writebyte(REG_UA>>4, REG_IX--, READ_REG(arg--));
+							mem_writebyte(REG_UA >> 4, REG_IX--, READ_REG(arg--));
 							m_icount -= 3;
 						}
 
@@ -2399,9 +2375,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							mem_writebyte(REG_UA>>6, REG_IZ--, READ_REG(arg--));
+							mem_writebyte(REG_UA >> 6, REG_IZ--, READ_REG(arg--));
 							m_icount -= 3;
 						}
 
@@ -2417,9 +2393,9 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						uint8_t arg1 = read_op();
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							push((op&1) ? REG_US : REG_SS, READ_REG(arg--));
+							push((op & 1) ? REG_US : REG_SS, READ_REG(arg--));
 
 							m_icount -= 3;
 						}
@@ -2438,9 +2414,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							WRITE_REG(arg++, mem_readbyte(REG_UA>>4, REG_IX++));
+							WRITE_REG(arg++, mem_readbyte(REG_UA >> 4, REG_IX++));
 							m_icount -= 3;
 						}
 
@@ -2460,9 +2436,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							WRITE_REG(arg++, mem_readbyte(REG_UA>>6, REG_IZ++));
+							WRITE_REG(arg++, mem_readbyte(REG_UA >> 6, REG_IZ++));
 							m_icount -= 3;
 						}
 
@@ -2480,9 +2456,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IX += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							WRITE_REG(arg--, mem_readbyte(REG_UA>>4, REG_IX--));
+							WRITE_REG(arg--, mem_readbyte(REG_UA >> 4, REG_IX--));
 							m_icount -= 3;
 						}
 
@@ -2500,9 +2476,9 @@ void hd61700_cpu_device::execute_run()
 
 						REG_IZ += ((arg & 0x80) ? -ir_inc : +ir_inc);
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							WRITE_REG(arg--, mem_readbyte(REG_UA>>6, REG_IZ--));
+							WRITE_REG(arg--, mem_readbyte(REG_UA >> 6, REG_IZ--));
 							m_icount -= 3;
 						}
 
@@ -2518,9 +2494,9 @@ void hd61700_cpu_device::execute_run()
 						uint8_t arg = read_op();
 						uint8_t arg1 = read_op();
 
-						for (int n=GET_IM3(arg1); n>0; n--)
+						for (int n = GET_IM3(arg1); n > 0; n--)
 						{
-							WRITE_REG(arg++, pop((op&1) ? REG_US : REG_SS));
+							WRITE_REG(arg++, pop((op & 1) ? REG_US : REG_SS));
 							m_icount -= 3;
 						}
 
@@ -2539,32 +2515,32 @@ void hd61700_cpu_device::execute_run()
 					{
 						if (check_cond(op))
 						{
-							uint8_t lsb = pop(REG_SS) ;
+							uint8_t lsb = pop(REG_SS);
 							uint8_t msb = pop(REG_SS);
 
-							set_pc((((msb<<8) | (lsb<<0)) + 1));
+							set_pc(((msb << 8) | lsb) + 1);
 						}
 						m_icount -= 3;
 					}
 					break;
 
 				case 0xf8:  //nop
-						m_icount -= 3;
+					m_icount -= 3;
 					break;
 
 				case 0xf9:  //clt
-						REG_TM = 0;
-						m_icount -= 3;
+					REG_TM = 0;
+					m_icount -= 3;
 					break;
 
 				case 0xfa:  //fst
-						m_state |= CPU_FAST;
-						m_icount -= 3;
+					m_state |= CPU_FAST;
+					m_icount -= 3;
 					break;
 
 				case 0xfb:  //slw
-						m_state &= ~CPU_FAST;
-						m_icount -= 3;
+					m_state &= ~CPU_FAST;
+					m_icount -= 3;
 					break;
 
 				case 0xfd:  //rtni
@@ -2572,58 +2548,52 @@ void hd61700_cpu_device::execute_run()
 						uint8_t lsb = pop(REG_SS);
 						uint8_t msb = pop(REG_SS);
 
-						set_pc((msb<<8) | (lsb<<0));
+						set_pc((msb << 8) | lsb);
 
 						m_icount -= 5;
 					}
 					[[fallthrough]];
 
 				case 0xfc:  //cani
+					for (uint8_t arg = 0x10; arg > 0; arg >>= 1)
 					{
-						for (uint8_t arg=0x10; arg>0; arg>>=1)
+						if (REG_IB & arg)
 						{
-							if (REG_IB & arg)
-							{
-								REG_IB &= (~arg);
-								m_irq_status &= (~arg);
-								break;
-							}
+							REG_IB &= ~arg;
+							m_irq_status &= ~arg;
+							break;
 						}
-
-						m_icount -= 3;
 					}
+
+					m_icount -= 3;
 					break;
 
 				case 0xfe:  //off
-					{
-						set_pc(0);
-						REG_UA = REG_IA = 0;
-						REG_IX = REG_IY = REG_IZ = 0;
-						REG_PE = 0;
-						REG_IE = (REG_IE&0x0c) | ((REG_IB>>1) & 0x10);
-						REG_IB &= 0xe3;
-						if (m_flags & FLAG_SW)
-							m_flags |= FLAG_APO;
-						else
-							m_flags &= ~FLAG_APO;
+					set_pc(0);
+					REG_UA = REG_IA = 0;
+					REG_IX = REG_IY = REG_IZ = 0;
+					REG_PE = 0;
+					REG_IE = (REG_IE & 0x0c) | ((REG_IB >> 1) & 0x10);
+					REG_IB &= 0xe3;
+					if (m_flags & FLAG_SW)
+						m_flags |= FLAG_APO;
+					else
+						m_flags &= ~FLAG_APO;
 
-						m_state |= CPU_SLP;
+					m_state |= CPU_SLP;
 
-						m_irq_status = 0;
-						m_lcd_ctrl_cb((offs_t)0, 0);
-						m_kb_write_cb((offs_t)0, 0);
-						m_icount -= 3;
-					}
+					m_irq_status = 0;
+					m_lcd_ctrl_cb(0);
+					m_kb_write_cb(0);
+					m_icount -= 3;
 					break;
 
 				case 0xff:  //trp
-					{
-						m_pc--;
-						push(REG_SS, (m_pc>>8)&0xff);
-						push(REG_SS, (m_pc>>0)&0xff);
-						set_pc(0x0022);
-						m_icount -= 9;
-					}
+					m_pc--;
+					push(REG_SS, (uint8_t)(m_pc >> 8));
+					push(REG_SS, (uint8_t)m_pc);
+					set_pc(0x0022);
+					m_icount -= 9;
 					break;
 
 				case 0x03:
@@ -2657,7 +2627,7 @@ void hd61700_cpu_device::execute_run()
 
 		//if is in the internal ROM align the pc
 		if (!WORD_ALIGNED(m_fetch_addr) && m_pc < INT_ROM)
-			set_pc((m_fetch_addr+1)>>1);
+			set_pc((m_fetch_addr + 1) >> 1);
 
 		m_icount -= 3;
 	} while (m_icount > 0);
@@ -2685,33 +2655,33 @@ void hd61700_cpu_device::execute_set_input(int inputnum, int state)
 			set_pc(0x0000);
 			break;
 		case HD61700_KEY_INT:   //level sensitive line
-			if (((REG_IE>>3) & (1<<inputnum)) && state != CLEAR_LINE)
-				REG_IB |= (1<<inputnum);
+			if (BIT(REG_IE >> 3, inputnum) && state != CLEAR_LINE)
+				REG_IB |= (1 << inputnum);
 			break;
 
 		case HD61700_INT1:  //edge sensitive line
-			if (((REG_IE>>3) & (1<<inputnum)) && (m_lines_status[inputnum] != state))
-				REG_IB |= (1<<inputnum);
+			if (BIT(REG_IE >> 3, inputnum) && m_lines_status[inputnum] != state)
+				REG_IB |= (1 << inputnum);
 
 			if (m_lines_status[inputnum] == CLEAR_LINE && state != CLEAR_LINE)
 				REG_IE = (REG_IE & 0xfd) | 0x02;    //rising edge
 			else if (m_lines_status[inputnum] != CLEAR_LINE && state == CLEAR_LINE)
 				REG_IE = (REG_IE & 0xfd) | 0x00;    //falling edge
 
-			REG_KY = (REG_KY & 0xf7ff) | ((state != CLEAR_LINE)<<11);
+			REG_KY = (REG_KY & 0xf7ff) | ((state != CLEAR_LINE) << 11);
 			break;
 		case HD61700_INT2:  //level sensitive line
-			if (((REG_IE>>3) & (1<<inputnum)) && state != CLEAR_LINE)
-				REG_IB |= (1<<inputnum);
+			if (BIT(REG_IE >> 3, inputnum) && state != CLEAR_LINE)
+				REG_IB |= (1 << inputnum);
 
 			REG_IE = (REG_IE & 0xfe) | (state != CLEAR_LINE);
-			REG_KY = (REG_KY & 0xfbff) | ((state != CLEAR_LINE)<<10);
+			REG_KY = (REG_KY & 0xfbff) | ((state != CLEAR_LINE) << 10);
 			break;
 		case HD61700_ON_INT:    //level sensitive line
-			if ((REG_IE>>3) & (1<<inputnum) && state != CLEAR_LINE)
-				REG_IB |= (1<<inputnum);
+			if (BIT(REG_IE >> 3, inputnum) && state != CLEAR_LINE)
+				REG_IB |= (1 << inputnum);
 
-			REG_KY = (REG_KY & 0xfdff) | ((state != CLEAR_LINE)<<9);
+			REG_KY = (REG_KY & 0xfdff) | ((state != CLEAR_LINE) << 9);
 			break;
 
 		case HD61700_SW:    //level sensitive line
@@ -2725,7 +2695,7 @@ void hd61700_cpu_device::execute_set_input(int inputnum, int state)
 				}
 			}
 
-			m_flags |= ((state != CLEAR_LINE)<<3);
+			m_flags |= (state != CLEAR_LINE) << 3;
 			break;
 	}
 
@@ -2742,43 +2712,43 @@ inline void hd61700_cpu_device::set_pc(int32_t new_pc)
 	m_curpc = (m_curpc & 0x30000) | new_pc;
 	m_pc = new_pc & 0xffff;
 	m_ppc = m_curpc;
-	m_fetch_addr = new_pc<<1;
+	m_fetch_addr = new_pc << 1;
 }
 
 inline uint8_t hd61700_cpu_device::read_op()
 {
 	uint16_t data;
-	uint32_t addr18 = make_18bit_addr((m_irq_status) ? 0 : prev_ua, m_pc);
+	uint32_t addr18 = make_18bit_addr(m_irq_status ? 0 : prev_ua, m_pc);
 
 	if (m_pc <= INT_ROM)
 	{
 		data = m_program->read_word(addr18);
 
-		if (!(m_fetch_addr&1))
-			data = (data>>8) ;
+		if (!(m_fetch_addr & 1))
+			data >>= 8;
 	}
 	else
 	{
-		if (m_fetch_addr&1)
+		if (m_fetch_addr & 1)
 			data = m_program->read_word(addr18 + 1);
 		else
-			data = m_program->read_word(addr18 + 0);
+			data = m_program->read_word(addr18);
 	}
 
-	m_fetch_addr += ((m_pc > INT_ROM) ? 2 : 1);
+	m_fetch_addr += (m_pc > INT_ROM) ? 2 : 1;
 
-	m_pc = m_fetch_addr>>1;
+	m_pc = m_fetch_addr >> 1;
 
-	m_curpc =  make_18bit_addr((m_irq_status) ? 0 : prev_ua, m_pc);
+	m_curpc =  make_18bit_addr(m_irq_status ? 0 : prev_ua, m_pc);
 
 	prev_ua = REG_UA;
 
-	return (data&0xff);
+	return (uint8_t)data;
 }
 
 inline uint8_t hd61700_cpu_device::mem_readbyte(uint8_t segment, uint16_t offset)
 {
-	return m_program->read_word(make_18bit_addr(segment, offset)) & 0xff;
+	return (uint8_t)m_program->read_word(make_18bit_addr(segment, offset));
 }
 
 inline void hd61700_cpu_device::mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data)
@@ -2789,7 +2759,7 @@ inline void hd61700_cpu_device::mem_writebyte(uint8_t segment, uint16_t offset, 
 inline uint32_t hd61700_cpu_device::make_18bit_addr(uint8_t segment, uint16_t offset)
 {
 	if (offset >= ((REG_IB>>6) & 0x03) * 0x4000)
-		return (uint32_t)((offset | ((segment&0x03)<<16)) & 0x3ffff);
+		return (uint32_t)((offset | ((segment & 0x03) << 16)) & 0x3ffff);
 	else
 		return offset;
 }
@@ -2797,52 +2767,52 @@ inline uint32_t hd61700_cpu_device::make_18bit_addr(uint8_t segment, uint16_t of
 inline void hd61700_cpu_device::push(uint16_t &offset, uint8_t data)
 {
 	offset--;
-	mem_writebyte(REG_UA>>2, offset, data);
+	mem_writebyte(REG_UA >> 2, offset, data);
 }
 
 inline uint8_t hd61700_cpu_device::pop(uint16_t &offset)
 {
-	uint8_t data = mem_readbyte(REG_UA>>2, offset);
+	uint8_t data = mem_readbyte(REG_UA >> 2, offset);
 	offset++;
 	return data;
 }
 
 inline int hd61700_cpu_device::check_cond(uint32_t op)
 {
-	switch ( op & 0x07 )
+	switch (op & 0x07)
 	{
 	case 0x00:  // Z set
-		if ( !(m_flags & FLAG_Z) )
+		if (!(m_flags & FLAG_Z))
 			return 1;
 		break;
 
 	case 0x01:  // NC set
-		if ( !(m_flags & FLAG_C) )
+		if (!(m_flags & FLAG_C))
 			return 1;
 		break;
 
 	case 0x02:  // LZ set
-		if ( !(m_flags & FLAG_LZ) )
+		if (!(m_flags & FLAG_LZ))
 			return 1;
 		break;
 
 	case 0x03:  // UZ set
-		if ( !(m_flags & FLAG_UZ) )
+		if (!(m_flags & FLAG_UZ))
 			return 1;
 		break;
 
 	case 0x04:  // NZ set
-		if ( m_flags & FLAG_Z )
+		if (m_flags & FLAG_Z)
 			return 1;
 		break;
 
 	case 0x05:  // C set
-		if ( m_flags & FLAG_C )
+		if (m_flags & FLAG_C)
 			return 1;
 		break;
 
 	case 0x06:  // NLZ clear
-		if ( m_flags & FLAG_LZ )
+		if (m_flags & FLAG_LZ)
 			return 1;
 		break;
 
@@ -2855,7 +2825,7 @@ inline int hd61700_cpu_device::check_cond(uint32_t op)
 
 inline uint8_t hd61700_cpu_device::make_logic(uint8_t type, uint8_t d1, uint8_t d2)
 {
-	switch (type&3)
+	switch (type & 3)
 	{
 		case 0: //and
 			return d1 & d2;
@@ -2887,11 +2857,9 @@ inline void hd61700_cpu_device::check_optional_jr(uint8_t arg)
 
 inline uint8_t hd61700_cpu_device::get_sir_im8(uint8_t arg)
 {
-	if (((arg>>5) & 0x03) == 0x03)
+	if (((arg >> 5) & 0x03) == 0x03)
 	{
-		uint8_t arg1 = read_op();
-
-		return arg1&0x1f;
+		return read_op() & 0x1f;
 	}
 	else
 	{
@@ -2901,9 +2869,9 @@ inline uint8_t hd61700_cpu_device::get_sir_im8(uint8_t arg)
 
 inline uint8_t hd61700_cpu_device::get_sir_im8(uint8_t arg, uint8_t arg1)
 {
-	if (((arg>>5) & 0x03) == 0x03)
+	if (((arg >> 5) & 0x03) == 0x03)
 	{
-		return arg1&0x1f;
+		return arg1 & 0x1f;
 	}
 	else
 	{
@@ -2931,7 +2899,7 @@ inline int hd61700_cpu_device::get_sign_im8(uint8_t arg)
 
 inline int hd61700_cpu_device::get_im_7(uint8_t data)
 {
-	if (data&0x80)
+	if (data & 0x80)
 		return 0x80 - data;
 	else
 		return data;
@@ -2939,7 +2907,7 @@ inline int hd61700_cpu_device::get_im_7(uint8_t data)
 
 inline uint16_t hd61700_cpu_device::make_bcd_sub(uint8_t arg1, uint8_t arg2)
 {
-	uint32_t ret = (arg1&0x0f) - (arg2&0x0f);
+	uint32_t ret = (arg1 & 0x0f) - (arg2 & 0x0f);
 	uint8_t carry;
 
 	if (ret > 0x09)
@@ -2950,24 +2918,24 @@ inline uint16_t hd61700_cpu_device::make_bcd_sub(uint8_t arg1, uint8_t arg2)
 	else
 		carry = 0;
 
-	ret += ((arg1&0xf0) - (arg2&0xf0) - (carry<<4));
+	ret += ((arg1 & 0xf0) - (arg2 & 0xf0) - (carry << 4));
 
 	if (ret > 0x9f)
 	{
-		ret = (ret - 0x60) & 0x0ff;
+		ret = (uint8_t)(ret - 0x60);
 		carry = 1;
 	}
 	else
 		carry = 0;
 
-	ret -= (carry<<8);
+	ret -= carry << 8;
 
 	return ret;
 }
 
 inline uint16_t hd61700_cpu_device::make_bcd_add(uint8_t arg1, uint8_t arg2)
 {
-	uint32_t ret = (arg1&0x0f) + (arg2&0x0f);
+	uint32_t ret = (arg1 & 0x0f) + (arg2 & 0x0f);
 	uint8_t carry;
 
 	if (ret > 0x09)
@@ -2978,17 +2946,17 @@ inline uint16_t hd61700_cpu_device::make_bcd_add(uint8_t arg1, uint8_t arg2)
 	else
 		carry = 0;
 
-	ret += ((arg1&0xf0) + (arg2&0xf0) + (carry<<4));
+	ret += ((arg1 & 0xf0) + (arg2 & 0xf0) + (carry << 4));
 
 	if (ret > 0x9f)
 	{
-		ret = (ret + 0x60) & 0x0ff;
+		ret = (uint8_t)(ret + 0x60);
 		carry = 1;
 	}
 	else
 		carry = 0;
 
-	ret += (carry<<8);
+	ret += carry << 8;
 
 	return ret;
 }

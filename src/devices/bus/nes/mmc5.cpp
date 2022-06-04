@@ -235,7 +235,7 @@ void nes_exrom_device::update_prg()
 	}
 }
 
-void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
+void nes_exrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	m_vcount = scanline;
 

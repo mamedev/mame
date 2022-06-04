@@ -194,7 +194,7 @@ void itech32_state::video_start()
 	/* reset statics */
 	std::fill_n(&m_video[0], m_video.bytes() >> 1, 0);
 
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech32_state::scanline_interrupt),this));
+	m_scanline_timer = timer_alloc(FUNC(itech32_state::scanline_interrupt), this);
 	m_enable_latch[0] = 1;
 	m_enable_latch[1] = (m_planes > 1) ? 1 : 0;
 
@@ -211,7 +211,7 @@ void itech32_state::video_start()
 void shoottv_state::video_start()
 {
 	itech32_state::video_start();
-	m_gun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(shoottv_state::gun_interrupt),this));
+	m_gun_timer = timer_alloc(FUNC(shoottv_state::gun_interrupt), this);
 	m_gun_timer->adjust(m_screen->time_until_pos(0));
 }
 

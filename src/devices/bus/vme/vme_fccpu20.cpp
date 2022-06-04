@@ -204,11 +204,7 @@
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -387,7 +383,7 @@ vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_typ
 	, m_mpcc3  (*this, "mpcc3")
 	, m_board_id(board_id)
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device ctor\n");
 }
 
 //**************************************************************************
@@ -396,67 +392,61 @@ vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_typ
 vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_card_device(mconfig, VME_FCCPU20, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu20_card_device ctor: %s\n", tag);
 }
 
 
 vme_fccpu21s_card_device::vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21s_card_device(mconfig, VME_FCCPU21S, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21s_card_device ctor: %s\n", tag);
 }
 
 vme_fccpu21_card_device::vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21_card_device(mconfig, VME_FCCPU21, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21_card_device ctor: %s\n", tag);
 }
 
 vme_fccpu21a_card_device::vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21a_card_device(mconfig, VME_FCCPU21A, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21a_card_device ctor: %s\n", tag);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
 vme_fccpu21ya_card_device::vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21ya_card_device(mconfig, VME_FCCPU21YA, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21ya_card_device ctor: %s\n", tag);
 }
 
 vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21b_card_device(mconfig, VME_FCCPU21B, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21b_card_device ctor: %s\n", tag);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
 vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21yb_card_device(mconfig, VME_FCCPU21YB, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOG("vme_fccpu21yb_card_device ctor: %s\n", tag);
 }
 
-enum
-{
-	TIMER_ID_BUS_GRANT
-};
-
-/* Start it up */
 void vme_fccpu20_device::device_start()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::device_start\n");
 
-	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
-	save_pointer (NAME (m_sysram), sizeof(m_sysram));
+	save_pointer(NAME(m_sysrom), sizeof(m_sysrom));
+	save_pointer(NAME(m_sysram), sizeof(m_sysram));
 	//  save_item(NAME(m_board_id)); // TODO: Save this "non base type" item
 
 	/* TODO: setup this RAM from (not yet) optional SRAM-2x board and also support 2MB versions */
 	//m_maincpu->space(AS_PROGRAM).install_ram(0x80000, m_ram->size() + 0x7ffff, m_ram->pointer());
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (uint32_t*)(memregion ("roms")->base());
+	m_sysrom = (uint32_t*)(memregion("roms")->base());
 
 #if 0 // TODO: Setup VME access handlers for shared memory area
 	uint32_t base = 0xFFFF5000;
@@ -465,43 +455,36 @@ void vme_fccpu20_device::device_start()
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
-	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
+	m_arbiter_start = timer_alloc(FUNC(vme_fccpu20_device::grant_bus), this);
 }
 
 void vme_fccpu20_device::device_reset()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::device_reset\n");
 
 	/* We need to delay the static bus grant signal until we have it from the VME interface or MAME supports bus arbitration */
-	m_arbiter_start->adjust(attotime::from_msec(10), TIMER_ID_BUS_GRANT, attotime::never);
+	m_arbiter_start->adjust(attotime::from_msec(10));
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  grant_bus
 //-------------------------------------------------
-void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int param)
+
+TIMER_CALLBACK_MEMBER(vme_fccpu20_device::grant_bus)
 {
-	switch(id)
-	{
-	case TIMER_ID_BUS_GRANT:
-		m_pit->h1_w(ASSERT_LINE); // Grant bus always
-		break;
-	default:
-		LOG("Unhandled Timer ID %d\n", id);
-		break;
-	}
+	m_pit->h1_w(ASSERT_LINE); // Grant bus always
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
 uint32_t vme_fccpu20_device::bootvect_r(offs_t offset)
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::bootvect_r\n");
 	return m_sysrom[offset];
 }
 
 void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::bootvect_w\n");
 	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
@@ -509,29 +492,29 @@ void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 WRITE_LINE_MEMBER(vme_fccpu20_device::bim_irq_callback)
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, state);
+	LOGINT("vme_fccpu20_device::bim_irq_callback(%02x)\n", state);
 
-	bim_irq_state = state;
-	bim_irq_level = m_bim->get_irq_level();
-	LOGINT(" - BIM irq level %s\n", bim_irq_level == CLEAR_LINE ? "Cleared" : "Asserted");
+	m_bim_irq_state = state;
+	m_bim_irq_level = m_bim->get_irq_level();
+	LOGINT(" - BIM irq level %s\n", m_bim_irq_level == CLEAR_LINE ? "Cleared" : "Asserted");
 	update_irq_to_maincpu();
 }
 
 void vme_fccpu20_device::update_irq_to_maincpu()
 {
-	LOGINT("%s()\n", FUNCNAME);
-	LOGINT(" - bim_irq_level: %02x\n", bim_irq_level);
-	LOGINT(" - bim_irq_state: %02x\n", bim_irq_state);
-	switch (bim_irq_level & 0x07)
+	LOGINT("vme_fccpu20_device::update_irq_to_maincpu()\n");
+	LOGINT(" - m_bim_irq_level: %02x\n", m_bim_irq_level);
+	LOGINT(" - m_bim_irq_state: %02x\n", m_bim_irq_state);
+	switch (m_bim_irq_level & 0x07)
 	{
-	case 1: m_maincpu->set_input_line(M68K_IRQ_1, bim_irq_state); break;
-	case 2: m_maincpu->set_input_line(M68K_IRQ_2, bim_irq_state); break;
-	case 3: m_maincpu->set_input_line(M68K_IRQ_3, bim_irq_state); break;
-	case 4: m_maincpu->set_input_line(M68K_IRQ_4, bim_irq_state); break;
-	case 5: m_maincpu->set_input_line(M68K_IRQ_5, bim_irq_state); break;
-	case 6: m_maincpu->set_input_line(M68K_IRQ_6, bim_irq_state); break;
-	case 7: m_maincpu->set_input_line(M68K_IRQ_7, bim_irq_state); break;
-	default: logerror("Programmatic error in %s, please report\n", FUNCNAME);
+	case 1: m_maincpu->set_input_line(M68K_IRQ_1, m_bim_irq_state); break;
+	case 2: m_maincpu->set_input_line(M68K_IRQ_2, m_bim_irq_state); break;
+	case 3: m_maincpu->set_input_line(M68K_IRQ_3, m_bim_irq_state); break;
+	case 4: m_maincpu->set_input_line(M68K_IRQ_4, m_bim_irq_state); break;
+	case 5: m_maincpu->set_input_line(M68K_IRQ_5, m_bim_irq_state); break;
+	case 6: m_maincpu->set_input_line(M68K_IRQ_6, m_bim_irq_state); break;
+	case 7: m_maincpu->set_input_line(M68K_IRQ_7, m_bim_irq_state); break;
+	default: logerror("Unsupported BIM IRQ line value 0 in vme_fccpu20_device::update_irq_to_maincpu, please report\n");
 	}
 }
 
@@ -557,14 +540,14 @@ void vme_fccpu20_device::update_irq_to_maincpu()
 
 uint8_t vme_fccpu20_device::pita_r()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::pita_r\n");
 	return FORCEBUG | BR7N9600;
 }
 
 /* Enabling/Disabling of VME IRQ 1-7 */
 uint8_t vme_fccpu20_device::pitb_r()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::pitb_r\n");
 	return 0xff;
 }
 
@@ -574,7 +557,7 @@ uint8_t vme_fccpu20_device::pitc_r()
 {
 	uint8_t board_id = 0;
 
-	LOG("%s Board id:%02x\n", FUNCNAME, m_board_id);
+	LOG("vme_fccpu20_device::pitc_r Board id:%02x\n", m_board_id);
 
 	switch (m_board_id)
 	{
@@ -589,8 +572,9 @@ uint8_t vme_fccpu20_device::pitc_r()
 	case cpu21:
 		board_id = CPU21;
 		break;
-	default: logerror("Attempt to set unknown board type %02x, defaulting to CPU20\n", board_id);
+	default: logerror("Attempted to set unknown board type %02x, defaulting to CPU20\n", board_id);
 		board_id = CPU20;
+		break;
 	}
 
 	return board_id | 0xbf;
@@ -615,7 +599,7 @@ ROM_END
 
 const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("vme_fccpu20_device::device_rom_region\n");
 
 	switch (m_board_id)
 	{
@@ -626,7 +610,7 @@ const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const
 	case cpu21yb: return ROM_NAME( fccpu21yb ); break;
 	case cpu21s:  return ROM_NAME( fccpu21s  ); break;
 	case cpu21:   return ROM_NAME( fccpu21   ); break;
-	default: logerror("Attempt to get rom set for unknown board type %02x, defaulting to CPU20\n", m_board_id);
+	default: logerror("Attempted to get rom set for unknown board type %02x, defaulting to CPU20\n", m_board_id);
 		return ROM_NAME( fccpu20 );
 	}
 }

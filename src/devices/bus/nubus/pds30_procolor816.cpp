@@ -99,7 +99,7 @@ void nubus_procolor816_device::device_start()
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_procolor816_device::vram_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::vram_w)));
 	nubus().install_device(slotspace+0xf00000, slotspace+0xff7fff, read32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_w)));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(nubus_procolor816_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
@@ -121,7 +121,7 @@ void nubus_procolor816_device::device_reset()
 }
 
 
-void nubus_procolor816_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(nubus_procolor816_device::vbl_tick)
 {
 	if (!m_vbl_disable)
 	{

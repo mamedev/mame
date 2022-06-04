@@ -252,7 +252,7 @@ void m2_bda_device::device_start()
 	save_pointer(NAME(m_ram), ram_size / sizeof(uint32_t));
 
 	// Set a timer to pull data from the DSPP FIFO into the DACs
-	m_dac_timer = timer_alloc(0);
+	m_dac_timer = timer_alloc(FUNC(m2_bda_device::dac_update), this);
 	m_dac_timer->adjust(attotime::from_hz(16.9345));
 }
 
@@ -311,21 +311,14 @@ void m2_bda_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - device-specific timers
+//  dac_update - pull DAC data from the DSPP
 //-------------------------------------------------
 
-void m2_bda_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m2_bda_device::dac_update)
 {
-	switch (id)
-	{
-		case 0:
-		{
-			m_dac_l(m_dspp->read_output_fifo());
-			m_dac_r(m_dspp->read_output_fifo());
-			m_dac_timer->adjust(attotime::from_hz(44100));
-			break;
-		}
-	}
+	m_dac_l(m_dspp->read_output_fifo());
+	m_dac_r(m_dspp->read_output_fifo());
+	m_dac_timer->adjust(attotime::from_hz(44100));
 }
 
 
@@ -813,8 +806,8 @@ void m2_vdu_device::device_start()
 	m_vint1_int_handler.resolve_safe();
 
 	// Initialize line interrupt timers
-	m_vint0_timer = timer_alloc(TIMER_ID_VINT0);
-	m_vint1_timer = timer_alloc(TIMER_ID_VINT1);
+	m_vint0_timer = timer_alloc(FUNC(m2_vdu_device::vint0_set), this);
+	m_vint1_timer = timer_alloc(FUNC(m2_vdu_device::vint1_set), this);
 
 	// Calculate H/V count bias values (1 = start of blanking)
 	const rectangle visarea = m_screen->visible_area();
@@ -861,28 +854,21 @@ void m2_vdu_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - device-specific timers
+//  vertical interrupt timer callbacks
 //-------------------------------------------------
 
-void m2_vdu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m2_vdu_device::vint0_set)
 {
-	switch (id)
-	{
-		case TIMER_ID_VINT0:
-		{
-			m_vint |= VDU_VINT_VINT0;
-			m_vint0_int_handler(ASSERT_LINE);
-			set_vint_timer(0);
-			break;
-		}
-		case TIMER_ID_VINT1:
-		{
-			m_vint |= VDU_VINT_VINT1;
-			m_vint1_int_handler(ASSERT_LINE);
-			set_vint_timer(1);
-			break;
-		}
-	}
+	m_vint |= VDU_VINT_VINT0;
+	m_vint0_int_handler(ASSERT_LINE);
+	set_vint_timer(0);
+}
+
+TIMER_CALLBACK_MEMBER(m2_vdu_device::vint1_set)
+{
+	m_vint |= VDU_VINT_VINT1;
+	m_vint1_int_handler(ASSERT_LINE);
+	set_vint_timer(1);
 }
 
 
@@ -1493,7 +1479,8 @@ m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, dev
 	m_cpu1(*this, finder_base::DUMMY_TAG),
 	m_bda(*this, finder_base::DUMMY_TAG),
 	m_int_handler(*this),
-	m_sdbg_out_handler(*this)
+	m_sdbg_out_handler(*this),
+	m_cd_ready_timer(nullptr)
 {
 }
 
@@ -1509,8 +1496,8 @@ void m2_cde_device::device_start()
 	m_sdbg_out_handler.resolve_safe();
 
 	// Init DMA
-	m_dma[0].m_timer = timer_alloc(TIMER_ID_DMA1);
-	m_dma[1].m_timer = timer_alloc(TIMER_ID_DMA2);
+	m_dma[0].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);
+	m_dma[1].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);
 
 	// Register state for saving
 	save_item(NAME(m_sdbg_cntl));
@@ -1534,8 +1521,10 @@ void m2_cde_device::device_start()
 		save_item(NAME(m_dma[i].m_nbad), i);
 		save_item(NAME(m_dma[i].m_npad), i);
 		save_item(NAME(m_dma[i].m_ncnt), i);
-		// timer
 	}
+
+	// Allocate other timers
+	m_cd_ready_timer = timer_alloc(FUNC(m2_cde_device::trigger_ready_int), this);
 }
 
 //-------------------------------------------------
@@ -1568,29 +1557,13 @@ void m2_cde_device::device_post_load()
 
 
 //-------------------------------------------------
-//  device_timer - a timer
+//  trigger_ready_int - flag CD ready
 //-------------------------------------------------
 
-void m2_cde_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m2_cde_device::trigger_ready_int)
 {
-	switch (id)
-	{
-		case TIMER_ID_READY:
-			// TODO ?
-			set_interrupt(CDE_ID_READY);
-			break;
-
-		case TIMER_ID_DMA1:
-			next_dma(0);
-			break;
-
-		case TIMER_ID_DMA2:
-			next_dma(1);
-			break;
-
-		default:
-			throw emu_fatalerror("m2_cde_device::device_timer: Unknown CDE timer ID");
-	}
+	// TODO: Do we need to do more things here?
+	set_interrupt(CDE_ID_READY);
 }
 
 
@@ -1743,31 +1716,22 @@ void m2_cde_device::write(address_space &space, offs_t offset, uint32_t data, ui
 	switch (byte_offs)
 	{
 		case CDE_SDBG_CNTL:
-		{
 			// ........ ........ xxxxxxxx xxxx....      Clock scaler (written with 33MHz/38400 = 868)
 			write_m2_reg(m_sdbg_cntl, data, wm_cw);
 			break;
-		}
 		case CDE_SDBG_WRT:
-		{
 			m_sdbg_out_handler(data);
 			set_interrupt(CDE_SDBG_WRT_DONE);
 			break;
-		}
 		case CDE_INT_STS:
-		{
 			write_m2_reg(m_int_status, data, wm_cw);
 			update_interrupts();
 			break;
-		}
 		case CDE_INT_ENABLE:
-		{
 			write_m2_reg(m_int_enable, data, wm_cs);
 			update_interrupts();
 			break;
-		}
 		case CDE_RESET_CNTL:
-		{
 			if (data & 1)
 			{
 				// TODO: Should we reset both CPUs?
@@ -1782,23 +1746,16 @@ void m2_cde_device::write(address_space &space, offs_t offset, uint32_t data, ui
 			}
 
 			break;
-		}
 		case CDE_CD_CMD_WRT:
-		{
 			//set_interrupt(CDE_CD_CMD_WRT_DONE); // ?
 			//set_interrupt(CDE_CD_STS_FL_DONE); // ?
 			break;
-		};
 		case CDE_UNIQ_ID_CMD:
-		{
 			// TODO: What is this?
-			timer_set(attotime::from_usec(250), TIMER_ID_READY);
+			m_cd_ready_timer->adjust(attotime::from_usec(250));
 			break;
-		}
 		case CDE_BBLOCK:
-		{
 			break;
-		}
 
 		case CDE_DEV0_SETUP:
 		case CDE_DEV1_SETUP:
@@ -1830,18 +1787,14 @@ void m2_cde_device::write(address_space &space, offs_t offset, uint32_t data, ui
 
 //      case CDE_SYSTEM_CONF:
 		case CDE_VISA_DIS:
-		{
 			write_m2_reg(m_visa_dis, data, wm_cw);
 			break;
-		}
 		case CDE_MICRO_RWS:
 		case CDE_MICRO_WI:
 		case CDE_MICRO_WOB:
 		case CDE_MICRO_WO:
 		case CDE_MICRO_STATUS:
-		{
 			break;
-		}
 
 		case CDE_DMA1_CNTL:
 		case CDE_DMA2_CNTL:
@@ -1861,26 +1814,19 @@ void m2_cde_device::write(address_space &space, offs_t offset, uint32_t data, ui
 		}
 		case CDE_DMA1_CBAD:
 		case CDE_DMA2_CBAD:
-		{
 			write_m2_reg(m_dma[dmach].m_cbad, data, wm_cw);
 			break;
-		}
 		case CDE_DMA1_CPAD:
 		case CDE_DMA2_CPAD:
-		{
 			write_m2_reg(m_dma[dmach].m_cpad, data, wm_cw);
 			break;
-		}
 		case CDE_DMA1_CCNT:
 		case CDE_DMA2_CCNT:
-		{
 			write_m2_reg(m_dma[dmach].m_ccnt, data, wm_cw);
 			break;
-		}
 		default:
-		{
 			//logerror("%s: CDE_W UNHANDLED: 0x%.8x 0x%.8x 0x%.8x\n", machine().describe_context(), byte_offs, data, mem_mask);
-		}
+			break;
 	}
 }
 
@@ -1926,7 +1872,7 @@ void m2_cde_device::start_dma(uint32_t ch)
 	attotime delay = attotime::from_nsec(10);// * dma_ch.m_ccnt;
 
 //  attotime delay = clocks_to_attotime(4 * dma_ch.m_ccnt);
-	dma_ch.m_timer->adjust(delay);
+	dma_ch.m_timer->adjust(delay, (int)ch);
 
 	if (dma_ch.m_cntl & CDE_DMA_DIRECTION)
 	{
@@ -1989,8 +1935,9 @@ void m2_cde_device::start_dma(uint32_t ch)
 //  next_dma - Start the next DMA if set
 //-------------------------------------------------
 
-void m2_cde_device::next_dma(uint32_t ch)
+TIMER_CALLBACK_MEMBER(m2_cde_device::next_dma)
 {
+	const uint32_t ch = (uint32_t)param;
 	dma_channel &dma_ch = m_dma[ch];
 
 	// TODO: HACK!

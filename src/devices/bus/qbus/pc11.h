@@ -50,12 +50,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
+
+	TIMER_CALLBACK_MEMBER(read_tick);
 
 private:
 	int m_rxvec;
@@ -70,6 +71,8 @@ private:
 	uint16_t m_rbuf;
 	uint16_t m_tcsr;
 	uint16_t m_tbuf;
+
+	emu_timer *m_read_timer;
 
 	const char *pc11_regnames[4];
 };

@@ -156,7 +156,7 @@ spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, co
 
 void spc1000_fdd_exp_device::device_start()
 {
-	m_timer_tc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spc1000_fdd_exp_device::tc_off), this));
+	m_timer_tc = timer_alloc(FUNC(spc1000_fdd_exp_device::tc_off), this);
 }
 
 //-------------------------------------------------

@@ -82,11 +82,6 @@ public:
 	inline void sega005_update_sound_data();
 
 private:
-	enum
-	{
-		TIMER_VBLANK_LATCH_CLEAR
-	};
-
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -172,6 +167,7 @@ private:
 	void sega005_sound_a_w(uint8_t data);
 	void sega005_sound_b_w(uint8_t data);
 
+	TIMER_CALLBACK_MEMBER(vblank_latch_clear);
 	void vblank_latch_set();
 	void g80_set_palette_entry(int entry, uint8_t data);
 	void spaceod_bg_init_palette();
@@ -191,7 +187,6 @@ private:
 	void sindbadm_portmap(address_map &map);
 	void sindbadm_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	emu_timer *m_vblank_latch_clear_timer = nullptr;
 };
 

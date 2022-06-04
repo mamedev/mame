@@ -60,8 +60,8 @@ void ds2401_device::device_start()
 	save_item(NAME(m_rx));
 	save_item(NAME(m_tx));
 
-	m_timer_main  = timer_alloc(TIMER_MAIN);
-	m_timer_reset = timer_alloc(TIMER_RESET);
+	m_timer_main  = timer_alloc(FUNC(ds2401_device::main_tick), this);
+	m_timer_reset = timer_alloc(FUNC(ds2401_device::reset_tick), this);
 }
 
 void ds2401_device::device_reset()
@@ -92,81 +92,78 @@ void ds2401_device::device_reset()
 	memset(m_data, 0, SIZE_DATA);
 }
 
-void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ds2401_device::reset_tick)
 {
-	switch(id)
+	verboselog(1, "timer_reset\n");
+	m_state = STATE_RESET;
+	m_timer_reset->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(ds2401_device::main_tick)
+{
+	switch(m_state)
 	{
-	case TIMER_RESET:
-		verboselog(1, "timer_reset\n");
-		m_state = STATE_RESET;
-		m_timer_reset->adjust(attotime::never);
+	case STATE_RESET1:
+		verboselog(2, "timer_main state_reset1 %d\n", m_rx);
+		m_tx = false;
+		m_state = STATE_RESET2;
+		m_timer_main->adjust(t_pdl);
 		break;
 
-	case TIMER_MAIN:
-		switch(m_state)
+	case STATE_RESET2:
+		verboselog(2, "timer_main state_reset2 %d\n", m_rx);
+		m_tx = true;
+		m_bit = 0;
+		m_shift = 0;
+		m_state = STATE_COMMAND;
+		break;
+
+	case STATE_COMMAND:
+		verboselog(2, "timer_main state_command %d\n", m_rx);
+
+		m_shift >>= 1;
+		if(m_rx)
 		{
-		case STATE_RESET1:
-			verboselog(2, "timer_main state_reset1 %d\n", m_rx);
-			m_tx = false;
-			m_state = STATE_RESET2;
-			m_timer_main->adjust(t_pdl);
-			break;
-
-		case STATE_RESET2:
-			verboselog(2, "timer_main state_reset2 %d\n", m_rx);
-			m_tx = true;
-			m_bit = 0;
-			m_shift = 0;
-			m_state = STATE_COMMAND;
-			break;
-
-		case STATE_COMMAND:
-			verboselog(2, "timer_main state_command %d\n", m_rx);
-
-			m_shift >>= 1;
-			if(m_rx)
-			{
-				m_shift |= 0x80;
-			}
-
-			m_bit++;
-			if(m_bit == 8)
-			{
-				switch(m_shift)
-				{
-				case COMMAND_READROM:
-				case COMMAND_READROM_COMPAT:
-					verboselog(1, "timer_main readrom\n");
-					m_bit = 0;
-					m_byte = 0;
-					m_state = STATE_READROM;
-					break;
-
-				default:
-					verboselog(0, "timer_main command not handled %02x\n", m_shift);
-					m_state = STATE_IDLE;
-					break;
-				}
-			}
-			break;
-
-		case STATE_READROM:
-			m_tx = true;
-
-			if( m_byte == SIZE_DATA )
-			{
-				verboselog(1, "timer_main readrom finished\n");
-				m_state = STATE_IDLE;
-			}
-			else
-			{
-				verboselog(2, "timer_main readrom window closed\n");
-			}
-			break;
-		default:
-			verboselog(0, "timer_main state not handled: %d\n", m_state);
-			break;
+			m_shift |= 0x80;
 		}
+
+		m_bit++;
+		if(m_bit == 8)
+		{
+			switch(m_shift)
+			{
+			case COMMAND_READROM:
+			case COMMAND_READROM_COMPAT:
+				verboselog(1, "timer_main readrom\n");
+				m_bit = 0;
+				m_byte = 0;
+				m_state = STATE_READROM;
+				break;
+
+			default:
+				verboselog(0, "timer_main command not handled %02x\n", m_shift);
+				m_state = STATE_IDLE;
+				break;
+			}
+		}
+		break;
+
+	case STATE_READROM:
+		m_tx = true;
+
+		if( m_byte == SIZE_DATA )
+		{
+			verboselog(1, "timer_main readrom finished\n");
+			m_state = STATE_IDLE;
+		}
+		else
+		{
+			verboselog(2, "timer_main readrom window closed\n");
+		}
+		break;
+	default:
+		verboselog(0, "timer_main state not handled: %d\n", m_state);
+		break;
 	}
 }
 

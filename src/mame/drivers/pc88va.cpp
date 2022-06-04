@@ -374,31 +374,6 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PC8801FD_UPD765_TC_TO_ZERO:
-		pc8801fd_upd765_tc_to_zero(param);
-		break;
-	case TIMER_T3_MOUSE_CALLBACK:
-		t3_mouse_callback(param);
-		break;
-	case TIMER_PC88VA_FDC_TIMER:
-		pc88va_fdc_timer(param);
-		break;
-	case TIMER_PC88VA_FDC_MOTOR_START_0:
-		pc88va_fdc_motor_start_0(param);
-		break;
-	case TIMER_PC88VA_FDC_MOTOR_START_1:
-		pc88va_fdc_motor_start_1(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pc88va_state::device_timer");
-	}
-}
-
-
 void pc88va_state::pc88va_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
@@ -893,7 +868,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			{
 				m_fdd[0]->get_device()->mon_w(1);
 				if(m_fdc_motor_status[0] == 0)
-					timer_set(attotime::from_msec(505), TIMER_PC88VA_FDC_MOTOR_START_0);
+					m_motor_start_timer[0]->adjust(attotime::from_msec(505));
 				else
 					m_fdc_motor_status[0] = 0;
 			}
@@ -902,7 +877,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			{
 				m_fdd[1]->get_device()->mon_w(1);
 				if(m_fdc_motor_status[1] == 0)
-					timer_set(attotime::from_msec(505), TIMER_PC88VA_FDC_MOTOR_START_1);
+					m_motor_start_timer[1]->adjust(attotime::from_msec(505));
 				else
 					m_fdc_motor_status[1] = 0;
 			}
@@ -918,7 +893,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 		case 0x06:
 			//printf("%02x\n",data);
 			if(data & 1)
-				timer_set(attotime::from_msec(100), TIMER_PC88VA_FDC_TIMER);
+				m_fdc_timer->adjust(attotime::from_msec(100));
 
 			if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
 				m_dmac->dreq2_w(1);
@@ -1100,7 +1075,7 @@ void pc88va_state::pc88va_z80_map(address_map &map)
 uint8_t pc88va_state::upd765_tc_r()
 {
 	m_fdc->tc_w(true);
-	timer_set(attotime::from_usec(50), TIMER_PC8801FD_UPD765_TC_TO_ZERO);
+	m_tc_clear_timer->adjust(attotime::from_usec(50));
 	return 0;
 }
 
@@ -1440,8 +1415,20 @@ uint8_t pc88va_state::get_slave_ack(offs_t offset)
 
 void pc88va_state::machine_start()
 {
-	m_t3_mouse_timer = timer_alloc(TIMER_T3_MOUSE_CALLBACK);
+	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
+	m_tc_clear_timer->adjust(attotime::never);
+
+	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
+	m_fdc_timer->adjust(attotime::never);
+
+	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
+	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
+	m_motor_start_timer[0]->adjust(attotime::never);
+	m_motor_start_timer[1]->adjust(attotime::never);
+
+	m_t3_mouse_timer = timer_alloc(FUNC(pc88va_state::t3_mouse_callback), this);
 	m_t3_mouse_timer->adjust(attotime::never);
+
 	floppy_image_device *floppy;
 	floppy = m_fdd[0]->get_device();
 	if(floppy)

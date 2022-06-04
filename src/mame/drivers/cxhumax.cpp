@@ -986,7 +986,7 @@ void cxhumax_state::machine_start()
 	int index = 0;
 	for(index = 0; index < MAX_CX_TIMERS; index++)
 	{
-		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxhumax_state::timer_tick),this));
+		m_timer_regs.timer[index].timer = timer_alloc(FUNC(cxhumax_state::timer_tick), this);
 		m_timer_regs.timer[index].timer->adjust(attotime::never, index);
 	}
 }

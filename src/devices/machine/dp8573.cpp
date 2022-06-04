@@ -35,7 +35,7 @@ void dp8573_device::device_start()
 	save_item(NAME(m_pfr));
 	save_item(NAME(m_millis));
 
-	m_timer = timer_alloc(TIMER_ID);
+	m_timer = timer_alloc(FUNC(dp8573_device::msec_tick), this);
 	m_timer->adjust(attotime::never);
 
 	m_intr_cb.resolve_safe();
@@ -79,7 +79,7 @@ void dp8573_device::save_registers()
 	m_ram[REG_SAVE_MONTH]  = m_ram[REG_MONTH];
 }
 
-void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dp8573_device::msec_tick)
 {
 	if ((m_pfr & PFR_OSF) || !(m_ram[REG_RTMR] & RTMR_CSS))
 	{

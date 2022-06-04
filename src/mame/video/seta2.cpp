@@ -889,7 +889,7 @@ void seta2_state::video_start()
 		m_realtilenumber[i] = i % m_spritegfx->elements();
 	}
 
-	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
+	m_raster_timer = timer_alloc(FUNC(seta2_state::raster_timer_done), this);
 
 	save_pointer(NAME(m_private_spriteram), 0x1000 / 2);
 }

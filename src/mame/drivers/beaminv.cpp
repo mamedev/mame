@@ -134,7 +134,7 @@ TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
 
 void beaminv_state::create_interrupt_timer()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beaminv_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(beaminv_state::interrupt_callback), this);
 }
 
 

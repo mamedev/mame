@@ -230,14 +230,14 @@ void vrc5074_device::device_start()
 	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, true, m_romRegion->base());
 
 	// DMA timer
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc5074_device::dma_transfer), this));
+	m_dma_timer = timer_alloc(FUNC(vrc5074_device::dma_transfer), this);
 	// Leave the timer disabled.
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 	/* allocate timers for the NILE */
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc5074_device::nile_timer_callback), this));
-	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc5074_device::nile_timer_callback), this));
+	m_timer[2] = timer_alloc(FUNC(vrc5074_device::nile_timer_callback), this);
+	m_timer[3] = timer_alloc(FUNC(vrc5074_device::nile_timer_callback), this);
 
 	// Save states
 	// m_sdram

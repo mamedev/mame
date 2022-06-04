@@ -158,7 +158,7 @@ a2bus_transwarp_device::a2bus_transwarp_device(const machine_config &mconfig, co
 
 void a2bus_transwarp_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(a2bus_transwarp_device::clock_adjust_tick), this);
 
 	save_item(NAME(m_bEnabled));
 	save_item(NAME(m_bReadA2ROM));
@@ -187,7 +187,7 @@ void a2bus_transwarp_device::device_reset()
 	}
 }
 
-void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a2bus_transwarp_device::clock_adjust_tick)
 {
 	if (m_bIn1MHzMode)
 	{

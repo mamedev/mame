@@ -191,7 +191,7 @@ void trvquest_state::trvquest(machine_config &config)
 	m_via_2->readpa_handler().set_ioport("UNK");
 	m_via_2->readpb_handler().set_ioport("DSW");
 	m_via_2->ca2_handler().set(FUNC(trvquest_state::misc_w));
-	m_via_2->irq_handler().set(FUNC(trvquest_state::via_irq));
+	m_via_2->irq_handler().set_inputline(m_maincpu, 0);
 }
 
 ROM_START( trvquest )

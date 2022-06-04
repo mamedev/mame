@@ -28,14 +28,11 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	static const device_timer_id TIMER_CTRL_POLL = 0;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	void vii_portb_w(uint16_t data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_vii);
 
-	virtual void poll_controls();
+	TIMER_CALLBACK_MEMBER(poll_controls);
 
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_motionx;
@@ -47,19 +44,6 @@ private:
 	uint8_t m_controller_input[8];
 };
 
-
-void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_CTRL_POLL:
-		poll_controls();
-		break;
-	default:
-		logerror("Unknown timer ID: %d\n", id);
-		break;
-	}
-}
 
 void vii_state::vii_portb_w(uint16_t data)
 {
@@ -101,7 +85,7 @@ void vii_state::machine_start()
 		m_bank->set_entry(0);
 	}
 
-	m_ctrl_poll_timer = timer_alloc(TIMER_CTRL_POLL);
+	m_ctrl_poll_timer = timer_alloc(FUNC(vii_state::poll_controls), this);
 	m_ctrl_poll_timer->adjust(attotime::never);
 
 	save_item(NAME(m_controller_input));
@@ -120,7 +104,7 @@ void vii_state::machine_reset()
 }
 
 
-void vii_state::poll_controls()
+TIMER_CALLBACK_MEMBER(vii_state::poll_controls)
 {
 	int32_t x = m_io_motionx ? ((int32_t)m_io_motionx->read() - 0x200) : 0;
 	int32_t y = m_io_motiony ? ((int32_t)m_io_motiony->read() - 0x200) : 0;

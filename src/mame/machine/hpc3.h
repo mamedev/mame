@@ -71,7 +71,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -109,7 +108,7 @@ protected:
 	uint32_t bbram_r(offs_t offset);
 	void bbram_w(offs_t offset, uint32_t data);
 
-	void do_pbus_dma(uint32_t channel);
+	TIMER_CALLBACK_MEMBER(do_pbus_dma);
 	void do_scsi_dma(int channel);
 
 	void dump_chain(uint32_t base);
@@ -122,8 +121,6 @@ protected:
 	void enet_transmit(int param = 0);
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
-
-	static const device_timer_id TIMER_PBUS_DMA = 0;
 
 	struct pbus_dma_t
 	{

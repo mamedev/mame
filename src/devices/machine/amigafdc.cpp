@@ -86,7 +86,7 @@ void amiga_fdc_device::device_start()
 
 	floppy = nullptr;
 
-	t_gen = timer_alloc(0);
+	t_gen = timer_alloc(FUNC(amiga_fdc_device::update_tick), this);
 }
 
 void amiga_fdc_device::device_reset()
@@ -485,7 +485,7 @@ uint16_t amiga_fdc_device::dskbytr_r()
 	return res;
 }
 
-void amiga_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(amiga_fdc_device::update_tick)
 {
 	live_sync();
 	live_run();

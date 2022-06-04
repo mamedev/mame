@@ -168,7 +168,7 @@ void nes_sunsoft_dcs_device::device_start()
 {
 	nes_sunsoft_4_device::device_start();
 
-	ntb_enable_timer = timer_alloc(TIMER_PROTECT);
+	ntb_enable_timer = timer_alloc(FUNC(nes_sunsoft_dcs_device::protect_tick), this);
 	ntb_enable_timer->reset();
 	timer_freq = clocks_to_attotime(107520);
 
@@ -281,14 +281,11 @@ void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  protect_tick - handler NTB-ROM timer elapsing
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_sunsoft_dcs_device::protect_tick)
 {
-	if (id == TIMER_PROTECT)
-	{
-		m_timer_on = 0;
-		ntb_enable_timer->reset();
-	}
+	m_timer_on = 0;
+	ntb_enable_timer->reset();
 }

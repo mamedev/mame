@@ -493,9 +493,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq2_cb)
 
 void namcofl_state::machine_start()
 {
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
-	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
-	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+	m_raster_interrupt_timer = timer_alloc(FUNC(namcofl_state::raster_interrupt_callback), this);
+	m_network_interrupt_timer = timer_alloc(FUNC(namcofl_state::network_interrupt_callback), this);
+	m_vblank_interrupt_timer =  timer_alloc(FUNC(namcofl_state::vblank_interrupt_callback), this);
 
 	m_mainbank.select(1);
 }

@@ -188,7 +188,7 @@ void nes_ks7022_device::pcb_reset()
 void nes_ks7032_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_ks7032_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));
@@ -230,7 +230,7 @@ void nes_ks7016_device::pcb_reset()
 void nes_ks7017_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_ks7017_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));
@@ -443,18 +443,15 @@ u8 nes_ks7022_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_ks7032_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (++m_irq_count == 0)
 		{
-			if (++m_irq_count == 0)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-				m_irq_count = m_irq_count_latch;
-			}
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
+			m_irq_count = m_irq_count_latch;
 		}
 	}
 }
@@ -611,18 +608,15 @@ void nes_ks7016_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_ks7017_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (--m_irq_count == 0)
 		{
-			if (--m_irq_count == 0)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-				m_irq_status |= 0x01;
-			}
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
+			m_irq_status |= 0x01;
 		}
 	}
 }

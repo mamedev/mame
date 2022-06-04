@@ -68,8 +68,8 @@ private:
 	void zx80_io_w(offs_t offset, uint8_t data);
 	void zx81_io_w(offs_t offset, uint8_t data);
 
-	void zx_tape_input();
-	void zx_ula_hsync();
+	TIMER_CALLBACK_MEMBER(zx_tape_input);
+	TIMER_CALLBACK_MEMBER(zx_ula_hsync);
 
 	void pc8300_io_map(address_map &map);
 	void pow3000_io_map(address_map &map);
@@ -78,12 +78,6 @@ private:
 	void zx80_map(address_map &map);
 	void zx81_io_map(address_map &map);
 	void zx81_map(address_map &map);
-
-	enum
-	{
-		TIMER_TAPE_INPUT,
-		TIMER_ULA_HSYNC
-	};
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -97,7 +91,8 @@ private:
 	required_device<screen_device> m_screen;
 
 	address_space *m_program = nullptr;
-	emu_timer *m_tape_input = nullptr, *m_ula_hsync = nullptr;
+	emu_timer *m_tape_input = nullptr;
+	emu_timer *m_ula_hsync = nullptr;
 
 	bool m_vsync_active = false, m_hsync_active = false;
 	bool m_nmi_on = false, m_nmi_generator_active = false;
@@ -112,8 +107,6 @@ private:
 
 	uint16_t m_ula_char_buffer = 0;
 	double m_cassette_cur_level = 0;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void drop_sync();
 	void recalc_hsync();

@@ -37,7 +37,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -48,12 +47,6 @@ protected:
 	virtual void txd_w(int state) override;
 
 private:
-	enum
-	{
-		TIMER_SERIAL,
-		TIMER_MOUSE
-	};
-
 	enum
 	{
 		LED_1 = 0,
@@ -69,11 +62,11 @@ private:
 		LED_CAPS_LOCK
 	};
 
-	inline void serial_input();
-	inline void serial_output(int state);
-	inline void serial_clock();
-	inline void key_down(int state);
-	inline void scan_mouse();
+	void serial_input();
+	void serial_output(int state);
+	TIMER_CALLBACK_MEMBER(serial_clock);
+	TIMER_CALLBACK_MEMBER(scan_mouse);
+	void key_down(int state);
 
 	void z2_p1_w(uint8_t data);
 	uint8_t z2_p2_r();

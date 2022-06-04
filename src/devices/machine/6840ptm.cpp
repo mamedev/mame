@@ -95,9 +95,9 @@ void ptm6840_device::device_start()
 	m_out_cb.resolve_all_safe();
 	m_irq_cb.resolve_safe();
 
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
-	m_timer[2] = timer_alloc(2);
+	m_timer[0] = timer_alloc(FUNC(ptm6840_device::timeout), this);
+	m_timer[1] = timer_alloc(FUNC(ptm6840_device::timeout), this);
+	m_timer[2] = timer_alloc(FUNC(ptm6840_device::timeout), this);
 
 	for (auto & elem : m_timer)
 	{
@@ -160,15 +160,6 @@ void ptm6840_device::device_resolve_objects()
 {
 	for (int i = 0; i < 3; i++)
 		m_gate[i]  = 0;
-}
-
-//-------------------------------------------------
-//  device_timer - handle timer callbacks
-//-------------------------------------------------
-
-void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	timeout(id);
 }
 
 
@@ -246,7 +237,7 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 		{
 			duration *= m_t3_divisor;
 		}
-		m_timer[counter]->adjust(duration);
+		m_timer[counter]->adjust(duration, counter);
 	}
 }
 
@@ -429,7 +420,7 @@ void ptm6840_device::reload_count(int idx)
 		LOGMASKED(LOG_COUNTERS, "Timer #%d reload_count: output = %f\n", idx + 1, duration.as_double());
 
 		m_enabled[idx] = 1;
-		m_timer[idx]->adjust(duration);
+		m_timer[idx]->adjust(duration, idx);
 		m_timer[idx]->enable(true);
 	}
 }
@@ -606,57 +597,57 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 //  timeout - Called if timer is mature
 //-------------------------------------------------
 
-void ptm6840_device::timeout(int idx)
+TIMER_CALLBACK_MEMBER(ptm6840_device::timeout)
 {
-	LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d timeout**\n", idx + 1);
+	LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d timeout**\n", param + 1);
 
 	// Set the interrupt flag
-	m_status_reg |= (1 << idx);
-	m_status_read_since_int &= ~(1 << idx);
+	m_status_reg |= (1 << param);
+	m_status_read_since_int &= ~(1 << param);
 	update_interrupts();
 
-	if (m_control_reg[idx] & COUNT_OUT_EN)
+	if (m_control_reg[param] & COUNT_OUT_EN)
 	{
-		switch (m_mode[idx])
+		switch (m_mode[param])
 		{
 			case 0:
 			case 2:
 
-				if (m_control_reg[idx] & COUNT_MODE_8BIT)
+				if (m_control_reg[param] & COUNT_MODE_8BIT)
 				{
-					m_hightime[idx] = !m_hightime[idx];
-					m_output[idx] = m_hightime[idx];
-					m_out_cb[idx](m_output[idx]);
+					m_hightime[param] = !m_hightime[param];
+					m_output[param] = m_hightime[param];
+					m_out_cb[param](m_output[param]);
 				}
 				else
 				{
-					m_output[idx] = m_output[idx] ^ 1;
-					m_out_cb[idx](m_output[idx]);
+					m_output[param] = m_output[param] ^ 1;
+					m_out_cb[param](m_output[param]);
 				}
-				LOGMASKED(LOG_TIMEOUTS, "%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), idx + 1, m_output[idx]);
+				LOGMASKED(LOG_TIMEOUTS, "%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), param + 1, m_output[param]);
 				break;
 
 			case 4:
 			case 6:
-				if (!m_fired[idx])
+				if (!m_fired[param])
 				{
-					m_output[idx] = 1;
-					LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d output %d **\n", idx + 1, m_output[idx]);
+					m_output[param] = 1;
+					LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d output %d **\n", param + 1, m_output[param]);
 
-					m_out_cb[idx](m_output[idx]);
+					m_out_cb[param](m_output[param]);
 
 					// No changes in output until reinit
-					m_fired[idx] = 1;
+					m_fired[param] = 1;
 
-					m_status_reg |= (1 << idx);
-					m_status_read_since_int &= ~(1 << idx);
+					m_status_reg |= (1 << param);
+					m_status_read_since_int &= ~(1 << param);
 					update_interrupts();
 				}
 				break;
 		}
 	}
-	m_enabled[idx]= 0;
-	reload_count(idx);
+	m_enabled[param]= 0;
+	reload_count(param);
 }
 
 
@@ -737,7 +728,7 @@ void ptm6840_device::set_ext_clock(int counter, double clock)
 		}
 
 		m_enabled[counter] = 1;
-		m_timer[counter]->adjust(duration);
+		m_timer[counter]->adjust(duration, counter);
 		m_timer[counter]->enable(true);
 	}
 }

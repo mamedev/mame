@@ -508,7 +508,9 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(command_tick);
+	TIMER_CALLBACK_MEMBER(switch_off_tick);
 
 	void rainbow8088_base_map(address_map &map);
 	void rainbow8088_base_io(address_map &map);
@@ -890,10 +892,10 @@ static void rainbow_floppies(device_slot_interface &device)
 void rainbow_base_state::machine_start()
 {
 	m_power_good = false; // Simulate AC_OK signal from power supply.
-	cmd_timer = timer_alloc(0);
+	cmd_timer = timer_alloc(FUNC(rainbow_base_state::command_tick), this);
 	cmd_timer->adjust(attotime::from_msec(MS_TO_POWER_GOOD));
 
-	switch_off_timer = timer_alloc(1);
+	switch_off_timer = timer_alloc(FUNC(rainbow_base_state::switch_off_tick), this);
 	switch_off_timer->adjust(attotime::from_msec(10));
 
 	m_digits.resolve();
@@ -1278,40 +1280,29 @@ void rainbow_modelb_state::machine_reset()
 }
 
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
-void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(rainbow_base_state::command_tick)
 {
-	switch (tid)
+	if (m_power_good == false)
 	{
-	case 0:
-		cmd_timer->adjust(attotime::never);
+		m_power_good = true;
+		logerror("**** POWER GOOD ****\n");
+	}
+	else
+	{
+		logerror("**** WATCHDOG: CPU RESET ****\n");
+		m_i8088->reset(); // gives 'ERROR_16 - INTERRUPTS OFF' (indicates hardware failure or software bug).
+	}
+}
 
-		if (m_power_good == false)
-		{
-			m_power_good = true;
-			logerror("**** POWER GOOD ****\n");
-		}
-		else
-		{
-			logerror("**** WATCHDOG: CPU RESET ****\n");
-			m_i8088->reset(); // gives 'ERROR_16 - INTERRUPTS OFF' (indicates hardware failure or software bug).
-		}
-		break; // case 0
+TIMER_CALLBACK_MEMBER(rainbow_base_state::switch_off_tick)
+{
+	m_driveleds[0] = 0; // DRIVE 0 (A)
+	m_driveleds[1] = 0; // DRIVE 1 (B)
+	m_driveleds[2] = 0; // DRIVE 2 (C)
+	m_driveleds[3] = 0; // DRIVE 3 (D)
 
-	case 1:
-
-		switch_off_timer->adjust(attotime::never);
-
-		m_driveleds[0] = 0; // DRIVE 0 (A)
-		m_driveleds[1] = 0; // DRIVE 1 (B)
-		m_driveleds[2] = 0; // DRIVE 2 (C)
-		m_driveleds[3] = 0; // DRIVE 3 (D)
-
-		m_leds[0] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for DEC hard disk)
-		m_leds[1] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for Corvus HD)
-
-		break; // case 1
-
-	} // switch (timer ID)
+	m_leds[0] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for DEC hard disk)
+	m_leds[1] = 1;  // 1 = OFF (One of the CPU LEDs as drive LED for Corvus HD)
 }
 
 uint32_t rainbow_base_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

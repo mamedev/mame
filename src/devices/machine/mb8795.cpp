@@ -52,8 +52,8 @@ void mb8795_device::device_start()
 	drq_rx_cb.resolve();
 
 	memset(mac, 0, 6);
-	timer_tx = timer_alloc(TIMER_TX);
-	timer_rx = timer_alloc(TIMER_RX);
+	timer_tx = timer_alloc(FUNC(mb8795_device::tx_update), this);
+	timer_rx = timer_alloc(FUNC(mb8795_device::rx_update), this);
 }
 
 void mb8795_device::device_reset()
@@ -323,15 +323,16 @@ bool mb8795_device::recv_is_multicast()
 	return rxbuf[0] & 0x01;
 }
 
-void mb8795_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mb8795_device::tx_update)
 {
-	if(id == TIMER_TX) {
-		drq_tx = true;
-		if(!drq_tx_cb.isnull())
-			drq_tx_cb(drq_tx);
-	}
+	drq_tx = true;
+	if(!drq_tx_cb.isnull())
+		drq_tx_cb(drq_tx);
+}
 
-	if(id == TIMER_RX && rxlen) {
+TIMER_CALLBACK_MEMBER(mb8795_device::rx_update)
+{
+	if(rxlen) {
 		drq_rx = true;
 		if(!drq_rx_cb.isnull())
 			drq_rx_cb(drq_rx);

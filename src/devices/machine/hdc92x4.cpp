@@ -294,15 +294,6 @@ enum
 };
 
 /*
-    Timers
-*/
-enum
-{
-	GEN_TIMER = 1,
-	COM_TIMER
-};
-
-/*
     Definition of bits in the Mode register
 */
 enum {
@@ -4764,22 +4755,22 @@ void hdc92x4_device::set_clock_divider(int line, int value)
 }
 
 /*
-    This is reached when a timer has expired
+    These are reached when the relevant timer has expired
 */
-void hdc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hdc92x4_device::gen_timer_expired)
 {
 	live_sync();
 	m_timed_wait = false;
 
-	switch (id)
-	{
-	case GEN_TIMER:
-		reenter_command_processing();
-		break;
-	case COM_TIMER:
-		process_command();
-		break;
-	}
+	reenter_command_processing();
+}
+
+TIMER_CALLBACK_MEMBER(hdc92x4_device::com_timer_expired)
+{
+	live_sync();
+	m_timed_wait = false;
+
+	process_command();
 }
 
 /*
@@ -4804,9 +4795,9 @@ void hdc92x4_device::device_start()
 	m_in_dma.resolve_safe(0);
 
 	// allocate timers
-	m_timer = timer_alloc(GEN_TIMER);
-	m_cmd_timer = timer_alloc(COM_TIMER);
-	// m_live_timer = timer_alloc(LIVE_TIMER);
+	m_timer = timer_alloc(FUNC(hdc92x4_device::gen_timer_expired), this);
+	m_cmd_timer = timer_alloc(FUNC(hdc92x4_device::com_timer_expired), this);
+	// m_live_timer = timer_alloc(FUNC(hdc92x4_device::live_timer_expired), this);
 
 	m_live_state.state = IDLE;
 }

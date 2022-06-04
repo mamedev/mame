@@ -50,16 +50,9 @@ void trucocl_state::irq_enable_w(uint8_t data)
 }
 
 
-void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(trucocl_state::dac_irq)
 {
-	switch (id)
-	{
-	case TIMER_DAC_IRQ:
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in trucocl_state::device_timer");
-	}
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -168,9 +161,16 @@ static GFXDECODE_START( gfx_trucocl )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
 
+void trucocl_state::machine_start()
+{
+	m_dac_irq_timer = timer_alloc(FUNC(trucocl_state::dac_irq), this);
+}
+
 void trucocl_state::machine_reset()
 {
-	// ...
+	m_cur_dac_address = -1;
+	m_cur_dac_address_index = 0;
+	m_dac_irq_timer->adjust(attotime::never);
 }
 
 INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
@@ -209,7 +209,7 @@ void trucocl_state::trucocl(machine_config &config)
 
 /***************************************************************************
 
-  Game driver(s)
+  ROM definitions
 
 ***************************************************************************/
 
@@ -232,16 +232,5 @@ ROM_END
  *
  *************************************/
 
-void trucocl_state::init_trucocl()
-{
-	m_cur_dac_address = -1;
-	m_cur_dac_address_index = 0;
-
-	m_dac_irq_timer = timer_alloc(TIMER_DAC_IRQ);
-}
-
-
-
-/******************************************************************************/
 //    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT          MONITOR
-GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, init_trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, empty_init,   ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

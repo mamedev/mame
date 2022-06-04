@@ -332,7 +332,7 @@ void trs80_state::machine_start()
 	m_tape_unit = 1;
 	m_reg_load = 1;
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80_state::cassette_data_callback),this));
+	m_cassette_data_timer = timer_alloc(FUNC(trs80_state::cassette_data_callback), this);
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 }
 

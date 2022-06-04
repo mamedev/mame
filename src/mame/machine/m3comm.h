@@ -41,26 +41,25 @@ public:
 
 	void m3comm_mem(address_map &map);
 protected:
-	enum { TIMER_IRQ5 = 1 };
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	TIMER_CALLBACK_MEMBER(trigger_irq5);
+
 private:
-	uint16_t naomi_control = 0;
-	uint16_t naomi_offset = 0;
+	uint16_t m_naomi_control = 0;
+	uint16_t m_naomi_offset = 0;
 	uint16_t m_status0 = 0;
 	uint16_t m_status1 = 0;
 	uint16_t m_commbank = 0;
 
-	uint16_t recv_offset = 0;
-	uint16_t recv_size = 0;
-	uint16_t send_offset = 0;
-	uint16_t send_size = 0;
+	uint16_t m_recv_offset = 0;
+	uint16_t m_recv_size = 0;
+	uint16_t m_send_offset = 0;
+	uint16_t m_send_size = 0;
 
 
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
@@ -68,9 +67,9 @@ private:
 	char m_localhost[256]{};
 	char m_remotehost[256]{};
 
-	emu_timer *timer = nullptr;
+	emu_timer *m_timer = nullptr;
 
-	required_shared_ptr<uint16_t> m68k_ram;
+	required_shared_ptr<uint16_t> m_68k_ram;
 	required_device<m68000_device> m_commcpu;
 	required_device<ram_device> m_ram;
 };

@@ -25,11 +25,6 @@
 class nbmj9195_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -79,7 +74,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 
 private:
 	required_device<tmpz84c011_device> m_maincpu;

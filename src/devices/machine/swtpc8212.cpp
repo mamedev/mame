@@ -323,14 +323,9 @@ MC6845_UPDATE_ROW(swtpc8212_device::update_row)
 	}
 }
 
-void swtpc8212_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(swtpc8212_device::bell_off)
 {
-	switch (id)
-	{
-	case BELL_TIMER_ID:
-		m_beeper->set_state(0);
-		break;
-	}
+	m_beeper->set_state(0);
 }
 
 void swtpc8212_device::rs232_conn_dcd_w(int state)
@@ -382,7 +377,7 @@ void swtpc8212_device::device_resolve_objects()
 
 void swtpc8212_device::device_start()
 {
-	m_bell_timer = timer_alloc(BELL_TIMER_ID);
+	m_bell_timer = timer_alloc(FUNC(swtpc8212_device::bell_off), this);
 
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_keyboard_data));

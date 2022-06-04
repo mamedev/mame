@@ -95,7 +95,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 
 void williams_cvsd_sound_device::write(u16 data)
 {
-	synchronize(0, data);
+	m_sync_write_timer->adjust(attotime::zero, data);
 }
 
 
@@ -230,6 +230,9 @@ void williams_cvsd_sound_device::device_start()
 
 	// register for save states
 	save_item(NAME(m_talkback));
+
+	// allocate timers
+	m_sync_write_timer = timer_alloc(FUNC(williams_cvsd_sound_device::sync_write), this);
 }
 
 
@@ -247,10 +250,10 @@ void williams_cvsd_sound_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  sync_write
 //-------------------------------------------------
 
-void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(williams_cvsd_sound_device::sync_write)
 {
 	// process incoming data write
 	m_pia->portb_w(param & 0xff);
@@ -302,7 +305,7 @@ u16 williams_narc_sound_device::read()
 
 void williams_narc_sound_device::write(u16 data)
 {
-	synchronize(TID_MASTER_COMMAND, data);
+	m_sync_master_timer->adjust(attotime::zero, data);
 }
 
 
@@ -373,7 +376,7 @@ u8 williams_narc_sound_device::command_r()
 
 void williams_narc_sound_device::command2_w(u8 data)
 {
-	synchronize(TID_SLAVE_COMMAND, data);
+	m_sync_slave_timer->adjust(attotime::zero, data);
 }
 
 
@@ -408,7 +411,7 @@ void williams_narc_sound_device::master_talkback_w(u8 data)
 
 void williams_narc_sound_device::master_sync_w(u8 data)
 {
-	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x01);
+	m_sync_clear_timer->adjust(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), 0x01);
 	m_audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
@@ -432,7 +435,7 @@ void williams_narc_sound_device::slave_talkback_w(u8 data)
 
 void williams_narc_sound_device::slave_sync_w(u8 data)
 {
-	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x02);
+	m_sync_clear_timer->adjust(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), 0x02);
 	m_audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }
@@ -562,6 +565,11 @@ void williams_narc_sound_device::device_start()
 	save_item(NAME(m_talkback));
 	save_item(NAME(m_audio_sync));
 	save_item(NAME(m_sound_int_state));
+
+	// allocate timers
+	m_sync_master_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_master_command), this);
+	m_sync_slave_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_slave_command), this);
+	m_sync_clear_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_clear), this);
 }
 
 
@@ -583,32 +591,29 @@ void williams_narc_sound_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  timer callbacks
 //-------------------------------------------------
 
-void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(williams_narc_sound_device::sync_master_command)
 {
-	switch (id)
+	m_latch = param & 0xff;
+	m_cpu[0]->set_input_line(INPUT_LINE_NMI, (param & 0x100) ? CLEAR_LINE : ASSERT_LINE);
+	if ((param & 0x200) == 0)
 	{
-		case TID_MASTER_COMMAND:
-			m_latch = param & 0xff;
-			m_cpu[0]->set_input_line(INPUT_LINE_NMI, (param & 0x100) ? CLEAR_LINE : ASSERT_LINE);
-			if ((param & 0x200) == 0)
-			{
-				m_cpu[0]->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-				m_sound_int_state = 1;
-			}
-			break;
-
-		case TID_SLAVE_COMMAND:
-			m_latch2 = param & 0xff;
-			m_cpu[1]->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-			break;
-
-		case TID_SYNC_CLEAR:
-			m_audio_sync &= ~param;
-			break;
+		m_cpu[0]->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_sound_int_state = 1;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(williams_narc_sound_device::sync_slave_command)
+{
+	m_latch2 = param & 0xff;
+	m_cpu[1]->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(williams_narc_sound_device::sync_clear)
+{
+	m_audio_sync &= ~param;
 }
 
 
@@ -640,7 +645,7 @@ williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &m
 
 void williams_adpcm_sound_device::write(u16 data)
 {
-	synchronize(TID_COMMAND, data);
+	m_sync_command_timer->adjust(attotime::zero, data);
 }
 
 
@@ -707,7 +712,7 @@ u8 williams_adpcm_sound_device::command_r()
 
 	// don't clear the external IRQ state for a short while; this allows the
 	// self-tests to pass
-	timer_set(attotime::from_usec(10), TID_IRQ_CLEAR);
+	m_irq_clear_timer->adjust(attotime::from_usec(10));
 	return m_latch;
 }
 
@@ -801,6 +806,9 @@ void williams_adpcm_sound_device::device_start()
 	save_item(NAME(m_latch));
 	save_item(NAME(m_talkback));
 	save_item(NAME(m_sound_int_state));
+
+	m_sync_command_timer = timer_alloc(FUNC(williams_adpcm_sound_device::sync_command), this);
+	m_irq_clear_timer = timer_alloc(FUNC(williams_adpcm_sound_device::irq_clear), this);
 }
 
 
@@ -815,31 +823,30 @@ void williams_adpcm_sound_device::device_reset()
 	m_cpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	m_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_sync_command_timer->adjust(attotime::never);
+	m_irq_clear_timer->adjust(attotime::never);
 }
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  timer callbacks
 //-------------------------------------------------
 
-void williams_adpcm_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(williams_adpcm_sound_device::sync_command)
 {
-	switch (id)
+	m_latch = param & 0xff;
+	if (!(param & 0x200))
 	{
-		case TID_COMMAND:
-			m_latch = param & 0xff;
-			if (!(param & 0x200))
-			{
-				m_cpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-				m_sound_int_state = 1;
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-			}
-			break;
-
-		case TID_IRQ_CLEAR:
-			m_sound_int_state = 0;
-			break;
+		m_cpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_sound_int_state = 1;
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
+}
+
+TIMER_CALLBACK_MEMBER(williams_adpcm_sound_device::irq_clear)
+{
+	m_sound_int_state = 0;
 }
 
 

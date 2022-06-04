@@ -1325,33 +1325,33 @@ MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 
 void model3_state::model3_init(int step)

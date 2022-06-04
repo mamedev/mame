@@ -21,16 +21,9 @@ enum { spaceod_bg_detect_tile_color = 1 };
  *
  *************************************/
 
-void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segag80r_state::vblank_latch_clear)
 {
-	switch (id)
-	{
-	case TIMER_VBLANK_LATCH_CLEAR:
-		m_vblank_latch = 0;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in segag80r_state::device_timer");
-	}
+	m_vblank_latch = 0;
 }
 
 

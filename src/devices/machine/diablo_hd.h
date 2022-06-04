@@ -67,8 +67,9 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(sector_mark_tick);
 
 private:
 	template <typename Format, typename... Params> void logprintf(int level, Format &&fmt, Params &&... args);

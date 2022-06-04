@@ -375,7 +375,7 @@ void midway_serial_pic2_device::device_start()
 
 	//m_yearoffs = yearoffs;
 	m_time_just_written = 0;
-	m_time_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_serial_pic2_device::reset_timer),this));
+	m_time_write_timer = timer_alloc(FUNC(midway_serial_pic2_device::reset_timer), this);
 	memset(m_default_nvram, 0xff, sizeof(m_default_nvram));
 }
 

@@ -140,7 +140,7 @@ void nes_2yudb_device::pcb_reset()
 void nes_900218_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_900218_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -268,7 +268,7 @@ void nes_tf1201_device::device_start()
 void nes_th21311_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_th21311_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -322,15 +322,12 @@ void nes_waixing_sgz_device::device_start()
 
  -------------------------------------------------*/
 
-void nes_900218_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_900218_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count++;
-			set_irq_line(BIT(m_irq_count, 10) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		m_irq_count++;
+		set_irq_line(BIT(m_irq_count, 10) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -580,18 +577,15 @@ void nes_tf1201_device::irq_ack_w()
 
  -------------------------------------------------*/
 
-void nes_th21311_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_th21311_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0xfff; // 12-bit counter
-			if (m_irq_count == 0x800)
-				m_irq_latch--;
-			if (!m_irq_latch && m_irq_count < 0x800)
-				set_irq_line(ASSERT_LINE);
-		}
+		m_irq_count = (m_irq_count + 1) & 0xfff; // 12-bit counter
+		if (m_irq_count == 0x800)
+			m_irq_latch--;
+		if (!m_irq_latch && m_irq_count < 0x800)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 

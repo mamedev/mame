@@ -70,11 +70,11 @@ void x68k_crtc_device::device_resolve_objects()
 
 void x68k_crtc_device::device_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_crtc_device::hsync), this));
-	m_operation_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_crtc_device::operation_end), this));
-	m_raster_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_crtc_device::raster_end), this));
-	m_raster_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_crtc_device::raster_irq), this));
-	m_vblank_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_crtc_device::vblank_irq), this));
+	m_scanline_timer = timer_alloc(FUNC(x68k_crtc_device::hsync), this);
+	m_operation_end_timer = timer_alloc(FUNC(x68k_crtc_device::operation_end), this);
+	m_raster_end_timer = timer_alloc(FUNC(x68k_crtc_device::raster_end), this);
+	m_raster_irq_timer = timer_alloc(FUNC(x68k_crtc_device::raster_irq), this);
+	m_vblank_irq_timer = timer_alloc(FUNC(x68k_crtc_device::vblank_irq), this);
 
 	// save state
 	save_item(NAME(m_reg));

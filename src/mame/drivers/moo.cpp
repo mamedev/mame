@@ -473,7 +473,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_protram));
 
-	m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
+	m_dmaend_timer = timer_alloc(FUNC(moo_state::dmaend_callback), this);
 }
 
 MACHINE_RESET_MEMBER(moo_state,moo)

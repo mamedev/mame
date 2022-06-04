@@ -32,7 +32,7 @@ void tvc_sound_device::device_start()
 	m_write_sndint.resolve_safe();
 
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
-	m_sndint_timer = timer_alloc(TIMER_SNDINT);
+	m_sndint_timer = timer_alloc(FUNC(tvc_sound_device::trigger_int), this);
 }
 
 //-------------------------------------------------
@@ -49,10 +49,10 @@ void tvc_sound_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  trigger_int
 //-------------------------------------------------
 
-void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tvc_sound_device::trigger_int)
 {
 	m_write_sndint(1);
 }

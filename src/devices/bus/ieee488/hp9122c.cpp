@@ -91,7 +91,7 @@ void hp9122c_device::device_start()
 	save_item(NAME(m_ds0));
 	save_item(NAME(m_ds1));
 
-	m_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9122c_device::motor_timeout), this));
+	m_motor_timer = timer_alloc(FUNC(hp9122c_device::motor_timeout), this);
 }
 
 TIMER_CALLBACK_MEMBER(hp9122c_device::motor_timeout)

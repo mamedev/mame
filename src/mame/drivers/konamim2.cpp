@@ -700,7 +700,7 @@ void konamim2_state::machine_start()
 	m_available_cdroms = chd ? new cdrom_file(chd) : nullptr;
 
 	// TODO: REMOVE
-	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamim2_state::atapi_delay), this));
+	m_atapi_timer = timer_alloc(FUNC(konamim2_state::atapi_delay), this);
 	m_atapi_timer->adjust( attotime::never );
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)

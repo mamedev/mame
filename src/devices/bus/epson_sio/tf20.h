@@ -36,7 +36,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -59,6 +58,9 @@ private:
 	uint8_t rom_disable_r();
 	uint8_t upd765_tc_r();
 	void fdc_control_w(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER( serial_tick );
+	TIMER_CALLBACK_MEMBER( tc_tick );
 
 	void cpu_io(address_map &map);
 	void cpu_mem(address_map &map);

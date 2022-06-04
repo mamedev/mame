@@ -73,7 +73,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	devcb_write_line   m_res_out_de_cb;
@@ -155,18 +154,10 @@ private:
 	int16_t   m_cursor_x;
 
 	/* timers */
-	static constexpr device_timer_id TIMER_LINE = 0;
-	static constexpr device_timer_id TIMER_DE_OFF = 1;
-	static constexpr device_timer_id TIMER_CUR_ON = 2;
-	static constexpr device_timer_id TIMER_CUR_OFF = 3;
-	static constexpr device_timer_id TIMER_HSYNC_ON = 4;
-	static constexpr device_timer_id TIMER_HSYNC_OFF = 5;
-	static constexpr device_timer_id TIMER_LIGHT_PEN_LATCH = 6;
-
 	emu_timer *m_line_timer;
 	emu_timer *m_de_off_timer;
-	emu_timer *m_cur_on_timer;
-	emu_timer *m_cur_off_timer;
+	emu_timer *m_cursor_on_timer;
+	emu_timer *m_cursor_off_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_light_pen_latch_timer;
@@ -191,7 +182,13 @@ private:
 	void set_vsync(int state);
 	void set_vblank(int state);
 	void set_cur(int state);
-	void handle_line_timer();
+	TIMER_CALLBACK_MEMBER(handle_line_timer);
+	TIMER_CALLBACK_MEMBER(de_off_tick);
+	TIMER_CALLBACK_MEMBER(cursor_on);
+	TIMER_CALLBACK_MEMBER(cursor_off);
+	TIMER_CALLBACK_MEMBER(hsync_on);
+	TIMER_CALLBACK_MEMBER(hsync_off);
+	TIMER_CALLBACK_MEMBER(latch_light_pen);
 	void update_cursor_state();
 };
 

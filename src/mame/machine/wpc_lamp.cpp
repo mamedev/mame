@@ -23,11 +23,19 @@ void wpc_lamp_device::set_names(const char *const *_names)
 
 void wpc_lamp_device::update()
 {
-	for(int i=0; i<8; i++)
-		if(row & (1 << i))
-			for(int j=0; j<8; j++)
-				if(col & (1 << j))
-					state[(j<<3)|i] |= 0x80;
+	for (int i = 0; i < 8; i++)
+	{
+		if (row & (1 << i))
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				if (BIT(col, j))
+				{
+					state[(j << 3) | i] |= 0x80;
+				}
+			}
+		}
+	}
 }
 
 void wpc_lamp_device::row_w(uint8_t data)
@@ -48,7 +56,7 @@ void wpc_lamp_device::device_start()
 	save_item(NAME(col));
 	save_item(NAME(row));
 
-	timer = timer_alloc(0);
+	timer = timer_alloc(FUNC(wpc_lamp_device::update_lamps), this);
 }
 
 void wpc_lamp_device::device_reset()
@@ -57,14 +65,16 @@ void wpc_lamp_device::device_reset()
 	timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
-void wpc_lamp_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wpc_lamp_device::update_lamps)
 {
-	for(int i=0; i<64; i++) {
+	for (int i = 0; i < 64; i++)
+	{
 		uint8_t s = state[i];
 		state[i] = s >> 1;
-		if((s & 0xc0) == 0x40 || (s & 0xc0) == 0x80) {
+		if ((s & 0xc0) == 0x40 || (s & 0xc0) == 0x80)
+		{
 			char buffer[256];
-			if(names && names[i])
+			if (names && names[i])
 				sprintf(buffer, "l:%s", names[i]);
 			else
 				sprintf(buffer, "l:%d%d", 1+(i >> 3), 1 + (i & 7));

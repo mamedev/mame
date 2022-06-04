@@ -1325,10 +1325,10 @@ void alto2_cpu_device::init_ether(int task)
 	m_eth.rx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 	m_eth.tx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 
-	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
+	m_eth.tx_timer = timer_alloc(FUNC(alto2_cpu_device::tx_packet), this);
 	m_eth.tx_timer->reset();
 
-	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_breath_of_life),this));
+	m_eth.rx_timer = timer_alloc(FUNC(alto2_cpu_device::rx_breath_of_life), this);
 	m_eth.rx_timer->reset();
 }
 

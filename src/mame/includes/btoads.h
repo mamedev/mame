@@ -40,12 +40,12 @@ public:
 	void btoads(machine_config &config);
 
 protected:
-	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(delayed_sound);
+	TIMER_CALLBACK_MEMBER(audio_sync) { }
 
 private:
 	// timer IDs
@@ -83,6 +83,8 @@ private:
 	uint16_t m_misc_control = 0;
 	int m_xcount = 0;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
+	emu_timer *m_delayed_sound_timer;
+	emu_timer *m_audio_sync_timer;
 
 	// in drivers/btoads
 	void nvram_w(offs_t offset, uint8_t data);

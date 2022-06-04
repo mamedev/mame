@@ -63,7 +63,7 @@ void bk_state::machine_start()
 
 	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
 
-	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bk_state::keyboard_callback), this));
+	m_kbd_timer = timer_alloc(FUNC(bk_state::keyboard_callback), this);
 	m_kbd_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 }
 

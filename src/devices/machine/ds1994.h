@@ -37,7 +37,6 @@ class ds1994_device : public device_t, public device_nvram_interface
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -65,12 +64,6 @@ class ds1994_device : public device_t, public device_nvram_interface
 	};
 
 	enum {
-		TIMER_MAIN,
-		TIMER_RESET,
-		TIMER_CLOCK
-	};
-
-	enum {
 		STATE_IDLE,
 		STATE_RESET,
 		STATE_RESET1,
@@ -93,14 +86,20 @@ class ds1994_device : public device_t, public device_nvram_interface
 		STATE_COPY_SCRATCHPAD
 	};
 
-	void ds1994_rom_cmd(void);
-	void ds1994_cmd(void);
+	void handle_rom_cmd(void);
+	void handle_cmd(void);
 	bool one_wire_tx_bit(uint8_t value);
 	bool one_wire_rx_bit(void);
-	uint8_t ds1994_readmem();
-	void ds1994_writemem(uint8_t value);
+	uint8_t readmem();
+	void writemem(uint8_t value);
 
-	emu_timer *m_timer_main, *m_timer_reset, *m_timer_clock;
+	TIMER_CALLBACK_MEMBER(main_tick);
+	TIMER_CALLBACK_MEMBER(reset_tick);
+	TIMER_CALLBACK_MEMBER(clock_tick);
+
+	emu_timer *m_timer_main;
+	emu_timer *m_timer_reset;
+	emu_timer *m_timer_clock;
 
 	uint32_t m_ref_year;
 	uint8_t  m_ref_month;
@@ -124,8 +123,6 @@ class ds1994_device : public device_t, public device_nvram_interface
 	bool     m_offs_ro;
 
 	attotime t_samp, t_rdv, t_rstl, t_pdh, t_pdl;
-
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
 };
 
 // device type definition

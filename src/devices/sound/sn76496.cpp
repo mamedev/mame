@@ -280,7 +280,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_state = true;
 
-	m_ready_timer = timer_alloc(0);
+	m_ready_timer = timer_alloc(FUNC(sn76496_base_device::delayed_ready), this);
 	m_ready_handler(ASSERT_LINE);
 
 	register_for_save_states();
@@ -298,7 +298,7 @@ void sn76496_base_device::stereo_w(u8 data)
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-void sn76496_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sn76496_base_device::delayed_ready)
 {
 	m_ready_state = true;
 	m_ready_handler(ASSERT_LINE);

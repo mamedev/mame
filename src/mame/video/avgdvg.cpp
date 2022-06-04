@@ -1303,8 +1303,8 @@ void avgdvg_device_base::device_start()
 	if (!m_vector->started())
 		throw device_missing_dependencies();
 
-	m_vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device_base::vg_set_halt_callback), this));
-	m_vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device_base::run_state_machine), this));
+	m_vg_halt_timer = timer_alloc(FUNC(avgdvg_device_base::vg_set_halt_callback), this);
+	m_vg_run_timer = timer_alloc(FUNC(avgdvg_device_base::run_state_machine), this);
 
 	m_flip_x = m_flip_y = false;
 

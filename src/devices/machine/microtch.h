@@ -26,7 +26,6 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;
@@ -35,6 +34,8 @@ protected:
 
 	// ROM region (unused, as the device is HLE'd)
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(update_output);
 
 private:
 	int check_command( const char* commandtocheck, int command_len, uint8_t* command_data );
@@ -56,25 +57,25 @@ private:
 		MODE_POINT
 	};
 
-	uint8_t       m_rx_buffer[16];
+	uint8_t     m_rx_buffer[16];
 	int         m_rx_buffer_ptr;
-	uint8_t       m_tx_buffer[16];
-	uint8_t       m_tx_buffer_num;
-	uint8_t       m_tx_buffer_ptr;
+	uint8_t     m_tx_buffer[16];
+	uint8_t     m_tx_buffer_num;
+	uint8_t     m_tx_buffer_ptr;
 	int         m_reset_done;
 	int         m_format;
 	int         m_mode;
 	int         m_last_touch_state;
 	int         m_last_x;
 	int         m_last_y;
-	touch_cb m_out_touch_cb;
+	touch_cb    m_out_touch_cb;
 	devcb_write_line m_out_stx_func;
 	required_ioport m_touch;
 	required_ioport m_touchx;
 	required_ioport m_touchy;
 	emu_timer*  m_timer;
-	bool m_output_valid;
-	uint8_t m_output;
+	bool        m_output_valid;
+	uint8_t     m_output;
 };
 
 DECLARE_DEVICE_TYPE(MICROTOUCH, microtouch_device)

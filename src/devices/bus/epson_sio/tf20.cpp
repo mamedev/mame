@@ -149,8 +149,8 @@ void epson_tf20_device::device_start()
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	m_timer_serial = timer_alloc(0);
-	m_timer_tc = timer_alloc(1);
+	m_timer_serial = timer_alloc(FUNC(epson_tf20_device::serial_tick), this);
+	m_timer_tc = timer_alloc(FUNC(epson_tf20_device::tc_tick), this);
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
@@ -175,30 +175,31 @@ void epson_tf20_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  serial_tick - update serial clocks
 //-------------------------------------------------
 
-void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER( epson_tf20_device::serial_tick )
 {
-	switch (id)
-	{
-	case 0:
-		m_mpsc->rxca_w(1);
-		m_mpsc->rxca_w(0);
-		m_mpsc->txca_w(1);
-		m_mpsc->txca_w(0);
-		m_mpsc->rxcb_w(1);
-		m_mpsc->rxcb_w(0);
-		m_mpsc->txcb_w(1);
-		m_mpsc->txcb_w(0);
-		break;
-
-	case 1:
-		logerror("%s: tc off\n", tag());
-		m_fdc->tc_w(false);
-		break;
-	}
+	m_mpsc->rxca_w(1);
+	m_mpsc->rxca_w(0);
+	m_mpsc->txca_w(1);
+	m_mpsc->txca_w(0);
+	m_mpsc->rxcb_w(1);
+	m_mpsc->rxcb_w(0);
+	m_mpsc->txcb_w(1);
+	m_mpsc->txcb_w(0);
 }
+
+//-------------------------------------------------
+//  tc_tick - update the FDC terminal count flag
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER( epson_tf20_device::tc_tick )
+{
+	logerror("%s: tc off\n", tag());
+	m_fdc->tc_w(false);
+}
+
 
 
 //**************************************************************************

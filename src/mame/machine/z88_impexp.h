@@ -27,7 +27,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -46,6 +45,8 @@ protected:
 	virtual const char *file_extensions() const noexcept override { return ""; }
 	virtual const char *image_type_name() const noexcept override { return "serial"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "serl"; }
+
+	TIMER_CALLBACK_MEMBER(poll_queue);
 
 private:
 	void check_filename(std::string &filename);

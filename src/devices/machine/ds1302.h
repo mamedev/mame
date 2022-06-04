@@ -46,7 +46,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -58,6 +57,8 @@ protected:
 	virtual bool rtc_feature_leap_year() const override { return true; }
 
 private:
+	TIMER_CALLBACK_MEMBER(clock_tick);
+
 	void load_shift_register();
 	void input_bit();
 	void output_bit();

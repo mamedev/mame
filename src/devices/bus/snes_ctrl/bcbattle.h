@@ -32,7 +32,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -42,9 +41,9 @@ protected:
 
 	int read_current_bit();
 
-private:
-	static constexpr device_timer_id TIMER_BATTLER = 1;
+	TIMER_CALLBACK_MEMBER(scan_tick);
 
+private:
 	required_device<barcode_reader_device> m_reader;
 	uint8_t m_current_barcode[20];
 	int m_pending_code, m_new_code, m_transmitting, m_cur_bit, m_cur_byte;

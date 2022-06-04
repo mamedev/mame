@@ -73,6 +73,9 @@ private:
 	optional_device<n82077aa_device> fdc; // 040 only
 	optional_device<floppy_connector> floppy0; // 040 only
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void setup(uint32_t scr1, int size_x, int size_y, int skip, bool color);
@@ -114,7 +117,8 @@ private:
 
 	attotime timer_tbase;
 	uint16_t timer_vbase = 0;
-	uint32_t timer_data = 0, timer_next_data = 0;
+	uint32_t timer_data = 0;
+	uint32_t timer_next_data = 0;
 	uint32_t timer_ctrl = 0;
 	emu_timer *timer_tm = nullptr;
 
@@ -155,9 +159,15 @@ private:
 	void next_mem(address_map &map);
 
 	struct dma_slot {
-		uint32_t start = 0, limit = 0, chain_start = 0, chain_limit = 0, current = 0;
+		uint32_t start = 0;
+		uint32_t limit = 0;
+		uint32_t chain_start = 0;
+		uint32_t chain_limit = 0;
+		uint32_t current = 0;
 		uint8_t state = 0;
-		bool supdate = false, restart = false, drq = false;
+		bool supdate = false;
+		bool restart = false;
+		bool drq = false;
 	};
 
 	enum {
@@ -186,14 +196,13 @@ private:
 	dma_slot dma_slots[0x20];
 	uint32_t esp = 0;
 
-	int screen_sx = 0, screen_sy = 0, screen_skip = 0;
+	int screen_sx = 0;
+	int screen_sy = 0;
+	int screen_skip = 0;
 	bool screen_color = false;
 	bool vbl_enabled = false;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(timer_tick);
 	void timer_start();
 	void timer_update();
 

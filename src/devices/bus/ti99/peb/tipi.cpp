@@ -406,7 +406,7 @@ void tipi_card_device::process_message()
 
     Default for port is 9901.
 */
-void tipi_card_device::open_websocket()
+TIMER_CALLBACK_MEMBER(tipi_card_device::open_websocket)
 {
 	if (m_rpiconn)
 	{
@@ -539,15 +539,6 @@ void tipi_card_device::websocket_error(const std::error_code& code)
 	}
 }
 
-/*
-    Restart the websocket connection
-*/
-void tipi_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	open_websocket();
-}
-
-
 void tipi_card_device::websocket_closed(int i, const std::string& msg)
 {
 	LOG("Closing connection\n");
@@ -573,7 +564,7 @@ void tipi_card_device::device_start()
 	save_item(NAME(m_rc));
 	save_item(NAME(m_lasttc));
 
-	m_restart_timer = timer_alloc(0);
+	m_restart_timer = timer_alloc(FUNC(tipi_card_device::open_websocket), this);
 	m_rpiconn = (m_rpi->exists());
 }
 
@@ -586,7 +577,7 @@ void tipi_card_device::device_reset()
 	m_dsr = false;
 	m_portaccess = false;
 	if (!m_rpiconn) LOGMASKED(LOG_CONFIG, "No Raspberry Pi connected\n");
-	open_websocket();
+	open_websocket(0);
 	m_connected = false;
 	m_lasttc = 0;
 	m_attempts = 5;

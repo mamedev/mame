@@ -319,7 +319,7 @@ void parodius_state::machine_start()
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
 	m_mainbank->set_entry(0);
 
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(parodius_state::nmi_timer), this));
+	m_nmi_timer = timer_alloc(FUNC(parodius_state::nmi_timer), this);
 
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

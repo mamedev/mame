@@ -86,10 +86,10 @@ grid210x_device::grid210x_device(const machine_config &mconfig, device_type type
 void grid210x_device::device_start() {
 	m_bus->ndac_w(this, 1);
 	m_bus->nrfd_w(this, 1);
-	m_delay_timer = timer_alloc(0);
+	m_delay_timer = timer_alloc(FUNC(grid210x_device::delay_tick), this);
 }
 
-void grid210x_device::device_timer(emu_timer &timer, device_timer_id id, int param) {
+TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {
 	if (m_floppy_loop_state == GRID210X_STATE_READING_DATA) {
 		std::unique_ptr<uint8_t[]> data(new uint8_t[io_size]);
 		fseek(floppy_sector_number * 512, SEEK_SET);

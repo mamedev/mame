@@ -172,13 +172,9 @@ There is an Asura Buster known to exist on a FG3-SUB-EP containing all EPROMs
 #include "speaker.h"
 
 
-/***************************************************************************
-
-
-                            Memory Maps - Main CPU
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  memory - main CPU
+//-------------------------------------------------
 
 /* Sound comms */
 u8 fuuki32_state::snd_020_r(offs_t offset)
@@ -234,7 +230,7 @@ void fuuki32_state::vram_buffered_w(offs_t offset, u32 data, u32 mem_mask)
 		m_tilemap[2]->mark_tile_dirty(offset);
 }
 
-void fuuki32_state::fuuki32_map(address_map &map)
+void fuuki32_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                                                                     // ROM
 	map(0x400000, 0x40ffff).ram();                                                                     // Work RAM
@@ -261,18 +257,16 @@ void fuuki32_state::fuuki32_map(address_map &map)
 }
 
 
-/***************************************************************************
-
-                            Memory Maps - Sound CPU
-
-***************************************************************************/
+//-------------------------------------------------
+//  memory - sound CPU
+//-------------------------------------------------
 
 void fuuki32_state::sound_bw_w(u8 data)
 {
 	m_soundbank->set_entry(data);
 }
 
-void fuuki32_state::fuuki32_sound_map(address_map &map)
+void fuuki32_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                             // ROM
 	map(0x6000, 0x6fff).ram();                             // RAM
@@ -280,7 +274,7 @@ void fuuki32_state::fuuki32_sound_map(address_map &map)
 	map(0x8000, 0xffff).bankr("soundbank");                // ROM
 }
 
-void fuuki32_state::fuuki32_sound_io_map(address_map &map)
+void fuuki32_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(fuuki32_state::sound_bw_w));
@@ -288,13 +282,10 @@ void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 	map(0x40, 0x45).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 }
 
-/***************************************************************************
 
-
-                                Input Ports
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  input ports
+//-------------------------------------------------
 
 static INPUT_PORTS_START( asurabld )
 	PORT_START("SYSTEM")
@@ -434,13 +425,9 @@ static INPUT_PORTS_START( asurabusa )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-/***************************************************************************
-
-
-                            Graphics Layouts
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  graphics layouts
+//-------------------------------------------------
 
 /* 16x16x8 */
 static const gfx_layout layout_16x16x8 =
@@ -461,34 +448,27 @@ static GFXDECODE_START( gfx_fuuki32 )
 GFXDECODE_END
 
 
-/***************************************************************************
+//-------------------------------------------------
+//  driver functions
+//-------------------------------------------------
 
-
-                                Machine Drivers
-
-
-***************************************************************************/
-
-void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(fuuki32_state::level1_interrupt)
 {
-	switch (id)
-	{
-	case TIMER_LEVEL_1_INTERRUPT:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
-		break;
-	case TIMER_VBLANK_INTERRUPT:
-		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-		m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
-		break;
-	case TIMER_RASTER_INTERRUPT:
-		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
-		m_screen->update_partial(m_screen->vpos());
-		m_raster_interrupt_timer->adjust(m_screen->frame_period());
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in fuuki32_state::device_timer");
-	}
+	m_maincpu->set_input_line(1, HOLD_LINE);
+	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
+}
+
+TIMER_CALLBACK_MEMBER(fuuki32_state::vblank_interrupt)
+{
+	m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
+}
+
+TIMER_CALLBACK_MEMBER(fuuki32_state::raster_interrupt)
+{
+	m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
+	m_screen->update_partial(m_screen->vpos());
+	m_raster_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 
@@ -498,9 +478,9 @@ void fuuki32_state::machine_start()
 
 	m_soundbank->configure_entries(0, 0x10, &ROM[0], 0x8000);
 
-	m_level_1_interrupt_timer = timer_alloc(TIMER_LEVEL_1_INTERRUPT);
-	m_vblank_interrupt_timer = timer_alloc(TIMER_VBLANK_INTERRUPT);
-	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
+	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki32_state::level1_interrupt), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki32_state::vblank_interrupt), this);
+	m_raster_interrupt_timer = timer_alloc(FUNC(fuuki32_state::raster_interrupt), this);
 
 	save_item(NAME(m_spr_buffered_tilebank));
 }
@@ -519,11 +499,11 @@ void fuuki32_state::fuuki32(machine_config &config)
 {
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, CPU_CLOCK); /* 20MHz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki32_state::fuuki32_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki32_state::main_map);
 
 	z80_device &soundcpu(Z80(config, "soundcpu", SOUND_CPU_CLOCK)); /* 6MHz verified */
-	soundcpu.set_addrmap(AS_PROGRAM, &fuuki32_state::fuuki32_sound_map);
-	soundcpu.set_addrmap(AS_IO, &fuuki32_state::fuuki32_sound_io_map);
+	soundcpu.set_addrmap(AS_PROGRAM, &fuuki32_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &fuuki32_state::sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -541,8 +521,8 @@ void fuuki32_state::fuuki32(machine_config &config)
 	m_fuukivid->set_palette(m_palette);
 	m_fuukivid->set_color_base(0x400*2);
 	m_fuukivid->set_color_num(0x40);
-	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::fuuki32_tile_cb));
-	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::fuuki32_colpri_cb));
+	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::tile_cb));
+	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -558,13 +538,9 @@ void fuuki32_state::fuuki32(machine_config &config)
 	ymf.add_route(5, "rspeaker", 0.50);
 }
 
-/***************************************************************************
-
-
-                                ROMs Loading
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  ROM loading
+//-------------------------------------------------
 
 /***************************************************************************
 
@@ -756,13 +732,10 @@ ROM_START( asurabusjr ) // ARCADIA review build
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
-/***************************************************************************
 
-
-                                Game Drivers
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  game drivers
+//-------------------------------------------------
 
 GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

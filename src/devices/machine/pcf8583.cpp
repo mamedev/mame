@@ -55,7 +55,7 @@ pcf8583_device::pcf8583_device(const machine_config &mconfig, const char *tag, d
 
 void pcf8583_device::device_start()
 {
-	m_timer = timer_alloc(TIMER_TICK);
+	m_timer = timer_alloc(FUNC(pcf8583_device::clock_tick), this);
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 
 	save_item(NAME(m_scl));
@@ -73,15 +73,10 @@ void pcf8583_device::device_start()
 	m_irq_cb.resolve_safe();
 }
 
-void pcf8583_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pcf8583_device::clock_tick)
 {
-	switch (id)
-	{
-	case TIMER_TICK:
-		if (!BIT(m_data[REG_CONTROL], CONTROL_STOP_BIT))
-			advance_hundredths();
-		break;
-	}
+	if (!BIT(m_data[REG_CONTROL], CONTROL_STOP_BIT))
+		advance_hundredths();
 }
 
 void pcf8583_device::advance_hundredths()

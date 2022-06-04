@@ -125,7 +125,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -137,13 +136,32 @@ protected:
 	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
-	static constexpr device_timer_id CLOCK_TIMER = 0;
-	static constexpr device_timer_id SQUAREWAVE_TIMER = 1;
-	static constexpr device_timer_id WATCHDOG_TIMER = 2;
-	static constexpr device_timer_id INTA_TIMER = 3;
-	static constexpr device_timer_id INTB_TIMER = 4;
-
 protected:
+	enum
+	{
+		DISABLE_OSC     = 0x80,
+		DISABLE_SQW     = 0x40,
+
+		COMMAND_TE      = 0x80,
+		COMMAND_IPSW    = 0x40,
+		COMMAND_IBH_LO  = 0x20,
+		COMMAND_PU_LVL  = 0x10,
+		COMMAND_WAM     = 0x08,
+		COMMAND_TDM     = 0x04,
+		COMMAND_WAF     = 0x02,
+		COMMAND_TDF     = 0x01,
+
+		HOURS_12_24     = 0x40,
+		HOURS_AM_PM     = 0x20
+	};
+
+
+	TIMER_CALLBACK_MEMBER(advance_hundredths);
+	TIMER_CALLBACK_MEMBER(square_tick);
+	TIMER_CALLBACK_MEMBER(watchdog_tick);
+	TIMER_CALLBACK_MEMBER(inta_timer_elapsed);
+	TIMER_CALLBACK_MEMBER(intb_timer_elapsed);
+
 	void safe_inta_cb(int state);
 	void safe_intb_cb(int state);
 	void safe_sqw_cb(int state);
@@ -153,8 +171,6 @@ protected:
 	void check_tod_alarm();
 	void time_of_day_alarm();
 	void watchdog_alarm();
-
-	void advance_hundredths();
 
 	void copy_ram_to_registers();
 	void copy_registers_to_ram();

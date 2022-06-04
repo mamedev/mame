@@ -153,20 +153,16 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
  *
  *************************************/
 
-void segas18_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segas18_state::initial_boost)
 {
-	switch (id)
-	{
-		case TID_INITIAL_BOOST:
-			machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
-			break;
-	}
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 }
 
 void segas18_state::machine_start()
 {
 	m_gun_recoil.resolve(); // lghost
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
+	m_init_boost_timer = timer_alloc(FUNC(segas18_state::initial_boost), this);
 }
 
 void segas18_state::machine_reset()
@@ -177,7 +173,7 @@ void segas18_state::machine_reset()
 
 	// if we are running with a real live 8751, we need to boost the interleave at startup
 	if (m_mcu != nullptr && m_mcu->type() == I8751)
-		synchronize(TID_INITIAL_BOOST);
+		m_init_boost_timer->adjust(attotime::zero);
 }
 
 
