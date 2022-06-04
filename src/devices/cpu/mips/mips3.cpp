@@ -2886,8 +2886,8 @@ inline void r5900le_device::handle_dmfc2(uint32_t op)
 	{
 		rtval[i] = reg[i];
 	}
-	m_core->r[rt]  = util::icat<uint64_t>(rtval[1], rtval[0]);
-	m_core->rh[rt] = util::icat<uint64_t>(rtval[3], rtval[2]);
+	m_core->r[rt]  = ((uint64_t)rtval[1] << 32) | rtval[0];
+	m_core->rh[rt] = ((uint64_t)rtval[3] << 32) | rtval[2];
 }
 
 inline void r5900le_device::handle_dmtc2(uint32_t op)
@@ -3784,7 +3784,7 @@ void r5900le_device::handle_idt(uint32_t op)
 							break;
 					}
 				}
-				m_core->r[rd] = util::icat<uint64_t>(count[1], count[0]);
+				m_core->r[rd] = ((uint64_t)count[1] << 32) | count[0];
 			}
 			break;
 		case 0x08: /* MMI0 */
@@ -4271,8 +4271,8 @@ void r5900le_device::handle_mmi0(uint32_t op)
 				uint64_t rsval = m_core->r[rs];
 				uint64_t rtval = m_core->r[rt];
 				uint32_t rdval[4] = { (uint32_t)rtval, (uint32_t)rsval, (uint32_t)(rtval >> 32), (uint32_t)(rsval >> 32) };
-				m_core->r[rd]  = util::icat<uint64_t>(rdval[1], rdval[0]);
-				m_core->rh[rd] = util::icat<uint64_t>(rdval[3], rdval[2]);
+				m_core->r[rd]  = (uint64_t)rdval[1] << 32 | rdval[0];
+				m_core->rh[rd] = (uint64_t)rdval[3] << 32 | rdval[2];
 			}
 			break;
 		}

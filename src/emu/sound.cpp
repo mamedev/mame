@@ -1523,7 +1523,7 @@ void sound_manager::update(int param)
 	}
 
 #if (SOUND_DEBUG)
-	if (lscale != m_compressor_scale && m_compressor_enabled)
+	if (lscale != m_compressor_scale)
 	printf("scale=%.5f\n", m_compressor_scale);
 #endif
 
@@ -1541,27 +1541,35 @@ void sound_manager::update(int param)
 
 		// ensure that changing the compression won't reverse direction to reduce "pops"
 		stream_buffer::sample_t lsamp = m_leftmix[sampindex];
+		if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
+			lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
+
+		lprev = lsamp * lscale;
 		if (m_compressor_enabled)
-		{
-			if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
-				lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
-			lprev = lsamp *= lscale;
-		}
+			lsamp = lprev;
 
 		// clamp the left side
-		finalmix[finalmix_offset++] = s16(std::clamp<stream_buffer::sample_t>(lsamp, -1.0, 1.0) * 32767.0);
+		if (lsamp > 1.0)
+			lsamp = 1.0;
+		else if (lsamp < -1.0)
+			lsamp = -1.0;
+		finalmix[finalmix_offset++] = s16(lsamp * 32767.0);
 
 		// ensure that changing the compression won't reverse direction to reduce "pops"
 		stream_buffer::sample_t rsamp = m_rightmix[sampindex];
+		if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
+			rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
+
+		rprev = rsamp * rscale;
 		if (m_compressor_enabled)
-		{
-			if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
-				rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
-			rprev = rsamp *= rscale;
-		}
+			rsamp = rprev;
 
 		// clamp the right side
-		finalmix[finalmix_offset++] = s16(std::clamp<stream_buffer::sample_t>(rsamp, -1.0, 1.0) * 32767.0);
+		if (rsamp > 1.0)
+			rsamp = 1.0;
+		else if (rsamp < -1.0)
+			rsamp = -1.0;
+		finalmix[finalmix_offset++] = s16(rsamp * 32767.0);
 	}
 	m_finalmix_leftover = sample - m_samples_this_update * 1000;
 

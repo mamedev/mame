@@ -58,7 +58,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 namespace {
 
@@ -147,7 +147,6 @@ public:
 			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
 			m_ikbd_mouse_pc(0),
 			m_ikbd_joy(1),
-			m_psg_pa(0),
 			m_monochrome(1),
 			m_video(*this, "video"),
 			m_screen(*this, "screen"),
@@ -180,8 +179,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(mouse_tick);
 
 	// driver
-	uint16_t fdc_data_r();
-	void fdc_data_w(uint16_t data);
+	uint16_t fdc_data_r(offs_t offset);
+	void fdc_data_w(offs_t offset, uint16_t data);
 	uint16_t dma_status_r();
 	void dma_mode_w(uint16_t data);
 	uint8_t dma_counter_r(offs_t offset);
@@ -239,7 +238,6 @@ protected:
 	int m_fdc_fifo_msb = 0;
 	int m_fdc_fifo_empty[2]{};
 	int m_fdc_dmabytes = 0;
-	uint8_t m_psg_pa;
 
 	/* timers */
 	emu_timer *m_mouse_timer = nullptr;
@@ -550,7 +548,7 @@ void st_state::fdc_dma_transfer()
 //  fdc_data_r -
 //-------------------------------------------------
 
-uint16_t st_state::fdc_data_r()
+uint16_t st_state::fdc_data_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -582,7 +580,7 @@ uint16_t st_state::fdc_data_r()
 //  fdc_data_w -
 //-------------------------------------------------
 
-void st_state::fdc_data_w(uint16_t data)
+void st_state::fdc_data_w(offs_t offset, uint16_t data)
 {
 	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
@@ -1539,7 +1537,7 @@ void st_state::st_map(address_map &map)
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::glue_sync_r), FUNC(st_video_device::glue_sync_w));
+	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
 	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
 	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
 	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
@@ -1570,7 +1568,7 @@ void st_state::megast_map(address_map &map)
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
 	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::glue_sync_r), FUNC(st_video_device::glue_sync_w));
+	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
 	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
 	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
 	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
@@ -1670,14 +1668,14 @@ void stbook_state::stbook_map(address_map &map)
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 /*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
     map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
-    map(0xff8200, 0xff8203).rw(m_video, FUNC(stbook_video_device::shifter_base_r), FUNC(stbook_video_device::shifter_base_w));
-    map(0xff8204, 0xff8209).rw(m_video, FUNC(stbook_video_device::shifter_counter_r), FUNC(stbook_video_device::shifter_counter_w));
-    map(0xff820a, 0xff820a).rw(m_video, FUNC(stbook_video_device::shifter_sync_r), FUNC(stbook_video_device::shifter_sync_w));
-    map(0xff820c, 0xff820d).rw(m_video, FUNC(stbook_video_device::shifter_base_low_r), FUNC(stbook_video_device::shifter_base_low_w));
-    map(0xff820e, 0xff820f).rw(m_video, FUNC(stbook_video_device::shifter_lineofs_r), FUNC(stbook_video_device::shifter_lineofs_w));
-    map(0xff8240, 0xff8241).rw(m_video, FUNC(stbook_video_device::shifter_palette_r), FUNC(stbook_video_device::shifter_palette_w));
-    map(0xff8260, 0xff8260).rw(m_video, FUNC(stbook_video_device::shifter_mode_r), FUNC(stbook_video_device::shifter_mode_w));
-    map(0xff8264, 0xff8265).rw(m_video, FUNC(stbook_video_device::shifter_pixelofs_r), FUNC(stbook_video_device::shifter_pixelofs_w));
+    map(0xff8200, 0xff8203).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_r), FUNC(stbook_video_device::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(m_video, FUNC(stbook_video_device::stbook_shifter_counter_r), FUNC(stbook_video_device::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(m_video, FUNC(stbook_video_device::stbook_shifter_sync_r), FUNC(stbook_video_device::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_low_r), FUNC(stbook_video_device::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(m_video, FUNC(stbook_video_device::stbook_shifter_lineofs_r), FUNC(stbook_video_device::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(m_video, FUNC(stbook_video_device::stbook_shifter_palette_r), FUNC(stbook_video_device::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(m_video, FUNC(stbook_video_device::stbook_shifter_mode_r), FUNC(stbook_video_device::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(m_video, FUNC(stbook_video_device::stbook_shifter_pixelofs_r), FUNC(stbook_video_device::stbook_shifter_pixelofs_w));
     map(0xff827e, 0xff827f).w(m_video, FUNC(stbook_video_device::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
@@ -2035,8 +2033,6 @@ void st_state::psg_pa_w(uint8_t data)
 
 	// centronics strobe
 	m_centronics->write_strobe(BIT(data, 5));
-
-	m_psg_pa = data;
 }
 
 //-------------------------------------------------
@@ -2145,7 +2141,6 @@ void st_state::state_save()
 	save_item(NAME(m_fdc_mode));
 	save_item(NAME(m_fdc_sectors));
 	save_item(NAME(m_fdc_dmabytes));
-	save_item(NAME(m_psg_pa));
 	save_item(NAME(m_ikbd_keylatch));
 	save_item(NAME(m_ikbd_mouse));
 	save_item(NAME(m_ikbd_mouse_x));
@@ -2318,7 +2313,6 @@ void st_state::common(machine_config &config)
 	YM2149(config, m_ymsnd, Y2/16);
 	m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
-	m_ymsnd->port_a_read_callback().set([this] { return m_psg_pa; });
 	m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
 	m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
@@ -2560,7 +2554,6 @@ void stbook_state::stbook(machine_config &config)
 	ym3439_device &ym3439(YM3439(config, YM3439_TAG, U517/8));
 	ym3439.set_flags(AY8910_SINGLE_OUTPUT);
 	ym3439.set_resistors_load(RES_K(1), 0, 0);
-	ym3439.port_a_read_callback().set([this] { return m_psg_pa; });
 	ym3439.port_a_write_callback().set(FUNC(stbook_state::psg_pa_w));
 	ym3439.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ym3439.add_route(ALL_OUTPUTS, "mono", 1.00);
