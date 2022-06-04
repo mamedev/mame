@@ -452,8 +452,8 @@ ROM_START( pasopia )
 	ROM_REGION( 0x8000, "basic", 0 )
 	ROM_LOAD( "tbasic.rom", 0x0000, 0x8000, CRC(f53774ff) SHA1(bbec45a3bad8d184505cc6fe1f6e2e60a7fb53f2))
 
-	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "pasopia7_ic146_2732.rom", 0x0000, 0x1000, BAD_DUMP CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0)) //stolen from pasopia7
 ROM_END
 
 /* Driver */
