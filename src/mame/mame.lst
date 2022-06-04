@@ -26064,6 +26064,12 @@ m4c999a                         //
 m4c999b                         //
 m4c999c                         //
 m4c999d                         //
+m4c999e                         //
+m4c999f                         //
+m4c999g                         //
+m4c999h                         //
+m4c999i                         //
+m4c999j                         //
 m4cardcs                        // Card Cash (Barcrest)
 m4cashcn                        // Cash Connect (Barcrest)
 m4cashco                        // Cash Counter (Barcrest)
@@ -26761,10 +26767,6 @@ m4c9__7                         //
 m4c9__8                         //
 m4c9__9                         //
 m4c9__a                         //
-m4c9__a0                        //
-m4c9__a1                        //
-m4c9__a2                        //
-m4c9__a3                        //
 m4c9__aa                        //
 m4c9__ab                        //
 m4c9__ac                        //
@@ -26789,8 +26791,6 @@ m4c9__au                        //
 m4c9__av                        //
 m4c9__aw                        //
 m4c9__ax                        //
-m4c9__ay                        //
-m4c9__az                        //
 m4c9__b                         //
 m4c9__c                         //
 m4c9__d                         //

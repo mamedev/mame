@@ -2012,6 +2012,23 @@ GAME(199?, m4c999b,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            
 GAME(199?, m4c999c,   m4c999,    mod2_bootleg_fixedret<0x80>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
 GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// expects chr sequence starting 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4 (hittop)
+ // "(C)1993  B.W.B." and "SC9 5.0"
+GAME_CUSTOM( 199?, m4c999g,   m4c999,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Bwb","Cloud 999 (Barcrest) (MPU4) (SC9 5.0)" )
+GAME_CUSTOM( 199?, m4c999h,   m4c999,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Bwb","Cloud 999 (Barcrest) (MPU4) (SC9 5.0 D)" )
+// no copyright string and "SC9 1.0" (hack or early Bwb set?) (still expects regular CHR protection)
+GAME_CUSTOM( 199?, m4c999i,   m4c999,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4c999j,   m4c999,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4c999e,   m4c999,   "c9o10__1.1",   0x0000, 0x010000, CRC(c5063185) SHA1(ca98038ccd85ebc370cacce8583ddbc1f759558d), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 3)" )
+GAME_CUSTOM( 199?, m4c999f,   m4c999,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b20b16d) SHA1(15079fc5f14f545c291d357a795e6b41ca1d5a47), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 4)" ) // doesn't have 'D' set but is a dataport set
 
 
 

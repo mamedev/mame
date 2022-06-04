@@ -3629,24 +3629,6 @@ GAME_CUSTOM( 199?, m4c9__k,    m4c9,   "c9510r.p1",    0x0000, 0x010000, CRC(a9f
 GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a93bc6a) SHA1(2832b48b6391746dbcea3484715dd6a169c081af), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C95 1.0 Y)" )
 
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4C9_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// expects chr sequence starting 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4 (hittop)
- // "(C)1993  B.W.B." and "SC9 5.0"
-GAME_CUSTOM( 199?, m4c9__a2,   m4c9,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0)" )
-GAME_CUSTOM( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0 D)" )
-// no copyright string and "SC9 1.0" (hack or early Bwb set?) (still expects regular CHR protection)
-GAME_CUSTOM( 199?, m4c9__ay,   m4c9,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 1)" )
-GAME_CUSTOM( 199?, m4c9__az,   m4c9,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 2)" )
-GAME_CUSTOM( 199?, m4c9__a0,   m4c9,   "c9o10__1.1",   0x0000, 0x010000, CRC(c5063185) SHA1(ca98038ccd85ebc370cacce8583ddbc1f759558d), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 3)" )
-GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b20b16d) SHA1(15079fc5f14f545c291d357a795e6b41ca1d5a47), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 4)" ) // doesn't have 'D' set but is a dataport set
 
 
 /*****************************************************************************************************************************************************************************
@@ -4962,6 +4944,8 @@ GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC
 *
 * Lucky Las Vegas Classic
 *
+* the lamping on this is not similar to Lucky Las Vegas at all
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4LVLCL_EXTRA_ROMS \
@@ -4977,7 +4961,7 @@ GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC
 	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cashencounters_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // need chr sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 (cashencounters)
-// "(C)1998    BWB" and "LLU 0.1"
+// "(C)1998    BWB" and "LLU 0.1" // the LLU code is also used by some of the Barcrest sets, these are not the same version!
 GAME_CUSTOM( 199?, m4lvlcl,     0,          "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 0.1)" )
 GAME_CUSTOM( 199?, m4lvlcl__e,  m4lvlcl,    "ll__xgdx.1_1", 0x0000, 0x010000, CRC(65824c4f) SHA1(a514e48ac0f9d4a8d7506bf6932aeee88ca17104), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 0.1 AD)" )
 // "(C)1998    BWB" and "LLU 3.0"

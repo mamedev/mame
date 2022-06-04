@@ -968,6 +968,66 @@ public:
 	// Dutch Cherryo    "DCH 1.4"
 	static constexpr uint8_t cheryo_characteriser_prot[8] = { 0x00, 0x68, 0x40, 0x28, 0x20, 0x48, 0x40, 0x00 }; // good?
 
+
+	// games with sequence starting
+	// 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
+	// Andy Capp    "AC101.0"
+	//              "AC5 1.0"
+	static constexpr uint8_t andycappalt_characteriser_prot[8] = { 0x00, 0x58, 0x10, 0x58, 0x50, 0x18, 0x10, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 84 a4 b4 38 c4 b4 30 1c d8 d8 d8 dc
+	// Luxor      "LX5 1.0"
+	//            "LX101.0"
+	// Hot Rod    "HR__1.0"
+	static constexpr uint8_t hotrodalt_characteriser_prot[8] = { 0x00, 0x18, 0x00, 0x18, 0x10, 0x08, 0x00, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 30 20 14 a4 b8 d4 0c e4 3c 54 84 b8 54 24 90
+	// Viva Espana  "VE105.0"
+	//              "VE5 4.0"
+	//              "VE104.0"
+	static constexpr uint8_t vivaalt_characteriser_prot[8] = { 0x00, 0x30, 0x30, 0x10, 0x10, 0x30, 0x30, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 b4 20 4c 90 a8 bc dc 58 d0 a0 60 44 c4 ec b8 5c 50 88 34 84 6c 14 8c b8 d8 58 d0 a0 64 44 cc b8 d8 d0 a8 3c dc d8 d8 d8 58 d8 d8 d0 a8 bc d4 24 c4 64 cc 00
+	// Lucky Las Vegas Classic "LLU 0.1"
+	//                         "LLU 3.0"
+	// Cash Encounters         "CA_ 5.0"
+	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x48, 0x40, 0x48, 0x40, 0x48, 0x40, 0x40 }; // maybe
+
+
+	// games with sequence starting
+	// 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
+	// Lucky Strike    "LSS 1.0"
+	static constexpr uint8_t luckystrikealt_characteriser_prot[8] = { 0x00, 0x50, 0x50, 0x40, 0x40, 0x50, 0x50, 0x40 }; // matches unprotected set
+
+
+	// games with sequence starting
+	// 00 14 04 54 64 14 64 14 64 54 20 74 04
+	// Super Hyper Viper   "HVC 1.0"
+	static constexpr uint8_t hypvipalt_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x70, 0x50, 0x30, 0x10, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08
+	// Boulder Dash        "BLS 0.1"
+	//                     "BLD 0.6"
+	//                     "BLD 0.7"
+	// Crazy Cavern (Nova) "GCV 0.5"
+	static constexpr uint8_t bdash_characteriser_prot[8] = { 0x00, 0x20, 0x00, 0x40, 0x40, 0x20, 0x00, 0x40 }; // good?
+
+
+	// games with sequence starting
+	// 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
+	// Cloud 999     "SC9 5.0"
+	// Hit The Top    "H4T 2.0" (no lamp scramble)
+	static constexpr uint8_t hittop_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x40, 0x40, 0x20, 0x00, 0x40 }; // good?
+
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -1047,12 +1107,7 @@ public:
 
 
 
-	// games with sequence starting
-	// 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 b4 20 4c 90 a8 bc dc 58 d0 a0 60 44 c4 ec b8 5c 50 88 34 84 6c 14 8c b8 d8 58 d0 a0 64 44 cc b8 d8 d0 a8 3c dc d8 d8 d8 58 d8 d8 d0 a8 bc d4 24 c4 64 cc 00
-	// Lucky Las Vegas Classic "LLU 0.1"
-	//                         "LLU 3.0"
-	// Cash Encounters         "CA_ 5.0"
-	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting
 	// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
@@ -1094,7 +1149,6 @@ public:
 
 	// games with sequence starting
 	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
-
 	// Magnificent 7s       "M7  2.0"
     // Prize Fruit & Loot   "PFR 0.3"
 	static constexpr uint8_t pfloot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -1122,39 +1176,6 @@ public:
 	// Buccaneer    "BR_ 1.0"
 	static constexpr uint8_t bucalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 84 a4 b4 38 c4 b4 30 1c d8 d8 d8 dc
-	// Luxor      "LX5 1.0"
-	//            "LX101.0"
-	// Hot Rod    "HR__1.0"
-	static constexpr uint8_t hotrodalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08
-	// Boulder Dash        "BLS 0.1"
-	//                     "BLD 0.6"
-	//                     "BLD 0.7"
-	// Crazy Cavern (Nova) "GCV 0.5"
-	static constexpr uint8_t bdash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-	// games with sequence starting
-	// 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
-	// Lucky Strike    "LSS 1.0"
-	static constexpr uint8_t luckystrikealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
-	// Cloud Nine     "SC9 5.0"
-	// Hit The Top    "H4T 2.0"
-	static constexpr uint8_t hittop_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 30 20 14 a4 b8 d4 0c e4 3c 54 84 b8 54 24 90
-	// Viva Espana  "VE105.0"
-	//              "VE5 4.0"
-	//              "VE104.0"
-	static constexpr uint8_t vivaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 84 a4 e4 a8 3c dc d0 6c 58 d8 d8 dc d8 d4 60
@@ -1174,11 +1195,6 @@ public:
 	static constexpr uint8_t hittopalt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
-	// games with sequence starting
-	// 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
-	// Andy Capp    "AC101.0"
-	//              "AC5 1.0"
-	static constexpr uint8_t andycappalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
 
@@ -1187,11 +1203,6 @@ public:
 	// Ace Chase     "AE5 2.0"
 	//               "AE10 2.0"
 	static constexpr uint8_t acechasealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 14 04 54 64 14 64 14 64 54 20 74 04
-	// Super Hyper Viper   "HVC 1.0"
-	static constexpr uint8_t hypvipalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
@@ -1327,7 +1338,7 @@ public:
 	static constexpr uint8_t starsbars_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 a0 88 18 b0 48 50 60 e4 c8 58 90
-	// Top Gear (Barcrest) (MPU4) (TG4 1.1)
+	// Top Gears (Barcrest) (MPU4) (TG4 1.1)
 	static constexpr uint8_t topgear_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 c0 c8 38 f4 8c b8 70 a4 e8 38 74 80 4c b0 0c 94
