@@ -72,13 +72,13 @@ emu_timer::~emu_timer()
 //  re-allocated as a non-device timer
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init(running_machine &machine, timer_expired_delegate callback, bool temporary)
+emu_timer &emu_timer::init(running_machine &machine, timer_expired_delegate &&callback, bool temporary)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
 	m_next = nullptr;
 	m_prev = nullptr;
-	m_callback = callback;
+	m_callback = std::move(callback);
 	m_param = 0;
 	m_enabled = false;
 	m_temporary = temporary;
@@ -501,14 +501,17 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 	if (m_execute_list == nullptr)
 		rebuild_execute_list();
 
-	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
+	{
+		// if we have a non-zero time, schedule a timer
 		timer_set(after, timer_expired_delegate(FUNC(device_scheduler::timed_trigger), this), trigid);
-
-	// send the trigger to everyone who cares
+	}
 	else
-		for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
+	{
+		// send the trigger to everyone who cares
+		for (device_execute_interface *exec = m_execute_list; exec; exec = exec->m_nextexec)
 			exec->trigger(trigid);
+	}
 }
 
 
@@ -533,7 +536,7 @@ void device_scheduler::boost_interleave(const attotime &timeslice_time, const at
 
 emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 {
-	return &m_timer_allocator.alloc()->init(machine(), callback, false);
+	return &m_timer_allocator.alloc()->init(machine(), std::move(callback), false);
 }
 
 
@@ -545,7 +548,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 
 void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
 {
-	m_timer_allocator.alloc()->init(machine(), callback, true).adjust(duration, param);
+	m_timer_allocator.alloc()->init(machine(), std::move(callback), true).adjust(duration, param);
 }
 
 
