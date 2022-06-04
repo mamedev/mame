@@ -1586,7 +1586,7 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_nand_read_cb.resolve_safe(0);
 
-	m_unk_timer = timer_alloc(0);
+	m_unk_timer = timer_alloc(FUNC(sunplus_gcm394_base_device::unknown_tick), this);
 	m_unk_timer->adjust(attotime::never);
 
 	save_item(NAME(m_dma_params));
@@ -1785,20 +1785,13 @@ void sunplus_gcm394_base_device::checkirq6()
 */
 
 
-void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sunplus_gcm394_base_device::unknown_tick)
 {
-	switch (id)
-	{
-	case 0:
-	{
-		m_7935 |= 0x0100;
-		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-		//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
+	m_7935 |= 0x0100;
+	set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
 
 	//  checkirq6();
-		break;
-	}
-	}
 }
 
 

@@ -300,7 +300,7 @@ at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char
 }
 
 
-void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc_keyboard_device::poll_keys)
 {
 	polling();
 	if(!charqueue_empty())
@@ -326,7 +326,7 @@ void pc_keyboard_device::device_start()
 		ioport_charqueue_empty_delegate(&pc_keyboard_device::charqueue_empty, this));
 
 	m_out_keypress_func.resolve_safe();
-	m_keyboard_timer = timer_alloc();
+	m_keyboard_timer = timer_alloc(FUNC(at_keyboard_device::poll_keys), this);
 }
 
 void at_keyboard_device::device_start()

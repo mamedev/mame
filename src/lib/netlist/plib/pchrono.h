@@ -184,7 +184,7 @@ namespace plib {
 		};
 
 
-		template< typename T, bool enabled_ = true>
+		template <typename T, bool enabled_ = true>
 		struct timer
 		{
 			using type = typename T::type;
@@ -269,10 +269,10 @@ namespace plib {
 	//  Performance tracking
 	//============================================================
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperfcount_t = plib::chrono::counter<enabled_>;
 } // namespace plib
 

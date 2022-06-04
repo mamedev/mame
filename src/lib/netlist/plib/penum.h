@@ -13,9 +13,10 @@
 namespace plib
 {
 
-	//============================================================
-	//  penum - strongly typed enumeration
-	//============================================================
+	///
+	/// \brief strongly typed enumeration
+	///
+	///
 	struct penum_base
 	{
 	protected:
@@ -46,8 +47,8 @@ namespace plib
 		template <typename S> void save_state(S &saver) { saver.save_item(m_v, "m_v"); } \
 		private: E m_v; \
 		static pstring strings() {\
-			static const char * lstrings = # __VA_ARGS__; \
-			return pstring(lstrings); \
+			static const char * static_strings = # __VA_ARGS__; \
+			return pstring(static_strings); \
 		} \
 	};
 

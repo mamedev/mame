@@ -578,7 +578,7 @@ void trs80m3_state::machine_start()
 
 	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
 	{
-		m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
+		m_cassette_data_timer = timer_alloc(FUNC(trs80m3_state::cassette_data_callback), this);
 		m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 	}
 

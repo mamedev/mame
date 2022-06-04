@@ -39,7 +39,6 @@ namespace plib {
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-		//uninitialised_array_t() noexcept = default;
 		uninitialised_array() noexcept = default;
 
 		uninitialised_array(const uninitialised_array &) = default;
@@ -183,14 +182,14 @@ namespace plib {
 	/// The list allows insertions and deletions whilst being processed.
 	///
 	template <class LC>
-	class linkedlist_t
+	class linked_list_t
 	{
 	public:
 
 		struct element_t
 		{
 		public:
-			friend class linkedlist_t<LC>;
+			friend class linked_list_t<LC>;
 
 			constexpr element_t() : m_next(nullptr), m_prev(nullptr) {}
 			~element_t() noexcept = default;
@@ -233,7 +232,7 @@ namespace plib {
 			constexpr LC* operator->() const noexcept { return p; }
 		};
 
-		constexpr linkedlist_t() noexcept : m_head(nullptr) {}
+		constexpr linked_list_t() noexcept : m_head(nullptr) {}
 
 		constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 		constexpr iter_t end() const noexcept { return iter_t(nullptr); }

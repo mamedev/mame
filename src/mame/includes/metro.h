@@ -95,13 +95,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
 
 private:
-	enum
-	{
-		TIMER_MOUJA_IRQ
-	};
+	virtual void machine_start() override;
 
 	void ipl_w(u8 data);
-	void mouja_irq_timer_ctrl_w(uint16_t data);
+	void mouja_irq_timer_ctrl_w(u16 data);
 	void sound_data_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sound_data_sync);
 	u8 soundstatus_r();
@@ -112,13 +109,13 @@ private:
 	void upd7810_portb_w(u8 data);
 	void daitorid_portb_w(u8 data);
 	void coin_lockout_1word_w(u8 data);
-	void coin_lockout_4words_w(offs_t offset, uint16_t data);
-	uint16_t balcube_dsw_r(offs_t offset);
-	uint16_t gakusai_input_r();
+	void coin_lockout_4words_w(offs_t offset, u16 data);
+	u16 balcube_dsw_r(offs_t offset);
+	u16 gakusai_input_r();
 	void blzntrnd_sh_bankswitch_w(u8 data);
-	void puzzlet_irq_enable_w(uint8_t data);
-	void puzzlet_portb_w(uint16_t data);
-	void k053936_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void puzzlet_irq_enable_w(u8 data);
+	void puzzlet_portb_w(u16 data);
+	void k053936_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gakusai_oki_bank_hi_w(u8 data);
 	void gakusai_oki_bank_lo_w(u8 data);
 	u8 gakusai_eeprom_r();
@@ -178,8 +175,7 @@ private:
 	void vmetal_map(address_map &map);
 	void ymf278_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(mouja_irq);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -198,8 +194,8 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_input_sel;
-	optional_shared_ptr<uint16_t> m_k053936_ram;
+	optional_shared_ptr<u16> m_input_sel;
+	optional_shared_ptr<u16> m_k053936_ram;
 
 	optional_memory_bank m_audiobank;
 	optional_memory_bank m_okibank;
@@ -211,8 +207,8 @@ private:
 	emu_timer   *m_mouja_irq_timer = nullptr;
 
 	/* sound related */
-	u8     m_sound_data = 0;
-	uint16_t      m_soundstatus = 0;
+	u8          m_sound_data = 0;
+	u16    m_soundstatus = 0;
 	int         m_porta = 0;
 	int         m_portb = 0;
 	int         m_busy_sndcpu = 0;

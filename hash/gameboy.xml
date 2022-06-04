@@ -270,8 +270,8 @@ license:CC0
 	</software>
 
 	<software name="rockybwunk" cloneof="rockybw">
-		<!--    Old dump of unknown origin  -->
-		<!--    Three different bytes in the header -->
+		<!-- Old dump of unknown origin -->
+		<!-- Three different bytes in the header -->
 		<description>The Adventures of Rocky and Bullwinkle (USA, bad dump?)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
@@ -2473,7 +2473,7 @@ license:CC0
 	</software>
 
 	<software name="bokujomnp" cloneof="harvmoon">
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Bokujou Monogatari GB (Japan, NP)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -2753,7 +2753,7 @@ license:CC0
 	</software>
 
 	<software name="boxxle">
-		<!--    European release is a relabeled USA version -->
+		<!-- European release is a relabeled USA version -->
 		<description>Boxxle (Europe, USA, Rev 1)</description>
 		<year>1990</year>
 		<publisher>FCI</publisher>
@@ -6134,7 +6134,7 @@ license:CC0
 	</software>
 
 	<software name="f1polepo" supported="partial">
-		<!--    Region code "E" (USA)   -->
+		<!-- Region code "E" (USA) -->
 		<description>F1 Pole Position (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -7339,8 +7339,8 @@ license:CC0
 	</software>
 
 	<software name="gargoyle">
-		<!--    European release is a relabeled USA version -->
-		<!--    Unreleased in USA?  -->
+		<!-- European release is a relabeled USA version -->
+		<!-- Unreleased in USA? -->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
@@ -7355,7 +7355,7 @@ license:CC0
 	</software>
 
 	<software name="gargoylea" cloneof="gargoyle">
-		<!--    European release is a relabeled USA version -->
+		<!-- European release is a relabeled USA version -->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
@@ -9442,7 +9442,7 @@ license:CC0
 	</software>
 
 	<software name="hyperlod">
-		<!--    Region code "A" -->
+		<!-- Region code "A" -->
 		<description>Hyper Lode Runner (World, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -9458,7 +9458,7 @@ license:CC0
 	</software>
 
 	<software name="hyperloda" cloneof="hyperlod">
-		<!--    Region code "A" -->
+		<!-- Region code "A" -->
 		<description>Hyper Lode Runner (Japan?)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -11266,8 +11266,8 @@ license:CC0
 	</software>
 
 	<software name="kirby2">
-		<!--    USA version released as "dmg-akbe-0"    -->
-		<!--    Retail cartridge of USA version not yet secured -->
+		<!-- USA version released as "dmg-akbe-0" -->
+		<!-- Retail cartridge of USA version not yet secured -->
 		<description>Kirby's Dream Land 2 (Australia, Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -11924,7 +11924,7 @@ license:CC0
 	</software>
 
 	<software name="zeldalnk">
-		<!--    Region code "E" (USA)   -->
+		<!-- Region code "E" (USA) -->
 		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -11940,7 +11940,7 @@ license:CC0
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
-		<!--    Region code "E" (USA)   -->
+		<!-- Region code "E" (USA) -->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -11956,7 +11956,7 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
-		<!--    Region code "E" (USA)   -->
+		<!-- Region code "E" (USA) -->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -16447,7 +16447,7 @@ license:CC0
 	</software>
 
 	<software name="pacmanj" cloneof="pacman">
-		<!--    Region code "A" -->
+		<!-- Region code "A" -->
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Pac-Man (Japan)</description>
 		<year>1990</year>
@@ -16881,8 +16881,8 @@ license:CC0
 	</software>
 
 	<software name="pangunk" cloneof="pang">
-		<!--    Old dump of unknown origin  -->
-		<!--    One different byte in the header, different padding at the end -->
+		<!-- Old dump of unknown origin -->
+		<!-- One different byte in the header, different padding at the end -->
 		<description>Pang (UK, bad dump?)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -17145,7 +17145,7 @@ license:CC0
 	</software>
 
 	<software name="picross2">
-		<!--  Also released via the Nintendo Power service in 2000-03 -->
+		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Picross 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -17219,7 +17219,7 @@ license:CC0
 	</software>
 
 	<software name="pinbaldx">
-		<!--    Enhanced version of Pinball Fantasies with 3 extra tables   -->
+		<!-- Enhanced version of Pinball Fantasies with 3 extra tables -->
 		<description>Pinball Deluxe (Europe)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -17858,7 +17858,7 @@ license:CC0
 
 	<software name="poktpuyo">
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Pocket Puyo Puyo Tsuu (Japan, Rev 1, NP)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
@@ -18786,7 +18786,7 @@ license:CC0
 
 	<software name="purikura">
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev 1, NP)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
@@ -21595,7 +21595,7 @@ license:CC0
 	</software>
 
 	<software name="spaceinvj" cloneof="spaceinv">
-		<!--    The 1994 release is technically an improved localization of this, since it shares its "SP" code -->
+		<!-- The 1994 release is technically an improved localization of this, since it shares its "SP" code -->
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Space Invaders (Japan)</description>
 		<year>1990</year>
@@ -21804,7 +21804,7 @@ license:CC0
 	</software>
 
 	<software name="uchiiwai" cloneof="splitz">
-		<!--    Reskinned version of Splitz, based on the manga Kyoudaijingi    -->
+		<!-- Reskinned version of Splitz, based on the manga Kyoudaijingi -->
 		<description>Uchiiwai - Kyoudaijingi no Puzzle Game (Japan)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22040,7 +22040,7 @@ license:CC0
 	</software>
 
 	<software name="stng">
-		<!--    Region code "E" (USA)   -->
+		<!-- Region code "E" (USA) -->
 		<description>Star Trek - The Next Generation (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -23112,8 +23112,8 @@ license:CC0
 	</software>
 
 	<software name="suzukif1unk" cloneof="suzukif1">
-		<!--    Old dump of unknown origin  -->
-		<!--    Possible prototype? -->
+		<!-- Old dump of unknown origin -->
+		<!-- Possible prototype? -->
 		<description>Suzuki Aguri no F-1 Super Driving (Japan, prototype?)</description>
 		<year>1993</year>
 		<publisher>Logic</publisher>
@@ -23904,7 +23904,7 @@ license:CC0
 	</software>
 
 	<software name="tetris2a" cloneof="tetris2">
-		<!--    USA rerelease is a relabeled European cartridge?    -->
+		<!-- USA rerelease is a relabeled European cartridge? -->
 		<description>Tetris 2 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23922,7 +23922,7 @@ license:CC0
 	</software>
 
 	<software name="tetris2u" cloneof="tetris2">
-		<!--    Original USA-only release   -->
+		<!-- Original USA-only release -->
 		<description>Tetris 2 (USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -26090,7 +26090,7 @@ license:CC0
 	</software>
 
 	<software name="lunchasep" cloneof="xj">
-		<!--    Very early prototype with different gameplay    -->
+		<!-- Very early prototype with different gameplay -->
 		<description>Lunar Chase (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>

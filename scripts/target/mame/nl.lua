@@ -400,12 +400,12 @@ files{
 	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
 	MAME_DIR .. "src/mame/includes/starcrus.h",
 	MAME_DIR .. "src/mame/video/starcrus.cpp",
-	
+
 	MAME_DIR .. "src/mame/drivers/dragrace.cpp",
 	MAME_DIR .. "src/mame/includes/dragrace.h",
 	MAME_DIR .. "src/mame/audio/dragrace.cpp",
 	MAME_DIR .. "src/mame/video/dragrace.cpp",
-	
+
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
@@ -423,7 +423,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/segattl.cpp",
 	MAME_DIR .. "src/mame/drivers/taitottl.cpp",
 	MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
-	
+
 	MAME_DIR .. "src/mame/drivers/jpmsru.cpp",
 	MAME_DIR .. "src/mame/audio/nl_jpmsru.cpp",
 

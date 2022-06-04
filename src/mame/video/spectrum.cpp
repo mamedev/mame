@@ -24,7 +24,8 @@
 ***************************************************************************/
 void spectrum_state::video_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+	m_irq_on_timer = timer_alloc(FUNC(spectrum_state::irq_on), this);
+	m_irq_off_timer = timer_alloc(FUNC(spectrum_state::irq_off), this);
 
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;

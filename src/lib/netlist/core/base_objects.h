@@ -110,7 +110,7 @@ namespace netlist::detail {
 	private:
 	};
 
-	/// \brief Base class for all objects bejng owned by a netlist
+	/// \brief Base class for all objects being owned by a netlist
 	///
 	/// The object provides adds \ref netlist_state_t and \ref netlist_t
 	/// accessors.
@@ -135,7 +135,7 @@ namespace netlist::detail {
 		const netlist_t & exec() const noexcept { return m_netlist; }
 
 		// to ease template design
-		template<typename T, typename... Args>
+		template <typename T, typename... Args>
 		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
 			return state().make_pool_object<T>(std::forward<Args>(args)...);
@@ -193,7 +193,7 @@ namespace netlist::detail {
 	/// All terminals are derived from this class.
 	///
 	class core_terminal_t : public device_object_t,
-							public plib::linkedlist_t<core_terminal_t>::element_t
+							public plib::linked_list_t<core_terminal_t>::element_t
 	{
 	public:
 		/// \brief Number of signal bits
@@ -222,7 +222,7 @@ namespace netlist::detail {
 		};
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
-				state_e state, nldelegate delegate);
+				state_e state, nl_delegate delegate);
 		virtual ~core_terminal_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -266,11 +266,11 @@ namespace netlist::detail {
 #else
 		void set_copied_input([[maybe_unused]] const netlist_sig_t &val) const noexcept { } // NOLINT: static means more message elsewhere
 #endif
-		void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
-		const nldelegate &delegate() const noexcept { return m_delegate; }
+		void set_delegate(const nl_delegate &delegate) noexcept { m_delegate = delegate; }
+		const nl_delegate &delegate() const noexcept { return m_delegate; }
 		void run_delegate() const noexcept { return m_delegate(); }
 	private:
-		nldelegate m_delegate;
+		nl_delegate m_delegate;
 		net_t * m_net;
 		state_var<state_e> m_state;
 	};

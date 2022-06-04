@@ -540,22 +540,17 @@ WRITE_LINE_MEMBER( comx35_state::irq_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  reset_done - flag that reset is complete
 //-------------------------------------------------
 
-void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(comx35_state::reset_done)
 {
-	switch (id)
-	{
-	case TIMER_ID_RESET:
-		m_clear = 1;
-		break;
-	}
+	m_clear = 1;
 }
 
 
 //-------------------------------------------------
-//  MACHINE_START( comx35 )
+//  machine_start
 //-------------------------------------------------
 
 void comx35_state::machine_start()
@@ -572,6 +567,8 @@ void comx35_state::machine_start()
 	save_item(NAME(m_int));
 	save_item(NAME(m_prd));
 	save_item(NAME(m_cr1));
+
+	m_reset_done_timer = timer_alloc(FUNC(comx35_state::reset_done), this);
 }
 
 
@@ -587,7 +584,7 @@ void comx35_state::machine_reset()
 	m_int = CLEAR_LINE;
 	m_prd = CLEAR_LINE;
 
-	timer_set(attotime::from_msec(t), TIMER_ID_RESET);
+	m_reset_done_timer->adjust(attotime::from_msec(t));
 }
 
 

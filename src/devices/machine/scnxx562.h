@@ -152,13 +152,16 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
+
+	TIMER_CALLBACK_MEMBER(check_zero_detect);
+	TIMER_CALLBACK_MEMBER(rtxc_tick);
+	TIMER_CALLBACK_MEMBER(trxc_tick);
 
 	int m_rxc;
 	int m_txc;
@@ -433,13 +436,6 @@ protected:
 		REG_CTCR_ZERO_DET_INT   = 0x80,
 		REG_CTCR_ZERO_DET_CTL   = 0x40,
 		REG_CTCR_TIM_OC         = 0x20,
-	};
-
-	enum
-	{
-		TIMER_ID,
-		TIMER_ID_RTXC,
-		TIMER_ID_TRXC
 	};
 
 	uint16_t m_brg_rx_rate;

@@ -1327,6 +1327,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kurzweil",
 		"kyber",
 		"kyocera",
+		"labtam",
 		"leapfrog",
 		"learsiegler",
 		"lsi",
@@ -2901,6 +2902,11 @@ files {
 	MAME_DIR .. "src/mame/video/kyocera.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "labtam")
+files {
+	MAME_DIR .. "src/mame/drivers/labtam.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "leapfrog")
 files {
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",
@@ -3391,6 +3397,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/nforcepc.cpp",
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
+	MAME_DIR .. "src/mame/drivers/sis630.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
 	MAME_DIR .. "src/mame/machine/tosh1000_bram.cpp",
@@ -4012,6 +4019,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tek405x.cpp",
 	MAME_DIR .. "src/mame/includes/tek405x.h",
 	MAME_DIR .. "src/mame/drivers/tek410x.cpp",
+	MAME_DIR .. "src/mame/drivers/tek43xx.cpp",
 	MAME_DIR .. "src/mame/drivers/tek440x.cpp",
 	MAME_DIR .. "src/mame/drivers/tekigw.cpp",
 	MAME_DIR .. "src/mame/drivers/tekxp33x.cpp",
@@ -4516,6 +4524,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ympsr40.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr60.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr340.cpp",
+	MAME_DIR .. "src/mame/drivers/ymqy70.cpp",
 	MAME_DIR .. "src/mame/drivers/ymrx15.cpp",
 	MAME_DIR .. "src/mame/drivers/ymsy35.cpp",
 	MAME_DIR .. "src/mame/drivers/ymtx81z.cpp",

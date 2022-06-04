@@ -189,7 +189,7 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
-		<software name="click">
+	<software name="click">
 		<description>Click v1.04</description>
 		<year>1990</year>
 		<publisher>Slogger</publisher>

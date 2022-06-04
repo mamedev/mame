@@ -201,10 +201,10 @@ void rp5c01_device::device_start()
 	// allocate timers
 	if (clock() > 0)
 	{
-		m_clock_timer = timer_alloc(TIMER_CLOCK);
+		m_clock_timer = timer_alloc(FUNC(rp5c01_device::advance_1hz_clock), this);
 		m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 
-		m_16hz_timer = timer_alloc(TIMER_16HZ);
+		m_16hz_timer = timer_alloc(FUNC(rp5c01_device::advance_16hz_clock), this);
 		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 	}
 
@@ -227,28 +227,29 @@ void rp5c01_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  advance_1hz_clock -
 //-------------------------------------------------
 
-void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(rp5c01_device::advance_1hz_clock)
 {
-	switch (id)
+	if (m_1hz && (m_mode & MODE_TIMER_EN))
 	{
-	case TIMER_CLOCK:
-		if (m_1hz && (m_mode & MODE_TIMER_EN))
-		{
-			advance_seconds();
-		}
-
-		m_1hz = !m_1hz;
-		set_alarm_line();
-		break;
-
-	case TIMER_16HZ:
-		m_16hz = !m_16hz;
-		set_alarm_line();
-		break;
+		advance_seconds();
 	}
+
+	m_1hz = !m_1hz;
+	set_alarm_line();
+}
+
+
+//-------------------------------------------------
+//  advance_16hz_clock -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(rp5c01_device::advance_16hz_clock)
+{
+	m_16hz = !m_16hz;
+	set_alarm_line();
 }
 
 

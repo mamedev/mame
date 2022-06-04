@@ -605,7 +605,7 @@ void itech8_state::nmi_ack_w(uint8_t data)
 MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
+	m_behind_beam_update_timer = timer_alloc(FUNC(itech8_state::behind_the_beam_update), this);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
 
 	itech8_state::machine_start();
@@ -633,8 +633,8 @@ void itech8_state::machine_start()
 		m_fixed->set_entry(0);
 	}
 
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-	m_blitter_done_timer = timer_alloc(TIMER_BLITTER_DONE);
+	m_irq_off_timer = timer_alloc(FUNC(itech8_state::irq_off), this);
+	m_blitter_done_timer = timer_alloc(FUNC(itech8_state::blitter_done), this);
 
 	save_item(NAME(m_grom_bank));
 	save_item(NAME(m_blitter_int));
@@ -648,7 +648,7 @@ void grmatch_state::machine_start()
 {
 	itech8_state::machine_start();
 
-	m_palette_timer = timer_alloc(TIMER_PALETTE);
+	m_palette_timer = timer_alloc(FUNC(grmatch_state::palette_update), this);
 }
 
 void itech8_state::machine_reset()
@@ -672,27 +672,6 @@ void grmatch_state::machine_reset()
 {
 	itech8_state::machine_reset();
 	m_palette_timer->adjust(m_screen->time_until_pos(m_screen->vpos()+1));
-}
-
-void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_IRQ_OFF:
-		irq_off(param);
-		break;
-	case TIMER_BEHIND_BEAM_UPDATE:
-		behind_the_beam_update(param);
-		break;
-	case TIMER_BLITTER_DONE:
-		blitter_done(param);
-		break;
-	case TIMER_DELAYED_Z80_CONTROL:
-		delayed_z80_control_w(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in itech8_state::device_timer");
-	}
 }
 
 
@@ -2707,8 +2686,6 @@ void grmatch_state::driver_init()
 
 void itech8_state::init_slikshot()
 {
-	m_delayed_z80_control_timer = timer_alloc(TIMER_DELAYED_Z80_CONTROL);
-
 	save_item(NAME(m_z80_ctrl));
 	save_item(NAME(m_z80_port_val));
 	save_item(NAME(m_z80_clear_to_send));

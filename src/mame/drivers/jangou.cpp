@@ -914,7 +914,7 @@ void jangou_state::machine_start()
 	save_item(NAME(m_cvsd_shift_cnt));
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	m_cvsd_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jangou_state::cvsd_bit_timer_callback), this));
+	m_cvsd_bit_timer = timer_alloc(FUNC(jangou_state::cvsd_bit_timer_callback), this);
 	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 

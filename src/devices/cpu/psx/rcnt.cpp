@@ -58,7 +58,7 @@ void psxrcnt_device::device_start()
 
 	for( n = 0; n < 3; n++ )
 	{
-		root_counter[ n ].timer = timer_alloc(n);
+		root_counter[ n ].timer = timer_alloc( FUNC( psxrcnt_device::timer_update ), this );
 		save_item(NAME(root_counter[ n ].n_count), n);
 		save_item(NAME(root_counter[ n ].n_mode), n);
 		save_item(NAME(root_counter[ n ].n_target), n);
@@ -227,9 +227,9 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 	}
 }
 
-void psxrcnt_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER( psxrcnt_device::timer_update )
 {
-	int n_counter = id;
+	int n_counter = param;
 	psx_root *root = &root_counter[ n_counter ];
 
 	verboselog( *this, 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );

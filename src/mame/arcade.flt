@@ -288,6 +288,7 @@ csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
 cubo.cpp
+cucaracha.cpp
 cultures.cpp
 cupidon.cpp
 cv1k.cpp
@@ -473,7 +474,6 @@ galpanic.cpp
 galpanic_ms.cpp
 galspnbl.cpp
 gambl186.cpp
-gamecstl.cpp
 gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
@@ -501,7 +501,6 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
-gokidetor.cpp
 goldart.cpp
 goldngam.cpp
 goldnpkr.cpp
@@ -748,6 +747,7 @@ majorpkr.cpp
 malzak.cpp
 manohman.cpp
 mappy.cpp
+marblmd2.cpp
 marineb.cpp
 marinedt.cpp
 mario.cpp
@@ -796,6 +796,7 @@ mgames.cpp
 mgavegas.cpp
 mgolf.cpp
 mhavoc.cpp
+miconkit.cpp
 micro3d.cpp
 microdar.cpp
 micropin.cpp
@@ -1193,6 +1194,7 @@ silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp
 simpsons.cpp
+sis630.cpp
 skeetsht.cpp
 skimaxx.cpp
 skopro.cpp
@@ -1381,6 +1383,7 @@ toaplan2.cpp
 toki.cpp
 toki_ms.cpp
 tomcat.cpp
+tomsadvs.cpp
 tonton.cpp
 toobin.cpp
 topspeed.cpp
@@ -1556,5 +1559,7 @@ zwackery.cpp
 -saturnjp
 -saturnkr
 -vsaturn
+//sis630.cpp
+-shutms11
 //vectrex.cpp
 -vectrex

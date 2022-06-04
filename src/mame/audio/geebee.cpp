@@ -45,7 +45,7 @@ void geebee_sound_device::device_start()
 	m_channel = stream_alloc(0, 1, clock() / 3 / 2 / 384);
 	m_vcount = 0;
 
-	m_volume_timer = timer_alloc(TIMER_VOLUME_DECAY);
+	m_volume_timer = timer_alloc(FUNC(geebee_sound_device::volume_decay_tick), this);
 
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_sound_signal));
@@ -54,18 +54,10 @@ void geebee_sound_device::device_start()
 	save_item(NAME(m_vcount));
 }
 
-void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(geebee_sound_device::volume_decay_tick)
 {
-	switch (id)
-	{
-	case TIMER_VOLUME_DECAY:
-		if (--m_volume < 0)
-			m_volume = 0;
-		break;
-
-	default:
-		throw emu_fatalerror("Unknown id in geebee_device::device_timer");
-	}
+	if (--m_volume < 0)
+		m_volume = 0;
 }
 
 void geebee_sound_device::sound_w(u8 data)

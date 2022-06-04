@@ -197,6 +197,7 @@ ioport_constructor k7659_keyboard_device::device_input_ports() const
 
 k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K7659_KEYBOARD, tag, owner, clock)
+	, m_keys(*this, "A%u", 1U)
 {}
 
 
@@ -206,7 +207,7 @@ k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, cons
 
 void k7659_keyboard_device::device_start()
 {
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(k7659_keyboard_device::scan_keyboard), this);
 	// state saving
 	save_item(NAME(m_lookup));
 	save_item(NAME(m_key));
@@ -224,21 +225,21 @@ void k7659_keyboard_device::device_reset()
 	m_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
-void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(k7659_keyboard_device::scan_keyboard)
 {
 	uint8_t retVal = 0;//m_lookup;
-	uint8_t a1 = ioport("A1")->read();
-	uint8_t a2 = ioport("A2")->read();
-	uint8_t a3 = ioport("A3")->read();
-	uint8_t a4 = ioport("A4")->read();
-	uint8_t a5 = ioport("A5")->read();
-	uint8_t a6 = ioport("A6")->read();
-	uint8_t a7 = ioport("A7")->read();
-	uint8_t a8 = ioport("A8")->read();
-	uint8_t a9 = ioport("A9")->read();
-	uint8_t a10 = ioport("A10")->read();
-	uint8_t a11 = ioport("A11")->read();
-	uint8_t a12 = ioport("A12")->read();
+	uint8_t a1 = m_keys[0]->read();
+	uint8_t a2 = m_keys[1]->read();
+	uint8_t a3 = m_keys[2]->read();
+	uint8_t a4 = m_keys[3]->read();
+	uint8_t a5 = m_keys[4]->read();
+	uint8_t a6 = m_keys[5]->read();
+	uint8_t a7 = m_keys[6]->read();
+	uint8_t a8 = m_keys[7]->read();
+	uint8_t a9 = m_keys[8]->read();
+	uint8_t a10 = m_keys[9]->read();
+	uint8_t a11 = m_keys[10]->read();
+	uint8_t a12 = m_keys[11]->read();
 	uint16_t code = 0;
 	if (a1)
 		code = 0x10 + key_pos(a1);

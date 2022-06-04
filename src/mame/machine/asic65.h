@@ -55,9 +55,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(synced_write);
 
 private:
+	emu_timer *m_synced_write_timer;
 	u8   m_asic65_type;
 	int  m_command;
 	u16  m_param[32];
@@ -75,8 +77,6 @@ private:
 	u8   m_xflg;
 	u16  m_68data;
 	u16  m_tdata;
-
-	FILE * m_log;
 
 	DECLARE_READ_LINE_MEMBER( get_bio );
 };

@@ -312,7 +312,7 @@ void mc68340_timer_module_device::device_start()
 
 	m_cpu = downcast<m68340_cpu_device *>(owner());
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68340_timer_module_device::timer_callback),this));
+	m_timer = timer_alloc(FUNC(mc68340_timer_module_device::timer_callback), this);
 
 	// Resolve Timer callbacks
 	m_tout_out_cb.resolve_safe();

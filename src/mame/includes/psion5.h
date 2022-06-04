@@ -48,7 +48,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(update_timer1);
+	TIMER_CALLBACK_MEMBER(update_timer2);
+	TIMER_CALLBACK_MEMBER(update_periodic_irq);
+	TIMER_CALLBACK_MEMBER(update_rtc);
 
 private:
 	void palette_init(palette_device &palette);
@@ -59,11 +62,6 @@ private:
 	void update_timer(int timer);
 	void set_timer_ctrl(int timer, uint32_t value);
 	void check_interrupts();
-
-	static constexpr device_timer_id TID_TIMER1 = 0;
-	static constexpr device_timer_id TID_TIMER2 = 1;
-	static constexpr device_timer_id TID_PERIODIC = 2;
-	static constexpr device_timer_id TID_RTC_TICKER = 3;
 
 	enum
 	{

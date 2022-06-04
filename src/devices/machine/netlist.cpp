@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern const plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::static_library::symbol nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
@@ -343,18 +343,18 @@ void netlist_mame_device::register_memregion_source(netlist::nlparse_t &parser, 
 
 void netlist_mame_analog_input_device::write(const double val)
 {
-	m_value_for_device_timer = val * m_mult + m_offset;
-	if (m_value_for_device_timer != (*m_param)())
+	m_value_to_sync = val * m_mult + m_offset;
+	if (m_value_to_sync != (*m_param)())
 	{
-		synchronize();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_analog_input_device::sync_callback), this));
 	}
 }
 
-void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_analog_input_device::sync_callback)
 {
 	update_to_current_time();
-	nl_owner().log_csv().log_add(m_param_name, m_value_for_device_timer, true);
-	m_param->set(m_value_for_device_timer);
+	nl_owner().log_csv().log_add(m_param_name, m_value_to_sync, true);
+	m_param->set(m_value_to_sync);
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -363,7 +363,7 @@ void netlist_mame_int_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_int_input_device::sync_callback), this), v);
 }
 }
 
@@ -373,25 +373,25 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_logic_input_device::sync_callback), this), v);
 	}
 }
 
-void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_int_input_device::sync_callback)
 {
 	update_to_current_time();
 	nl_owner().log_csv().log_add(m_param_name, param, false);
 	m_param->set(param);
 }
 
-void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_logic_input_device::sync_callback)
 {
 	update_to_current_time();
 	nl_owner().log_csv().log_add(m_param_name, param, false);
 	m_param->set(param);
 }
 
-void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_ram_pointer_device::sync_callback)
 {
 	m_data = (*m_param)();
 }
@@ -432,7 +432,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name(param_name)
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 
@@ -442,7 +442,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name("")
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 
@@ -986,7 +986,7 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 			plib::plog_delegate(&validity_logger::log, &logger));
 		// enable validation mode
 
-		lnetlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nullptr));
+		lnetlist->set_static_solver_lib(std::make_unique<plib::static_library>(nullptr));
 
 		common_dev_start(lnetlist.get());
 		lnetlist->setup().prepare_to_run();
@@ -1034,7 +1034,7 @@ void netlist_mame_device::device_start_common()
 {
 	m_netlist = std::make_unique<netlist_mame_t>(*this, "netlist");
 
-	m_netlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nl_static_solver_syms));
+	m_netlist->set_static_solver_lib(std::make_unique<plib::static_library>(nl_static_solver_syms));
 
 	if (!machine().options().verbose())
 	{

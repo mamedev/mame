@@ -52,44 +52,10 @@ void snes_state::scpu_irq_refresh()
 }
 
 
-void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_NMI_TICK:
-		snes_nmi_tick(param);
-		break;
-	case TIMER_HIRQ_TICK:
-		snes_hirq_tick_callback(param);
-		break;
-	case TIMER_RESET_OAM_ADDRESS:
-		snes_reset_oam_address(param);
-		break;
-	case TIMER_RESET_HDMA:
-		snes_reset_hdma(param);
-		break;
-	case TIMER_UPDATE_IO:
-		snes_update_io(param);
-		break;
-	case TIMER_SCANLINE_TICK:
-		snes_scanline_tick(param);
-		break;
-	case TIMER_HBLANK_TICK:
-		snes_hblank_tick(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in snes_state::device_timer");
-	}
-}
-
-
 TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
 {
 	// pull NMI
 	m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
-
-	// don't happen again
-	m_nmi_timer->adjust(attotime::never);
 }
 
 void snes_state::hirq_tick()
@@ -99,9 +65,6 @@ void snes_state::hirq_tick()
 	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
 	SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 	scpu_irq_refresh();
-
-	// don't happen again
-	m_hirq_timer->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
@@ -125,8 +88,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 {
 	io_read();
 	SNES_CPU_REG(HVBJOY) &= 0xfe;       /* Clear busy bit */
-
-	m_io_timer->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
@@ -180,7 +141,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	/* Start of VBlank */
 	if (m_ppu->current_vert() == m_ppu->last_visible_line())
 	{
-		timer_set(m_screen->time_until_pos(m_ppu->current_vert(), 10), TIMER_RESET_OAM_ADDRESS);
+		m_oam_reset_addr_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), 10));
 
 		SNES_CPU_REG(HVBJOY) |= 0x81;       /* Set vblank bit to on & indicate controllers being read */
 		SNES_CPU_REG(RDNMI) |= 0x80;        /* Set NMI occurred bit */
@@ -212,7 +173,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	m_scanline_timer->adjust(attotime::never);
 	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), m_hblank_offset * m_ppu->htmult()));
 
 //  printf("%02x %d\n",SNES_CPU_REG(HVBJOY),m_ppu->current_vert());
@@ -225,9 +185,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	int nextscan;
 
 	m_ppu->set_current_vert(m_screen->vpos());
-
-	/* make sure we halt */
-	m_hblank_timer->adjust(attotime::never);
 
 	/* draw a scanline */
 	if (m_ppu->current_vert() <= m_ppu->last_visible_line())
@@ -559,7 +516,7 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 			return;
 		case HDMAEN:    /* HDMA channel designation */
 			if (data != SNES_CPU_REG(HDMAEN)) //if a HDMA is enabled, data is inited at the next scanline
-				timer_set(m_screen->time_until_pos(m_ppu->current_vert() + 1), TIMER_RESET_HDMA);
+				m_hdma_reset_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert() + 1));
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
 		case TIMEUP:    // IRQ Flag is cleared on both read and write
@@ -1018,20 +975,24 @@ uint8_t snes_state::oldjoy2_read(int latched)
 void snes_state::snes_init_timers()
 {
 	/* init timers and stop them */
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE_TICK);
+	m_scanline_timer = timer_alloc(FUNC(snes_state::snes_scanline_tick), this);
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer = timer_alloc(TIMER_HBLANK_TICK);
+	m_hblank_timer = timer_alloc(FUNC(snes_state::snes_hblank_tick), this);
 	m_hblank_timer->adjust(attotime::never);
-	m_nmi_timer = timer_alloc(TIMER_NMI_TICK);
+	m_nmi_timer = timer_alloc(FUNC(snes_state::snes_nmi_tick), this);
 	m_nmi_timer->adjust(attotime::never);
-	m_hirq_timer = timer_alloc(TIMER_HIRQ_TICK);
+	m_hirq_timer = timer_alloc(FUNC(snes_state::snes_hirq_tick_callback), this);
 	m_hirq_timer->adjust(attotime::never);
 	//m_div_timer = timer_alloc(TIMER_DIV);
 	//m_div_timer->adjust(attotime::never);
 	//m_mult_timer = timer_alloc(TIMER_MULT);
 	//m_mult_timer->adjust(attotime::never);
-	m_io_timer = timer_alloc(TIMER_UPDATE_IO);
+	m_io_timer = timer_alloc(FUNC(snes_state::snes_update_io), this);
 	m_io_timer->adjust(attotime::never);
+	m_oam_reset_addr_timer = timer_alloc(FUNC(snes_state::snes_reset_oam_address), this);
+	m_oam_reset_addr_timer->adjust(attotime::never);
+	m_hdma_reset_timer = timer_alloc(FUNC(snes_state::snes_reset_hdma), this);
+	m_hdma_reset_timer->adjust(attotime::never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.

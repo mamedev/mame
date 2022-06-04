@@ -87,15 +87,33 @@ def process_file(srcfile):
 
     src.close()
 
+def file_header():
+    print("// license:BSD-3-Clause")
+    print("// copyright-holders:Couriersud")
+    print("")
+    print("#ifndef NLD_DEVINC_H")
+    print("#define NLD_DEVINC_H")
+    print("")
+    print("#ifndef __PLIB_PREPROCESSOR__\n")
+    print("")
+    print("#include \"../nl_setup.h\"")
+    print("")
+
+def file_footer():
+    print("#endif // __PLIB_PREPROCESSOR__\n")
+    print("#endif // NLD_DEVINC_H\n")
+
 if __name__ == '__main__':
     if (len(sys.argv) == 0):
         print('Usage:')
         print('  create_devinc files ...')
         sys.exit(0)
-    files_sorted = [];
+    files_sorted = []
     for argno in range(1, len(sys.argv)):
         files_sorted.append(sys.argv[argno])
-    files_sorted.sort();
+    files_sorted.sort()
+    file_header()
     for entry in files_sorted:
         process_file(entry)
+    file_footer()
 

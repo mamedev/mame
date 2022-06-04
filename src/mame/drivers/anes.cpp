@@ -2,32 +2,38 @@
 // copyright-holders:Ivan Vangelista
 
 /*
-TON PUU MAHJONG (Japan) by ANES
+Sanma - San-nin Uchi Mahjong (Japan) by ANES
+Ton Puu Mahjong (Japan) by ANES
 
 TODO:
 - ROM banking;
 - blitter, 8bpp with hardcoded palette & writes to ROM area!?
 - inputs;
+- dip sheets are available for sanma.
 
 - 1x Z0840008PSC Z80 CPU
 - 1x 16.000 XTAL near the Z80
 - 1x YM2413 sound chip
 - 1x 3.579545 XTAL near the YM2413
 - 1x Xilinx XC7354 CPLD
+- 1x 17128EPC configuration bitstream for the Xilinx
 - 2x ISSI IS61C64AH 8k x8 SRAM
 - 1x HM6265LK-70
-- 1x unknown 160 pin device labeled "ANES ORIGINAL SEAL NO. A199."
+- 1x unknown 160 pin device labeled "ANES ORIGINAL SEAL NO. A199." for tonpuu, "ANES ORIGINAL SEAL NO. A446." for sanma
 - 4x bank of 8 dip-switches
-
-Sanma - 3nin-uchi Mahjong is another ANES game confirmed running on the same hardware.
 */
 
 #include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "cpu/z80/z80.h"
-#include "sound/ymopl.h"
+
+
+namespace {
 
 class anes_state : public driver_device
 {
@@ -39,6 +45,9 @@ public:
 
 	void anes(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void vram_offset_w(offs_t offset, uint8_t data);
 	void blit_trigger_w(uint8_t data);
@@ -47,8 +56,6 @@ private:
 
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
-
-	virtual void machine_start() override;
 
 	uint8_t m_vram_offset[3];
 };
@@ -158,7 +165,7 @@ void anes_state::machine_start()
 
 void anes_state::anes(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	z80_device &maincpu(Z80(config, "maincpu", XTAL(16'000'000) / 2)); // Z0840008PSC
 	maincpu.set_addrmap(AS_PROGRAM, &anes_state::prg_map);
 	maincpu.set_addrmap(AS_IO, &anes_state::io_map);
@@ -175,11 +182,25 @@ void anes_state::anes(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ym", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
+
+ROM_START( sanma ) // exact ROM type unknown, dumped multiple times as various sized chips and 27C040 seems correct. Program ROM might actually be 27C020.
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "anes_s26.u32", 0x00000, 0x80000, CRC(2c14ed16) SHA1(8ce0ddee9501896f76dab63d57326812ba4a9a6c) ) // 27C040?, 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION(0x200000, "gfx1", 0)
+	ROM_LOAD( "anes_301.u33", 0x000000, 0x80000, CRC(d2ba943d) SHA1(9aea0bda5186c0a746bf86eeaa2bd7910d3d5e03) ) // 27C040?
+	ROM_LOAD( "anes_302.u34", 0x080000, 0x80000, CRC(92cac418) SHA1(3f17a7a95cc7d9ca3e1eb638276c40c8dab9f12d) ) // 27C040?
+	ROM_LOAD( "anes_324.u35", 0x100000, 0x80000, CRC(7f6a7af5) SHA1(c8657dc3053d3e125c9e92ade7467ffa31e48a34) ) // 27C040?
+	ROM_LOAD( "anes_333.u36", 0x180000, 0x80000, CRC(f46db452) SHA1(b545b071a72323009110aecfda6c434468851a63) ) // 27C040?
+
+	ROM_REGION(0x4001, "fpga_bitstream", 0)
+	ROM_LOAD( "17128epc.u41", 0x0000, 0x4001, CRC(95e38a6c) SHA1(ba2f563f6aa6de7d6439f73ccc6d82346e453e22) )
+ROM_END
 
 ROM_START( tonpuu )
 	ROM_REGION(0x20000, "maincpu", 0)
@@ -188,7 +209,13 @@ ROM_START( tonpuu )
 	ROM_REGION(0x100000, "gfx1", 0)
 	ROM_LOAD( "202.u33", 0x00000, 0x80000, CRC(4d62a358) SHA1(6edff8e031272cd5a466d9767454093870a0f90a) ) // 27C4001
 	ROM_LOAD( "203.u34", 0x80000, 0x80000, CRC(a6068528) SHA1(c988bd1fc2f91befa9d0d39995ba98ef86b5d854) ) // 27C4001
+
+	ROM_REGION(0x4001, "fpga_bitstream", 0)
+	ROM_LOAD( "17128epc.u41", 0x0000, 0x4001, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 200?, tonpuu, 0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 2001, sanma,  0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 200?, tonpuu, 0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

@@ -67,7 +67,7 @@ mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, d
 void mm58167_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(mm58167_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32.768f), 0, attotime::from_hz(clock() / 32.768f));
 
 	m_irq_w.resolve_safe();
@@ -94,10 +94,10 @@ void mm58167_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the RTC's registers
 //-------------------------------------------------
 
-void mm58167_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm58167_device::clock_tick)
 {
 	m_milliseconds++;
 

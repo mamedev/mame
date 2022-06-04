@@ -2734,6 +2734,8 @@ if CPUS["KC80"] then
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a16.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.h",
 		MAME_DIR .. "src/devices/cpu/z80/ky80.cpp",

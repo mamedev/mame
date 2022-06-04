@@ -1566,7 +1566,7 @@ void seta_state::uPD71054_timer_init()
 		uPD71054->max[no] = 0xffff;
 
 	for (int no = 0; no < USED_TIMER_NUM; no++)
-		uPD71054->timer[no] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),this));
+		uPD71054->timer[no] = timer_alloc(FUNC(seta_state::uPD71054_timer_callback), this);
 }
 
 
@@ -2338,7 +2338,7 @@ void seta_state::keroppi_map(address_map &map)
 
 MACHINE_START_MEMBER(seta_state,keroppi)
 {
-	m_keroppi_prize_hop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback), this));
+	m_keroppi_prize_hop_timer = timer_alloc(FUNC(seta_state::keroppi_prize_hop_callback), this);
 
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;

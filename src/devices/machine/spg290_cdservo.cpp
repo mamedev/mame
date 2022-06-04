@@ -36,7 +36,7 @@ void spg290_cdservo_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_space_write_cb.resolve_safe();
 
-	m_cdtimer = timer_alloc();
+	m_cdtimer = timer_alloc(FUNC(spg290_cdservo_device::cd_update), this);
 	m_dsp_memory = std::make_unique<uint32_t[]>(0x10000);
 
 	save_item(NAME(m_addr));
@@ -101,7 +101,7 @@ void spg290_cdservo_device::device_reset()
 	change_status();
 }
 
-void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg290_cdservo_device::cd_update)
 {
 	if (!(m_control1 & 0x04) && m_cur_sector == m_seek_lba + SPG290_LEADIN_LEN)
 	{

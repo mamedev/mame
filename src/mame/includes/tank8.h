@@ -54,11 +54,6 @@ public:
 	void init_decode();
 
 private:
-	enum
-	{
-		TIMER_COLLISION
-	};
-
 	uint8_t collision_r();
 	void lockout_w(offs_t offset, uint8_t data);
 	void int_reset_w(uint8_t data);
@@ -83,9 +78,8 @@ private:
 	inline int get_y_pos(int n);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_collision(int index);
+	TIMER_CALLBACK_MEMBER(set_collision);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void tank8_cpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;

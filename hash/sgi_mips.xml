@@ -3615,7 +3615,7 @@ license:CC0
 	</software>
 
 	<software name="irix_5_0">
-	  <!-- node: Onyx workstations & Challenge servers only -->
+	<!-- node: Onyx workstations & Challenge servers only -->
 		<description>IRIX 5.0</description>
 		<year>1993</year> <!-- 02/93 -->
 		<publisher>Silicon Graphics</publisher>

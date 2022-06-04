@@ -56,6 +56,17 @@ public:
 	void newbrain_video(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void newbrain_iorq(address_map &map);
+	void newbrain_mreq(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(clear_reset);
+	TIMER_CALLBACK_MEMBER(power_on);
+	TIMER_CALLBACK_MEMBER(clear_clkint);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t mreq_r(offs_t offset);
@@ -75,22 +86,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( k2_w );
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
-
-	void newbrain_iorq(address_map &map);
-	void newbrain_mreq(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-	enum
-	{
-		TIMER_ID_RESET,
-		TIMER_ID_PWRUP,
-		TIMER_ID_CLKINT
-	};
 
 	void check_interrupt();
 	void clclk();
@@ -142,6 +137,8 @@ private:
 	int m_80l = 0;
 	uint16_t m_tvl = 0;
 
+	emu_timer *m_reset_timer = nullptr;
+	emu_timer *m_power_timer = nullptr;
 	emu_timer *m_clkint_timer = nullptr;
 };
 

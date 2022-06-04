@@ -977,11 +977,11 @@ ROM_END
 
 
 // chimes
-GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  blkshpsq,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Astro", "Black Sheep Squadron",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  blkshpsq,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Astro", "Black Sheep Squadron",        MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound unit B-521
 GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

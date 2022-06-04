@@ -114,6 +114,7 @@ private:
 
 	// misc. state
 	seq m_sequence;
+	seq m_return_sequence;
 	u32 m_ea;
 	u16 m_tmp;
 	bool m_start;

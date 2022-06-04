@@ -27,10 +27,10 @@ centronics_printer_device::centronics_printer_device(const machine_config &mconf
 	m_printer(*this, "printer")
 {
 }
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 
 void centronics_printer_device::device_add_mconfig(machine_config &config)
 {
@@ -38,54 +38,10 @@ void centronics_printer_device::device_add_mconfig(machine_config &config)
 	m_printer->online_callback().set(FUNC(centronics_printer_device::printer_online));
 }
 
-/*-------------------------------------------------
-    printer_online - callback that
-    sets us busy when the printer goes offline
--------------------------------------------------*/
-
-WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
-{
-	output_perror(!state);
-}
-
-void centronics_printer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_ACK:
-		output_ack(param);
-
-		if (param == false)
-		{
-			/* data is now ready, output it */
-			m_printer->output(m_data);
-
-			/* ready to receive more data, return BUSY to low */
-			m_busy_timer->adjust(attotime::from_usec(7), false);
-		}
-		break;
-
-	case TIMER_BUSY:
-		m_busy = param;
-		output_busy(m_busy);
-
-		if (param == true)
-		{
-			/* timer to turn ACK low to receive data */
-			m_ack_timer->adjust(attotime::from_usec(10), false);
-		}
-		else
-		{
-			/* timer to return ACK to high state */
-			m_ack_timer->adjust(attotime::from_usec(5), true);
-		}
-	}
-}
-
 void centronics_printer_device::device_start()
 {
-	m_ack_timer = timer_alloc(TIMER_ACK);
-	m_busy_timer = timer_alloc(TIMER_BUSY);
+	m_ack_timer = timer_alloc(FUNC(centronics_printer_device::ack_timer_tick), this);
+	m_busy_timer = timer_alloc(FUNC(centronics_printer_device::busy_timer_tick), this);
 
 	/* register for state saving */
 	save_item(NAME(m_strobe));
@@ -100,6 +56,59 @@ void centronics_printer_device::device_reset()
 	output_fault(1);
 	output_ack(1);
 	output_select(1);
+}
+
+
+
+/*-------------------------------------------------
+    printer_online - callback that
+    sets us busy when the printer goes offline
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
+{
+	output_perror(!state);
+}
+
+/*-------------------------------------------------
+    ack_timer_tick - update the printer
+    acknowledge line after an appropriate delay
+-------------------------------------------------*/
+
+TIMER_CALLBACK_MEMBER(centronics_printer_device::ack_timer_tick)
+{
+	output_ack(param);
+
+	if (!param)
+	{
+		/* data is now ready, output it */
+		m_printer->output(m_data);
+
+		/* ready to receive more data, return BUSY to low */
+		m_busy_timer->adjust(attotime::from_usec(7), 0);
+	}
+}
+
+/*-------------------------------------------------
+    busy_timer_tick - update the printer's
+    busy state
+-------------------------------------------------*/
+
+TIMER_CALLBACK_MEMBER(centronics_printer_device::busy_timer_tick)
+{
+	m_busy = param;
+	output_busy(m_busy);
+
+	if (param)
+	{
+		/* timer to turn ACK low to receive data */
+		m_ack_timer->adjust(attotime::from_usec(10), 0);
+	}
+	else
+	{
+		/* timer to return ACK to high state */
+		m_ack_timer->adjust(attotime::from_usec(5), 1);
+	}
 }
 
 /*-------------------------------------------------

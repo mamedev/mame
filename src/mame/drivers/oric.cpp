@@ -401,7 +401,7 @@ void oric_state::machine_start_common()
 	m_ext_irq = false;
 
 	if (!m_tape_timer)
-		m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(oric_state::update_tape), this));
+		m_tape_timer = timer_alloc(FUNC(oric_state::update_tape), this);
 
 	save_item(NAME(m_blink_counter));
 	save_item(NAME(m_pattr));

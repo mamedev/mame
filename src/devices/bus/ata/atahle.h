@@ -35,7 +35,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(busy_tick);
+	TIMER_CALLBACK_MEMBER(empty_tick);
 
 	void set_irq(int state);
 	void set_dmarq(int state);

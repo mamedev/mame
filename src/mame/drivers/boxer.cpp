@@ -27,12 +27,6 @@
 class boxer_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_POT_INTERRUPT,
-		TIMER_PERIODIC
-	};
-
 	boxer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
@@ -47,6 +41,11 @@ public:
 	void boxer(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void boxer_map(address_map &map);
+
 	uint8_t input_r(offs_t offset);
 	uint8_t misc_r(offs_t offset);
 	void bell_w(uint8_t data);
@@ -60,12 +59,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void boxer_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	/* memory pointers */
@@ -91,21 +84,6 @@ private:
  *  Interrupts / Timers
  *
  *************************************/
-
-void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-	case TIMER_POT_INTERRUPT:
-		pot_interrupt(param);
-		break;
-	case TIMER_PERIODIC:
-		periodic_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in boxer_state::device_timer");
-	}
-}
 
 TIMER_CALLBACK_MEMBER(boxer_state::pot_interrupt)
 {
@@ -475,8 +453,8 @@ GFXDECODE_END
 void boxer_state::machine_start()
 {
 	m_leds.resolve();
-	m_pot_interrupt = timer_alloc(TIMER_POT_INTERRUPT);
-	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
+	m_pot_interrupt = timer_alloc(FUNC(boxer_state::pot_interrupt), this);
+	m_periodic_timer = timer_alloc(FUNC(boxer_state::periodic_callback), this);
 
 	save_item(NAME(m_pot_state));
 	save_item(NAME(m_pot_latch));

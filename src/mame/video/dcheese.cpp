@@ -64,20 +64,10 @@ void dcheese_state::update_scanline_irq()
 }
 
 
-void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dcheese_state::blitter_done)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER_SCANLINE:
-		signal_irq(3);
-		update_scanline_irq();
-		break;
-	case TIMER_SIGNAL_IRQ:
-		signal_irq(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in dcheese_state::device_timer");
-	}
+	signal_irq(3);
+	update_scanline_irq();
 }
 
 
@@ -96,8 +86,8 @@ void dcheese_state::video_start()
 	m_dstbitmap = std::make_unique<bitmap_ind16>(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	// create timers
-	m_blitter_timer = timer_alloc(TIMER_BLITTER_SCANLINE);
-	m_signal_irq_timer = timer_alloc(TIMER_SIGNAL_IRQ);
+	m_blitter_timer = timer_alloc(FUNC(dcheese_state::blitter_done), this);
+	m_signal_irq_timer = timer_alloc(FUNC(dcheese_state::signal_irq), this);
 
 	// register for saving
 	save_item(NAME(m_blitter_color));

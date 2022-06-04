@@ -191,7 +191,8 @@ private:
 
 	uint16_t m_c64_bitmap[2], m_bitmapmulti[4], m_mono[2], m_multi[4], m_ecmcolor[2], m_colors[4], m_spritemulti[4];
 
-	int m_lastline, m_rasterline;
+	int m_lastline;
+	int m_rasterline;
 
 	int m_interlace;
 	int m_columns, m_rows;

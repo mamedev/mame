@@ -138,7 +138,7 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, M3COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ),
-	m68k_ram(*this, "m68k_ram"),
+	m_68k_ram(*this, "m68k_ram"),
 	m_commcpu(*this, M68K_TAG),
 	m_ram(*this, RAM_TAG)
 {
@@ -163,8 +163,8 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 
 void m3comm_device::device_start()
 {
-	timer = timer_alloc(TIMER_IRQ5);
-	timer->adjust(attotime::from_usec(10000));
+	m_timer = timer_alloc(FUNC(m3comm_device::trigger_irq5), this);
+	m_timer->adjust(attotime::from_usec(10000));
 }
 
 //-------------------------------------------------
@@ -173,8 +173,8 @@ void m3comm_device::device_start()
 
 void m3comm_device::device_reset()
 {
-	naomi_control = 0xC000;
-	naomi_offset = 0;
+	m_naomi_control = 0xC000;
+	m_naomi_offset = 0;
 	m_status0 = 0;
 	m_status1 = 0;
 	m_commbank = 0;
@@ -194,13 +194,10 @@ uint16_t swapb16(uint16_t data)
 }
 
 
-void m3comm_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m3comm_device::trigger_irq5)
 {
-	if(id != TIMER_IRQ5)
-		return;
-
 	m_commcpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
-	timer.adjust(attotime::from_usec(10000));   // there is it from actually ??????
+	m_timer->adjust(attotime::from_usec(10000));   // Where is this timing from, actually?
 }
 
 ///////////// Internal MMIO
@@ -267,7 +264,7 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;      // it seems one of these ^v is IRQ6 ON/ACK, another is data transfer enable
 	case 0x16 / 2:  // written 8C at data receive enable, 0 at IRQ6 handler
 		if ((data & 0xFF) == 0x8C) {
-			LOG("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
+			LOG("M3COMM Receive offs %04x size %04x\n", m_recv_offset, m_recv_size);
 /*
             if (!m_line_rx.is_open())
             {
@@ -277,7 +274,7 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
             if (m_line_rx.is_open())
             {
                 uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
-                m_line_rx.read(&commram[recv_offset], recv_size);
+                m_line_rx.read(&commram[m_recv_offset], m_recv_size);
             }
 */
 		m_commcpu->set_input_line(M68K_IRQ_6, ASSERT_LINE); // debug hack
@@ -287,7 +284,7 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;      // it seems one of these ^v is IRQ4 ON/ACK, another is data transfer enable
 	case 0x1C / 2:  // written 8C at data transmit enable, 0 at IRQ4 handler
 		if ((data & 0xFF) == 0x8C) {
-			LOG("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
+			LOG("M3COMM Send offs %04x size %04x\n", m_send_offset, m_send_size);
 /*
             if (!m_line_tx.is_open())
             {
@@ -297,23 +294,23 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
             if (m_line_tx.is_open())
             {
                 uint8_t *commram = (uint8_t*)membank("comm_ram")->base();
-                m_line_tx.write(&commram[send_offset], send_size);
+                m_line_tx.write(&commram[m_send_offset], m_send_size);
             }
 */
 		}
 		m_commcpu->set_input_line(M68K_IRQ_4, ((data & 0xFF) == 0x8C) ? ASSERT_LINE : CLEAR_LINE);  // debug hack
 		break;
 	case 0x40 / 2:
-		recv_offset = (recv_offset >> 8) | (data << 8);
+		m_recv_offset = (m_recv_offset >> 8) | (data << 8);
 		break;
 	case 0x42 / 2:
-		recv_size = (recv_size >> 8) | (data << 8);
+		m_recv_size = (m_recv_size >> 8) | (data << 8);
 		break;
 	case 0x44 / 2:
-		send_offset = (send_offset >> 8) | (data << 8);
+		m_send_offset = (m_send_offset >> 8) | (data << 8);
 		break;
 	case 0x46 / 2:
-		send_size = (send_size >> 8) | (data << 8);
+		m_send_size = (m_send_size >> 8) | (data << 8);
 		break;
 	case 0x88 / 2:
 		COMBINE_DATA(&m_status0);
@@ -334,12 +331,12 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t m3comm_device::m3_m68k_ram_r(offs_t offset)
 {
-	uint16_t value = m68k_ram[offset];        // FIXME endian
+	uint16_t value = m_68k_ram[offset];        // FIXME endian
 	return swapb16(value);
 }
 void m3comm_device::m3_m68k_ram_w(offs_t offset, uint16_t data)
 {
-	m68k_ram[offset] = swapb16(data);       // FIXME endian
+	m_68k_ram[offset] = swapb16(data);       // FIXME endian
 }
 uint8_t m3comm_device::m3_comm_ram_r(offs_t offset)
 {
@@ -373,21 +370,21 @@ uint16_t m3comm_device::naomi_r(offs_t offset)
 	switch (offset)
 	{
 	case 0:         // 5F7018
-		return naomi_control;
+		return m_naomi_control;
 	case 1:         // 5F701C
-		return naomi_offset;
+		return m_naomi_offset;
 	case 2:         // 5F7020
 	{
-//      LOG("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
+//      LOG("M3COMM read @ %08x\n", (m_naomi_control << 16) | m_naomi_offset);
 		uint16_t value;
-		if (naomi_control & 1)
-			value = m68k_ram[naomi_offset / 2];     // FIXME endian
+		if (m_naomi_control & 1)
+			value = m_68k_ram[m_naomi_offset / 2];     // FIXME endian
 		else {
 			uint16_t *commram = (uint16_t*)membank("comm_ram")->base();
 
-			value = commram[naomi_offset / 2];      // FIXME endian
+			value = commram[m_naomi_offset / 2];      // FIXME endian
 		}
-		naomi_offset += 2;
+		m_naomi_offset += 2;
 		return value;
 	}
 	case 3:         // 5F7024
@@ -411,21 +408,21 @@ void m3comm_device::naomi_w(offs_t offset, uint16_t data)
 					// bit 14: G1 DMA bus master 0 - active / 1 - disabled
 					// bit 15: 0 - enable / 1 - disable this device ???
 //      LOG("M3COMM control write %04x\n", data);
-		naomi_control = data;
-		m_commcpu->set_input_line(INPUT_LINE_RESET, (naomi_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_naomi_control = data;
+		m_commcpu->set_input_line(INPUT_LINE_RESET, (m_naomi_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	case 1:         // 5F701C
-		naomi_offset = data;
+		m_naomi_offset = data;
 		break;
 	case 2:         // 5F7020
-//      LOG("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
-		if (naomi_control & 1)
-			m68k_ram[naomi_offset / 2] = data;      // FIXME endian
+//      LOG("M3COMM write @ %08x %04x\n", (m_naomi_control << 16) | m_naomi_offset, data);
+		if (m_naomi_control & 1)
+			m_68k_ram[m_naomi_offset / 2] = data;      // FIXME endian
 		else {
 			uint16_t *commram = (uint16_t*)membank("comm_ram")->base();
-			commram[naomi_offset / 2] = data;       // FIXME endian
+			commram[m_naomi_offset / 2] = data;       // FIXME endian
 		}
-		naomi_offset += 2;
+		m_naomi_offset += 2;
 		break;
 	case 3:         // 5F7024
 		m_status0 = data;

@@ -67,7 +67,7 @@ void paula_8364_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_channel[i].index = i;
-		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(paula_8364_device::signal_irq), this));
+		m_channel[i].irq_timer = timer_alloc(FUNC(paula_8364_device::signal_irq), this);
 	}
 
 	// create the stream

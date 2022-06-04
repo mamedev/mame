@@ -134,7 +134,7 @@ void aviion88k_state::machine_start()
 	m_leds.resolve();
 
 	for (emu_timer *&pit : m_pit)
-		pit = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aviion88k_state::pit_timer), this));
+		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }
 
 void aviion88k_state::machine_reset()

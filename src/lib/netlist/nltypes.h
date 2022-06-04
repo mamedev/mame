@@ -22,6 +22,11 @@
 
 #include <memory>
 
+/// \brief Construct a netlist device name
+///
+#define NETLIB_NAME(chip) nld_ ## chip
+
+
 namespace netlist
 {
 	// -----------------------------------------------------------------------------
@@ -144,9 +149,9 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional_t<config::use_mempool::value,
-		plib::mempool_arena<plib::aligned_arena, config::mempool_align::value>,
-		plib::aligned_arena>;
-	using host_arena   = plib::aligned_arena;
+		plib::mempool_arena<plib::aligned_arena<>, config::mempool_align::value>,
+		plib::aligned_arena<>>;
+	using host_arena   = plib::aligned_arena<>;
 
 	using log_type =  plib::plog_base<NL_DEBUG>;
 
@@ -154,11 +159,11 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	/// \brief Timestep type.
+	/// \brief Time step type.
 	///
 	/// May be either FORWARD or RESTORE
 	///
-	enum class timestep_type
+	enum class time_step_type
 	{
 		FORWARD,  ///< forward time
 		RESTORE   ///< restore state before last forward
@@ -166,9 +171,9 @@ namespace netlist
 
 	/// \brief Delegate type for device notification.
 	///
-	using nldelegate = plib::pmfp<void ()>;
-	using nldelegate_ts = plib::pmfp<void (timestep_type, nl_fptype)>;
-	using nldelegate_dyn = plib::pmfp<void ()>;
+	using nl_delegate = plib::pmfp<void ()>;
+	using nl_delegate_ts = plib::pmfp<void (time_step_type, nl_fptype)>;
+	using nl_delegate_dyn = plib::pmfp<void ()>;
 
 	namespace detail {
 

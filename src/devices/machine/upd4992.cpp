@@ -58,19 +58,14 @@ void upd4992_device::device_validity_check(validity_checker &valid) const
 
 void upd4992_device::device_start()
 {
-	m_timer_clock = timer_alloc(TIMER_CLOCK);
+	m_timer_clock = timer_alloc(FUNC(upd4992_device::clock_tick), this);
 	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 }
 
 
-void upd4992_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd4992_device::clock_tick)
 {
-	switch (id)
-	{
-	case TIMER_CLOCK:
-		advance_seconds();
-		break;
-	}
+	advance_seconds();
 }
 
 //-------------------------------------------------

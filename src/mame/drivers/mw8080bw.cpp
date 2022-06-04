@@ -887,7 +887,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 	mw8080bw_state::machine_start();
 
 	/* create astable timer for IC B1 */
-	m_maze_tone_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this));
+	m_maze_tone_timer = timer_alloc(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this);
 	m_maze_tone_timer->adjust(MAZE_555_B1_PERIOD, 0, MAZE_555_B1_PERIOD);
 
 	/* initialize state of Tone Timing FF, IC C1 */

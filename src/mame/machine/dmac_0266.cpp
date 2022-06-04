@@ -58,7 +58,7 @@ void dmac_0266_device::device_start()
 
 	save_item(NAME(m_req_state));
 
-	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac_0266_device::dma_check), this));
+	m_dma_check = timer_alloc(FUNC(dmac_0266_device::dma_check), this);
 
 	m_req_state = false;
 }

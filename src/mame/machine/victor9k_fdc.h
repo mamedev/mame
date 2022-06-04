@@ -46,23 +46,19 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	TIMER_CALLBACK_MEMBER(gen_tick);
+	TIMER_CALLBACK_MEMBER(tach0_tick);
+	TIMER_CALLBACK_MEMBER(tach1_tick);
+
 private:
 	static const int rpm[0x100];
 
 	void add_floppy_drive(machine_config &config, const char *_tag);
-
-	enum
-	{
-		TM_GEN,
-		TM_TACH0,
-		TM_TACH1
-	};
 
 	enum
 	{

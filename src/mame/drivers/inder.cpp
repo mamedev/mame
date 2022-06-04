@@ -1662,19 +1662,19 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder",    "Moon Light (Inder)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",    "Clown (Inder)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder",    "Corsario",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder",    "Mundial 90",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder",    "Atleta",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder",    "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",    "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder",    "Corsario",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder",    "Mundial 90",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder",    "Atleta",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",    "La Rana",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

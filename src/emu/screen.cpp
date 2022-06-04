@@ -835,15 +835,15 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer = timer_alloc(TID_VBLANK_START);
-	m_vblank_end_timer = timer_alloc(TID_VBLANK_END);
+	m_vblank_begin_timer = timer_alloc(FUNC(screen_device::vblank_begin), this);
+	m_vblank_end_timer = timer_alloc(FUNC(screen_device::vblank_end), this);
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
+	m_scanline0_timer = timer_alloc(FUNC(screen_device::first_scanline_tick), this);
 
 	// allocate a timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
-		m_scanline_timer = timer_alloc(TID_SCANLINE);
+		m_scanline_timer = timer_alloc(FUNC(screen_device::scanline_tick), this);
 
 	// configure the screen with the default parameters
 	configure(m_width, m_height, m_visarea, m_refresh);
@@ -931,54 +931,39 @@ void screen_device::device_post_load()
 
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
+//  timer events
 //-------------------------------------------------
 
-void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(screen_device::first_scanline_tick)
 {
-	switch (id)
+	// first scanline
+	reset_partial_updates();
+	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 	{
-		// signal VBLANK start
-		case TID_VBLANK_START:
-			vblank_begin();
-			break;
-
-		// signal VBLANK end
-		case TID_VBLANK_END:
-			vblank_end();
-			break;
-
-		// first scanline
-		case TID_SCANLINE0:
-			reset_partial_updates();
-			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-			{
-				pre_update_scanline(0);
-			}
-			break;
-
-		// subsequent scanlines when scanline updates are enabled
-		case TID_SCANLINE:
-			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-			{
-				pre_update_scanline(param);
-			}
-			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
-			{
-				// force a partial update to the current scanline
-				update_partial(param);
-			}
-			if (m_scanline_cb)
-				m_scanline_cb(param);
-
-			// compute the next visible scanline
-			param++;
-			if (param > m_visarea.bottom())
-				param = m_visarea.top();
-			m_scanline_timer->adjust(time_until_pos(param), param);
-			break;
+		pre_update_scanline(0);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(screen_device::scanline_tick)
+{
+	// subsequent scanlines when scanline updates are enabled
+	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+	{
+		pre_update_scanline(param);
+	}
+	if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
+	{
+		// force a partial update to the current scanline
+		update_partial(param);
+	}
+	if (m_scanline_cb)
+		m_scanline_cb(param);
+
+	// compute the next visible scanline
+	param++;
+	if (param > m_visarea.bottom())
+		param = m_visarea.top();
+	m_scanline_timer->adjust(time_until_pos(param), param);
 }
 
 
@@ -1027,7 +1012,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
 	if (delta >= m_frame_period)
-		vblank_begin();
+		vblank_begin(0);
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
 
@@ -1065,7 +1050,7 @@ void screen_device::reset_origin(int beamy, int beamx)
 	// if we are resetting relative to (visarea.bottom() + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == ((m_visarea.bottom() + 1) % m_height) && beamx == 0)
-		vblank_begin();
+		vblank_begin(0);
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
 }
@@ -1650,7 +1635,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 //  signal the VBLANK period has begun
 //-------------------------------------------------
 
-void screen_device::vblank_begin()
+TIMER_CALLBACK_MEMBER(screen_device::vblank_begin)
 {
 	// reset the starting VBLANK time
 	m_vblank_start_time = machine().time();
@@ -1670,7 +1655,7 @@ void screen_device::vblank_begin()
 
 	// if no VBLANK period, call the VBLANK end callback immediately, otherwise reset the timer
 	if (m_vblank_period == 0)
-		vblank_end();
+		vblank_end(0);
 	else
 		m_vblank_end_timer->adjust(time_until_vblank_end());
 }
@@ -1681,7 +1666,7 @@ void screen_device::vblank_begin()
 //  signal the VBLANK period has ended
 //-------------------------------------------------
 
-void screen_device::vblank_end()
+TIMER_CALLBACK_MEMBER(screen_device::vblank_end)
 {
 	// call the screen specific callbacks
 	for (auto &item : m_callback_list)

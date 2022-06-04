@@ -72,12 +72,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
 
 private:
-	enum
-	{
-		TIMER_INT_OFF,
-		TIMER_INT_GEN
-	};
-
 	void color_latch_w(uint8_t data);
 	void spaceint_videoram_w(offs_t offset, uint8_t data);
 	uint8_t kamikaze_ppi_r(offs_t offset);
@@ -98,19 +92,18 @@ private:
 	uint32_t screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
-	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
+	TIMER_CALLBACK_MEMBER(kamikaze_int_gen);
 
 	void kamikaze_map(address_map &map);
 	void kamikaze_portmap(address_map &map);
 	void spaceint_map(address_map &map);
 	void spaceint_portmap(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
 	std::unique_ptr<uint8_t[]>    m_colorram{};
-	emu_timer  *m_int_timer = nullptr;
-	emu_timer  *m_int_off_timer = nullptr;
+	emu_timer   *m_int_timer = nullptr;
+	emu_timer   *m_int_off_timer = nullptr;
 	uint8_t      m_sound_state[2]{};
 	uint8_t      m_screen_flip = 0;
 	uint8_t      m_screen_red = 0;
@@ -251,29 +244,13 @@ uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_INT_OFF:
-		kamikaze_int_off(param);
-		break;
-	case TIMER_INT_GEN:
-		kamizake_int_gen(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in astinvad_state::device_timer");
-	}
-}
-
-
 TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
+TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_gen)
 {
 	/* interrupts are asserted on every state change of the 128V line */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -287,9 +264,9 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-	m_int_timer = timer_alloc(TIMER_INT_GEN);
+	m_int_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_gen), this);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
-	m_int_off_timer = timer_alloc(TIMER_INT_OFF);
+	m_int_off_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_off), this);
 
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_screen_red));

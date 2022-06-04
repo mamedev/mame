@@ -873,10 +873,10 @@ void lockon_state::video_start()
 	m_obj_pal_ram = std::make_unique<uint8_t[]>(2048);
 
 	/* Timer for ground display list callback */
-	m_bufend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::bufend_callback),this));
+	m_bufend_timer = timer_alloc(FUNC(lockon_state::bufend_callback), this);
 
 	/* Timer for the CRTC cursor pulse */
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::cursor_callback),this));
+	m_cursor_timer = timer_alloc(FUNC(lockon_state::cursor_callback), this);
 	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
 	save_item(NAME(*m_back_buffer));

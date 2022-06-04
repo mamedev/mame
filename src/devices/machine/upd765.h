@@ -64,11 +64,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	enum {
-		TIMER_DRIVE_READY_POLLING = 4
-	};
+	TIMER_CALLBACK_MEMBER(update_floppy);
 
 	enum {
 		PHASE_CMD, PHASE_EXEC, PHASE_RESULT
@@ -290,7 +287,7 @@ protected:
 
 	void end_reset();
 
-	void delay_cycles(emu_timer *tm, int cycles);
+	void delay_cycles(floppy_info &fi, int cycles);
 	void check_irq();
 	void fifo_expect(int size, bool write);
 	void fifo_push(uint8_t data, bool internal);
@@ -303,7 +300,7 @@ protected:
 	void disable_transfer();
 	int calc_sector_size(uint8_t size);
 
-	void run_drive_ready_polling();
+	TIMER_CALLBACK_MEMBER(run_drive_ready_polling);
 
 	virtual int check_command();
 	virtual void start_command(int cmd);

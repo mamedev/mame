@@ -115,10 +115,9 @@ protected:
 	void lx385_ctrl_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 
-	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
-	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(cassette_tc);
+	TIMER_CALLBACK_MEMBER(kbd_scan);
+	TIMER_CALLBACK_MEMBER(pulse_nmi);
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<ay31015_device> m_uart;

@@ -7,6 +7,9 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
+// Names
+// spell-checker: words Woodbury
+
 #include "plib/pconfig.h"
 #include "plib/pexception.h"
 

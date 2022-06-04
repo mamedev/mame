@@ -247,7 +247,7 @@ void htmusic_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	// allocate timer
-	m_dsp_timer = timer_alloc(0);
+	m_dsp_timer = timer_alloc(FUNC(htmusic_device::dsp_tick), this);
 
 	// register for save states
 	save_item(NAME(m_wave_ram));
@@ -303,7 +303,7 @@ void htmusic_device::device_reset()
 #define INVERT(c) (BIT(CTL(c), 4))
 #define PAN(c) (CTL(c) & 0x0f)
 
-void htmusic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(htmusic_device::dsp_tick)
 {
 	// 4-bit channel select
 	uint8_t channel = (m_counter >> 3) & 0x0f;

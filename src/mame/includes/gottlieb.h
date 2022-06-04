@@ -79,17 +79,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	enum
-	{
-		TIMER_LASERDISC_PHILIPS,
-		TIMER_LASERDISC_BIT_OFF,
-		TIMER_LASERDISC_BIT,
-		TIMER_NMI_CLEAR
-	};
-
 	void qbert_knocker(u8 knock);
 
 	void analog_reset_w(u8 data);
@@ -153,7 +144,9 @@ private:
 	u8 m_joystick_select = 0U;
 	u8 m_track[2]{};
 	emu_timer *m_laserdisc_bit_timer = nullptr;
+	emu_timer *m_laserdisc_bit_off_timer = nullptr;
 	emu_timer *m_laserdisc_philips_timer = nullptr;
+	emu_timer *m_nmi_clear_timer = nullptr;
 	u8 m_laserdisc_select = 0U;
 	u8 m_laserdisc_status = 0U;
 	uint16_t m_laserdisc_philips_code = 0U;

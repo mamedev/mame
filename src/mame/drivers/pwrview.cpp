@@ -35,6 +35,12 @@ public:
 	void pwrview(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(update_tmr0);
+	TIMER_CALLBACK_MEMBER(update_kbd);
+
 	u16 bank0_r(offs_t offset);
 	void bank0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 unk1_r();
@@ -65,10 +71,6 @@ private:
 	void pwrview_io(address_map &map);
 	void pwrview_map(address_map &map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8251_device> m_uart;
@@ -77,26 +79,29 @@ private:
 	required_device<address_map_bank_device> m_biosbank;
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
-	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
-	bool m_dtr, m_rts;
+	u8 m_switch;
+	u8 m_c001;
+	u8 m_c009;
+	u8 m_c280;
+	u8 m_c080;
+	u8 m_errcode;
+	u8 m_vramwin[2];
+	bool m_dtr;
+	bool m_rts;
 	emu_timer *m_tmr0ext;
 	emu_timer *m_tmrkbd;
-	enum {
-		TMR0_TIMER,
-		KBD_TIMER
-	};
 };
 
-void pwrview_state::device_start()
+void pwrview_state::machine_start()
 {
 	save_item(NAME(m_vram));
-	m_tmr0ext = timer_alloc(TMR0_TIMER);
-	m_tmrkbd = timer_alloc(KBD_TIMER);
+	m_tmr0ext = timer_alloc(FUNC(pwrview_state::update_tmr0), this);
+	m_tmrkbd = timer_alloc(FUNC(pwrview_state::update_kbd), this);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }
 
-void pwrview_state::device_reset()
+void pwrview_state::machine_reset()
 {
 	m_leds[0] = m_leds[1] = 0;
 	m_switch = 0xe0;
@@ -110,21 +115,18 @@ void pwrview_state::device_reset()
 	m_tmrkbd->adjust(attotime::from_hz(9600*16), 0, attotime::from_hz(9600*16)); // kbd baud is guess
 }
 
-void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pwrview_state::update_tmr0)
 {
-	switch(id)
-	{
-		case TMR0_TIMER:
-			m_maincpu->tmrin0_w(ASSERT_LINE);
-			m_maincpu->tmrin0_w(CLEAR_LINE);
-			break;
-		case KBD_TIMER:
-			m_uart->write_rxc(ASSERT_LINE);
-			m_uart->write_txc(ASSERT_LINE);
-			m_uart->write_rxc(CLEAR_LINE);
-			m_uart->write_txc(CLEAR_LINE);
-			break;
-	}
+	m_maincpu->tmrin0_w(ASSERT_LINE);
+	m_maincpu->tmrin0_w(CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(pwrview_state::update_kbd)
+{
+	m_uart->write_rxc(ASSERT_LINE);
+	m_uart->write_txc(ASSERT_LINE);
+	m_uart->write_rxc(CLEAR_LINE);
+	m_uart->write_txc(CLEAR_LINE);
 }
 
 MC6845_UPDATE_ROW(pwrview_state::update_row)

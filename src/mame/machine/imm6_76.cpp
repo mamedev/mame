@@ -29,9 +29,9 @@ intel_imm6_76_device::intel_imm6_76_device(
 
 void intel_imm6_76_device::device_start()
 {
-	m_cycle_tmr     = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intel_imm6_76_device::cycle_expired), this));
-	m_cycle_a_tmr   = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intel_imm6_76_device::cycle_a_expired), this));
-	m_prg_tmr       = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intel_imm6_76_device::prg_expired), this));
+	m_cycle_tmr     = timer_alloc(FUNC(intel_imm6_76_device::cycle_expired), this);
+	m_cycle_a_tmr   = timer_alloc(FUNC(intel_imm6_76_device::cycle_a_expired), this);
+	m_prg_tmr       = timer_alloc(FUNC(intel_imm6_76_device::prg_expired), this);
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_di));

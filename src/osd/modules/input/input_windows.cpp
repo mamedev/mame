@@ -13,15 +13,14 @@
 // MAME headers
 #include "emu.h"
 
-// MAMEOS headers
+#include "input_windows.h"
+
+#include "window.h"
 #include "winmain.h"
 
 #include "util/language.h"
 
 #include "osdepend.h"
-
-#include "input_common.h"
-#include "input_windows.h"
 
 
 bool windows_osd_interface::should_hide_mouse() const

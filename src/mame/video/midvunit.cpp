@@ -36,36 +36,22 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SCANLINE:
-		scanline_timer_cb(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in midvunit_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
 {
-	int scanline = param;
-
-	if (scanline != -1)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_scanline_timer->adjust(m_screen->time_until_pos(scanline + 1), scanline);
-		timer_set(attotime::from_hz(25000000), TIMER_SCANLINE, -1);
-	}
-	else
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_scanline_timer->adjust(m_screen->time_until_pos(param + 1), param);
+	m_eoi_timer->adjust(attotime::from_hz(25000000), -1);
 }
 
+TIMER_CALLBACK_MEMBER(midvunit_state::eoi_timer_cb)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
 void midvunit_state::video_start()
 {
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer = timer_alloc(FUNC(midvunit_state::scanline_timer_cb), this);
+	m_eoi_timer = timer_alloc(FUNC(midvunit_state::eoi_timer_cb), this);
 
 	m_poly = std::make_unique<midvunit_renderer>(*this);
 

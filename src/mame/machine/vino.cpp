@@ -49,8 +49,8 @@ vino_device::vino_device(const machine_config &mconfig, const char *tag, device_
 
 void vino_device::device_start()
 {
-	m_channels[0].m_fetch_timer = timer_alloc(TIMER_FETCH_CHA);
-	m_channels[1].m_fetch_timer = timer_alloc(TIMER_FETCH_CHB);
+	m_channels[0].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel<0>), this);
+	m_channels[1].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel<1>), this);
 
 	save_item(NAME(m_rev_id));
 	save_item(NAME(m_control));
@@ -144,12 +144,6 @@ void vino_device::device_add_mconfig(machine_config &config)
 {
 	IMAGE_PICTURE(config, m_picture);
 	IMAGE_AVIVIDEO(config, m_avivideo);
-}
-
-void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if (id == TIMER_FETCH_CHA || id == TIMER_FETCH_CHB)
-		fetch_pixel((int)id);
 }
 
 uint32_t vino_device::read(offs_t offset, uint32_t mem_mask)
@@ -800,26 +794,27 @@ void vino_device::input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v)
 	}
 }
 
-void vino_device::fetch_pixel(int channel)
+template <int Channel>
+TIMER_CALLBACK_MEMBER(vino_device::fetch_pixel)
 {
-	channel_t &chan = m_channels[channel];
+	channel_t &chan = m_channels[Channel];
 	if (chan.m_decimation > 1 && (chan.m_field_x % chan.m_decimation) != 0)
 	{
-		count_pixel(channel);
+		count_pixel(Channel);
 		return;
 	}
 	if (BIT(chan.m_frame_mask_shifter, 0))
 	{
 		int32_t y = 0, u = 0, v = 0;
-		input_pixel(channel, y, u, v);
-		process_pixel(channel, y, u, v);
+		input_pixel(Channel, y, u, v);
+		process_pixel(Channel, y, u, v);
 	}
 	else
 	{
-		count_pixel(channel);
+		count_pixel(Channel);
 		if (chan.m_end_of_field)
 		{
-			end_of_field(channel);
+			end_of_field(Channel);
 			chan.m_end_of_field = false;
 		}
 	}

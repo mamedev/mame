@@ -70,7 +70,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer);
 
 private:
 	void dig0_w(u8 data);
@@ -97,7 +98,7 @@ private:
 	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
 	emu_timer* m_irq_timer = nullptr;
-	static const device_timer_id TIMER_IRQ = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;
 	required_device<pia6821_device> m_pia21;
@@ -307,26 +308,21 @@ WRITE_LINE_MEMBER( s9_state::pia_irq )
 	}
 }
 
-void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s9_state::irq_timer)
 {
-	switch(id)
+	if(param == 1)
 	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
-		}
-		else
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
+		m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 }
 
@@ -343,7 +339,7 @@ void s9_state::machine_start()
 	save_item(NAME(m_comma12));
 	save_item(NAME(m_comma34));
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(s9_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 

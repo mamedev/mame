@@ -533,6 +533,32 @@ ROM_START(aqualand)
 	ROM_LOAD("jpaq14sd", 0x68000, 0x8000, CRC(0bdcbbbd) SHA1(555d8ed846079894cfc60041fb724deeaddc4e89))
 ROM_END
 
+/* Seems like this alternate CPU ROM was for a different hardware revision, as if you use the CPU ROM from
+   'aqualand' on this machine, the "Diana Variable" locks and you cannot play, while its own ROM works OK. */
+ROM_START(aqualanda)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("aqualand_cpu_a.bin", 0x0000, 0x2000, CRC(55caa233) SHA1(84dde0bf865f3bfc9a620510a9a816f4792a6610))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("jpaqsds", 0x0000, 0x4000, CRC(ff1e0cd2) SHA1(ef58d2b59929c7250dd30c413a3ba31ebfd7e09d))
+
+	ROM_REGION(0x80000, "sound1", 0)
+	ROM_LOAD("jpaq-1sd", 0x0000, 0x8000, CRC(7cdf2f7a) SHA1(e00482a6accd11e96fd0d444b3167b7d36332f7b))
+	ROM_LOAD("jpaq-2sd", 0x8000, 0x8000, CRC(db05c774) SHA1(2d40410b70de6ab0de57e94c6d8ada6e8a4a2050))
+	ROM_LOAD("jpaq-3sd", 0x10000, 0x8000, CRC(df38304e) SHA1(ec6f0c99764e3c3fe7e1de09b2d9b59d85d168d5))
+	ROM_LOAD("jpaq-4sd", 0x18000, 0x8000, CRC(8065c03e) SHA1(0731cb76d3be117a82c4ad5b7e23b53e05b3a95a))
+	ROM_LOAD("jpaq-5sd", 0x20000, 0x8000, CRC(a387a1a6) SHA1(20abee033a33e388a5f2ed3896a650766b62cfa2))
+	ROM_LOAD("jpaq-6sd", 0x28000, 0x8000, CRC(55076afb) SHA1(68b86e6855b2a80e37d2fb172bb0c4fa107d4aba))
+	ROM_LOAD("jpaq-7sd", 0x30000, 0x8000, CRC(67675b5b) SHA1(52b7cb310ddeff0bde7f0dfd37f61ab09964a75d))
+	ROM_LOAD("jpaq-8sd", 0x38000, 0x8000, CRC(c9d2d30e) SHA1(ee504b0e2aa69f541c3f4d245cc6525a7c920fa7))
+	ROM_LOAD("jpaq-9sd", 0x40000, 0x8000, CRC(3bc45f9f) SHA1(6d838b1ba94087f9a29af016b68125400dcf1fe5))
+	ROM_LOAD("jpaq10sd", 0x48000, 0x8000, CRC(239cb7f3) SHA1(1abc59bc73cf84ee3b73d500bf57a2a202291fcb))
+	ROM_LOAD("jpaq11sd", 0x50000, 0x8000, CRC(e5b9e70f) SHA1(7db0a13166120fe20bb76072475b092e942629cf))
+	ROM_LOAD("jpaq12sd", 0x58000, 0x8000, CRC(9aa37260) SHA1(6eec14f0d7152bf0cfadabe5b3017b9b6b7aa2d3))
+	ROM_LOAD("jpaq13sd", 0x60000, 0x8000, CRC(5599792e) SHA1(9d844d9f155f299bbe2d512f8ed84410e7a9cfb3))
+	ROM_LOAD("jpaq14sd", 0x68000, 0x8000, CRC(0bdcbbbd) SHA1(555d8ed846079894cfc60041fb724deeaddc4e89))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Faeton #1103
 /-------------------------------------------------------------------*/
@@ -675,17 +701,18 @@ ROM_END
 } // Anonymous namespace
 
 // 6-digit display
-GAME(1985,  petacon,  0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  petacona, 0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  petacon,   0,        jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  petacona,  0,        jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  faeton6d,  faeton,   jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // 7-digit display
-GAME(1985,  petaco2,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  faeton,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  halley,   0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  halleya,  halley, jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  aqualand, 0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  america,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  olympus,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  lortium,  0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(19??,  pimbal,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  petaco2,   0,        jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  faeton,    0,        jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  halley,    0,        jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  halleya,   halley,   jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  aqualand,  0,        jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  aqualanda, aqualand, jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand (alternate version)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  america,   0,        jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  olympus,   0,        jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  lortium,   0,        jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(19??,  pimbal,    0,        jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -1010,7 +1010,7 @@ void swtpc09_state::machine_start()
 	m_dmaf_high_address[2] = 0;
 	m_dmaf_high_address[3] = 0;
 
-	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(swtpc09_state::floppy_motor_callback),this));
+	m_floppy_motor_timer = timer_alloc(FUNC(swtpc09_state::floppy_motor_callback), this);
 	m_floppy_motor_on = 0;
 
 	// reset the 6844

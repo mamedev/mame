@@ -46,7 +46,7 @@ avivideo_image_device::~avivideo_image_device()
 
 void avivideo_image_device::device_start()
 {
-	m_frame_timer = timer_alloc(TIMER_FRAME);
+	m_frame_timer = timer_alloc(FUNC(avivideo_image_device::frame_timer), this);
 	m_frame_timer->adjust(attotime::never);
 
 	save_item(NAME(m_frame_count));
@@ -58,28 +58,25 @@ void avivideo_image_device::device_reset()
 	m_frame_num = 0;
 }
 
-void avivideo_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(avivideo_image_device::frame_timer)
 {
-	if (id == TIMER_FRAME)
+	if (m_avi != nullptr)
 	{
-		if (m_avi != nullptr)
-		{
-			avi_file::error avierr = m_avi->read_uncompressed_video_frame(m_frame_num, *m_frame);
-			if (avierr != avi_file::error::NONE)
-			{
-				m_frame_timer->adjust(attotime::never);
-				return;
-			}
-			m_frame_num++;
-			if (m_frame_num >= m_frame_count)
-			{
-				m_frame_num = 0;
-			}
-		}
-		else
+		avi_file::error avierr = m_avi->read_uncompressed_video_frame(m_frame_num, *m_frame);
+		if (avierr != avi_file::error::NONE)
 		{
 			m_frame_timer->adjust(attotime::never);
+			return;
 		}
+		m_frame_num++;
+		if (m_frame_num >= m_frame_count)
+		{
+			m_frame_num = 0;
+		}
+	}
+	else
+	{
+		m_frame_timer->adjust(attotime::never);
 	}
 }
 

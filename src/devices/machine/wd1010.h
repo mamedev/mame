@@ -54,7 +54,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(update_seek);
+	TIMER_CALLBACK_MEMBER(delayed_read);
+	TIMER_CALLBACK_MEMBER(delayed_write);
 
 private:
 	enum
@@ -89,13 +92,6 @@ private:
 		CMD_SCAN_ID = 4,
 		CMD_WRITE_FORMAT = 5,
 		CMD_SEEK = 7
-	};
-
-	enum
-	{
-		TIMER_SEEK,
-		TIMER_READ,
-		TIMER_WRITE
 	};
 
 	void set_error(int error);

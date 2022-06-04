@@ -75,7 +75,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -93,6 +92,7 @@ private:
 
 	required_device<floppy_connector> m_floppy;
 
+	TIMER_CALLBACK_MEMBER(rxd_tick);
 	bool read_bit();
 	void write_bit(bool bit);
 

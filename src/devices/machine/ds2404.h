@@ -46,7 +46,7 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 private:
 	void rom_cmd(uint8_t cmd);

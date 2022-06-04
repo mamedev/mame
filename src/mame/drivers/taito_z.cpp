@@ -1320,17 +1320,10 @@ void dblaxle_state::dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
                         INTERRUPTS
 ***********************************************************/
 
-void sci_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sci_state::trigger_int6)
 {
-	switch (id)
-	{
-	case TIMER_TAITOZ_INTERRUPT6:
-		/* 68000 A */
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in taitoz_state::device_timer");
-	}
+	/* 68000 A */
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /***** Routines for particular games *****/
@@ -1344,7 +1337,7 @@ INTERRUPT_GEN_MEMBER(sci_state::sci_interrupt)
 	m_sci_int6 = !m_sci_int6;
 
 	if (m_sci_int6)
-		timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_TAITOZ_INTERRUPT6);
+		m_int6_timer->adjust(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500));
 
 	device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -3169,6 +3162,8 @@ void sci_state::machine_start()
 	taitoz_z80_sound_state::machine_start();
 
 	save_item(NAME(m_sci_int6));
+
+	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
 }
 
 void nightstr_state::machine_start()
@@ -3208,6 +3203,7 @@ void sci_state::machine_reset()
 	taitoz_z80_sound_state::machine_reset();
 
 	m_sci_int6 = 0;
+	m_int6_timer->adjust(attotime::never);
 }
 
 void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vdisp_end)

@@ -551,11 +551,11 @@ void missile_state::machine_start()
 	m_ctrld = 0;
 
 	/* create a timer to speed/slow the CPU */
-	m_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::adjust_cpu_speed),this));
+	m_cpu_timer = timer_alloc(FUNC(missile_state::adjust_cpu_speed), this);
 	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::clock_irq),this));
+	m_irq_timer = timer_alloc(FUNC(missile_state::clock_irq), this);
 	m_irq_state = 0;
 	schedule_next_irq(-32);
 

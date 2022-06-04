@@ -338,7 +338,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 
 void mpf1_state::machine_start()
 {
-	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpf1_state::led_refresh),this));
+	m_led_refresh_timer = timer_alloc(FUNC(mpf1_state::led_refresh), this);
 	m_digits.resolve();
 	m_leds.resolve();
 

@@ -2033,7 +2033,7 @@ GFXDECODE_END
 void cave_state::machine_start()
 {
 	m_led_outputs.resolve();
-	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::vblank_end), this));
+	m_vblank_end_timer = timer_alloc(FUNC(cave_state::vblank_end), this);
 
 	save_item(NAME(m_soundbuf_wptr));
 	save_item(NAME(m_soundbuf_rptr));

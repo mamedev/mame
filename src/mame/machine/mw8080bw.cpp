@@ -99,7 +99,7 @@ IRQ_CALLBACK_MEMBER(mw8080bw_state::interrupt_vector)
 
 void mw8080bw_state::mw8080bw_create_interrupt_timer(  )
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::interrupt_trigger),this));
+	m_interrupt_timer = timer_alloc(FUNC(mw8080bw_state::interrupt_trigger), this);
 }
 
 

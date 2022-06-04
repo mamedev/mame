@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(metro_state::k053936_gstrik2_get_tile_info)
 			0);
 }
 
-void metro_state::k053936_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void metro_state::k053936_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_k053936_ram[offset]);
 	m_k053936_tilemap->mark_tile_dirty(offset);

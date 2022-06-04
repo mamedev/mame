@@ -155,7 +155,9 @@ void pioneer_ldv1000_device::device_start()
 	laserdisc_device::device_start();
 
 	// allocate timers
-	m_multitimer = timer_alloc(TID_MULTIJUMP);
+	m_multitimer = timer_alloc(FUNC(pioneer_ldv1000_device::multijump_tick), this);
+	m_vsync_off_timer = timer_alloc(FUNC(pioneer_ldv1000_device::vsync_off), this);
+	m_process_vbi_timer = timer_alloc(FUNC(pioneer_ldv1000_device::process_vbi_data), this);
 
 	m_command_strobe_cb.resolve_safe();
 }
@@ -187,73 +189,72 @@ void pioneer_ldv1000_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  vsync_off - clear the VSYNC flag
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pioneer_ldv1000_device::vsync_off)
 {
-	switch (id)
+	m_vsync = false;
+}
+
+
+//-------------------------------------------------
+//  multijump_tick - move the slider across
+//  multiple tracks
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(pioneer_ldv1000_device::multijump_tick)
+{
+	// bit 5 of port B on PPI 1 selects the direction of slider movement
+	int direction = (m_portb1 & 0x20) ? 1 : -1;
+	advance_slider(direction);
+
+	// update down counter and reschedule
+	if (--m_counter != 0)
+		m_multitimer->adjust(MULTIJUMP_TRACK_TIME);
+}
+
+
+//-------------------------------------------------
+//  process_vbi_data - process VBI data which was
+//  fetched by the parent device
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(pioneer_ldv1000_device::process_vbi_data)
+{
+	// appears to return data in reverse order
+	uint32_t lines[3];
+	lines[0] = get_field_code(LASERDISC_CODE_LINE1718, false);
+	lines[1] = get_field_code(LASERDISC_CODE_LINE17, false);
+	lines[2] = get_field_code(LASERDISC_CODE_LINE16, false);
+
+	// fill in the details
+	memset(m_vbi, 0, sizeof(m_vbi));
+	if (focus_on() && laser_on())
 	{
-		case TID_MULTIJUMP:
+		// loop over lines
+		for (int line = 0; line < 3; line++)
 		{
-			// bit 5 of port B on PPI 1 selects the direction of slider movement
-			int direction = (m_portb1 & 0x20) ? 1 : -1;
-			advance_slider(direction);
+			uint8_t *dest = &m_vbi[line * 7];
+			uint32_t data = lines[line];
 
-			// update down counter and reschedule
-			if (--m_counter != 0)
-				timer.adjust(MULTIJUMP_TRACK_TIME);
-			break;
-		}
-
-		case TID_VSYNC_OFF:
-			m_vsync = false;
-			break;
-
-		case TID_VBI_DATA_FETCH:
-		{
-			// appears to return data in reverse order
-			uint32_t lines[3];
-			lines[0] = get_field_code(LASERDISC_CODE_LINE1718, false);
-			lines[1] = get_field_code(LASERDISC_CODE_LINE17, false);
-			lines[2] = get_field_code(LASERDISC_CODE_LINE16, false);
-
-			// fill in the details
-			memset(m_vbi, 0, sizeof(m_vbi));
-			if (focus_on() && laser_on())
+			// the logic only processes leadin/leadout/frame number codes
+			if (data == VBI_CODE_LEADIN || data == VBI_CODE_LEADOUT || (data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 			{
-				// loop over lines
-				for (int line = 0; line < 3; line++)
-				{
-					uint8_t *dest = &m_vbi[line * 7];
-					uint32_t data = lines[line];
-
-					// the logic only processes leadin/leadout/frame number codes
-					if (data == VBI_CODE_LEADIN || data == VBI_CODE_LEADOUT || (data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-					{
-						*dest++ = 0x09 | (((data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE) ? 0x02 : 0x00);
-						*dest++ = 0x08;
-						*dest++ = (data >> 16) & 0x0f;
-						*dest++ = (data >> 12) & 0x0f;
-						*dest++ = (data >>  8) & 0x0f;
-						*dest++ = (data >>  4) & 0x0f;
-						*dest++ = (data >>  0) & 0x0f;
-					}
-				}
+				*dest++ = 0x09 | (((data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE) ? 0x02 : 0x00);
+				*dest++ = 0x08;
+				*dest++ = (data >> 16) & 0x0f;
+				*dest++ = (data >> 12) & 0x0f;
+				*dest++ = (data >>  8) & 0x0f;
+				*dest++ = (data >>  4) & 0x0f;
+				*dest++ = (data >>  0) & 0x0f;
 			}
-
-			// signal that data is ready and reset the readback index
-			m_vbiready = true;
-			m_vbiindex = 0;
-			break;
 		}
-
-		// pass everything else onto the parent
-		default:
-			laserdisc_device::device_timer(timer, id, param);
-			break;
 	}
+
+	// signal that data is ready and reset the readback index
+	m_vbiready = true;
+	m_vbiindex = 0;
 }
 
 
@@ -309,10 +310,10 @@ void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 
 	// signal VSYNC and set a timer to turn it off
 	m_vsync = true;
-	timer_set(screen().scan_period() * 4, TID_VSYNC_OFF);
+	m_vsync_off_timer->adjust(screen().scan_period() * 4);
 
 	// also set a timer to fetch the VBI data when it is ready
-	timer_set(screen().time_until_pos(19*2), TID_VBI_DATA_FETCH);
+	m_process_vbi_timer->adjust(screen().time_until_pos(19*2));
 
 	// boost interleave for the first 1ms to improve communications
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));

@@ -168,9 +168,9 @@ void atari_vad_device::device_start()
 	m_scanline_int_cb.resolve_safe();
 
 	// allocate timers
-	m_scanline_int_timer = timer_alloc(TID_SCANLINE_INT);
-	m_tilerow_update_timer = timer_alloc(TID_TILEROW_UPDATE);
-	m_eof_timer = timer_alloc(TID_EOF);
+	m_scanline_int_timer = timer_alloc(FUNC(atari_vad_device::scanline_int), this);
+	m_tilerow_update_timer = timer_alloc(FUNC(atari_vad_device::update_tilerow), this);
+	m_eof_timer = timer_alloc(FUNC(atari_vad_device::eof_update), this);
 
 	// register for save states
 	save_item(NAME(m_palette_bank));          // which palette bank is enabled
@@ -208,27 +208,14 @@ void atari_vad_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer: Handle device-specific timer
-//  calbacks
+//  scanline_int - trigger a scanline interrupt
 //-------------------------------------------------
 
-void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(atari_vad_device::scanline_int)
 {
-	switch (id)
-	{
-		case TID_SCANLINE_INT:
-			m_scanline_int_cb(ASSERT_LINE);
-			break;
-
-		case TID_TILEROW_UPDATE:
-			update_tilerow(timer, param);
-			break;
-
-		case TID_EOF:
-			eof_update(timer);
-			break;
-	}
+	m_scanline_int_cb(ASSERT_LINE);
 }
+
 
 
 //-------------------------------------------------
@@ -421,8 +408,10 @@ void atari_vad_device::update_parameter(uint16_t newword)
 //  rowscrolling.
 //-------------------------------------------------
 
-void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
+TIMER_CALLBACK_MEMBER(atari_vad_device::update_tilerow)
 {
+	int scanline = param;
+
 	// skip if out of bounds, or not enabled
 	if (scanline <= screen().visible_area().bottom() && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
 	{
@@ -446,7 +435,7 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 	scanline += ((m_control[0x0a] & 0x2000) != 0) ? 1 : 8;
 	if (scanline >= screen().height())
 		scanline = 0;
-	timer.adjust(screen().time_until_pos(scanline), scanline);
+	m_tilerow_update_timer->adjust(screen().time_until_pos(scanline), scanline);
 }
 
 
@@ -456,7 +445,7 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 //  every refresh.
 //-------------------------------------------------
 
-void atari_vad_device::eof_update(emu_timer &timer)
+TIMER_CALLBACK_MEMBER(atari_vad_device::eof_update)
 {
 	// echo all the commands to the video controller
 	for (int i = 0; i < 0x1c; i++)
@@ -472,7 +461,7 @@ void atari_vad_device::eof_update(emu_timer &timer)
     m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
     if (m_playfield2_tilemap != nullptr)
         m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
-	timer.adjust(screen().time_until_pos(0));
+	m_eof_timer->adjust(screen().time_until_pos(0));
 
 	// use this for debugging the video controller values
 #if 0

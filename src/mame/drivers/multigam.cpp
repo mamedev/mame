@@ -219,7 +219,7 @@ private:
 	void multigam_init_mmc1(uint8_t *prg_base, int prg_size, int chr_bank_base);
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
-	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
+	void multigam3_mmc3_scanline_cb(int scanline, bool vblank, bool blanked);
 	void multigam_map(address_map &map);
 	void multigm3_map(address_map &map);
 	void multigmt_map(address_map &map);
@@ -441,7 +441,7 @@ void multigam_state::ppu_map(address_map &map)
 *******************************************************/
 
 
-void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int blanked )
+void multigam_state::multigam3_mmc3_scanline_cb(int scanline, bool vblank, bool blanked)
 {
 	if (!vblank && !blanked)
 	{

@@ -2080,13 +2080,13 @@ void sa1111_device::device_start()
 	save_item(NAME(m_card_regs.pcssr));
 	save_item(NAME(m_card_regs.pcsr));
 
-	m_audio_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_rx_callback), this));
-	m_audio_regs.rx_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_rx_dma_callback), this));
-	m_audio_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_tx_callback), this));
-	m_audio_regs.tx_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_tx_dma_callback), this));
+	m_audio_regs.rx_timer = timer_alloc(FUNC(sa1111_device::audio_rx_callback), this);
+	m_audio_regs.rx_dma_timer = timer_alloc(FUNC(sa1111_device::audio_rx_dma_callback), this);
+	m_audio_regs.tx_timer = timer_alloc(FUNC(sa1111_device::audio_tx_callback), this);
+	m_audio_regs.tx_dma_timer = timer_alloc(FUNC(sa1111_device::audio_tx_dma_callback), this);
 
-	m_ssp_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::ssp_rx_callback), this));
-	m_ssp_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::ssp_tx_callback), this));
+	m_ssp_regs.rx_timer = timer_alloc(FUNC(sa1111_device::ssp_rx_callback), this);
+	m_ssp_regs.tx_timer = timer_alloc(FUNC(sa1111_device::ssp_tx_callback), this);
 
 	m_irq_out.resolve_safe();
 	m_gpio_out.resolve_all_safe();

@@ -153,28 +153,13 @@ public:
 
 	void uchroma68(machine_config &config);
 
-	enum
-	{
-		TIMER_KBD_STROBE
-	};
-
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6846_device> m_mc6846;
-	required_device<mc6847_ntsc_device> m_mc6847;
-	required_device<pia6821_device> m_pia;
-	required_device<acia6850_device> m_acia;
-	required_device<clock_device> m_acia_tx_clock;
-	required_device<screen_device> m_screen;
-	required_shared_ptr<uint8_t> m_video_ram;
-	required_device<cassette_image_device> m_cass;
-	required_ioport m_semi_graphics_six_mod;
-
-	void uchroma68_mem(address_map &map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	void uchroma68_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(kbd_strobe);
 
 	uint8_t mc6847_videoram_r(offs_t offset);
 	uint8_t pia_pa_r();
@@ -188,8 +173,25 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	uint8_t m_cass_rx_clock_count, m_cass_rx_period, m_cass_txcount;
-	bool m_cass_in, m_cass_inbit, m_cass_txbit, m_cass_last_txbit;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6846_device> m_mc6846;
+	required_device<mc6847_ntsc_device> m_mc6847;
+	required_device<pia6821_device> m_pia;
+	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_tx_clock;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_device<cassette_image_device> m_cass;
+	required_ioport m_semi_graphics_six_mod;
+
+	uint8_t m_cass_rx_clock_count;
+	uint8_t m_cass_rx_period;
+	uint8_t m_cass_txcount;
+	bool m_cass_in;
+	bool m_cass_inbit;
+	bool m_cass_txbit;
+	bool m_cass_last_txbit;
 };
 
 
@@ -249,17 +251,10 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void uchroma68_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(uchroma68_state::kbd_strobe)
 {
-	switch (id)
-	{
-	case TIMER_KBD_STROBE:
-		m_kbd_strobe = 1;
-		m_kbd_data = 0;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in uchroma68_state::device_timer");
-	}
+	m_kbd_strobe = 1;
+	m_kbd_data = 0;
 }
 
 void uchroma68_state::mc6846_out_w(uint8_t data)
@@ -388,7 +383,7 @@ WRITE_LINE_MEMBER(uchroma68_state::kansas_w)
 
 void uchroma68_state::machine_start()
 {
-	m_kbd_strobe_timer = timer_alloc(TIMER_KBD_STROBE);
+	m_kbd_strobe_timer = timer_alloc(FUNC(uchroma68_state::kbd_strobe), this);
 	m_kbd_strobe = 1;
 
 	save_item(NAME(m_kbd_strobe));

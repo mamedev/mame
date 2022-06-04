@@ -142,7 +142,7 @@ void aim65_state::machine_start()
 	save_item(NAME(m_printer_y));
 	save_item(NAME(m_printer_flag));
 	save_item(NAME(m_printer_level));
-	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::printer_timer),this));
+	m_print_timer = timer_alloc(FUNC(aim65_state::printer_timer), this);
 	m_printerRAM = make_unique_clear<uint16_t[]>(64*100);
 	save_pointer(NAME(m_printerRAM), 64*100);
 }

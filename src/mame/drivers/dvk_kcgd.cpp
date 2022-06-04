@@ -89,15 +89,14 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+
+	//TIMER_CALLBACK_MEMBER(vsync_tick);
+	TIMER_CALLBACK_MEMBER(toggle_500hz);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void kcgd_palette(palette_device &palette) const;
 
-	enum timer_ids : unsigned
-	{
-		TIMER_ID_VSYNC,
-		TIMER_ID_500HZ
-	};
 	enum status_bits : unsigned
 	{
 		KCGD_STATUS_PAGE = 0,
@@ -107,8 +106,6 @@ private:
 		KCGD_STATUS_MODE_LAST = 7,
 		KCGD_STATUS_TIMER_VAL = 15
 	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint16_t vram_addr_r();
 	uint16_t vram_data_r();
@@ -187,19 +184,16 @@ static DEVICE_INPUT_DEFAULTS_START( host_rs232_defaults )
 DEVICE_INPUT_DEFAULTS_END
 
 
-void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
 /*
-    case TIMER_ID_VSYNC:
-        m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
-        break;
+TIMER_CALLBACK_MEMBER(kcgd_state::vsync_tick)
+{
+	m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
+}
 */
-	case TIMER_ID_500HZ:
-		m_video.status ^= (1 << KCGD_STATUS_TIMER_VAL);
-		break;
-	}
+
+TIMER_CALLBACK_MEMBER(kcgd_state::toggle_500hz)
+{
+	m_video.status ^= (1 << KCGD_STATUS_TIMER_VAL);
 }
 
 void kcgd_state::machine_reset()
@@ -215,9 +209,9 @@ void kcgd_state::machine_start()
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ - 1, 0, KCGD_DISP_VERT - 1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 // future
-//  m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC);
+//  m_vsync_on_timer = timer_alloc(FUNC(kcgd_state::vsync_tick), this);
 //  m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
-	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
+	m_500hz_timer = timer_alloc(FUNC(kcgd_state::toggle_500hz), this);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
 

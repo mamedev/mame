@@ -41,23 +41,23 @@ public:
 	void driver_init() override;
 
 protected:
-	enum
-	{
-		TIMER_SLAPSHOT_INTERRUPT6
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(trigger_int6);
 
 private:
 	struct slapshot_tempsprite
 	{
 		u8 gfx = 0;
-		u32 code = 0, color = 0;
-		bool flipx = false, flipy = false;
-		int x = 0, y = 0;
-		int zoomx = 0, zoomy = 0;
+		u32 code = 0;
+		u32 color = 0;
+		bool flipx = false;
+		bool flipy = false;
+		int x = 0;
+		int y = 0;
+		int zoomx = 0;
+		int zoomy = 0;
 		u32 primask = 0;
 	};
 

@@ -827,7 +827,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="roadaven">
+	<software name="roadaven" supported="no">
 		<!-- source redump.org
 		<rom name="Road Avenger (Europe).cue" size="442" crc="c852ae6d" />
 		<rom name="Road Avenger (Europe) (Track 1).bin" size="317816352" crc="c15fde6f" />
@@ -838,6 +838,9 @@ license:CC0
 		<description>Road Avenger (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4603"/>
 		<info name="ring_code" value="MK-4603P-00053-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
@@ -2434,7 +2437,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ntrap32" cloneof="ntrap">
+	<software name="ntrap32" cloneof="ntrap" supported="no">
 		<!-- source toseciso
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 1 of 2)[!][32X].cue" size="319" crc="57fec2f6" />
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 1 of 2)(Track 1 of 2)[!][32X].iso" size="537303040" crc="12027282" />
@@ -2447,6 +2450,11 @@ license:CC0
 		<description>Night Trap (Euro, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16202F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -2940,7 +2948,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="slamcity32" cloneof="slamcity">
+	<software name="slamcity32" cloneof="slamcity" supported="no">
 		<!-- source toseciso
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)[!][Fingers][32X].cue" size="375" crc="d6b57cf0" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)(Track 1 of 2)[!][Fingers][32X].iso" size="529147904" crc="56a8ad9c" />
@@ -2961,6 +2969,11 @@ license:CC0
 		<description>Slam City with Scottie Pippen (Euro, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16204F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -3148,7 +3161,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="supremew32" cloneof="supremew">
+	<software name="supremew32" cloneof="supremew" supported="no">
 		<!-- source toseciso
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 1 of 2)[!][Fire & Earth][32X].cue" size="397" crc="e1c77730" />
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 1 of 2)(Track 1 of 2)[!][Fire & Earth][32X].iso" size="459593728" crc="d8c88078" />
@@ -3161,6 +3174,11 @@ license:CC0
 		<description>Supreme Warrior - Ying Heung (Euro, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16203F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">

@@ -78,7 +78,6 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	void get_pens(pen_t *pens);
-	void scanline_callback(uint32_t data);
 };
 
 class starfire_state : public starfire_base_state

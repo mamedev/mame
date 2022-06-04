@@ -362,7 +362,7 @@ public:
 
 	void start();
 	void reset();
-	void timer(emu_timer &timer, device_timer_id id, int param);
+	void timer(int param);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);

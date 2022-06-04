@@ -81,6 +81,7 @@ namespace plib {
 #include "ptypes.h"
 
 #include <algorithm>
+#include <cstddef> // ptrdiff_t
 #include <cstdint> // uintptr_t
 #include <type_traits>
 #include <utility>
@@ -89,7 +90,7 @@ namespace plib {
 //  Macro magic
 //============================================================
 
-//#define PPMF_FORCE_TYPE 0
+//#define PPMF_FORCE_TYPE 1
 
 #ifndef PPMF_FORCE_TYPE
 #define PPMF_FORCE_TYPE -1
@@ -162,11 +163,31 @@ namespace plib {
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
-		// actual state
+		/// \brief Byte offset into the vtable
+		///
+		/// On x86-64, the vtable contains pointers to code, and function pointers
+		/// are pointers to code. To obtain a function pointer for a virtual
+		/// member function, you fetch a pointer to code from the vtable.
+		///
+		/// On traditional PPC64, the vtable contains pointers to function
+		/// descriptors, and function pointers are pointers to function descriptors.
+		/// To obtain a function pointer for a virtual member function, you
+		/// fetch a pointer to a function descriptor from the vtable.
+		///
+		/// On IA64, the vtable contains function descriptors, and function
+		/// pointers are pointers to function descriptors. To obtain a
+		/// function pointer for a virtual member function, you calculate
+		/// the address of the function descriptor in the vtable.
+		///
+		/// Simply adding the byte offset to the vtable pointer creates a
+		/// function pointer on IA64 because the vtable contains function
+		/// descriptors; on most other targets, the vtable contains function
+		/// pointers, so you need to fetch the function pointer after
+		/// calculating its address in the vtable.
+		///
 		uintptr_t m_function;   // first item can be one of two things:
-								//    if even, it's a pointer to the function
+								//    if even, it's a function pointer
 								//    if odd, it's the byte offset into the vtable
-								//       or a byte offset into the function descriptors on IA64
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer
 	};
 
@@ -184,10 +205,10 @@ namespace plib {
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
 		// actual state
-		uintptr_t m_function;   // first item can pointer to the function or a byte offset into the vtable
+		uintptr_t m_function;   // first item can be a function pointer or a byte offset into the vtable
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer after right shifting by one bit
-								//    m_function is the byte offset into the vtable
-								//    On IA64 it may also be a byte offset into the function descriptors
+								//    if even, m_function is a fuction pointer
+								//    if odd, m_function is the byte offset into the vtable
 	};
 
 	template <>
@@ -300,7 +321,6 @@ namespace plib {
 		static R stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true);
 	};
 
-#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
 	struct mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>
 	{
@@ -325,7 +345,6 @@ namespace plib {
 		member_abi_function<mfp_generic_class>  m_resolved;
 		mfp_generic_class    *m_obj;
 	};
-#endif
 
 	template <ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	using pmfp_helper_select = std::conditional<
@@ -338,6 +357,7 @@ namespace plib {
 	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	class pmfp_base<PMFINTERNAL, R (Targs...)> : public pmfp_helper_select<PMFINTERNAL, R, Targs...>::type
 	{
+		static_assert((compile_info::env::value != ci_env::NVCC) || (PMFINTERNAL != ppmf_type::GNUC_PMF_CONV), "GNUC_PMF_CONV not supported by nvcc");
 	public:
 		using helper = typename pmfp_helper_select<PMFINTERNAL, R, Targs...>::type;
 
@@ -394,6 +414,7 @@ namespace plib {
 	/// is virtual, the vtable may not yet be fully constructed. In these cases
 	/// the following class allows to construct the delegate later.
 	///
+	/// ```
 	///     plib::late_pmfp<plib::pmfp<void, pstring>> a(&nld_7493::printer);
 	///     // Store the a object somewhere
 	///
@@ -401,7 +422,7 @@ namespace plib {
 	///
 	///     auto delegate_obj = a(this);
 	///     delegate_obj(pstring("Hello World!"));
-	///
+	/// ```
 	template<typename T>
 	class late_pmfp
 	{
@@ -472,8 +493,8 @@ namespace plib {
 	{
 		typename traits::template specific_member_function<O> pFunc;
 		static_assert(sizeof(pFunc) >= sizeof(F), "size error");
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		//*reinterpret_cast<F *>(&pFunc) = *mftp;
+		//# NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		//# *reinterpret_cast<F *>(&pFunc) = *mftp;
 		reinterpret_copy(*mftp, pFunc);
 		raw_type mfpo(pFunc);
 		generic_function_storage rfunc(nullptr);
@@ -516,7 +537,6 @@ namespace plib {
 		return (obj->*(*func))(std::forward<Targs>(args)...);
 	}
 
-#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
 	mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::mfp_helper()
 	: m_obj(nullptr)
@@ -530,13 +550,15 @@ namespace plib {
 	template<typename O, typename F>
 	void mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::bind(O *object, F *mftp)
 	{
+		// nvcc still tries to compile the code below - even when shielded with a `if constexpr`
+#if !defined(__NVCC__)
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		member_abi_function<O> t = reinterpret_cast<member_abi_function<O>>(object->*(*mftp));
 		reinterpret_copy(t, this->m_resolved);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		m_obj = reinterpret_cast<mfp_generic_class *>(object);
-	}
 #endif
+	}
 
 	template<typename T>
 	template<typename O>

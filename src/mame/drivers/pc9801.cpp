@@ -946,18 +946,13 @@ template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 	return res;
 }
 
-void pc9801vm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
 {
-	switch (id)
+	// TODO: sorcer definitely expects this irq to be taken
+	if (BIT(m_fdc_2hd_ctrl, 2))
 	{
-		case TIMER_FDC_TRIGGER:
-			// TODO: sorcer definitely expects this irq to be taken
-			if (bool(BIT(m_fdc_2hd_ctrl, 2)))
-			{
-				m_pic2->ir2_w(0);
-				m_pic2->ir2_w(1);
-			}
-			break;
+		m_pic2->ir2_w(0);
+		m_pic2->ir2_w(1);
 	}
 }
 
@@ -1922,7 +1917,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_sys_type = 0x80 >> 6;
 
-	m_fdc_timer = timer_alloc(TIMER_FDC_TRIGGER);
+	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
 
 	save_item(NAME(m_dac1bit_disable));
 

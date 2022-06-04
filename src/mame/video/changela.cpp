@@ -29,7 +29,7 @@ void changela_state::video_start()
 	m_screen->register_screen_bitmap(m_tree0_bitmap);
 	m_screen->register_screen_bitmap(m_tree1_bitmap);
 
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(changela_state::changela_scanline_callback),this));
+	m_scanline_timer = timer_alloc(FUNC(changela_state::changela_scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(30), 30);
 
 	save_pointer(NAME(m_memory_devices), 4 * 0x800);

@@ -525,4 +525,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

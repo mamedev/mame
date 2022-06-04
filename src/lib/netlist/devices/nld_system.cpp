@@ -89,9 +89,9 @@ namespace netlist::devices {
 			// continue with optimized clock handlers ....
 
 			if ((m_size & (m_size-1)) == 0) // power of 2?
-				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
+				m_feedback.set_delegate(nl_delegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
 			else
-				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2, this));
+				m_feedback.set_delegate(nl_delegate(&NETLIB_NAME(extclock)::clk2, this));
 		}
 
 

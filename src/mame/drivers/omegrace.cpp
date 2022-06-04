@@ -286,7 +286,7 @@ void omegrace_state::machine_start()
 
 	// Interrupt caused by overflow pulses from 74LS161 clocked by 74LS393 dividing .75 MHz output of 74LS161
 	attotime period = attotime::from_hz(12_MHz_XTAL/16/256/12); // ~250 Hz
-	m_gbnmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(omegrace_state::periodic_int), this));
+	m_gbnmi = timer_alloc(FUNC(omegrace_state::periodic_int), this);
 	m_gbnmi->adjust(period, 0, period); // first NMI must not arrive immediately
 }
 

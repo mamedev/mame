@@ -1341,7 +1341,7 @@ void isa16_sblaster16_device::device_start()
 
 void sb_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(sb_device::timer_tick), this);
 
 	save_item(NAME(m_dack_out));
 	save_item(NAME(m_onebyte_midi));
@@ -1559,11 +1559,8 @@ void sb_device::dack_w(int line, uint8_t data)
 	}
 }
 
-void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(sb_device::timer_tick)
 {
-	if (tid)
-		return;
-
 //    printf("DMA timer expire\n");
 	uint16_t lsample, rsample;
 	switch (m_dsp.flags) {

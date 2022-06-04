@@ -48,7 +48,7 @@ TIMER_CALLBACK_MEMBER(toobin_state::scanline_interrupt)
 
 void toobin_state::machine_start()
 {
-	m_scanline_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(toobin_state::scanline_interrupt), this));
+	m_scanline_interrupt_timer = timer_alloc(FUNC(toobin_state::scanline_interrupt), this);
 }
 
 

@@ -61,7 +61,7 @@ namespace netlist::devices {
 		, m_cnt(*this, "_m_cnt", 0)
 		, m_rate(*this, "_m_rate", 0)
 		, m_state(*this, "_m_state", 0)
-		, m_lastclock(*this, "_m_lastclock", 0)
+		, m_last_clock(*this, "_m_lastclock", 0)
 		, m_power_pins(*this)
 		{
 		}
@@ -71,7 +71,7 @@ namespace netlist::devices {
 		{
 			m_cnt = 0;
 			m_rate = 0;
-			m_lastclock = 0;
+			m_last_clock = 0;
 		}
 
 		NETLIB_HANDLERI(unity)
@@ -89,12 +89,12 @@ namespace netlist::devices {
 		{
 			netlist_sig_t clk = m_CLK();
 
-			if (!m_lastclock && clk && !m_ENQ() && !m_CLR())
+			if (!m_last_clock && clk && !m_ENQ() && !m_CLR())
 			{
 				m_cnt++;
 				m_cnt &= 63;
 			}
-			m_lastclock = clk;
+			m_last_clock = clk;
 
 			const netlist_sig_t clk_strb = (clk ^ 1) & (m_STRBQ() ^ 1);
 
@@ -140,7 +140,7 @@ namespace netlist::devices {
 		state_var_u8 m_cnt;
 		state_var_u8 m_rate;
 		state_var_sig m_state;
-		state_var_sig m_lastclock;
+		state_var_sig m_last_clock;
 		nld_power_pins m_power_pins;
 
 		void newstate(const netlist_sig_t state)

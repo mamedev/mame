@@ -4,18 +4,18 @@
 ///
 /// \file test_pmfp_multibase.cpp
 ///
-/// tests for plib::pmfp
+/// tests for `plib::pmfp`
 ///
 
 #include "plib/ptypes.h"
 #include "plib/pexception.h"
 #include "plib/ppmf.h"
 
-#include <utility>
+#include <iostream>
 #include <memory>
 #include <type_traits>
 #include <typeinfo>
-#include <iostream>
+#include <utility>
 
 template <class F, class S>
 typename std::enable_if_t<!plib::has_ostream_operator<std::basic_ostream<char>, std::pair<F, S>>::value, std::basic_ostream<char>&>

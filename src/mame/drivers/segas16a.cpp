@@ -276,7 +276,7 @@ void segas16a_state::standard_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 			// the port C handshaking signals control the Z80 NMI,
 			// so we have to sync whenever we access this PPI
 			if (ACCESSING_BITS_0_7)
-				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(segas16a_state::ppi_sync), this), ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
 	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2, data, mem_mask);
@@ -604,13 +604,25 @@ WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_reset - reset the state of the machine
+//  machine_start
+//-------------------------------------------------
+
+void segas16a_state::machine_start()
+{
+	m_lamps.resolve();
+
+	m_i8751_sync_timer = timer_alloc(FUNC(segas16a_state::i8751_sync), this);
+}
+
+
+//-------------------------------------------------
+//  machine_reset
 //-------------------------------------------------
 
 void segas16a_state::machine_reset()
 {
 	// queue up a timer to either boost interleave or disable the MCU
-	synchronize(TID_INIT_I8751);
+	m_i8751_sync_timer->adjust(attotime::zero);
 	m_video_control = 0;
 	m_mcu_control = 0x00;
 	m_n7751_command = 0;
@@ -623,26 +635,22 @@ void segas16a_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  timer events
 //-------------------------------------------------
 
-void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segas16a_state::i8751_sync)
 {
-	switch (id)
-	{
-		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
-		case TID_INIT_I8751:
-			if (!m_i8751_vblank_hook.isnull())
-				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != nullptr)
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
-			break;
+	// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
+	if (!m_i8751_vblank_hook.isnull())
+		m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
+	else if (m_mcu != nullptr)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+}
 
-		// synchronize writes to the 8255 PPI
-		case TID_PPI_WRITE:
-			m_i8255->write(param >> 8, param & 0xff);
-			break;
-	}
+TIMER_CALLBACK_MEMBER(segas16a_state::ppi_sync)
+{
+	// synchronize writes to the 8255 PPI
+	m_i8255->write(param >> 8, param & 0xff);
 }
 
 

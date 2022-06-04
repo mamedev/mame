@@ -500,7 +500,7 @@ void xain_state::xsleena(machine_config &config)
 	MC6809E(config, m_subcpu, CPU_CLOCK); // 68B09E
 	m_subcpu->set_addrmap(AS_PROGRAM, &xain_state::cpu_map_B);
 
-	MC6809(config, m_audiocpu, PIXEL_CLOCK); // 68A09
+	MC6809(config, m_audiocpu, CPU_CLOCK); // 68A09
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xain_state::sound_map);
 
 	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);

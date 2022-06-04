@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
-//
-// nl_factory.cpp
-//
+///
+/// \file nl_factory.cpp
+///
 
-#include "nl_factory.h"
-#include "nl_base.h"
 #include "nl_errstr.h"
+#include "nl_factory.h"
 #include "nl_setup.h"
+
+#include "core/core_device.h"
+
 #include "plib/putil.h"
 
 namespace netlist::factory {

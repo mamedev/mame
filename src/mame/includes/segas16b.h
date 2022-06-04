@@ -54,6 +54,7 @@ public:
 		, m_cxdio(*this, "cxdio")
 		, m_upd4701a(*this, "upd4701a%u", 1U)
 		, m_workram(*this, "workram")
+		, m_i8751_sync_timer(nullptr)
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_tilemap_type(segaic16_video_device::TILEMAP_16B)
 		, m_custom_io_r(*this)
@@ -188,13 +189,6 @@ protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 
-	// timer IDs
-	enum
-	{
-		TID_INIT_I8751,
-		TID_ATOMICP_SOUND_IRQ
-	};
-
 	// rom board types
 	enum segas16b_rom_board
 	{
@@ -209,9 +203,11 @@ protected:
 
 	// device overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(i8751_sync);
+	TIMER_CALLBACK_MEMBER(atomicp_sound_irq);
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
@@ -253,26 +249,29 @@ protected:
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
 
+	// timers
+	emu_timer *         m_i8751_sync_timer;
+
 	// configuration
 	segas16b_rom_board  m_romboard;
 	int                 m_tilemap_type;
-	read16_delegate   m_custom_io_r;
+	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
 	bool                m_disable_screen_blanking;
-	const uint8_t *       m_i8751_initial_config;
+	const uint8_t *     m_i8751_initial_config;
 	i8751_sim_delegate  m_i8751_vblank_hook;
-	uint8_t               m_atomicp_sound_divisor;
+	uint8_t             m_atomicp_sound_divisor;
 
 	// game-specific state
-	uint8_t               m_atomicp_sound_count;
-	uint8_t               m_hwc_input_value;
+	uint8_t             m_atomicp_sound_count;
+	uint8_t             m_hwc_input_value;
 	optional_ioport     m_hwc_monitor;
 	optional_ioport     m_hwc_left;
 	optional_ioport     m_hwc_right;
 	optional_ioport     m_hwc_left_limit;
 	optional_ioport     m_hwc_right_limit;
-	uint8_t               m_mj_input_num;
-	uint8_t               m_mj_last_val;
+	uint8_t             m_mj_input_num;
+	uint8_t             m_mj_last_val;
 	optional_ioport_array<6> m_mj_inputs;
 	int                 m_spritepalbase;
 
@@ -403,7 +402,7 @@ private:
 	uint16_t          m_security_latch;
 	uint8_t           m_rle_control_position;
 	uint8_t           m_rle_control_byte;
-	bool            m_rle_latched;
+	bool              m_rle_latched;
 	uint8_t           m_rle_byte;
 	void isgsm_map(address_map &map);
 };

@@ -142,11 +142,11 @@ void com8116_device::device_start()
 	// allocate timers
 	if (!m_fx4_handler.isnull())
 	{
-		m_fx4_timer = timer_alloc(TIMER_FX4);
+		m_fx4_timer = timer_alloc(FUNC(com8116_device::fx4_tick), this);
 		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
 	}
-	m_fr_timer = timer_alloc(TIMER_FR);
-	m_ft_timer = timer_alloc(TIMER_FT);
+	m_fr_timer = timer_alloc(FUNC(com8116_device::fr_tick), this);
+	m_ft_timer = timer_alloc(FUNC(com8116_device::ft_tick), this);
 
 	for (int i = 0; i < 16; i++)
 		LOGMASKED(LOG_TABLE, "Output Frequency %01X: 16X %f Hz\n", i, double(clock()) / m_divisors[i] / 16.0);
@@ -171,28 +171,35 @@ void com8116_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  fx4_tick - toggle the FX4 timer output
 //-------------------------------------------------
 
-void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(com8116_device::fx4_tick)
 {
-	switch (id)
-	{
-	case TIMER_FX4:
-		m_fx4 = !m_fx4;
-		m_fx4_handler(m_fx4);
-		break;
+	m_fx4 = !m_fx4;
+	m_fx4_handler(m_fx4);
+}
 
-	case TIMER_FR:
-		m_fr = !m_fr;
-		m_fr_handler(m_fr);
-		break;
 
-	case TIMER_FT:
-		m_ft = !m_ft;
-		m_ft_handler(m_ft);
-		break;
-	}
+//-------------------------------------------------
+//  fr_tick - toggle the FR timer output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(com8116_device::fr_tick)
+{
+	m_fr = !m_fr;
+	m_fr_handler(m_fr);
+}
+
+
+//-------------------------------------------------
+//  ft_tick - toggle the FT timer output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(com8116_device::ft_tick)
+{
+	m_ft = !m_ft;
+	m_ft_handler(m_ft);
 }
 
 

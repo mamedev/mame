@@ -89,7 +89,7 @@ void ss50_mpt_device::device_add_mconfig(machine_config &config)
 
 void ss50_mpt_device::device_start()
 {
-	m_mpt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_mpt_device::mpt_timer_callback),this));
+	m_mpt_timer = timer_alloc(FUNC(ss50_mpt_device::mpt_timer_callback), this);
 	m_mpt_timer_state = 0;
 
 	save_item(NAME(m_mpt_timer_state));

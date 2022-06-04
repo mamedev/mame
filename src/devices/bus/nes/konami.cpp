@@ -122,7 +122,7 @@ void nes_konami_vrc2_device::pcb_reset()
 void nes_konami_vrc3_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_konami_vrc3_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
@@ -148,7 +148,7 @@ void nes_konami_vrc3_device::pcb_reset()
 void nes_konami_vrc4_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_konami_vrc4_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
@@ -309,21 +309,18 @@ void nes_konami_vrc2_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_konami_vrc3_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			u16 mask = m_irq_mode ? 0x00ff : 0xffff; // 8 or 16 bit mode?
+		u16 mask = m_irq_mode ? 0x00ff : 0xffff; // 8 or 16 bit mode?
 
-			// upper byte only incremented and reloaded in 16-bit mode
-			m_irq_count = (m_irq_count & ~mask) | ((m_irq_count + 1) & mask);
-			if (!(m_irq_count & mask))
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = (m_irq_count & ~mask) | (m_irq_count_latch & mask);
-			}
+		// upper byte only incremented and reloaded in 16-bit mode
+		m_irq_count = (m_irq_count & ~mask) | ((m_irq_count + 1) & mask);
+		if (!(m_irq_count & mask))
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_count = (m_irq_count & ~mask) | (m_irq_count_latch & mask);
 		}
 	}
 }
@@ -384,26 +381,23 @@ void nes_konami_vrc4_device::irq_tick()
 		m_irq_count++;
 }
 
-void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_konami_vrc4_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (m_irq_mode) // cycle mode
+			irq_tick();
+		else    // scanline mode
 		{
-			if (m_irq_mode) // cycle mode
-				irq_tick();
-			else    // scanline mode
-			{
-				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
-				// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
-				// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
-				m_irq_prescale -= 3;
+			// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
+			// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
+			// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
+			m_irq_prescale -= 3;
 
-				if (m_irq_prescale <= 0)
-				{
-					m_irq_prescale += 341;
-					irq_tick();
-				}
+			if (m_irq_prescale <= 0)
+			{
+				m_irq_prescale += 341;
+				irq_tick();
 			}
 		}
 	}

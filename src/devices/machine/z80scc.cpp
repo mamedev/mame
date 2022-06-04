@@ -1072,7 +1072,7 @@ void z80scc_channel::device_start()
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
 
-	m_baudtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80scc_channel::brg_tick), this));
+	m_baudtimer = timer_alloc(FUNC(z80scc_channel::brg_tick), this);
 
 	// state saving
 	save_item(NAME(m_rr0));

@@ -74,7 +74,7 @@ void deco_irq_device::device_start()
 	m_vblank_irq_cb.resolve_safe();
 
 	// allocate scanline timer and start it
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(deco_irq_device::scanline_callback), this));
+	m_scanline_timer = timer_alloc(FUNC(deco_irq_device::scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	// register for save states
