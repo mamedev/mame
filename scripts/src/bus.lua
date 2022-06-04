@@ -626,6 +626,8 @@ if (BUSES["BBC_MODEM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/modem/modem.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/modem/modem.h",
+		MAME_DIR .. "src/devices/bus/bbc/modem/meup.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/modem/meup.h",
 		MAME_DIR .. "src/devices/bus/bbc/modem/scsiaiv.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/modem/scsiaiv.h",
 	}
