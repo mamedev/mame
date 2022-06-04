@@ -28,9 +28,15 @@
 #define CABINET_PORT_TAG                  "CAB"
 
 
+// TODO: turn the "Space Invaders samples" audio into a device and get rid of this class
 class invaders_clone_state : public invaders_state
 {
 public:
+	DECLARE_CUSTOM_INPUT_MEMBER(sicv_in2_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in2_control_r);
+
+protected:
 	invaders_clone_state(const machine_config &mconfig, device_type type, const char *tag) :
 		invaders_state(mconfig, type, tag),
 		m_sn(*this, "snsnd"),
@@ -38,7 +44,6 @@ public:
 	{
 	}
 
-protected:
 	void invaders_samples_audio(machine_config &config);
 
 	optional_device<sn76477_device> m_sn;
@@ -46,16 +51,25 @@ protected:
 };
 
 
-class invaders_clone_palette_state : public invaders_clone_state
+class sisv_state : public invaders_clone_state // only using invaders_clone_state for the custom input handler
 {
 public:
+	sisv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		invaders_clone_state(mconfig, type, tag)
+	{
+	}
+};
+
+
+class invaders_clone_palette_state : public invaders_clone_state
+{
+protected:
 	invaders_clone_palette_state(const machine_config &mconfig, device_type type, const char *tag) :
 		invaders_clone_state(mconfig, type, tag),
 		m_palette(*this, "palette")
 	{
 	}
 
-protected:
 	void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
 	void set_8_pixels(bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color);
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
@@ -101,9 +115,6 @@ public:
 
 	void init_attackfc();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sicv_in2_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in2_control_r);
 	DECLARE_READ_LINE_MEMBER(cosmicmo_cab_r);
 	DECLARE_READ_LINE_MEMBER(sflush_80_r);
 
