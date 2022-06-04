@@ -913,7 +913,11 @@ void mc6845_device::handle_line_timer()
 			update_cursor_state();
 
 			if (has_screen())
-				screen().reset_origin();
+			{
+				// HACK: prevent asoccer from hanging MAME by repeatedly stalling VBLANK periods and attendant frame updates
+				if (!m_vsync || !new_vsync)
+					screen().reset_origin();
+			}
 		}
 		else
 		{

@@ -14,7 +14,7 @@
 #define LOG_COMMAND (1 << 1)
 #define LOG_INTR    (1 << 2)
 #define LOG_READ    (1 << 3)
-#define VERBOSE     (0)
+#define VERBOSE     (LOG_IR)
 #include "logmacro.h"
 
 

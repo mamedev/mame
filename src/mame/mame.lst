@@ -34494,6 +34494,9 @@ pdp11ub                         //
 pdp11ub2                        //
 sms1000                         //
 
+@source:pdp1145.cpp
+pdp1145                         //
+
 @source:pdt3100.cpp
 pdt3100                         //
 

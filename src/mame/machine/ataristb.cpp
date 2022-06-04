@@ -10,7 +10,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ST_BLITTER, st_blitter_device, "st_blitter", "Atari ST Blitter")
+DEFINE_DEVICE_TYPE(ST_BLITTER, st_blitter_device, "st_blitter", "Atari ST BLiTTER")
 
 static const int BLITTER_NOPS[16][4] =
 {

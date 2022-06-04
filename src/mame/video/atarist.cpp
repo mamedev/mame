@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
 	int v = (y >= m_shifter_y_start) && (y < m_shifter_y_end);
 	int h = (x >= m_shifter_x_start) && (x < m_shifter_x_end);
 
-	if(m_shifter_mode == 1 && (m_shifter_sync & 0x02)) {
+	if(m_shifter_mode == 1 && (m_glue_sync & 0x02)) {
 		int dt = 8;
 		h = (x >= m_shifter_x_start-dt) && (x < m_shifter_x_end-dt);
 	}
@@ -295,7 +295,7 @@ TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
 
 void st_video_device::set_screen_parameters()
 {
-	if (m_shifter_sync & 0x02)
+	if (m_glue_sync & 0x02)
 	{
 		m_shifter_x_start = ATARIST_HBDEND_PAL*2;
 		m_shifter_x_end = ATARIST_HBDSTART_PAL*2;
@@ -388,23 +388,23 @@ uint8_t st_video_device::shifter_counter_r(offs_t offset)
 
 
 //-------------------------------------------------
-//  shifter_sync_r -
+//  glue_sync_r -
 //-------------------------------------------------
 
-uint8_t st_video_device::shifter_sync_r()
+uint8_t st_video_device::glue_sync_r()
 {
-	return m_shifter_sync;
+	return m_glue_sync;
 }
 
 
 //-------------------------------------------------
-//  shifter_sync_w -
+//  glue_sync_w -
 //-------------------------------------------------
 
-void st_video_device::shifter_sync_w(uint8_t data)
+void st_video_device::glue_sync_w(uint8_t data)
 {
-	m_shifter_sync = data;
-	logerror("SHIFTER Sync %x\n", m_shifter_sync);
+	m_glue_sync = data;
+	logerror("GLUE Sync %x\n", m_glue_sync);
 	set_screen_parameters();
 }
 
@@ -636,7 +636,7 @@ void st_video_device::device_start()
 	// register for state saving
 	save_item(NAME(m_shifter_base));
 	save_item(NAME(m_shifter_ofs));
-	save_item(NAME(m_shifter_sync));
+	save_item(NAME(m_glue_sync));
 	save_item(NAME(m_shifter_mode));
 	save_item(NAME(m_shifter_palette));
 	save_item(NAME(m_shifter_rr));
@@ -650,8 +650,6 @@ void st_video_device::device_start()
 	m_shifter_base = 0;
 	m_shifter_ofs = 0;
 	m_shifter_mode = 0;
-
-	set_screen_parameters();
 }
 
 void ste_video_device::device_start()
@@ -666,7 +664,8 @@ void ste_video_device::device_start()
 
 void st_video_device::device_reset()
 {
-	// TODO: reset glue chip
+	m_glue_sync = 0;
+	set_screen_parameters();
 }
 
 
