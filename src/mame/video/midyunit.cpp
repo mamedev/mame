@@ -48,8 +48,8 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	m_nvram->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
-	m_dma_timer = timer_alloc(TIMER_DMA);
-	m_autoerase_line_timer = timer_alloc(TIMER_AUTOERASE_LINE);
+	m_dma_timer = timer_alloc(FUNC(midyunit_state::dma_callback), this);
+	m_autoerase_line_timer = timer_alloc(FUNC(midyunit_state::autoerase_line), this);
 
 	/* reset all the globals */
 	m_cmos_page = 0;
@@ -380,21 +380,6 @@ void midyunit_state::dma_draw(uint16_t command)
  *  Timer callbacks
  *
  *************************************/
-
-void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_DMA:
-		dma_callback(param);
-		break;
-	case TIMER_AUTOERASE_LINE:
-		autoerase_line(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in midyunit_state::device_timer");
-	}
-}
 
 TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
 {

@@ -61,12 +61,13 @@ public:
 	void init_intv();
 
 private:
-	enum
-	{
-		TIMER_INTV_INTERRUPT2_COMPLETE,
-		TIMER_INTV_INTERRUPT_COMPLETE,
-		TIMER_INTV_BTB_FILL
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	emu_timer *m_int_complete_timer;
+	emu_timer *m_int2_complete_timer;
+	emu_timer *m_btb_fill_timers[stic_device::BACKTAB_HEIGHT];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8914_device> m_sound;
@@ -76,14 +77,14 @@ private:
 	optional_shared_ptr<uint16_t> m_intvkbd_dualport_ram;
 	optional_shared_ptr<uint8_t> m_videoram;
 
-	uint16_t intv_stic_r(offs_t offset);
-	void intv_stic_w(offs_t offset, uint16_t data);
-	uint16_t intv_gram_r(offs_t offset);
-	void intv_gram_w(offs_t offset, uint16_t data);
-	uint16_t intv_ram8_r(offs_t offset);
-	void intv_ram8_w(offs_t offset, uint16_t data);
-	uint16_t intv_ram16_r(offs_t offset);
-	void intv_ram16_w(offs_t offset, uint16_t data);
+	uint16_t stic_r(offs_t offset);
+	void stic_w(offs_t offset, uint16_t data);
+	uint16_t gram_r(offs_t offset);
+	void gram_w(offs_t offset, uint16_t data);
+	uint16_t ram8_r(offs_t offset);
+	void ram8_w(offs_t offset, uint16_t data);
+	uint16_t ram16_r(offs_t offset);
+	void ram16_w(offs_t offset, uint16_t data);
 	uint8_t intvkb_iocart_r(offs_t offset);
 
 	uint8_t m_bus_copy_mode = 0;
@@ -116,17 +117,14 @@ private:
 	int m_tape_interrupts_enabled = 0;
 	int m_tape_motor_mode = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void intv_palette(palette_device &palette) const;
 	uint32_t screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(intv_interrupt2);
-	INTERRUPT_GEN_MEMBER(intv_interrupt);
-	TIMER_CALLBACK_MEMBER(intv_interrupt2_complete);
-	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
-	TIMER_CALLBACK_MEMBER(intv_btb_fill);
+	INTERRUPT_GEN_MEMBER(interrupt2);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(interrupt2_complete);
+	TIMER_CALLBACK_MEMBER(interrupt_complete);
+	TIMER_CALLBACK_MEMBER(btb_fill);
 
 	void intv2_mem(address_map &map);
 	void intv_mem(address_map &map);
@@ -148,8 +146,6 @@ private:
 	required_device<palette_device> m_palette;
 
 	ioport_port *m_intv_keyboard[10];
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_INTV_H

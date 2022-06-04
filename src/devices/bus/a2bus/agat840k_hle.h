@@ -55,7 +55,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -64,11 +63,8 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 
-	enum
-	{
-		TIMER_ID_WAIT = 0,
-		TIMER_ID_SEEK
-	};
+	TIMER_CALLBACK_MEMBER(timer_wait_tick);
+	TIMER_CALLBACK_MEMBER(timer_seek_tick);
 
 	required_device_array<legacy_floppy_image_device, 2> m_floppy_image;
 	required_device<i8255_device> m_d14;
@@ -91,8 +87,8 @@ private:
 	int m_seektime;
 	int m_waittime;
 
-	emu_timer *m_timer_wait = nullptr;
-	emu_timer *m_timer_seek = nullptr;
+	emu_timer *m_timer_wait;
+	emu_timer *m_timer_seek;
 
 	uint8_t *m_rom;
 };

@@ -168,8 +168,8 @@ void acorn_vidc10_device::device_start()
 	save_pointer(NAME(m_cursor_vram), m_cursor_vram_size);
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
 
-	m_video_timer = timer_alloc(TIMER_VIDEO);
-	m_sound_timer = timer_alloc(TIMER_SOUND);
+	m_video_timer = timer_alloc(FUNC(acorn_vidc10_device::vblank_timer), this);
+	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_drq_timer), this);
 
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual
@@ -216,22 +216,15 @@ void acorn_vidc10_device::device_reset()
 	m_sound_timer->adjust(attotime::never);
 }
 
-//-------------------------------------------------
-//  device_timer - device-specific timer
-//-------------------------------------------------
-
-void acorn_vidc10_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(acorn_vidc10_device::vblank_timer)
 {
-	switch (id)
-	{
-		case TIMER_VIDEO:
-			m_vblank_cb(ASSERT_LINE);
-			screen_vblank_line_update();
-			break;
-		case TIMER_SOUND:
-			m_sound_drq_cb(ASSERT_LINE);
-			break;
-	}
+	m_vblank_cb(ASSERT_LINE);
+	screen_vblank_line_update();
+}
+
+TIMER_CALLBACK_MEMBER(acorn_vidc10_device::sound_drq_timer)
+{
+	m_sound_drq_cb(ASSERT_LINE);
 }
 
 //**************************************************************************
@@ -305,13 +298,11 @@ void acorn_vidc10_device::write(offs_t offset, u32 data, u32 mem_mask)
 
 inline void acorn_vidc10_device::update_4bpp_palette(u16 index, u32 paldata)
 {
-	int r,g,b;
-
 	// TODO: for TV Tuner we need to output this, also check if cursor mode actually sets this up for offset = 0
 //  i = (paldata & 0x1000) >> 12; //supremacy bit
-	b = (paldata & 0x0f00) >> 8;
-	g = (paldata & 0x00f0) >> 4;
-	r = (paldata & 0x000f) >> 0;
+	int b = (paldata & 0x0f00) >> 8;
+	int g = (paldata & 0x00f0) >> 4;
+	int r = (paldata & 0x000f) >> 0;
 
 	set_pen_color(index, pal4bit(r), pal4bit(g), pal4bit(b) );
 	screen().update_partial(screen().vpos());
@@ -444,8 +435,7 @@ void acorn_vidc10_device::sound_frequency_w(u32 data)
 
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 {
-	int16_t res;
-	res = m_ulaw_lookup[data];
+	int16_t res = m_ulaw_lookup[data];
 	m_dac[channel & 7]->write(res);
 }
 
@@ -505,29 +495,25 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int xstart,ystart,xend,yend;
-	int xsize,ysize;
-	int calc_dxs = 0,calc_dxe = 0;
-
 	/* border color */
 	bitmap.fill(pen(m_pal_border_base), cliprect);
 
 	/* define X display area through BPP mode register */
-	calc_dxs = m_crtc_regs[CRTC_HDSR];
-	calc_dxe = m_crtc_regs[CRTC_HDER];
+	int calc_dxs = m_crtc_regs[CRTC_HDSR];
+	int calc_dxe = m_crtc_regs[CRTC_HDER];
 
 	/* now calculate display clip rectangle start/end areas */
-	xstart = (calc_dxs)-m_crtc_regs[CRTC_HBSR];
-	ystart = (m_crtc_regs[CRTC_VDSR]-m_crtc_regs[CRTC_VBSR]);
-	xend = (calc_dxe)+xstart;
-	yend = (m_crtc_regs[CRTC_VDER] * (m_crtc_interlace+1))+ystart;
+	int xstart = (calc_dxs)-m_crtc_regs[CRTC_HBSR];
+	int ystart = (m_crtc_regs[CRTC_VDSR]-m_crtc_regs[CRTC_VBSR]);
+	int xend = (calc_dxe)+xstart;
+	int yend = (m_crtc_regs[CRTC_VDER] * (m_crtc_interlace+1))+ystart;
 
 	/* disable the screen if display params are invalid */
 	if(xstart > xend || ystart > yend)
 		return 0;
 
-	xsize = calc_dxe-calc_dxs;
-	ysize = m_crtc_regs[CRTC_VDER]-m_crtc_regs[CRTC_VDSR];
+	int xsize = calc_dxe-calc_dxs;
+	int ysize = m_crtc_regs[CRTC_VDER]-m_crtc_regs[CRTC_VDSR];
 
 	if (xsize <= 0 || ysize <= 0)
 		return 0;
@@ -653,12 +639,6 @@ void arm_vidc20_device::device_reset()
 	write_dac32(1, 0);
 }
 
-void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	acorn_vidc10_device::device_timer(timer, id, param);
-	// TODO: other timers
-}
-
 inline void arm_vidc20_device::refresh_stereo_image(u8 channel)
 {
 	// TODO: set_input_gain hampers with both QS1000 and serial DAC mode
@@ -669,13 +649,11 @@ inline void arm_vidc20_device::refresh_stereo_image(u8 channel)
 
 inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 {
-	int r,g,b;
-
 	// TODO: ext hookup, supremacy plus other stuff according to the manual
 //  ext = (paldata & 0x0f000000) >> 24;
-	b =   (paldata & 0x00ff0000) >> 16;
-	g =   (paldata & 0x0000ff00) >> 8;
-	r =   (paldata & 0x000000ff) >> 0;
+	int b =   (paldata & 0x00ff0000) >> 16;
+	int g =   (paldata & 0x0000ff00) >> 8;
+	int r =   (paldata & 0x000000ff) >> 0;
 
 	set_pen_color(index, r, g, b );
 	screen().update_partial(screen().vpos());

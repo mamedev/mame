@@ -64,7 +64,7 @@ sam_mouse_device::sam_mouse_device(const machine_config &mconfig, const char *ta
 void sam_mouse_device::device_start()
 {
 	// allocate timer
-	m_reset = timer_alloc();
+	m_reset = timer_alloc(FUNC(sam_mouse_device::reset_tick), this);
 
 	// register for savestates
 	save_item(NAME(m_mouse_index));
@@ -85,10 +85,10 @@ void sam_mouse_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  reset_tick - reset the mouse index
 //-------------------------------------------------
 
-void sam_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sam_mouse_device::reset_tick)
 {
 	m_mouse_index = 0;
 }

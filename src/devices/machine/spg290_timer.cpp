@@ -22,7 +22,7 @@ spg290_timer_device::spg290_timer_device(const machine_config &mconfig, const ch
 void spg290_timer_device::device_start()
 {
 	m_irq_cb.resolve_safe();
-	m_tick_timer = timer_alloc();
+	m_tick_timer = timer_alloc(FUNC(spg290_timer_device::timer_update), this);
 
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_control));
@@ -56,7 +56,7 @@ void spg290_timer_device::device_clock_changed()
 		m_tick_timer->adjust(attotime::never);
 }
 
-void spg290_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg290_timer_device::timer_update)
 {
 	if (!BIT(m_control, 31))
 		return;

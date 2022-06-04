@@ -85,17 +85,6 @@ public:
 	virtual void driver_init() override;
 
 protected:
-	enum
-	{
-		TIMER_X68K_LED,
-		TIMER_X68K_SCC_ACK,
-		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
-		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
-		TIMER_X68K_BUS_ERROR,
-		TIMER_X68K_FDC_TC,
-		TIMER_X68K_ADPCM
-	};
-
 	template <typename CpuType, typename AddrMap, typename Clock>
 	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock)
 	{
@@ -256,6 +245,8 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(floppy_tc_tick);
+	TIMER_CALLBACK_MEMBER(adpcm_drq_tick);
 	TIMER_CALLBACK_MEMBER(led_callback);
 	TIMER_CALLBACK_MEMBER(scc_ack);
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
@@ -340,7 +331,6 @@ public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);

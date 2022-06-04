@@ -38,12 +38,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	void csdeluxe_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_pia);
 
 private:
 	// devices
@@ -52,8 +54,9 @@ private:
 	required_device<dac_word_interface> m_dac;
 
 	// internal state
-	uint8_t m_status;
-	uint16_t m_dacval;
+	uint8_t    m_status;
+	uint16_t   m_dacval;
+	emu_timer *m_pia_sync_timer;
 
 	// internal communications
 	void porta_w(uint8_t data);

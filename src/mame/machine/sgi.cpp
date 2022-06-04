@@ -86,10 +86,10 @@ void sgi_mc_device::device_start()
 	m_sys_id = 0x03; // rev. C MC
 	m_sys_id |= m_eisa_present() << 4;
 
-	m_rpss_timer = timer_alloc(TIMER_RPSS);
+	m_rpss_timer = timer_alloc(FUNC(sgi_mc_device::rpss_tick), this);
 	m_rpss_timer->adjust(attotime::never);
 
-	m_dma_timer = timer_alloc(TIMER_DMA);
+	m_dma_timer = timer_alloc(FUNC(sgi_mc_device::perform_dma), this);
 	m_dma_timer->adjust(attotime::never);
 
 	save_item(NAME(m_cpu_control));
@@ -211,7 +211,7 @@ uint32_t sgi_mc_device::dma_translate(uint32_t address)
 	return 0;
 }
 
-void sgi_mc_device::dma_immediate()
+TIMER_CALLBACK_MEMBER(sgi_mc_device::perform_dma)
 {
 	uint32_t memory_addr = m_dma_mem_addr;
 	uint32_t linecount = get_line_count();
@@ -721,19 +721,12 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sgi_mc_device::rpss_tick)
 {
-	if (id == TIMER_RPSS)
+	m_rpss_divide_counter--;
+	if (m_rpss_divide_counter < 0)
 	{
-		m_rpss_divide_counter--;
-		if (m_rpss_divide_counter < 0)
-		{
-			m_rpss_divide_counter = m_rpss_divide_count;
-			m_rpss_counter += m_rpss_increment;
-		}
-	}
-	else if (id == TIMER_DMA)
-	{
-		dma_immediate();
+		m_rpss_divide_counter = m_rpss_divide_count;
+		m_rpss_counter += m_rpss_increment;
 	}
 }

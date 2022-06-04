@@ -68,6 +68,7 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_divshift(0)
 	, m_cycles_per_second(0)
 	, m_attoseconds_per_cycle(0)
+	, m_spin_end_timer(nullptr)
 {
 	memset(&m_localtime, 0, sizeof(m_localtime));
 
@@ -164,7 +165,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig);
+	m_spin_end_timer->adjust(duration, TRIGGER_SUSPENDTIME + timetrig);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -384,9 +385,16 @@ void device_execute_interface::interface_pre_start()
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
-	// allocate timers if we need them
+	// allocate a timed-interrupt timer if we need it
 	if (m_timed_interrupt_period != attotime::zero)
 		m_timedint_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::trigger_periodic_interrupt), this));
+
+	// allocate a timer for triggering the end of spin-until conditions
+	m_spin_end_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback), this));
+
+	// allocate input-pulse timers if we have input lines
+	for (u32 i = 0; i < MAX_INPUT_LINES; i++)
+		m_pulse_end_timers[i] = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this));
 }
 
 
@@ -619,7 +627,7 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 		set_input_line(irqline, ASSERT_LINE);
 
 		attotime target_time = local_time() + duration;
-		m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+		m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
 	}
 }
 

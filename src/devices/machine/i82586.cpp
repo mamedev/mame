@@ -164,7 +164,7 @@ void i82586_base_device::device_start()
 
 	m_out_irq.resolve_safe();
 
-	m_cu_timer = timer_alloc(CU_TIMER);
+	m_cu_timer = timer_alloc(FUNC(i82586_base_device::cu_execute), this);
 	m_cu_timer->enable(false);
 
 	save_item(NAME(m_cx));
@@ -202,16 +202,6 @@ void i82586_base_device::device_reset()
 
 	m_scp_address = SCP_ADDRESS;
 	m_mac_multi = 0;
-}
-
-void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case CU_TIMER:
-			cu_execute();
-			break;
-	}
 }
 
 device_memory_interface::space_config_vector i82586_base_device::memory_space_config() const
@@ -407,7 +397,7 @@ void i82586_base_device::update_scb()
 	set_irq(m_cx || m_fr || m_cna || m_rnr);
 }
 
-void i82586_base_device::cu_execute()
+TIMER_CALLBACK_MEMBER(i82586_base_device::cu_execute)
 {
 	// fetch the command block command/status
 	const u32 cb_cs = m_space->read_dword(m_cba);

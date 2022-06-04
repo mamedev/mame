@@ -1030,12 +1030,12 @@ void pcw_state::init_pcw()
 	m_roller_ram_offset = 0;
 
 	/* timer interrupt */
-	m_beep_setup_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::setup_beep), this));
+	m_beep_setup_timer = timer_alloc(FUNC(pcw_state::setup_beep), this);
 	m_beep_setup_timer->adjust(attotime::zero);
 
-	m_prn_stepper = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_stepper_callback), this));
-	m_prn_pins = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_pins_callback), this));
-	m_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse), this));
+	m_prn_stepper = timer_alloc(FUNC(pcw_state::pcw_stepper_callback), this);
+	m_prn_pins = timer_alloc(FUNC(pcw_state::pcw_pins_callback), this);
+	m_pulse_timer = timer_alloc(FUNC(pcw_state::pcw_timer_pulse), this);
 }
 
 

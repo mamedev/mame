@@ -352,7 +352,7 @@ void sym1_state::init_sym1()
 		bank->set_entry(1);
 
 	// allocate a timer to refresh the led display
-	m_led_update = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sym1_state::led_refresh), this));
+	m_led_update = timer_alloc(FUNC(sym1_state::led_refresh), this);
 }
 
 void sym1_state::machine_reset()

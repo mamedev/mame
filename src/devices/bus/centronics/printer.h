@@ -33,17 +33,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual bool supports_pin35_5v() override { return true; }
+
 private:
 	DECLARE_WRITE_LINE_MEMBER( printer_online );
 
-	enum
-	{
-		TIMER_ACK,
-		TIMER_BUSY
-	};
+	TIMER_CALLBACK_MEMBER(ack_timer_tick);
+	TIMER_CALLBACK_MEMBER(busy_timer_tick);
 
 	emu_timer *m_ack_timer;
 	emu_timer *m_busy_timer;

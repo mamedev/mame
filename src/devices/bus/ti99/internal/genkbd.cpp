@@ -35,7 +35,7 @@
 #define LOG_TRANSFER     (1U<<3)
 #define LOG_LINES        (1U<<4)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -203,42 +203,34 @@ geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machi
 {
 }
 
-/*
-    Called by the poll timer
-*/
-void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(geneve_xt_101_hle_keyboard_device::poll_tick)
 {
-	if (id==0)
+	poll();
+	send_key();
+}
+
+TIMER_CALLBACK_MEMBER(geneve_xt_101_hle_keyboard_device::send_tick)
+{
+	// Send timer
+	if (m_shift_count == 10)
 	{
-		poll();
-		send_key();
+		// Done, all sent
+		m_pc_kbdc->clock_write_from_kb(1);
+		m_pc_kbdc->data_write_from_kb(1);
+		m_send_timer->reset();
+		m_shift_count = 0;
+
+		// Adjust the queue
+		m_queue_head = (m_queue_head + 1) % KEYQUEUESIZE;
+		m_queue_length--;
 	}
 	else
 	{
-		if (id==1)
-		{
-			// Send timer
-			if (m_shift_count==10)
-			{
-				// Done, all sent
-				m_pc_kbdc->clock_write_from_kb(1);
-				m_pc_kbdc->data_write_from_kb(1);
-				m_send_timer->reset();
-				m_shift_count = 0;
-
-				// Adjust the queue
-				m_queue_head = (m_queue_head + 1) % KEYQUEUESIZE;
-				m_queue_length--;
-			}
-			else
-			{
-				m_pc_kbdc->clock_write_from_kb(1);
-				m_pc_kbdc->data_write_from_kb(m_shift_reg&1);
-				m_pc_kbdc->clock_write_from_kb(0);
-				m_shift_reg>>=1;
-				m_shift_count++;
-			}
-		}
+		m_pc_kbdc->clock_write_from_kb(1);
+		m_pc_kbdc->data_write_from_kb(BIT(m_shift_reg, 0));
+		m_pc_kbdc->clock_write_from_kb(0);
+		m_shift_reg >>= 1;
+		m_shift_count++;
 	}
 }
 
@@ -271,38 +263,32 @@ static const uint8_t MF1_CODE[0xe] =
 
 void geneve_xt_101_hle_keyboard_device::poll()
 {
-	uint32_t keystate;
-	uint32_t key_transitions;
-	uint32_t mask;
-	bool pressed = false;
-	int keycode = 0;
-
 	if (m_resetting) return;
 
 	// We're testing two 16-bit ports at once
 	// but only if we have enough space in the queue
-	for (int i=0; (i < 4) && (m_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
+	for (uint8_t i = 0; i < 4 && m_queue_length <= (KEYQUEUESIZE - MAXKEYMSGLENGTH); i++)
 	{
 		// Get those two ports and calculate the difference
-		keystate = m_keys[2*i]->read() | (m_keys[2*i + 1]->read() << 16);
-		key_transitions = keystate ^ m_key_state_save[i];
+		uint32_t keystate = m_keys[2 * i]->read() | (m_keys[2 * i + 1]->read() << 16);
+		uint32_t key_transitions = keystate ^ m_key_state_save[i];
 		if (key_transitions != 0)
 		{
-			mask = 0x00000001;
+			uint32_t mask = 0x00000001;
 			// Some key(s) has/have changed (pressed/released)
-			for (int j=0; (j < 32) && (m_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); j++)
+			for (uint8_t j = 0; j < 32 && m_queue_length <= (KEYQUEUESIZE - MAXKEYMSGLENGTH); j++)
 			{
-				if ((key_transitions & mask)!=0)
+				if ((key_transitions & mask) != 0)
 				{
 					// Found one changed key (i is a 32-key block)
-					keycode = (i<<5) | j;
-					pressed = (keystate & mask)!=0;
+					uint8_t keycode = (i << 5) | j;
+					bool pressed = (bool)(keystate & mask);
 
 					// Auto-repeat
 					if (pressed)
 					{
 						m_autorepeat_code = keycode;
-						m_autorepeat_timer = KEYAUTOREPEATDELAY+1;
+						m_autorepeat_timer = KEYAUTOREPEATDELAY + 1;
 						m_key_state_save[i] |= mask;
 					}
 					else
@@ -358,9 +344,9 @@ void geneve_xt_101_hle_keyboard_device::poll()
 					}
 
 					// Extended keycodes
-					if ((keycode >= 0x60) && (keycode < 0x6e))
+					if (keycode >= 0x60 && keycode < 0x6e)
 					{
-						if ((keycode >= 0x63) && pressed)
+						if (keycode >= 0x63 && pressed)
 						{
 							// Handle shift state
 							if (keycode == 0x63)   // Slash
@@ -373,14 +359,14 @@ void geneve_xt_101_hle_keyboard_device::poll()
 							}
 							else
 							{   // Key function with NumLock=0
-								if (m_numlock && (!m_left_shift) && (!m_right_shift))
+								if (m_numlock && !m_left_shift && !m_right_shift)
 								{
 									// Fake shift press if numlock is active
 									m_fake_shift_state = true;
 								}
 								else
 								{
-									if ((!m_numlock) && (m_left_shift || m_right_shift))
+									if (!m_numlock && (m_left_shift || m_right_shift))
 									{
 										// Fake shift unpress if shift is down
 										m_fake_unshift_state = true;
@@ -400,7 +386,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 								post_in_key_queue(0xaa);
 							}
 						}
-						keycode = MF1_CODE[keycode-0x60];
+						keycode = MF1_CODE[keycode - 0x60];
 						if (!pressed) keycode |= 0x80;
 						post_in_key_queue(0xe0);
 						post_in_key_queue(keycode);
@@ -422,7 +408,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 							else
 							{
 								// Handle shift state
-								if (pressed && (!m_left_shift) && (!m_right_shift) && (!m_left_ctrl) && (!m_right_ctrl))
+								if (pressed && !m_left_shift && !m_right_shift && !m_left_ctrl && !m_right_ctrl)
 								{   // Fake shift press
 									post_in_key_queue(0xe0);
 									post_in_key_queue(0x2a);
@@ -481,13 +467,13 @@ void geneve_xt_101_hle_keyboard_device::poll()
 	if (m_autorepeat_code != 0)
 	{
 		m_autorepeat_timer--;
-		if ((m_autorepeat_timer == 0) && (m_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)))
+		if (m_autorepeat_timer == 0 && m_queue_length <= (KEYQUEUESIZE - MAXKEYMSGLENGTH))
 		{
 			// Extended code
-			if ((m_autorepeat_code >= 0x60) && (m_autorepeat_code < 0x6e))
+			if (m_autorepeat_code >= 0x60 && m_autorepeat_code < 0x6e)
 			{
 				post_in_key_queue(0xe0);
-				post_in_key_queue(MF1_CODE[m_autorepeat_code-0x60]);
+				post_in_key_queue(MF1_CODE[m_autorepeat_code - 0x60]);
 			}
 			else
 			{
@@ -521,7 +507,7 @@ void geneve_xt_101_hle_keyboard_device::send_key()
 	if (m_clock_line == CLEAR_LINE)
 	{
 		m_reset_timer--;
-		if (m_reset_timer==0)
+		if (m_reset_timer == 0)
 		{
 			LOG("Reset triggered\n");
 			reset_line(0);
@@ -530,7 +516,7 @@ void geneve_xt_101_hle_keyboard_device::send_key()
 	}
 	else
 	{
-		if (m_data_line==1)
+		if (m_data_line)
 		{
 			// Dequeue a key
 			if (m_queue_length != 0)
@@ -558,7 +544,7 @@ void geneve_xt_101_hle_keyboard_device::post_in_key_queue(int keycode)
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::clock_write )
+WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::clock_write)
 {
 	LOGMASKED(LOG_LINES, "Clock write: %d\n", state);
 	m_clock_line = (line_state)state;
@@ -576,7 +562,7 @@ WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::data_write )
+WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::data_write)
 {
 	LOGMASKED(LOG_LINES, "Data write: %d\n", state);
 	m_data_line = (line_state)state;
@@ -590,14 +576,14 @@ WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::data_write )
 void geneve_xt_101_hle_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
-	m_poll_timer = timer_alloc(0);
-	m_send_timer = timer_alloc(1);
+	m_poll_timer = timer_alloc(FUNC(geneve_xt_101_hle_keyboard_device::poll_tick), this);
+	m_send_timer = timer_alloc(FUNC(geneve_xt_101_hle_keyboard_device::send_tick), this);
 
 	// state saving
 	save_item(NAME(m_queue_length));
 	save_item(NAME(m_queue_head));
-	save_pointer(NAME(m_key_state_save),4);
-	save_pointer(NAME(m_queue),KEYQUEUESIZE);
+	save_pointer(NAME(m_key_state_save), 4);
+	save_pointer(NAME(m_queue), KEYQUEUESIZE);
 }
 
 
@@ -614,9 +600,9 @@ void geneve_xt_101_hle_keyboard_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::reset_line )
+WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::reset_line)
 {
-	m_resetting = (state==0);
+	m_resetting = !state;
 
 	if (m_resetting)
 	{
@@ -645,4 +631,3 @@ WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::reset_line )
 		post_in_key_queue(0xaa);
 	}
 }
-

@@ -50,7 +50,7 @@ void k573fpga_device::device_start()
 	save_item(NAME(counter_base));
 	save_item(NAME(is_mpeg_frame_synced));
 
-	m_stream_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k573fpga_device::update_stream), this));
+	m_stream_timer = timer_alloc(FUNC(k573fpga_device::update_stream), this);
 	m_stream_timer->adjust(attotime::never);
 }
 

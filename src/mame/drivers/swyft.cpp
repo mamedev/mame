@@ -377,8 +377,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	void swyft_mem(address_map &map);
-
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 };
 
 

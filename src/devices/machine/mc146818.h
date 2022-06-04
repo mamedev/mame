@@ -53,7 +53,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -70,6 +69,10 @@ protected:
 	virtual void internal_set_address(uint8_t address);
 	virtual uint8_t internal_read(offs_t offset);
 	virtual void internal_write(offs_t offset, uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(periodic_tick);
+	TIMER_CALLBACK_MEMBER(clock_tick);
+	TIMER_CALLBACK_MEMBER(time_tick);
 
 	enum
 	{
@@ -156,10 +159,6 @@ protected:
 
 	uint8_t           m_index;
 	std::unique_ptr<uint8_t[]> m_data;
-
-	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_UPDATE = 1;
-	static const device_timer_id TIMER_PERIODIC = 2;
 
 	emu_timer *m_clock_timer;
 	emu_timer *m_update_timer;

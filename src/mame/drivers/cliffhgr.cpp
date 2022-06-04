@@ -235,7 +235,7 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::irq_callback)
 void cliffhgr_state::machine_start()
 {
 	m_led.resolve();
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cliffhgr_state::irq_callback),this));
+	m_irq_timer = timer_alloc(FUNC(cliffhgr_state::irq_callback), this);
 
 	save_item(NAME(m_port_bank));
 	save_item(NAME(m_philips_code));

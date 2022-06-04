@@ -147,8 +147,8 @@ INPUT_PORTS_END
 
 void gamate_state::init_gamate()
 {
-	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
-	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
+	timer1 = timer_alloc(FUNC(gamate_state::gamate_timer), this);
+	timer2 = timer_alloc(FUNC(gamate_state::gamate_timer2), this);
 }
 
 void gamate_state::machine_start()

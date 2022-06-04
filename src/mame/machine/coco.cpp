@@ -137,9 +137,9 @@ void coco_state::device_start()
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
 	// timers
-	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
-	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
-	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
+	m_hiresjoy_transition_timer[0] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_hiresjoy_transition_timer[1] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_diecom_lightgun_timer = timer_alloc(FUNC(coco_state::diecom_lightgun_hit), this);
 
 	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
@@ -187,21 +187,18 @@ void coco_state::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer
+//  timer callbacks
 //-------------------------------------------------
 
-void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(coco_state::diecom_lightgun_hit)
 {
-	switch(id)
-	{
-		case TIMER_DIECOM_LIGHTGUN:
-			m_dclg_output_h |= 0x02;
-			[[fallthrough]];
-		case TIMER_HIRES_JOYSTICK_X:
-		case TIMER_HIRES_JOYSTICK_Y:
-			poll_keyboard();
-			break;
-	}
+	m_dclg_output_h |= 0x02;
+	poll_keyboard();
+}
+
+TIMER_CALLBACK_MEMBER(coco_state::joystick_update)
+{
+	poll_keyboard();
 }
 
 

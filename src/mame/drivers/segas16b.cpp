@@ -1263,8 +1263,15 @@ INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
 //  DRIVER OVERRIDES
 //**************************************************************************
 
+void segas16b_state::machine_start()
+{
+	m_lamps.resolve();
+
+	m_i8751_sync_timer = timer_alloc(FUNC(segas16b_state::i8751_sync), this);
+}
+
 //-------------------------------------------------
-//  machine_reset - reset the state of the machine
+//  machine_reset
 //-------------------------------------------------
 
 void segas16b_state::machine_reset()
@@ -1278,7 +1285,7 @@ void segas16b_state::machine_reset()
 		m_mapper->configure_explicit(m_i8751_initial_config);
 
 	// queue up a timer to either boost interleave or disable the MCU
-	synchronize(TID_INIT_I8751);
+	m_i8751_sync_timer->adjust(attotime::zero);
 
 	// reset tilemap state
 	m_segaic16vid->tilemap_reset(*m_screen);
@@ -1300,29 +1307,25 @@ void segas16b_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  timer events
 //-------------------------------------------------
 
-void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segas16b_state::i8751_sync)
 {
-	switch (id)
-	{
-		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
-		case TID_INIT_I8751:
-			if (!m_i8751_vblank_hook.isnull())
-				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != nullptr)
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
-			break;
+	// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
+	if (!m_i8751_vblank_hook.isnull())
+		m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
+	else if (m_mcu != nullptr)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+}
 
-		// generate a periodic IRQ to the sound CPU
-		case TID_ATOMICP_SOUND_IRQ:
-			if (++m_atomicp_sound_count >= m_atomicp_sound_divisor)
-			{
-				m_maincpu->set_input_line(2, HOLD_LINE);
-				m_atomicp_sound_count = 0;
-			}
-			break;
+TIMER_CALLBACK_MEMBER(segas16b_state::atomicp_sound_irq)
+{
+	// generate a periodic IRQ to the sound CPU
+	if (++m_atomicp_sound_count >= m_atomicp_sound_divisor)
+	{
+		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_atomicp_sound_count = 0;
 	}
 }
 
@@ -9671,7 +9674,7 @@ void segas16b_state::init_generic_korean()
 	m_segaic16vid->m_display_enable = 1;
 
 	// allocate a sound timer
-	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
+	emu_timer *timer = timer_alloc(FUNC(segas16b_state::atomicp_sound_irq), this);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
 void segas16b_state::init_lockonph()

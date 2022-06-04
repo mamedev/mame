@@ -308,9 +308,9 @@ void efo_zsu_device::device_start()
 		membank("rombank")->set_entry(3); // 10K/+5 pullups on banking lines
 	}
 
-	m_fifo_shift_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::fifo_shift), this));
-	m_adpcm_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::adpcm_clock), this));
-	m_ctc0_ck0_restart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::ctc0_ck0_restart), this));
+	m_fifo_shift_timer = timer_alloc(FUNC(efo_zsu_device::fifo_shift), this);
+	m_adpcm_clock_timer = timer_alloc(FUNC(efo_zsu_device::adpcm_clock), this);
+	m_ctc0_ck0_restart_timer = timer_alloc(FUNC(efo_zsu_device::ctc0_ck0_restart), this);
 
 	save_item(NAME(m_ay1_porta));
 }

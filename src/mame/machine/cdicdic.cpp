@@ -1527,10 +1527,10 @@ void cdicdic_device::device_start()
 
 	save_item(NAME(m_xa_last));
 
-	m_audio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_tick), this));
+	m_audio_timer = timer_alloc(FUNC(cdicdic_device::audio_tick), this);
 	m_audio_timer->adjust(attotime::never);
 
-	m_sector_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::sector_tick), this));
+	m_sector_timer = timer_alloc(FUNC(cdicdic_device::sector_tick), this);
 	m_sector_timer->adjust(attotime::never);
 }
 

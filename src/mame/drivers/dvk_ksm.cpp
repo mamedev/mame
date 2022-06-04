@@ -116,7 +116,7 @@ private:
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clock_brg);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 
@@ -139,11 +139,6 @@ private:
 		uint8_t line = 0;
 		uint16_t ptr = 0;
 	} m_video;
-
-	enum
-	{
-		TIMER_ID_BRG = 0
-	};
 
 	bool brg_state = false;
 	int brga = 0, brgb = 0, brgc = 0;
@@ -221,14 +216,11 @@ static INPUT_PORTS_START( ksm )
 	PORT_DIPSETTING(0x0E, "75")
 INPUT_PORTS_END
 
-void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ksm_state::clock_brg)
 {
-	if (id == TIMER_ID_BRG)
-	{
-		brg_state = !brg_state;
-		m_i8251line->write_txc(brg_state);
-		m_i8251line->write_rxc(brg_state);
-	}
+	brg_state = !brg_state;
+	m_i8251line->write_txc(brg_state);
+	m_i8251line->write_rxc(brg_state);
 }
 
 void ksm_state::machine_reset()
@@ -245,7 +237,7 @@ void ksm_state::machine_start()
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ - 1, 0, KSM_DISP_VERT - 1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 
-	m_brg = timer_alloc(TIMER_ID_BRG);
+	m_brg = timer_alloc(FUNC(ksm_state::clock_brg), this);
 }
 
 void ksm_state::ksm_ppi_porta_w(uint8_t data)

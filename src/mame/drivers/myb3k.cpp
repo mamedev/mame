@@ -79,12 +79,6 @@
 #define LOGCENT(...) LOGMASKED(LOG_CENT, __VA_ARGS__)
 #define LOGRAM(...)  LOGMASKED(LOG_RAM, __VA_ARGS__)
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 class myb3k_state : public driver_device
 {
 public:
@@ -117,6 +111,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void myb3k_io(address_map &map);
+	void myb3k_map(address_map &map);
+
 	/* Interrupt controller */
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -130,18 +130,18 @@ private:
 	void dma_segment_w(uint8_t data);
 	uint8_t dma_memory_read_byte(offs_t offset);
 	void dma_memory_write_byte(offs_t offset, uint8_t data);
-	uint8_t io_dack0_r()  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	uint8_t io_dack1_r()  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	uint8_t io_dack2_r()  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	uint8_t io_dack3_r()  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	void io_dack0_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
-	void io_dack1_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
-	void io_dack2_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
-	void io_dack3_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
-	DECLARE_WRITE_LINE_MEMBER( dack0_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack1_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack2_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack3_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(3, state); }
+	uint8_t io_dack0_r()  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("io_dack0_r: %02x\n", tmp); return tmp; }
+	uint8_t io_dack1_r()  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("io_dack1_r: %02x\n", tmp); return tmp; }
+	uint8_t io_dack2_r()  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("io_dack2_r: %02x\n", tmp); return tmp; }
+	uint8_t io_dack3_r()  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("io_dack3_r: %02x\n", tmp); return tmp; }
+	void io_dack0_w(uint8_t data) { LOGDMA("io_dack0_w: %02x\n", data); m_isabus->dack_w(0, data); }
+	void io_dack1_w(uint8_t data) { LOGDMA("io_dack1_w: %02x\n", data); m_isabus->dack_w(1, data); }
+	void io_dack2_w(uint8_t data) { LOGDMA("io_dack2_w: %02x\n", data); m_isabus->dack_w(2, data); }
+	void io_dack3_w(uint8_t data) { LOGDMA("io_dack3_w: %02x\n", data); m_isabus->dack_w(3, data); }
+	DECLARE_WRITE_LINE_MEMBER( dack0_w ){ LOGDMA("dack0_w: %d\n", state); select_dma_channel(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack1_w ){ LOGDMA("dack1_w: %d\n", state); select_dma_channel(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack2_w ){ LOGDMA("dack2_w: %d\n", state); select_dma_channel(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack3_w ){ LOGDMA("dack3_w: %d\n", state); select_dma_channel(3, state); }
 
 	/* Timer */
 	DECLARE_WRITE_LINE_MEMBER( pit_out1_changed );
@@ -168,12 +168,6 @@ private:
 
 	/* Status bits */
 	uint8_t myb3k_io_status_r();
-
-	void myb3k_io(address_map &map);
-	void myb3k_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	/* Interrupt Controller */
 	void pic_ir5_w(int source, int state);
@@ -205,11 +199,7 @@ private:
 	void select_dma_channel(int channel, bool state);
 
 	/* Timer */
-	enum
-	{
-		TIMER_ID_KEY_INTERRUPT
-	};
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(key_interrupt);
 
 	/* Status bits */
 	enum
@@ -249,17 +239,18 @@ private:
 	uint8_t m_portc;
 	uint8_t m_dma_page[4]; // a 74670, 4 x 4 bit storage latch
 	int8_t m_io_status;
+	emu_timer *m_key_timer = nullptr;
 };
 
 uint8_t myb3k_state::myb3k_io_status_r()
 {
-	LOGCENT("%s\n", FUNCNAME);
+	LOGCENT("myb3k_io_status_r\n");
 	return m_io_status & 0x0f;
 }
 
 uint8_t myb3k_state::myb3k_kbd_r()
 {
-	LOGKBD("%s: %02x\n", FUNCNAME, m_kbd_data);
+	LOGKBD("myb3k_kbd_r: %02x\n", m_kbd_data);
 
 	/* IN from port 0x04 enables a 74LS244 buffer that
 	   presents to the CPU the parallel bits from the 74LS164
@@ -268,8 +259,9 @@ uint8_t myb3k_state::myb3k_kbd_r()
 	return m_kbd_data;
 }
 
-void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
-	LOGKBD("%s: %02x\n", FUNCNAME, data);
+void myb3k_state::kbd_set_data_and_interrupt(u8 data)
+{
+	LOGKBD("kbd_set_data_and_interrupt: %02x\n", data);
 	m_kbd_data = data;
 
 	/* The INT7 line is pulled low when a clock is detected from the keyboard. */
@@ -278,18 +270,13 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	/* When the clock stops, the INT7 line goes back high. This triggers the interrupt.
 	   We simulate the time it takes to send the 8 bits over the serial line
 	   here. It should be 0.8ms but is rounded off to 1ms. */
-	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
+	m_key_timer->adjust(attotime::from_msec(1));
 }
 
-void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(myb3k_state::key_interrupt)
 {
-	switch (id)
-	{
-	case TIMER_ID_KEY_INTERRUPT:
-		/* The serial transfer of 8 bits is complete. Now trigger INT7. */
-		m_pic8259->ir1_w(ASSERT_LINE);
-		break;
-	}
+	/* The serial transfer of 8 bits is complete. Now trigger INT7. */
+	m_pic8259->ir1_w(ASSERT_LINE);
 }
 
 MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
@@ -441,7 +428,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 
 void myb3k_state::myb3k_video_mode_w(uint8_t data)
 {
-	LOG("%s: %02x\n", FUNCNAME, data);
+	LOG("myb3k_video_mode_w: %02x\n", data);
 	LOGVMOD("Video Mode %02x\n", data);
 
 	/* ---- -x-- interlace mode */
@@ -674,7 +661,7 @@ INPUT_CHANGED_MEMBER(myb3k_state::monitor_changed)
 
 void myb3k_state::machine_start()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("machine_start\n");
 
 	/* Color palette for use with a RGB color CRT monitor such as the 12" Ericsson DU4720:
 	   76 degrees deflection, WxHxD: 373x375x428mm, Weight 12.8 Kg, 215x134.4mm display area,
@@ -724,62 +711,67 @@ void myb3k_state::machine_start()
 	/* No key presses allowed yet */
 	m_kbd_data = 0;
 
-	save_item (NAME (m_dma_channel));
-	save_item (NAME (m_cur_tc));
-	save_item (NAME (m_kbd_data));
-	save_item (NAME (m_vmode));
-	save_item (NAME (m_portc));
-	save_item (NAME (*m_pal));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_cur_tc));
+	save_item(NAME(m_kbd_data));
+	save_item(NAME(m_vmode));
+	save_item(NAME(m_portc));
+	save_item(NAME(*m_pal));
 	save_pointer(NAME(m_mpal), sizeof(m_mpal));
 	save_pointer(NAME(m_cpal), sizeof(m_cpal));
 	save_pointer(NAME(m_dma_page), sizeof(m_dma_page));
-	save_item (NAME (m_io_status));
+	save_item(NAME(m_io_status));
+
+	m_key_timer = timer_alloc(FUNC(myb3k_state::key_interrupt), this);
 }
 
 void myb3k_state::machine_reset()
 {
-	LOG("%s\n", FUNCNAME);
+	LOG("machine_reset\n");
 	m_cur_tc = false;
 	m_dma_channel = -1;
 	m_vmode = 0;
 	m_portc = 0;
 	memset(m_dma_page, 0, sizeof(m_dma_page));
-	m_pal = (m_io_monitor-> read() & 1) == 1 ? &m_mpal : &m_cpal;
+	m_pal = (m_io_monitor->read() & 1) ? &m_mpal : &m_cpal;
 }
 
 void myb3k_state::select_dma_channel(int channel, bool state)
 {
-	LOGDMA("%s: %d:%d\n", FUNCNAME, channel, state);
-	if(!state) {
+	LOGDMA("select_dma_channel: %d:%d\n", channel, state);
+	if (!state)
+	{
 		m_dma_channel = channel;
-		if(!m_cur_tc)
-			m_isabus->eop_w(channel, ASSERT_LINE );
+		if (!m_cur_tc)
+			m_isabus->eop_w(channel, ASSERT_LINE);
 
-	} else if(m_dma_channel == channel) {
+	}
+	else if (m_dma_channel == channel)
+	{
 		m_dma_channel = -1;
 		if(m_cur_tc)
-			m_isabus->eop_w(channel, CLEAR_LINE );
+			m_isabus->eop_w(channel, CLEAR_LINE);
 	}
 }
 
 WRITE_LINE_MEMBER( myb3k_state::tc_w )
 {
-	LOGDMA("%s: %d\n", FUNCNAME, state);
-	if(m_dma_channel != -1 && (state == ASSERT_LINE) != m_cur_tc)
-		m_isabus->eop_w(m_dma_channel, m_cur_tc ? ASSERT_LINE : CLEAR_LINE );
+	LOGDMA("tc_w: %d\n", state);
+	if (m_dma_channel != -1 && (state == ASSERT_LINE) != m_cur_tc)
+		m_isabus->eop_w(m_dma_channel, m_cur_tc ? ASSERT_LINE : CLEAR_LINE);
 	m_cur_tc = state == ASSERT_LINE;
 }
 
 WRITE_LINE_MEMBER(myb3k_state::pic_int_w)
 {
-	LOGPIC("%s: %d\n", FUNCNAME, state);
+	LOGPIC("pic_int_w: %d\n", state);
 	m_maincpu->set_input_line(0, state);
 }
 
 /* pic_ir5_w - select interrupt source depending on jumper J4 setting, either ISA IRQ5 or PPI PC3 (Light Pen) */
 void myb3k_state::pic_ir5_w(int source, int state)
 {
-	LOGPIC("%s: %d\n", FUNCNAME, state);
+	LOGPIC("pic_ir5_w: %d\n", state);
 	if (!machine().paused() && (source & m_io_j4->read()))
 		m_pic8259->ir5_w(state);
 }
@@ -787,26 +779,26 @@ void myb3k_state::pic_ir5_w(int source, int state)
 /* pic_ir7_w - select interrupt source depending on jumper J5 setting, either ISA IRQ7 or Centronics Ack */
 void myb3k_state::pic_ir7_w(int source, int state)
 {
-	LOGPIC("%s: %d\n", FUNCNAME, state);
+	LOGPIC("pic_ir7_w: %d\n", state);
 	if (!machine().paused() && (source & m_io_j5->read()))
 		m_pic8259->ir7_w(state);
 }
 
 WRITE_LINE_MEMBER( myb3k_state::pit_out1_changed )
 {
-	LOGPIT("%s: %d\n", FUNCNAME, state);
-	m_speaker->level_w(state ? 1 : 0);
+	LOGPIT("pit_out1_changed: %d\n", state);
+	m_speaker->level_w(state);
 }
 
 void myb3k_state::dma_segment_w(uint8_t data)
 {
-	LOGDMA("%s: %02x\n", FUNCNAME, data);
-	m_dma_page[(data >> 6) & 3] = (data & 0x0f);
+	LOGDMA("dma_segment_w: %02x\n", data);
+	m_dma_page[(data >> 6) & 3] = data & 0x0f;
 }
 
 WRITE_LINE_MEMBER(myb3k_state::hrq_w)
 {
-	LOGDMA("%s: %d\n", FUNCNAME, state);
+	LOGDMA("hrq_w: %d\n", state);
 
 	// Should connect to hold input clocked by DMA clock but hold isn't emulated
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -821,7 +813,7 @@ uint8_t myb3k_state::dma_memory_read_byte(offs_t offset)
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t tmp = prog_space.read_byte(offset | m_dma_page[m_dma_channel & 3] << 16);
-	LOGDMA("%s: %x:%04x => %02x\n", FUNCNAME, m_dma_channel, offset, tmp);
+	LOGDMA("dma_memory_read_byte: %x:%04x => %02x\n", m_dma_channel, offset, tmp);
 
 	return tmp;
 }
@@ -831,21 +823,21 @@ void myb3k_state::dma_memory_write_byte(offs_t offset, uint8_t data)
 	assert(m_dma_channel != -1);
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	LOGDMA("%s: %x:%04x <= %02x\n", FUNCNAME, m_dma_channel, offset, data);
+	LOGDMA("dma_memory_write_byte: %x:%04x <= %02x\n", m_dma_channel, offset, data);
 
 	return prog_space.write_byte(offset |  m_dma_page[m_dma_channel & 3] << 16, data);
 }
 
 uint8_t myb3k_state::ppi_portb_r()
 {
-	LOGPPI("%s\n", FUNCNAME);
+	LOGPPI("ppi_portb_r\n");
 
 	return m_io_dsw1->read();
 }
 
 void myb3k_state::ppi_portc_w(uint8_t data)
 {
-	LOGPPI("%s: %02x\n", FUNCNAME, data);
+	LOGPPI("ppi_portc_w: %02x\n", data);
 	LOGPPI(" - STROBE : %d\n", (data & PC0_STROBE)  ? 1 : 0);
 	LOGPPI(" - SETPAGE: %d\n", (data & PC1_SETPAGE) ? 1 : 0);
 	LOGPPI(" - DISPST : %d\n", (data & PC2_DISPST)  ? 1 : 0);
@@ -854,7 +846,7 @@ void myb3k_state::ppi_portc_w(uint8_t data)
 	LOGPPI(" - BUZON  : %d\n", (data & PC5_BUZON)   ? 1 : 0);
 	LOGPPI(" - CMTWRD : %d\n", (data & PC6_CMTWRD)  ? 1 : 0);
 	LOGPPI(" - CMTEN  : %d\n", (data & PC7_CMTEN)   ? 1 : 0);
-	LOGPPI(" => CMTEN: %d BUZON: %d\n", (data & PC7_CMTEN) ? 1 : 0, (data & PC5_BUZON)? 1 : 0);
+	LOGPPI(" => CMTEN: %d BUZON: %d\n", (data & PC7_CMTEN) ? 1 : 0, (data & PC5_BUZON) ? 1 : 0);
 
 	/* Centronics strobe signal */
 	LOGCENT("Centronics strobe %d\n", (data & PC0_STROBE) ? 1 : 0);
@@ -867,7 +859,7 @@ void myb3k_state::ppi_portc_w(uint8_t data)
 	 *  (CMTEN is active   low  and CMTRD is inactive high)
 	 * and CMTRD is low). Problem is that the schematics fails to show where CMTRD comes from so only the first case is emulated
 	 */
-	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN)? 1 : 0);
+	m_pit8253->write_gate1(!(data & PC5_BUZON) && (data & PC7_CMTEN) ? 1 : 0);
 
 	/* Update light pen interrupt */
 	pic_ir5_w(PPI_PC3, (data & PC3_LPENB) ? 1 : 0);
@@ -880,29 +872,30 @@ void myb3k_state::ppi_portc_w(uint8_t data)
 /* ISA IRQ5 handler */
 WRITE_LINE_MEMBER (myb3k_state::isa_irq5_w)
 {
-		LOGCENT("%s %d\n", FUNCNAME, state);
-		pic_ir5_w(ISA_IRQ5, state);
+	LOGCENT("isa_irq5_w %d\n", state);
+	pic_ir5_w(ISA_IRQ5, state);
 }
 
 /* ISA IRQ7 handler */
 WRITE_LINE_MEMBER (myb3k_state::isa_irq7_w)
 {
-		LOGCENT("%s %d\n", FUNCNAME, state);
-		pic_ir7_w(ISA_IRQ7, state);
+	LOGCENT("isa_irq7_w %d\n", state);
+	pic_ir7_w(ISA_IRQ7, state);
 }
 
 /* Centronics ACK handler */
 WRITE_LINE_MEMBER (myb3k_state::centronics_ack_w)
 {
-		LOGCENT("%s %d\n", FUNCNAME, state);
-		pic_ir7_w(CENT_ACK, state);
+	LOGCENT("centronics_ack_w %d\n", state);
+	pic_ir7_w(CENT_ACK, state);
 }
 
 /* Centronics BUSY handler
  * The busy line is enterring the schematics from the connector but is lost to its way to the status latch
  * but there is only two possibilities, either D0 or D1  */
-WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w){
-	LOGCENT("%s %d\n", FUNCNAME, state);
+WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w)
+{
+	LOGCENT("centronics_busy_w %d\n", state);
 	if (state == ASSERT_LINE)
 		m_io_status &= ~IOSTAT_BUSY;
 	else
@@ -910,8 +903,9 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_busy_w){
 }
 
 /* Centronics PERROR handler */
-WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w){
-	LOGCENT("%s %d\n", FUNCNAME, state);
+WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w)
+{
+	LOGCENT("centronics_perror_w %d\n", state);
 	if (state == ASSERT_LINE)
 		m_io_status &= ~IOSTAT_FAULT;
 	else
@@ -919,8 +913,9 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_perror_w){
 }
 
 /* Centronics SELECT handler - The centronics select signal is not used by this hardware */
-WRITE_LINE_MEMBER (myb3k_state::centronics_select_w){
-		LOGCENT("%s %d - not used by machine\n", FUNCNAME, state);
+WRITE_LINE_MEMBER (myb3k_state::centronics_select_w)
+{
+	LOGCENT("centronics_select_w %d - not used by machine\n", state);
 }
 
 static void stepone_isa_cards(device_slot_interface &device)

@@ -80,9 +80,9 @@ protected:
 	uint8_t spr_r(offs_t offset);
 	uint8_t chr_r(offs_t offset);
 	void chr_w(offs_t offset, uint8_t data);
-	void scanline_irq(int scanline, int vblank, int blanked);
-	void hblank_irq(int scanline, int vblank, int blanked);
-	void video_irq(bool hblank, int scanline, int vblank, int blanked);
+	void scanline_irq(int scanline, bool vblank, bool blanked);
+	void hblank_irq(int scanline, bool vblank, bool blanked);
+	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
 	uint8_t nt_r(offs_t offset);
 	void nt_w(offs_t offset, uint8_t data);
 	int calculate_real_video_address(int addr, int extended, int readtype);

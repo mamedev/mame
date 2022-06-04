@@ -99,15 +99,12 @@ protected:
 	{
 		TIMER_ID_1,
 		TIMER_ID_2,
-		TIMER_ID_3,
-		TIMER_LINE,
-		TIMER_FRAME
+		TIMER_ID_3
 	};
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sound_interface callbacks
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -125,8 +122,9 @@ protected:
 	void draw_cursor(int ybegin, int yend, int yoff, int xoff, int color);
 	void drawlines(int first, int last);
 	void soundport_w(int offset, int data);
-	void frame_interrupt_gen();
-	void raster_interrupt_gen();
+	TIMER_CALLBACK_MEMBER(timer_expired);
+	TIMER_CALLBACK_MEMBER(frame_interrupt_gen);
+	TIMER_CALLBACK_MEMBER(raster_interrupt_gen);
 	int cs0_r(offs_t offset);
 	int cs1_r(offs_t offset);
 
@@ -147,16 +145,24 @@ protected:
 	int m_frame_count;
 
 	int m_lines;
-	int m_timer1_active, m_timer2_active, m_timer3_active;
-	emu_timer *m_timer1, *m_timer2, *m_timer3;
+	bool m_timer_active[3];
+	emu_timer *m_timer[3];
 	int m_cursor1;
 
-	int m_chargenaddr, m_bitmapaddr, m_videoaddr;
+	int m_chargenaddr;
+	int m_bitmapaddr;
+	int m_videoaddr;
 
 	int m_x_begin, m_x_end;
 	int m_y_begin, m_y_end;
 
-	uint16_t m_c16_bitmap[2], m_bitmapmulti[4], m_mono[2], m_monoinversed[2], m_multi[4], m_ecmcolor[2], m_colors[5];
+	uint16_t m_c16_bitmap[2];
+	uint16_t m_bitmapmulti[4];
+	uint16_t m_mono[2];
+	uint16_t m_monoinversed[2];
+	uint16_t m_multi[4];
+	uint16_t m_ecmcolor[2];
+	uint16_t m_colors[5];
 
 	int m_rasterline, m_lastline;
 	double m_rastertime;

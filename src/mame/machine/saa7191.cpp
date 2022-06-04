@@ -53,9 +53,6 @@ void saa7191_device::device_start()
 	m_uv_out.resolve_safe();
 	m_hs_out.resolve_safe();
 	m_vs_out.resolve_safe();
-
-	m_input_clock = timer_alloc(TIMER_INPUT_CLOCK);
-	m_input_clock->adjust(attotime::never);
 }
 
 void saa7191_device::device_reset()
@@ -67,12 +64,6 @@ void saa7191_device::device_reset()
 	m_i2c_read_addr = 0x8b;
 	m_i2c_subaddr = 0x00;
 	m_i2c_state = I2C_STATE_IDLE;
-
-	m_input_clock->adjust(attotime::never);
-}
-
-void saa7191_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
 }
 
 void saa7191_device::i2c_data_w(uint8_t data)

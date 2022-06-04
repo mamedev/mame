@@ -44,7 +44,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -65,6 +64,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+
+	TIMER_CALLBACK_MEMBER(clk_tick);
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t ram_select_r();

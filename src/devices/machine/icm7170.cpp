@@ -60,8 +60,6 @@ enum
 	IRQ_BIT_ALARM = 0x01
 };
 
-static constexpr int ICM7170_TIMER_ID = 0;
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -88,7 +86,7 @@ void icm7170_device::device_start()
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 
-	m_timer = timer_alloc(ICM7170_TIMER_ID);
+	m_timer = timer_alloc(FUNC(icm7170_device::clock_tick), this);
 
 	// TODO: frequency should be based on input clock and divisor
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
@@ -110,10 +108,10 @@ void icm7170_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handles timer events
+//  clock_tick - advance the RTC's counters
 //-------------------------------------------------
 
-void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(icm7170_device::clock_tick)
 {
 	// advance hundredths
 	m_irq_status |= IRQ_BIT_100TH_SECOND;
@@ -122,11 +120,11 @@ void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_regs[REG_CNT_100TH_SEC] = 0;
 
 		if (m_regs[REG_COMMAND] & CMD_REG_24_HOUR)
-			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d\n",
+			LOG("clock_tick %02d-%02d-%02d %02d:%02d:%02d\n",
 				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
 				m_regs[REG_CNT_HOURS], m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS]);
 		else
-			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d %s\n",
+			LOG("clock_tick %02d-%02d-%02d %02d:%02d:%02d %s\n",
 				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
 				m_regs[REG_CNT_HOURS] & 0xf, m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS],
 				(m_regs[REG_CNT_HOURS] & 0x80) ? "pm" : "am");

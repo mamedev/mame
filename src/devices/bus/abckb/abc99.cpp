@@ -398,15 +398,11 @@ ioport_constructor abc99_device::device_input_ports() const
 
 
 
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
 //-------------------------------------------------
 //  serial_input -
 //-------------------------------------------------
 
-inline void abc99_device::serial_input()
+void abc99_device::serial_input()
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, (m_si || m_si_en) ? CLEAR_LINE : ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
@@ -417,7 +413,7 @@ inline void abc99_device::serial_input()
 //  serial_output -
 //-------------------------------------------------
 
-inline void abc99_device::serial_output(int state)
+void abc99_device::serial_output(int state)
 {
 	if (m_txd != state)
 	{
@@ -432,7 +428,7 @@ inline void abc99_device::serial_output(int state)
 //  serial_clock -
 //-------------------------------------------------
 
-inline void abc99_device::serial_clock()
+TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 {
 	m_slot->trxc_w(1);
 	m_slot->trxc_w(0);
@@ -440,25 +436,25 @@ inline void abc99_device::serial_clock()
 
 
 //-------------------------------------------------
+//  scan_mouse -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(abc99_device::scan_mouse)
+{
+}
+
+
+//-------------------------------------------------
 //  keydown -
 //-------------------------------------------------
 
-inline void abc99_device::key_down(int state)
+void abc99_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
 		m_slot->keydown_w(state);
 		m_keydown = state;
 	}
-}
-
-
-//-------------------------------------------------
-//  scan_mouse -
-//-------------------------------------------------
-
-inline void abc99_device::scan_mouse()
-{
 }
 
 
@@ -502,10 +498,10 @@ void abc99_device::device_start()
 {
 	m_leds.resolve();
 	// allocate timers
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
 
-	m_mouse_timer = timer_alloc(TIMER_MOUSE);
+	m_mouse_timer = timer_alloc(FUNC(abc99_device::scan_mouse), this);
 
 	// state saving
 	save_item(NAME(m_si));
@@ -532,25 +528,6 @@ void abc99_device::device_reset()
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
 	m_slot->write_rx(1);
-}
-
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SERIAL:
-		serial_clock();
-		break;
-
-	case TIMER_MOUSE:
-		scan_mouse();
-		break;
-	}
 }
 
 

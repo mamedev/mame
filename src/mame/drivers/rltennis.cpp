@@ -160,7 +160,7 @@ INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
 
 void rltennis_state::machine_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rltennis_state::sample_player),this));
+	m_timer = timer_alloc(FUNC(rltennis_state::sample_player), this);
 
 	save_item(NAME(m_data760000));
 	save_item(NAME(m_data740000));

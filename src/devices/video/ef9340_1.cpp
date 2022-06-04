@@ -65,10 +65,10 @@ void ef9340_1_device::device_start()
 	// let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
-	m_line_timer = timer_alloc(TIMER_LINE);
+	m_line_timer = timer_alloc(FUNC(ef9340_1_device::draw_scanline), this);
 	m_line_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
-	m_blink_timer = timer_alloc(TIMER_BLINK);
+	m_blink_timer = timer_alloc(FUNC(ef9340_1_device::blink_update), this);
 	m_blink_timer->adjust(screen().time_until_pos(0, 0), 0, screen().frame_period());
 
 	// zerofill
@@ -107,29 +107,19 @@ void ef9340_1_device::device_start()
 }
 
 
-void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ef9340_1_device::blink_update)
 {
-	switch (id)
-	{
-		case TIMER_LINE:
-			ef9340_scanline(screen().vpos());
-			break;
+	// blink rate is approximately 0.5s
+	m_ef9340.blink_prescaler = (m_ef9340.blink_prescaler + 1) & 0x1f;
+	if (m_ef9340.R & 0x40 && m_ef9340.blink_prescaler == 24)
+		m_ef9340.blink_prescaler = 0;
 
-		case TIMER_BLINK:
-			// blink rate is approximately 0.5s
-			m_ef9340.blink_prescaler = (m_ef9340.blink_prescaler + 1) & 0x1f;
-			if (m_ef9340.R & 0x40 && m_ef9340.blink_prescaler == 24)
-				m_ef9340.blink_prescaler = 0;
-
-			if (m_ef9340.blink_prescaler == 0)
-				m_ef9340.blink = !m_ef9340.blink;
-
-			break;
-	}
+	if (m_ef9340.blink_prescaler == 0)
+		m_ef9340.blink = !m_ef9340.blink;
 }
 
 
-u16 ef9340_1_device::ef9340_get_c_addr(u8 x, u8 y)
+u16 ef9340_1_device::get_c_addr(u8 x, u8 y)
 {
 	if ((y & 0x18) == 0x18)
 	{
@@ -143,7 +133,7 @@ u16 ef9340_1_device::ef9340_get_c_addr(u8 x, u8 y)
 }
 
 
-void ef9340_1_device::ef9340_inc_c()
+void ef9340_1_device::inc_c()
 {
 	m_ef9340.X++;
 	if (m_ef9340.X == 40 || m_ef9340.X == 48 || m_ef9340.X == 56 || m_ef9340.X == 64)
@@ -181,7 +171,7 @@ void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 					m_ef9340.X = m_ef9341.TA & 0x3f;
 					break;
 				case 0x60: // increment C
-					ef9340_inc_c();
+					inc_c();
 					break;
 				case 0x80: // load M
 					m_ef9340.M = m_ef9341.TA;
@@ -206,7 +196,7 @@ void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 	{
 		if (b)
 		{
-			u16 addr = ef9340_get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
+			u16 addr = get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
 
 			m_ef9341.TB = data;
 			m_ef9341.busy = true;
@@ -215,7 +205,7 @@ void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 				case 0x00: // write
 					m_ram_a[addr] = m_ef9341.TA;
 					m_ram_b[addr] = m_ef9341.TB;
-					ef9340_inc_c();
+					inc_c();
 					break;
 
 				case 0x40: // write without increment
@@ -271,7 +261,7 @@ u8 ef9340_1_device::ef9341_read(u8 command, u8 b)
 	{
 		if (b)
 		{
-			u16 addr = ef9340_get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
+			u16 addr = get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
 
 			data = m_ef9341.TB;
 			m_ef9341.busy = true;
@@ -280,7 +270,7 @@ u8 ef9340_1_device::ef9341_read(u8 command, u8 b)
 				case 0x20: // read
 					m_ef9341.TA = m_ram_a[addr];
 					m_ef9341.TB = m_ram_b[addr];
-					ef9340_inc_c();
+					inc_c();
 					break;
 
 				case 0x60: // read without increment
@@ -321,8 +311,9 @@ u8 ef9340_1_device::ef9341_read(u8 command, u8 b)
 }
 
 
-void ef9340_1_device::ef9340_scanline(int vpos)
+TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 {
+	int vpos = screen().vpos();
 	vpos -= m_offset_y;
 	if (vpos < 0)
 		return;
@@ -370,7 +361,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		for (int x = 0; x < 40; x++)
 		{
 			int s = slice;
-			u16 addr = ef9340_get_c_addr(x, y_row);
+			u16 addr = get_c_addr(x, y_row);
 			u8 a = m_ram_a[addr];
 			u8 b = m_ram_b[addr];
 			bool blink = m_ef9340.R & 0x80 && m_ef9340.blink;

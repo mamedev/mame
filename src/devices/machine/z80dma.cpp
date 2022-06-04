@@ -181,7 +181,7 @@ void z80dma_device::device_start()
 	m_out_iorq_cb.resolve_safe();
 
 	// allocate timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80dma_device::timerproc), this));
+	m_timer = timer_alloc(FUNC(z80dma_device::timerproc), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));

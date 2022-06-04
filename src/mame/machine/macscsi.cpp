@@ -96,7 +96,7 @@ void mac_scsi_helper_device::device_resolve_objects()
 
 void mac_scsi_helper_device::device_start()
 {
-	m_pseudo_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_scsi_helper_device::timer_callback), this));
+	m_pseudo_dma_timer = timer_alloc(FUNC(mac_scsi_helper_device::timer_callback), this);
 
 	save_item(NAME(m_mode));
 	save_item(NAME(m_read_fifo_bytes));

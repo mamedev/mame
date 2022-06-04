@@ -222,18 +222,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack6_w) { m_dma1->hack_w(state ? 0 : 1); }
 	DECLARE_WRITE_LINE_MEMBER(dack7_w) { m_dma1->hack_w(state ? 0 : 1); }
 
-	enum
-	{
-		BEEP_TIMER = 100
-	};
-
 	void octopus_io(address_map &map);
 	void octopus_mem(address_map &map);
 	void octopus_sub_io(address_map &map);
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(beep_off);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -369,14 +364,9 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(octopus_state::beep_off)
 {
-	switch(id)
-	{
-	case BEEP_TIMER:  // switch off speaker
-		m_beep_active = false;
-		break;
-	}
+	m_beep_active = false;
 }
 
 void octopus_state::vram_w(offs_t offset, uint8_t data)
@@ -756,7 +746,7 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 
 void octopus_state::machine_start()
 {
-	m_timer_beep = timer_alloc(BEEP_TIMER);
+	m_timer_beep = timer_alloc(FUNC(octopus_state::beep_off), this);
 	m_vidctrl = 0xff;
 
 	// install RAM

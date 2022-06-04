@@ -38,7 +38,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// FSM states
@@ -105,6 +104,10 @@ private:
 
 	// PLL
 	fdc_pll_t m_pll;
+
+	TIMER_CALLBACK_MEMBER(fsm_tick);
+	TIMER_CALLBACK_MEMBER(head_tick);
+	TIMER_CALLBACK_MEMBER(bit_byte_tick);
 
 	void floppy_ready_cb(floppy_image_device *floppy , int state);
 	void floppy_index_cb(floppy_image_device *floppy , int state);

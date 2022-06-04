@@ -330,7 +330,7 @@ void segaxbd_state::device_start()
 	video_start();
 
 	// allocate a scanline timer
-	m_scanline_timer = timer_alloc(TID_SCANLINE);
+	m_scanline_timer = timer_alloc(FUNC(segaxbd_state::scanline_tick), this);
 
 	// save state
 	save_item(NAME(m_timer_irq_state));
@@ -594,41 +594,34 @@ void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  scanline_tick
 //-------------------------------------------------
 
-void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segaxbd_state::scanline_tick)
 {
-	switch (id)
+	int scanline = param;
+	int next_scanline = (scanline + 1) % 262;
+
+	// clock the timer with V0
+	m_cmptimer_1->exck_w(scanline % 2);
+
+	// set VBLANK on scanline 223
+	if (scanline == 223)
 	{
-		case TID_SCANLINE:
-		{
-			int scanline = param;
-			int next_scanline = (scanline + 1) % 262;
-
-			// clock the timer with V0
-			m_cmptimer_1->exck_w(scanline % 2);
-
-			// set VBLANK on scanline 223
-			if (scanline == 223)
-			{
-				m_vblank_irq_state = 1;
-				m_subcpu->set_input_line(4, ASSERT_LINE);
-				update_main_irqs();
-			}
-
-			// clear VBLANK on scanline 224
-			else if (scanline == 224)
-			{
-				m_vblank_irq_state = 0;
-				m_subcpu->set_input_line(4, CLEAR_LINE);
-				update_main_irqs();
-			}
-
-			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
-			break;
-		}
+		m_vblank_irq_state = 1;
+		m_subcpu->set_input_line(4, ASSERT_LINE);
+		update_main_irqs();
 	}
+
+	// clear VBLANK on scanline 224
+	else if (scanline == 224)
+	{
+		m_vblank_irq_state = 0;
+		m_subcpu->set_input_line(4, CLEAR_LINE);
+		update_main_irqs();
+	}
+
+	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
 

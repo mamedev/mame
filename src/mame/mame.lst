@@ -11667,6 +11667,10 @@ mgprem11                        // (c) 1995
 odeontw                         //
 odeontw2                        // (c) 1999
 
+@source:cucaracha.cpp
+cucaracha                       // (c) 1992 Taito
+cucaracha2                      // (c) 1992 Taito
+
 @source:cultures.cpp
 cultures                        // (c) 1994 Face
 
@@ -15566,10 +15570,6 @@ goindol                         // (c) 1987 Sun a Electronics
 goindolj                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
-
-@source:gokidetor.cpp
-gokidetor                       // (c) 1992 Taito
-gokidetor2                      // (c) 1992 Taito
 
 @source:goldart.cpp
 goldart
@@ -23297,6 +23297,7 @@ mm2a                            // Mephisto MM II
 mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
+mm2e                            // Mephisto MM II
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -35462,6 +35463,7 @@ picno2                          // Konami Picno 2 (1993)
 dumpump                         //
 fidlstix                        //
 hoopitup                        //
+hoopitup21                      //
 hoopshot                        //
 jackbean                        //
 piggypas                        //
@@ -39314,6 +39316,7 @@ ballboy3p                       // bootleg
 cookbib2                        // (c) 1996 SemiCom
 cookbib2a                       // (c) 1996 SemiCom
 cookbib2b                       // (c) 1996 SemiCom
+cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
 honeydol                        // (c) 1995 Barko Corp
@@ -41965,6 +41968,10 @@ tokims
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
 
+@source:tomsadvs.cpp
+icecoldice                      // (c) ICE
+tomsadvs                        //
+
 @source:tomy_princ.cpp
 princ                           // Tomy Prin-C (Japan)
 
@@ -42799,8 +42806,8 @@ boxingm                         // 2001
 code1d                          // 2000
 code1da                         // 2000
 code1db                         // 2000
-gticlub2                        // 2001
-gticlub2ea                      // 2001
+gticlub2                        // 2000
+gticlub2ea                      // 2000
 jpark3                          // 2001
 jpark3u                         // 2001
 kviper                          // 1999
@@ -42809,15 +42816,15 @@ mfightcc                        // 2002
 mocapb                          // 2001
 mocapbj                         // 2001
 mocapglf                        // 2001
-p911                            // 2001
+p911                            // 2000
 p9112                           // 2001
-p911ac                          // 2001
-p911ea                          // 2001
-p911ed                          // 2001
-p911j                           // 2001
-p911k                           // 2001
-p911kc                          // 2001
-p911ud                          // 2001
+p911ac                          // 2000
+p911ea                          // 2000
+p911ed                          // 2000
+p911j                           // 2000
+p911k                           // 2000
+p911kc                          // 2000
+p911ud                          // 2000
 ppp2nd                          // 2001
 ppp2nda                         // 2001
 sogeki                          // 2001

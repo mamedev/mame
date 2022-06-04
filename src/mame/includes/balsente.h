@@ -163,6 +163,7 @@ private:
 	uint8_t m_shooter_x = 0;
 	uint8_t m_shooter_y = 0;
 	uint8_t m_adc_shift = 0;
+	emu_timer *m_irq_off_timer = nullptr;
 
 	/* random number generator states */
 	uint8_t m_rand17[POLY17_SIZE + 1]{};
@@ -170,6 +171,7 @@ private:
 	/* ADC I/O states */
 	int8_t m_analog_input_data[4]{};
 	uint8_t m_adc_value = 0;
+	emu_timer *m_adc_timer = nullptr;
 
 	/* game-specific states */
 	uint8_t m_nstocker_bits = 0;

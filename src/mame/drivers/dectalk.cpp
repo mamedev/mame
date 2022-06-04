@@ -264,11 +264,6 @@ public:
 	void dectalk(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_OUTFIFO_READ
-	};
-
 	// input fifo, between m68k and tms32010
 	uint16_t m_infifo[32]{}; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
 	uint8_t m_infifo_count = 0;
@@ -325,8 +320,6 @@ private:
 	void m68k_mem(address_map &map);
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -449,7 +442,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 
 void dectalk_state::machine_start()
 {
-	m_outfifo_read_timer = timer_alloc(TIMER_OUTFIFO_READ);
+	m_outfifo_read_timer = timer_alloc(FUNC(dectalk_state::outfifo_read_cb), this);
 	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
 	save_item(NAME(m_infifo));
 	save_item(NAME(m_infifo_count));
@@ -839,17 +832,6 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
-	}
-}
 
 TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {

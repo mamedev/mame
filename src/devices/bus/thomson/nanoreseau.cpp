@@ -86,7 +86,7 @@ void nanoreseau_device::rom_map(address_map &map)
 void nanoreseau_device::io_map(address_map &map)
 {
 	map(0, 3).rw(m_mc6854, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
-	if(!m_no_id)
+	if (!m_no_id)
 		map(8, 8).r(FUNC(nanoreseau_device::id_r));
 }
 
@@ -108,7 +108,7 @@ void nanoreseau_device::device_add_mconfig(machine_config &config)
 
 void nanoreseau_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(nanoreseau_device::answer_tick), this);
 	save_item(NAME(m_answer_step));
 }
 
@@ -127,14 +127,13 @@ ioport_constructor nanoreseau_device::device_input_ports() const
 /*********************** Network ************************/
 
 /* The network extension is built as an external floppy controller.
-   It uses the same ROM and I/O space, and so, it is natural to have the
-   toplevel network emulation here!
-*/
+   It uses the same ROM and I/O space, so it is natural to have the
+   top-level network emulation here.
 
-/* NOTE: This is work in progress!
-   For the moment, only hand-checks works: the TO7 can take the line, then
-   perform a DKBOOT request. We do not have the server emulated yet, so,
-   no way to answer the request.
+   NOTE: This is work in progress.
+   For the moment, only hand-checks work: the TO7 can take the line, then
+   perform a DKBOOT request. We do not have the server emulated yet, so
+   there is no way to answer the request.
 */
 
 /* consigne DKBOOT
@@ -166,11 +165,11 @@ ioport_constructor nanoreseau_device::device_input_ports() const
 
 */
 
-void nanoreseau_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nanoreseau_device::answer_tick)
 {
-	m_answer_step ++;
+	m_answer_step++;
 	m_mc6854->set_cts(m_answer_step & 1);
-	if(m_answer_step < 4)
+	if (m_answer_step < 4)
 		m_timer->adjust(attotime::from_usec(100));
 }
 
@@ -181,7 +180,7 @@ void nanoreseau_device::got_frame(uint8_t *data, int length)
 		frame += util::string_format(" %02x", data[i]);
 	logerror("%s\n", frame);
 
-	if(data[1] == 0xff) {
+	if (data[1] == 0xff) {
 		logerror("frame: %d phones %d\n", data[2], data[0]);
 		m_answer_step = 0;
 		m_timer->adjust(attotime::from_usec(100));
@@ -192,7 +191,7 @@ void nanoreseau_device::got_frame(uint8_t *data, int length)
 		memcpy(name, data + 12, 32);
 		name[32] = 0;
 		for(int i=0; i<32; i++)
-			if(name[i] < 32 || name[i] >= 127)
+			if (name[i] < 32 || name[i] >= 127)
 				name[i]='.';
 		logerror("DKBOOT system %s appli %s\n", data[10] == 0 ? "TO7" : data[10] == 1 ? "MO5" : data[10] == 2 ? "TO7/70" : "?", name);
 	}

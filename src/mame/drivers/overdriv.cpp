@@ -417,7 +417,7 @@ INPUT_PORTS_END
 void overdriv_state::machine_start()
 {
 	m_led.resolve();
-	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
+	m_objdma_end_timer = timer_alloc(FUNC(overdriv_state::objdma_end_cb), this);
 
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));

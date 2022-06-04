@@ -44,8 +44,8 @@ void clock_device::device_start()
 	save_item(NAME(m_thigh));
 	save_item(NAME(m_tlow));
 
-	m_timer_init = timer_alloc(TID_CLOCK_INIT);
-	m_timer_tick = timer_alloc(TID_CLOCK_TICK);
+	m_timer_init = timer_alloc(FUNC(clock_device::clock_init), this);
+	m_timer_tick = timer_alloc(FUNC(clock_device::clock_tick), this);
 	reinit();
 }
 
@@ -67,77 +67,67 @@ void clock_device::output()
 	}
 }
 
-void clock_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(clock_device::clock_init)
 {
-	switch (id)
+	attotime period = (m_clock > 0) ? attotime::from_hz(m_clock) : m_period;
+	assert(!period.is_zero());
+
+	if (period.is_never())
 	{
-		case TID_CLOCK_INIT:
-		{
-			attotime period = (m_clock > 0) ? attotime::from_hz(m_clock) : m_period;
-			assert(!period.is_zero());
-
-			if (period.is_never())
-			{
-				m_timer_tick->adjust(attotime::never);
-				return;
-			}
-
-			if (!m_pw.is_never())
-			{
-				// set timing via pulse width
-				attotime pw = m_pw;
-				if (pw > period)
-					pw = period;
-
-				m_thigh = pw;
-				m_tlow = period - pw;
-			}
-			else
-			{
-				// set timing via duty cycle
-				if (m_duty == 0.5)
-				{
-					m_thigh = period / 2;
-					m_tlow = m_thigh;
-				}
-				else if (m_duty == 0.0)
-				{
-					m_thigh = attotime::zero;
-					m_tlow = period;
-				}
-				else if (m_duty == 1.0)
-				{
-					m_thigh = period;
-					m_tlow = attotime::zero;
-				}
-				else
-				{
-					double p = period.as_double();
-					m_thigh = attotime::from_double(m_duty * p);
-					m_tlow = attotime::from_double((1.0 - m_duty) * p);
-				}
-			}
-
-			attotime next = m_signal ? m_thigh : m_tlow;
-			if (next < m_timer_tick->remaining())
-				m_timer_tick->adjust(next);
-
-			break;
-		}
-
-		case TID_CLOCK_TICK:
-			if (m_thigh.is_zero())
-				m_signal = 0;
-			else if (m_tlow.is_zero())
-				m_signal = 1;
-			else
-				m_signal ^= 1;
-
-			m_timer_tick->adjust(m_signal ? m_thigh : m_tlow);
-			output();
-			break;
-
-		default:
-			break;
+		m_timer_tick->adjust(attotime::never);
+		return;
 	}
+
+	if (!m_pw.is_never())
+	{
+		// set timing via pulse width
+		attotime pw = m_pw;
+		if (pw > period)
+			pw = period;
+
+		m_thigh = pw;
+		m_tlow = period - pw;
+	}
+	else
+	{
+		// set timing via duty cycle
+		if (m_duty == 0.5)
+		{
+			m_thigh = period / 2;
+			m_tlow = m_thigh;
+		}
+		else if (m_duty == 0.0)
+		{
+			m_thigh = attotime::zero;
+			m_tlow = period;
+		}
+		else if (m_duty == 1.0)
+		{
+			m_thigh = period;
+			m_tlow = attotime::zero;
+		}
+		else
+		{
+			double p = period.as_double();
+			m_thigh = attotime::from_double(m_duty * p);
+			m_tlow = attotime::from_double((1.0 - m_duty) * p);
+		}
+	}
+
+	attotime next = m_signal ? m_thigh : m_tlow;
+	if (next < m_timer_tick->remaining())
+		m_timer_tick->adjust(next);
+}
+
+TIMER_CALLBACK_MEMBER(clock_device::clock_tick)
+{
+	if (m_thigh.is_zero())
+		m_signal = 0;
+	else if (m_tlow.is_zero())
+		m_signal = 1;
+	else
+		m_signal ^= 1;
+
+	m_timer_tick->adjust(m_signal ? m_thigh : m_tlow);
+	output();
 }

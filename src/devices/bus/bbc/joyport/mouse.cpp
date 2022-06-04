@@ -75,7 +75,7 @@ bbcmc_mouse_device::bbcmc_mouse_device(const machine_config &mconfig, const char
 
 void bbcmc_mouse_device::device_start()
 {
-	m_mouse_timer = timer_alloc();
+	m_mouse_timer = timer_alloc(FUNC(bbcmc_mouse_device::update), this);
 }
 
 
@@ -100,7 +100,7 @@ void bbcmc_mouse_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void bbcmc_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(bbcmc_mouse_device::update)
 {
 	int x = m_mouse_x->read();
 	int y = m_mouse_y->read();

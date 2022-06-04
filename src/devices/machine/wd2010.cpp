@@ -202,17 +202,11 @@ void wd2010_device::device_start()
 	m_in_sc_cb.resolve_safe(0);
 
 	/* allocate a timer for commands */
-	cmd_timer = timer_alloc(0);
-	complete_write_when_buffer_ready_high = timer_alloc(1);
-	deassert_write_when_buffer_ready_low = timer_alloc(2);
-	deassert_read_when_buffer_ready_high = timer_alloc(3);
+	m_cmd_timer = timer_alloc(FUNC(wd2010_device::command_complete), this);
+	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
+	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);
+	m_deassert_read_timer = timer_alloc(FUNC(wd2010_device::deassert_read), this);
 }
-
-// timers
-#define COMMAND_TIMER 0
-#define COMPLETE_WRITE_SECTOR 1
-#define DE_ASSERT_WRITE 2
-#define DE_ASSERT_READ 3
 
 
 //-------------------------------------------------
@@ -430,7 +424,7 @@ void wd2010_device::restore(uint8_t data)
 			// NOTE: calculation needs 'data' (extracted from command register)
 			float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );
 
-			cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
+			m_cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
 			return;
 		}
 
@@ -532,7 +526,7 @@ void wd2010_device::seek(uint8_t data)
 	m_task_file[TASK_FILE_CYLINDER_LOW] = (m_present_cylinder - ((m_task_file[TASK_FILE_CYLINDER_HIGH] << 8) )) & 0xff;
 
 	//LOGERROR("SEEK (END) - m_present_cylinder = %u SDH CYL L/H %02x / %02x\n", m_present_cylinder,m_task_file[TASK_FILE_CYLINDER_LOW],m_task_file[TASK_FILE_CYLINDER_HIGH]);
-	cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
+	m_cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
 }
 
 //-------------------------------------------------
@@ -644,7 +638,7 @@ void wd2010_device::read_sector(uint8_t data)
 	// NOTE : (intrq_at_end = 0) - INTRQ occurs when the command is completed
 	newstatus |= (m_status & ~(STATUS_CIP | STATUS_DRQ)) | intrq_at_end; // de-assert CIP + DRQ (BSY already reset)
 
-	deassert_read_when_buffer_ready_high->adjust(attotime::from_usec(1), newstatus); // complete command ON  *RISING EDGE * OF BUFFER_READY
+	m_deassert_read_timer->adjust(attotime::from_usec(1), newstatus); // complete command ON  *RISING EDGE * OF BUFFER_READY
 }
 
 
@@ -671,7 +665,7 @@ void wd2010_device::write_sector(uint8_t data)
 	m_out_bdrq_cb(1);
 
 	//  WAIT UNTIL BRDY ASSERTED (-> timer):
-	complete_write_when_buffer_ready_high->adjust(attotime::from_usec(1), data); // 1 usec
+	m_complete_write_timer->adjust(attotime::from_usec(1), data); // 1 usec
 }
 
 
@@ -728,7 +722,7 @@ void wd2010_device::complete_write_sector(uint8_t data)
 	} // --------------------------------------------------------
 
 	// 'complete_cmd' ON THE FALLING EDGE OF _BUFFER_READY_ ( set by WRITE_SECTOR ) !
-	deassert_write_when_buffer_ready_low->adjust(attotime::from_usec(1), newstatus);
+	m_deassert_write_timer->adjust(attotime::from_usec(1), newstatus);
 }
 
 // ******************************************************
@@ -862,7 +856,7 @@ void wd2010_device::format(uint8_t data)
 	m_out_wg_cb(0);   // (transition from WG 1 -> 0). Actual write.
 
 	//  ** DELAY INTRQ UNTIL WRITE IS COMPLETE :
-	complete_write_when_buffer_ready_high->adjust(attotime::from_usec(1), newstatus | STATUS_DRQ); // 1 USECs
+	m_complete_write_timer->adjust(attotime::from_usec(1), newstatus | STATUS_DRQ); // 1 USECs
 }
 
 
@@ -875,65 +869,63 @@ void wd2010_device::buffer_ready(bool state)
 }
 
 
-void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(wd2010_device::command_complete)
 {
-	switch (tid)
+	m_cmd_timer->adjust(attotime::never);
+	complete_immediate(param);
+}
+
+TIMER_CALLBACK_MEMBER(wd2010_device::complete_write)
+{
+	// when BUFFER_READY -> HIGH
+	if (is_buffer_ready)
 	{
-	case COMMAND_TIMER:
-		cmd_timer->adjust(attotime::never);
-		complete_immediate(param);
-		break;
-
-	case COMPLETE_WRITE_SECTOR:  // when BUFFER_READY -> HIGH
-		if (is_buffer_ready)
-		{
-			complete_write_when_buffer_ready_high->adjust(attotime::never);
-			complete_write_sector(param);
-		}
-		else
-		{
-			complete_write_when_buffer_ready_high->reset();
-			complete_write_when_buffer_ready_high->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
-		}
-		break;
-
-	case DE_ASSERT_WRITE: //  waiting for BUFFER_READY -> LOW
-		if (!(is_buffer_ready))
-		{
-			deassert_write_when_buffer_ready_low->adjust(attotime::never);
-			complete_immediate(param);
-		}
-		else
-		{
-			deassert_write_when_buffer_ready_low->reset();
-			deassert_write_when_buffer_ready_low->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
-		}
-		break;
-
-	case DE_ASSERT_READ: // when BUFFER_READY -> HIGH
-		if (is_buffer_ready)
-		{
-			deassert_read_when_buffer_ready_high->adjust(attotime::never);
-
-			m_error &= ~ERROR_ID;
-			param &= ~STATUS_ERR;
-
-			m_out_bdrq_cb(0);
-			complete_immediate(param);
-		}
-		else
-		{
-			deassert_read_when_buffer_ready_high->reset();
-			deassert_read_when_buffer_ready_high->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
-		}
-		break;
-
-	default:
-		break;
+		m_complete_write_timer->adjust(attotime::never);
+		complete_write_sector(param);
+	}
+	else
+	{
+		m_complete_write_timer->reset();
+		m_complete_write_timer->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
 	}
 }
 
-// Called by 'device_timer' -
+TIMER_CALLBACK_MEMBER(wd2010_device::deassert_write)
+{
+	//  waiting for BUFFER_READY -> LOW
+	if (!(is_buffer_ready))
+	{
+		m_deassert_write_timer->adjust(attotime::never);
+		complete_immediate(param);
+	}
+	else
+	{
+		m_deassert_write_timer->reset();
+		m_deassert_write_timer->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
+	}
+}
+
+TIMER_CALLBACK_MEMBER(wd2010_device::deassert_read)
+{
+	// when BUFFER_READY -> HIGH
+	if (is_buffer_ready)
+	{
+		m_deassert_read_timer->adjust(attotime::never);
+
+		m_error &= ~ERROR_ID;
+		param &= ~STATUS_ERR;
+
+		m_out_bdrq_cb(0);
+		complete_immediate(param);
+	}
+	else
+	{
+		m_deassert_read_timer->reset();
+		m_deassert_read_timer->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
+	}
+}
+
+// Called by timer callbacks -
 void wd2010_device::complete_immediate(uint8_t status)
 {
 	// re-evaluate external signals at end of command
@@ -964,5 +956,5 @@ void wd2010_device::complete_immediate(uint8_t status)
 
 void wd2010_device::complete_cmd(uint8_t status)
 {
-	cmd_timer->adjust(attotime::from_msec(1), status);
+	m_cmd_timer->adjust(attotime::from_msec(1), status);
 }

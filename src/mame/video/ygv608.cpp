@@ -483,8 +483,8 @@ void ygv608_device::device_start()
 	// TODO: tagging configuration
 	m_vblank_handler.resolve();
 	m_raster_handler.resolve();
-	m_vblank_timer = timer_alloc(VBLANK_TIMER);
-	m_raster_timer = timer_alloc(RASTER_TIMER);
+	m_vblank_timer = timer_alloc(FUNC(ygv608_device::update_vblank_flag), this);
+	m_raster_timer = timer_alloc(FUNC(ygv608_device::update_raster_flag), this);
 
 	register_state_save();
 }
@@ -513,30 +513,21 @@ inline void ygv608_device::raster_irq_check()
 		m_raster_handler(ASSERT_LINE);
 }
 
-
-void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ygv608_device::update_vblank_flag)
 {
-	switch(id)
-	{
-		case VBLANK_TIMER:
-		{
-			m_screen_status |= 8; // FV
-			vblank_irq_check();
-			break;
-		}
-		case RASTER_TIMER:
-		{
-			m_screen_status |= 0x10; // FP
-			raster_irq_check();
-
-			// adjust for next one shot
-			m_raster_timer->reset();
-			m_raster_timer->adjust(raster_sync_offset(), 0);
-			break;
-		}
-	}
+	m_screen_status |= 8; // FV
+	vblank_irq_check();
 }
 
+TIMER_CALLBACK_MEMBER(ygv608_device::update_raster_flag)
+{
+	m_screen_status |= 0x10; // FP
+	raster_irq_check();
+
+	// adjust for next one shot
+	m_raster_timer->reset();
+	m_raster_timer->adjust(raster_sync_offset(), 0);
+}
 
 void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {

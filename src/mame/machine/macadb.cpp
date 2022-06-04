@@ -222,7 +222,7 @@ void macadb_device::device_start()
 	write_adb_data.resolve_safe();
 	write_adb_irq.resolve_safe();
 
-	this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macadb_device::mac_adb_tick),this));
+	this->m_adb_timer = timer_alloc(FUNC(macadb_device::mac_adb_tick), this);
 	this->m_adb_timer->adjust(attotime::never);
 
 	std::fill(std::begin(m_adb_buffer), std::end(m_adb_buffer), 0);

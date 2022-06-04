@@ -82,8 +82,8 @@ void cedar_magnet_board_interface::interface_pre_reset()
 
 void cedar_magnet_board_interface::interface_pre_start()
 {
-	m_halt_assert_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cedar_magnet_board_interface::halt_assert_callback), this));
-	m_halt_clear_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cedar_magnet_board_interface::halt_clear_callback), this));
-	m_reset_assert_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cedar_magnet_board_interface::reset_assert_callback), this));
-	m_reset_clear_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cedar_magnet_board_interface::reset_clear_callback), this));
+	m_halt_assert_timer = device().timer_alloc(FUNC(cedar_magnet_board_interface::halt_assert_callback), this);
+	m_halt_clear_timer = device().timer_alloc(FUNC(cedar_magnet_board_interface::halt_clear_callback), this);
+	m_reset_assert_timer = device().timer_alloc(FUNC(cedar_magnet_board_interface::reset_assert_callback), this);
+	m_reset_clear_timer = device().timer_alloc(FUNC(cedar_magnet_board_interface::reset_clear_callback), this);
 }

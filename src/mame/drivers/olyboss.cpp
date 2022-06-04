@@ -84,7 +84,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(toggle_tim);
 
 private:
 	u8 keyboard_read();
@@ -139,7 +140,7 @@ private:
 
 void olyboss_state::machine_reset()
 {
-	m_keybhit=false;
+	m_keybhit = false;
 	m_romen = true;
 	m_timstate = false;
 
@@ -149,7 +150,7 @@ void olyboss_state::machine_reset()
 	m_timer->adjust(attotime::from_hz(30), 0, attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
 }
 
-void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(olyboss_state::toggle_tim)
 {
 	m_timstate = !m_timstate;
 	if(m_pic)
@@ -300,7 +301,7 @@ void olyboss_state::ppic_w(u8 data)
 
 void olyboss_state::machine_start()
 {
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(olyboss_state::toggle_tim), this);
 	const char *type = m_fdd0->get_device()->shortname();
 	if(!strncmp(type, "floppy_525_qd", 13))
 		m_fdctype = 0xa0;

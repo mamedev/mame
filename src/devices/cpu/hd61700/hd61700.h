@@ -47,7 +47,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -69,24 +68,26 @@ protected:
 	// interrupts
 	bool check_irqs();
 
-	// inline helpers
-	inline void  set_pc(int32_t new_pc);
-	inline uint8_t read_op();
-	inline uint8_t mem_readbyte(uint8_t segment, uint16_t offset);
-	inline void  mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data);
-	inline uint32_t make_18bit_addr(uint8_t segment, uint16_t offset);
-	inline int   check_cond( uint32_t op );
-	inline void  push(uint16_t &offset, uint8_t data);
-	inline uint8_t pop(uint16_t &offset);
-	inline uint8_t make_logic(uint8_t type, uint8_t d1, uint8_t d2);
-	inline void  check_optional_jr(uint8_t arg);
-	inline uint8_t get_sir_im8(uint8_t arg);
-	inline uint8_t get_sir_im8(uint8_t arg, uint8_t arg1);
-	inline int   get_sign_mreg(uint8_t op1);
-	inline int   get_sign_im8(uint8_t op1);
-	inline int   get_im_7(uint8_t data);
-	inline uint16_t make_bcd_sub(uint8_t arg1, uint8_t arg2);
-	inline uint16_t make_bcd_add(uint8_t arg1, uint8_t arg2);
+	// helpers
+	void     set_pc(int32_t new_pc);
+	uint8_t  read_op();
+	uint8_t  mem_readbyte(uint8_t segment, uint16_t offset);
+	void     mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data);
+	uint32_t make_18bit_addr(uint8_t segment, uint16_t offset);
+	int      check_cond( uint32_t op );
+	void     push(uint16_t &offset, uint8_t data);
+	uint8_t  pop(uint16_t &offset);
+	uint8_t  make_logic(uint8_t type, uint8_t d1, uint8_t d2);
+	void     check_optional_jr(uint8_t arg);
+	uint8_t  get_sir_im8(uint8_t arg);
+	uint8_t  get_sir_im8(uint8_t arg, uint8_t arg1);
+	int      get_sign_mreg(uint8_t op1);
+	int      get_sign_im8(uint8_t op1);
+	int      get_im_7(uint8_t data);
+	uint16_t make_bcd_sub(uint8_t arg1, uint8_t arg2);
+	uint16_t make_bcd_add(uint8_t arg1, uint8_t arg2);
+
+	TIMER_CALLBACK_MEMBER(second_tick);
 
 	// registers
 	enum
@@ -95,8 +96,6 @@ protected:
 		HD61700_IB,  HD61700_UA, HD61700_IA, HD61700_IE, HD61700_TM, HD61700_IX,
 		HD61700_IY,  HD61700_IZ, HD61700_US, HD61700_SS, HD61700_KY, HD61700_MAINREG
 	};
-
-	static constexpr device_timer_id SEC_TIMER = 1;
 
 	// internal state
 	address_space_config m_program_config;

@@ -27,9 +27,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void dack16_w(int line, uint16_t data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(pcm_update);
+
 private:
 	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<dac_16bit_r2r_device> m_ldac;
@@ -61,7 +63,7 @@ void vis_audio_device::device_start()
 	m_isa->set_dma_channel(7, this, false);
 	m_isa->install_device(0x0220, 0x022f, read8sm_delegate(*this, FUNC(vis_audio_device::pcm_r)), write8sm_delegate(*this, FUNC(vis_audio_device::pcm_w)));
 	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::read)), write8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::write)));
-	m_pcm = timer_alloc();
+	m_pcm = timer_alloc(FUNC(vis_audio_device::pcm_update), this);
 	m_pcm->adjust(attotime::never);
 }
 
@@ -83,10 +85,11 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
-void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vis_audio_device::pcm_update)
 {
 	if(((m_samples < 2) && (m_mode & 8)) || !m_samples)
 		return;
+
 	switch(m_mode & 0x88)
 	{
 		case 0x80: // 8bit mono

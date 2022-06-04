@@ -504,7 +504,7 @@ void osbexec_state::init_osbexec()
 	m_vram = make_unique_clear<uint8_t[]>(0x2000);
 	m_fontram = make_unique_clear<uint8_t[]>(0x1000);
 
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osbexec_state::osbexec_video_callback),this));
+	m_video_timer = timer_alloc(FUNC(osbexec_state::osbexec_video_callback), this);
 }
 
 

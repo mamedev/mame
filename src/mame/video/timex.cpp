@@ -29,7 +29,8 @@ inline void tc2048_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
 void ts2068_state::video_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+	m_irq_on_timer = timer_alloc(FUNC(ts2068_state::irq_on), this);
+	m_irq_off_timer = timer_alloc(FUNC(ts2068_state::irq_off), this);
 
 	m_frame_invert_count = 30;
 	m_screen_location = m_video_ram;

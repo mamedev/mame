@@ -103,6 +103,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void prog_map(address_map &map);
+	void io_map(address_map &map);
+	void bank_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(update_baudgen);
+
 	void p1_w(u8 data);
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -113,19 +122,6 @@ private:
 	void output_40c(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void bank_map(address_map &map);
-	void io_map(address_map &map);
-	void prog_map(address_map &map);
-
-	enum
-	{
-		TIMER_BAUDGEN
-	};
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
@@ -253,26 +249,20 @@ void tv912_state::output_40c(u8 data)
 	m_dispram_bank->set_entry(BIT(data, 0));
 }
 
-void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tv912_state::update_baudgen)
 {
-	switch (id)
+	m_uart->write_rcp(param);
+	m_uart->write_tcp(param);
+
+	ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
+	for (int b = 0; b < 10; b++)
 	{
-	case TIMER_BAUDGEN:
-		m_uart->write_rcp(param);
-		m_uart->write_tcp(param);
-
-		ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
-		for (int b = 0; b < 10; b++)
+		if (!BIT(sel, b))
 		{
-			if (!BIT(sel, b))
-			{
-				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
-				break;
-			}
+			unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
+			m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
+			break;
 		}
-
-		break;
 	}
 }
 
@@ -379,7 +369,7 @@ void tv912_state::machine_start()
 	m_dispram = make_unique_clear<u8[]>(0x1000);
 	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
 
-	m_baudgen_timer = timer_alloc(TIMER_BAUDGEN);
+	m_baudgen_timer = timer_alloc(FUNC(tv912_state::update_baudgen), this);
 	m_baudgen_timer->adjust(attotime::zero, 0);
 
 	save_item(NAME(m_force_blank));

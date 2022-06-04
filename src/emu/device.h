@@ -468,10 +468,6 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 class device_missing_dependencies : public emu_exception { };
 
 
-// timer IDs for devices
-typedef u32 device_timer_id;
-
-
 /// \brief Base class for devices
 ///
 /// The base class for all device implementations in MAME's modular
@@ -706,10 +702,7 @@ public:
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
-	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
-	void timer_expired(emu_timer &timer, device_timer_id id, int param) { device_timer(timer, id, param); }
+	template <typename... T> emu_timer *timer_alloc(T &&... args);
 
 	/// \brief Register data for save states
 	///
@@ -977,7 +970,6 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	//------------------- end derived class overrides
 

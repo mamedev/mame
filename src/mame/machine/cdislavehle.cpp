@@ -471,7 +471,7 @@ void cdislave_hle_device::device_start()
 	save_item(NAME(m_device_mouse_x));
 	save_item(NAME(m_device_mouse_y));
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdislave_hle_device::trigger_readback_int), this));
+	m_interrupt_timer = timer_alloc(FUNC(cdislave_hle_device::trigger_readback_int), this);
 	m_interrupt_timer->adjust(attotime::never);
 }
 

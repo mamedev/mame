@@ -28,11 +28,16 @@ public:
 	void simpsons(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_DMASTART,
-		TIMER_DMAEND
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void bank0000_map(address_map &map);
+	void bank2000_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_end);
 
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>   m_spriteram;
@@ -41,6 +46,8 @@ private:
 	int        m_sprite_colorbase = 0;
 	int        m_layer_colorbase[3]{};
 	int        m_layerpri[3]{};
+	emu_timer *m_dma_start_timer;
+	emu_timer *m_dma_end_timer;
 
 	/* misc */
 	int        m_firq_enabled = 0;
@@ -58,30 +65,21 @@ private:
 	required_device<k053251_device> m_k053251;
 	void z80_bankswitch_w(uint8_t data);
 	void z80_arm_nmi_w(uint8_t data);
-	void simpsons_eeprom_w(uint8_t data);
-	void simpsons_coin_counter_w(uint8_t data);
-	uint8_t simpsons_sound_interrupt_r();
-	uint8_t simpsons_k052109_r(offs_t offset);
-	void simpsons_k052109_w(offs_t offset, uint8_t data);
-	uint8_t simpsons_k053247_r(offs_t offset);
-	void simpsons_k053247_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(simpsons_irq);
-	void simpsons_video_banking(int bank);
-	void simpsons_objdma();
+	void eeprom_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
+	uint8_t sound_interrupt_r();
+	uint8_t k052109_r(offs_t offset);
+	void k052109_w(offs_t offset, uint8_t data);
+	uint8_t k053247_r(offs_t offset);
+	void k053247_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	void video_bank_select(int bank);
+	void object_dma();
 	void z80_nmi_w(int state);
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(u8 data);
 	K053246_CB_MEMBER(sprite_callback);
-
-	void bank0000_map(address_map &map);
-	void bank2000_map(address_map &map);
-	void main_map(address_map &map);
-	void z80_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_SIMPSONS_H

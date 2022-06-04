@@ -690,10 +690,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
+
+	TIMER_CALLBACK_MEMBER(read_buttons);
 
 private:
 	devcb_write_line m_tx_cb;
@@ -739,7 +740,7 @@ void funcube_touchscreen_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_tra_rate(9600);
 	m_button_state = 0x00;
-	emu_timer *tm = timer_alloc(0);
+	emu_timer *tm = timer_alloc(FUNC(funcube_touchscreen_device::read_buttons), this);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
 	m_tx_cb.resolve_safe();
 
@@ -755,19 +756,17 @@ void funcube_touchscreen_device::device_reset()
 	m_tx_cb(1);
 }
 
-void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(funcube_touchscreen_device::read_buttons)
 {
-	if(!id) {
-		uint8_t button_state = m_btn->read();
-		if(m_button_state != button_state) {
-			m_button_state = button_state;
-			m_serial[0] = button_state ? 0xfe : 0xfd;
-			m_serial[1] = m_x->read();
-			m_serial[2] = m_y->read();
-			m_serial[3] = 0xff;
-			m_serial_pos = 0;
-			transmit_register_setup(m_serial[m_serial_pos++]);
-		}
+	uint8_t button_state = m_btn->read();
+	if(m_button_state != button_state) {
+		m_button_state = button_state;
+		m_serial[0] = button_state ? 0xfe : 0xfd;
+		m_serial[1] = m_x->read();
+		m_serial[2] = m_y->read();
+		m_serial[3] = 0xff;
+		m_serial_pos = 0;
+		transmit_register_setup(m_serial[m_serial_pos++]);
 	}
 }
 

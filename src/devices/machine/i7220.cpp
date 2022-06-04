@@ -79,7 +79,7 @@ void i7220_device::device_start()
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
 
-	bi.tm = timer_alloc(0);
+	m_bi.tm = timer_alloc(FUNC(i7220_device::general_continue), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -96,9 +96,9 @@ void i7220_device::device_start()
 
 void i7220_device::device_reset()
 {
-	main_phase = PHASE_IDLE;
-	bi.main_state = IDLE;
-	bi.sub_state = IDLE;
+	m_main_phase = PHASE_IDLE;
+	m_bi.main_state = IDLE;
+	m_bi.sub_state = IDLE;
 
 	set_drq(false);
 	set_irq(false);
@@ -106,11 +106,6 @@ void i7220_device::device_reset()
 
 	m_rac = m_cmdr = m_str = m_blr = m_ar = 0;
 	memset(&m_regs, 0, sizeof(m_regs));
-}
-
-void i7220_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	general_continue(bi);
 }
 
 image_init_result i7220_device::call_load()
@@ -125,25 +120,25 @@ image_init_result i7220_device::call_load()
 
 void i7220_device::set_drq(bool state)
 {
-	if (state != drq)
+	if (state != m_drq)
 	{
-		drq = state;
-		drq_cb(drq);
+		m_drq = state;
+		drq_cb(m_drq);
 	}
 }
 
 void i7220_device::set_irq(bool state)
 {
-	if (state != irq)
+	if (state != m_irq)
 	{
-		irq = state;
-		intrq_cb(irq);
+		m_irq = state;
+		intrq_cb(m_irq);
 	}
 }
 
 void i7220_device::update_drq()
 {
-	switch (bi.main_state)
+	switch (m_bi.main_state)
 	{
 	case READ_DATA:
 		set_drq(m_fifo_size < 22 ? false : true);
@@ -175,7 +170,7 @@ uint8_t i7220_device::fifo_pop()
 	{
 		val = m_fifo.dequeue();
 		m_fifo_size--;
-		if (main_phase == PHASE_EXEC)
+		if (m_main_phase == PHASE_EXEC)
 		{
 			update_drq();
 		}
@@ -193,7 +188,7 @@ void i7220_device::fifo_push(uint8_t val)
 	{
 		m_fifo.enqueue(val);
 		m_fifo_size++;
-		if (main_phase == PHASE_EXEC)
+		if (m_main_phase == PHASE_EXEC)
 		{
 			update_drq();
 		}
@@ -204,16 +199,16 @@ void i7220_device::update_regs()
 {
 	m_blr = (m_regs[R_BLR_M] << 8) + m_regs[R_BLR_L];
 	m_ar = (m_regs[R_AR_M] << 8) + m_regs[R_AR_L];
-	blr_count = m_blr & 0x7ff;
-	blr_nfc = (m_blr >> 12) ? ((m_blr >> 12) << 1) : 1;
-	ar_addr = m_ar & 0x7ff;
-	ar_mbm = (m_ar >> 11) & 15;
+	m_blr_count = m_blr & 0x7ff;
+	m_blr_nfc = (m_blr >> 12) ? ((m_blr >> 12) << 1) : 1;
+	m_ar_addr = m_ar & 0x7ff;
+	m_ar_mbm = (m_ar >> 11) & 15;
 }
 
 
 void i7220_device::start_command(int cmd)
 {
-	main_phase = PHASE_EXEC;
+	m_main_phase = PHASE_EXEC;
 	m_str &= ~SR_CLEAR;
 
 	switch (cmd)
@@ -224,45 +219,45 @@ void i7220_device::start_command(int cmd)
 	// MBM GROUP SELECT bits in the AR must select the last MBM in the system.
 	case C_INIT:
 		LOG("BMC INIT: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
-		if (blr_nfc != 2)
+			m_blr, m_blr_nfc, m_blr_count, m_ar, m_ar_mbm, m_ar_addr, m_regs[R_ER]);
+		if (m_blr_nfc != 2)
 		{
-			command_fail_start(bi);
+			command_fail_start();
 		}
 		else
 		{
-			init_start(bi);
+			init_start();
 		}
 		break;
 
 	case C_READ_FSA_STATUS:
-		read_fsa_start(bi);
+		read_fsa_start();
 		break;
 
 	// all parametric registers must be properly set up before issuing Read Bubble Data command
 	case C_READ:
 		LOG("BMC RBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
-		if (ar_mbm >= m_data_size || blr_nfc != 2)
+			m_blr, m_blr_nfc, m_blr_count, m_ar, m_ar_mbm, m_ar_addr, m_regs[R_ER]);
+		if (m_ar_mbm >= m_data_size || m_blr_nfc != 2)
 		{
-			command_fail_start(bi);
+			command_fail_start();
 		}
 		else
 		{
-			read_data_start(bi);
+			read_data_start();
 		}
 		break;
 
 	case C_WRITE:
 		LOG("BMC WBD: BLR %04x (NFC %d pages %d) AR %04x (MBM %d addr %03x) ER %02d\n",
-			m_blr, blr_nfc, blr_count, m_ar, ar_mbm, ar_addr, m_regs[R_ER]);
-		if (ar_mbm >= m_data_size || blr_nfc != 2)
+			m_blr, m_blr_nfc, m_blr_count, m_ar, m_ar_mbm, m_ar_addr, m_regs[R_ER]);
+		if (m_ar_mbm >= m_data_size || m_blr_nfc != 2)
 		{
-			command_fail_start(bi);
+			command_fail_start();
 		}
 		else
 		{
-			write_data_start(bi);
+			write_data_start();
 		}
 		break;
 
@@ -271,28 +266,28 @@ void i7220_device::start_command(int cmd)
 		m_regs[R_AR_L] = 0;
 		m_regs[R_AR_M] &= ~7;
 		update_regs();
-		main_phase = PHASE_RESULT;
+		m_main_phase = PHASE_RESULT;
 		m_str |= SR_DONE;
 		break;
 
 	// controlled termination of currently executing command.  command accepted in BUSY state.
 	// if not BUSY, clears FIFO.
 	case C_ABORT:
-		if (main_phase == PHASE_IDLE)
+		if (m_main_phase == PHASE_IDLE)
 		{
 			fifo_clear();
 		}
 		else
 		{
-			main_phase = PHASE_RESULT;
-			bi.main_state = bi.sub_state = IDLE;
+			m_main_phase = PHASE_RESULT;
+			m_bi.main_state = m_bi.sub_state = IDLE;
 		}
 		m_str |= SR_DONE;
 		break;
 
 	case C_RESET_FIFO:
 		fifo_clear();
-		main_phase = PHASE_RESULT;
+		m_main_phase = PHASE_RESULT;
 		m_str |= SR_DONE;
 		break;
 
@@ -300,45 +295,45 @@ void i7220_device::start_command(int cmd)
 	case C_RESET:
 		m_regs[R_UR] = 0;
 		fifo_clear();
-		main_phase = PHASE_RESULT;
+		m_main_phase = PHASE_RESULT;
 		m_str |= SR_DONE;
 		break;
 
 	default:
-		command_fail_start(bi);
+		command_fail_start();
 		break;
 	}
 }
 
-void i7220_device::general_continue(bubble_info &bi)
+TIMER_CALLBACK_MEMBER(i7220_device::general_continue)
 {
-	switch (bi.main_state)
+	switch (m_bi.main_state)
 	{
 	case IDLE:
 		break;
 
 	case INIT:
-		init_continue(bi);
+		init_continue();
 		break;
 
 	case FAIL:
-		command_fail_continue(bi);
+		command_fail_continue();
 		break;
 
 	case READ_FSA:
-		read_fsa_continue(bi);
+		read_fsa_continue();
 		break;
 
 	case READ_DATA:
-		read_data_continue(bi);
+		read_data_continue();
 		break;
 
 	case WRITE_DATA:
-		write_data_continue(bi);
+		write_data_continue();
 		break;
 
 	default:
-		LOG("BMC general_continue on unknown main-state %d\n", bi.main_state);
+		LOG("BMC general_continue on unknown main-state %d\n", m_bi.main_state);
 		break;
 	}
 }
@@ -348,11 +343,11 @@ void i7220_device::delay_cycles(emu_timer *tm, int cycles)
 	tm->adjust(attotime::from_double(double(cycles) / clock()));
 }
 
-void i7220_device::command_end(bubble_info &bi, bool success)
+void i7220_device::command_end(bool success)
 {
 	LOG("command done (%s) - %02x\n", success ? "success" : "fail", m_str);
-	main_phase = PHASE_RESULT;
-	bi.main_state = bi.sub_state = IDLE;
+	m_main_phase = PHASE_RESULT;
+	m_bi.main_state = m_bi.sub_state = IDLE;
 	if (success)
 	{
 		m_str |= SR_DONE;
@@ -364,88 +359,88 @@ void i7220_device::command_end(bubble_info &bi, bool success)
 }
 
 
-void i7220_device::command_fail_start(bubble_info &bi)
+void i7220_device::command_fail_start()
 {
-	bi.main_state = FAIL;
-	bi.sub_state = INITIALIZE;
+	m_bi.main_state = FAIL;
+	m_bi.sub_state = INITIALIZE;
 
-	command_fail_continue(bi);
+	command_fail_continue();
 }
 
-void i7220_device::command_fail_continue(bubble_info &bi)
+void i7220_device::command_fail_continue()
 {
-	switch (bi.sub_state)
+	switch (m_bi.sub_state)
 	{
 	case INITIALIZE:
-		bi.sub_state = COMMAND_DONE;
-		delay_cycles(bi.tm, 1200); // XXX
+		m_bi.sub_state = COMMAND_DONE;
+		delay_cycles(m_bi.tm, 1200); // XXX
 		return;
 
 	case COMMAND_DONE:
-		command_end(bi, false);
+		command_end(false);
 		return;
 
 	default:
-		LOG("BMC fail unknown sub-state %d\n", bi.sub_state);
+		LOG("BMC fail unknown sub-state %d\n", m_bi.sub_state);
 		return;
 	}
 }
 
-void i7220_device::init_start(bubble_info &bi)
+void i7220_device::init_start()
 {
-	bi.main_state = INIT;
-	bi.sub_state = INITIALIZE;
+	m_bi.main_state = INIT;
+	m_bi.sub_state = INITIALIZE;
 
-	init_continue(bi);
+	init_continue();
 }
 
-void i7220_device::init_continue(bubble_info &bi)
+void i7220_device::init_continue()
 {
 	for (;;)
 	{
-		switch (bi.sub_state)
+		switch (m_bi.sub_state)
 		{
 		case INITIALIZE:
-			bi.sub_state = WAIT_FSA_REPLY;
-			delay_cycles(bi.tm, m_data_size * 60); // p. 4-16 of BPK72UM
+			m_bi.sub_state = WAIT_FSA_REPLY;
+			delay_cycles(m_bi.tm, m_data_size * 60); // p. 4-16 of BPK72UM
 			return;
 
 		case WAIT_FSA_REPLY:
-			bi.sub_state = COMMAND_DONE;
+			m_bi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
-			command_end(bi, true);
+			command_end(true);
 			return;
 
 		default:
-			LOG("BMC init unknown sub-state %d\n", bi.sub_state);
+			LOG("BMC init unknown sub-state %d\n", m_bi.sub_state);
 			return;
 		}
 	}
 }
 
-void i7220_device::read_fsa_start(bubble_info &bi)
+void i7220_device::read_fsa_start()
 {
-	bi.main_state = READ_FSA;
-	bi.sub_state = INITIALIZE;
+	m_bi.main_state = READ_FSA;
+	m_bi.sub_state = INITIALIZE;
 
-	read_fsa_continue(bi);
+	read_fsa_continue();
 }
 
-void i7220_device::read_fsa_continue(bubble_info &bi)
+void i7220_device::read_fsa_continue()
 {
 	for (;;)
 	{
-		switch (bi.sub_state)
+		switch (m_bi.sub_state)
 		{
 		case INITIALIZE:
-			bi.sub_state = WAIT_FSA_REPLY;
-			delay_cycles(bi.tm, m_data_size * 60); // p. 4-16 of BPK72UM
+			m_bi.sub_state = WAIT_FSA_REPLY;
+			delay_cycles(m_bi.tm, m_data_size * 60); // p. 4-16 of BPK72UM
 			return;
 
 		case WAIT_FSA_REPLY:
-			bi.sub_state = COMMAND_DONE;
+			m_bi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
@@ -455,113 +450,113 @@ void i7220_device::read_fsa_continue(bubble_info &bi)
 				fifo_push(0x28); // FIFOMT | ECF/F
 				fifo_push(0x28);
 			}
-			command_end(bi, true);
+			command_end(true);
 			return;
 
 		default:
-			LOG("BMC read fsa unknown sub-state %d\n", bi.sub_state);
+			LOG("BMC read fsa unknown sub-state %d\n", m_bi.sub_state);
 			return;
 		}
 	}
 }
 
-void i7220_device::read_data_start(bubble_info &bi)
+void i7220_device::read_data_start()
 {
-	bi.main_state = READ_DATA;
-	bi.sub_state = INITIALIZE;
+	m_bi.main_state = READ_DATA;
+	m_bi.sub_state = INITIALIZE;
 
-	read_data_continue(bi);
+	read_data_continue();
 }
 
-void i7220_device::read_data_continue(bubble_info &bi)
+void i7220_device::read_data_continue()
 {
 	for (;;)
 	{
-		switch (bi.sub_state)
+		switch (m_bi.sub_state)
 		{
 		case INITIALIZE:
-			bi.sub_state = SECTOR_READ;
-			bi.counter = 0; // 256-bit pages
-			bi.limit = blr_count * blr_nfc;
-			fseek((ar_addr * 32 * blr_nfc) + (ar_mbm * I7110_MBM_SIZE) + (bi.counter * 32), SEEK_SET);
+			m_bi.sub_state = SECTOR_READ;
+			m_bi.counter = 0; // 256-bit pages
+			m_bi.limit = m_blr_count * m_blr_nfc;
+			fseek((m_ar_addr * 32 * m_blr_nfc) + (m_ar_mbm * I7110_MBM_SIZE) + (m_bi.counter * 32), SEEK_SET);
 			break;
 
 		case SECTOR_READ:
-			fread(buf, 32);
-			bi.sub_state = WAIT_FSA_REPLY;
-			delay_cycles(bi.tm, 270 * 20); // p. 4-14 of BPK72UM
+			fread(m_buf, 32);
+			m_bi.sub_state = WAIT_FSA_REPLY;
+			delay_cycles(m_bi.tm, 270 * 20); // p. 4-14 of BPK72UM
 			break;
 
 		case WAIT_FSA_REPLY:
-			LOGDBG("BMC read data: ct %02d limit %02d\n", bi.counter, bi.limit);
-			if (bi.counter < bi.limit)
+			LOGDBG("BMC read data: ct %02d limit %02d\n", m_bi.counter, m_bi.limit);
+			if (m_bi.counter < m_bi.limit)
 			{
 				for (int a = 0; a < 32; a++)
-					fifo_push(buf[a]);
-				bi.sub_state = SECTOR_READ;
-				bi.counter++;
-				delay_cycles(bi.tm, 270 * 20); // p. 4-14 of BPK72UM
+					fifo_push(m_buf[a]);
+				m_bi.sub_state = SECTOR_READ;
+				m_bi.counter++;
+				delay_cycles(m_bi.tm, 270 * 20); // p. 4-14 of BPK72UM
 				return;
 			}
-			bi.sub_state = COMMAND_DONE;
+			m_bi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
-			command_end(bi, true);
+			command_end(true);
 			return;
 
 		default:
-			LOG("BMC read data unknown sub-state %d\n", bi.sub_state);
+			LOG("BMC read data unknown sub-state %d\n", m_bi.sub_state);
 			return;
 		}
 	}
 }
 
-void i7220_device::write_data_start(bubble_info &bi)
+void i7220_device::write_data_start()
 {
-	bi.main_state = WRITE_DATA;
-	bi.sub_state = INITIALIZE;
+	m_bi.main_state = WRITE_DATA;
+	m_bi.sub_state = INITIALIZE;
 
-	write_data_continue(bi);
+	write_data_continue();
 }
 
-void i7220_device::write_data_continue(bubble_info &bi)
+void i7220_device::write_data_continue()
 {
 	for (;;)
 	{
-		switch (bi.sub_state)
+		switch (m_bi.sub_state)
 		{
 		case INITIALIZE:
-			bi.sub_state = WAIT_FIFO;
-			bi.counter = 0;
-			bi.limit = blr_count * blr_nfc * 32;
-			delay_cycles(bi.tm, 270 * 20); // p. 4-14 of BPK72UM
+			m_bi.sub_state = WAIT_FIFO;
+			m_bi.counter = 0;
+			m_bi.limit = m_blr_count * m_blr_nfc * 32;
+			delay_cycles(m_bi.tm, 270 * 20); // p. 4-14 of BPK72UM
 			return;
 
 		case WAIT_FIFO:
-			LOGDBG("BMC write data: fifo %02d ct %02d limit %02d\n", m_fifo_size, bi.counter, bi.limit);
+			LOGDBG("BMC write data: fifo %02d ct %02d limit %02d\n", m_fifo_size, m_bi.counter, m_bi.limit);
 			if (m_fifo_size >= 32)
 			{
 				for (int a = 0; a < 32; a++)
-					buf[a] = fifo_pop();
-				fseek((ar_addr * 32 * blr_nfc) + (ar_mbm * I7110_MBM_SIZE) + bi.counter, SEEK_SET);
-				fwrite(buf, 32);
-				bi.counter += 32;
+					m_buf[a] = fifo_pop();
+				fseek((m_ar_addr * 32 * m_blr_nfc) + (m_ar_mbm * I7110_MBM_SIZE) + m_bi.counter, SEEK_SET);
+				fwrite(m_buf, 32);
+				m_bi.counter += 32;
 			}
-			if (bi.counter < bi.limit)
+			if (m_bi.counter < m_bi.limit)
 			{
-				delay_cycles(bi.tm, 270 * 20); // p. 4-14 of BPK72UM
+				delay_cycles(m_bi.tm, 270 * 20); // p. 4-14 of BPK72UM
 				return;
 			}
-			bi.sub_state = COMMAND_DONE;
+			m_bi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
-			command_end(bi, true);
+			command_end(true);
 			return;
 
 		default:
-			LOG("BMC write data unknown sub-state %d\n", bi.sub_state);
+			LOG("BMC write data unknown sub-state %d\n", m_bi.sub_state);
 			return;
 		}
 	}
@@ -595,10 +590,10 @@ uint8_t i7220_device::read(offs_t offset)
 
 	case 1:
 		data = m_str;
-		if (main_phase == PHASE_EXEC)
+		if (m_main_phase == PHASE_EXEC)
 		{
 			data |= SR_BUSY;
-			switch (bi.main_state)
+			switch (m_bi.main_state)
 			{
 			case READ_DATA:
 				if (!m_fifo.empty()) // XXX
@@ -623,10 +618,10 @@ uint8_t i7220_device::read(offs_t offset)
 			}
 		}
 		LOGREG("BMC R status == %02x (phase %d state %d:%d fifo %d drq %d)\n",
-			data, main_phase, bi.main_state, bi.sub_state, m_fifo_size, drq);
-		if (main_phase == PHASE_RESULT)
+			data, m_main_phase, m_bi.main_state, m_bi.sub_state, m_fifo_size, m_drq);
+		if (m_main_phase == PHASE_RESULT)
 		{
-			main_phase = PHASE_IDLE;
+			m_main_phase = PHASE_IDLE;
 		}
 		break;
 	}
@@ -689,10 +684,10 @@ void i7220_device::write(offs_t offset, uint8_t data)
 		else if (BIT(data, 4))
 		{
 			m_cmdr = data & 15;
-			if (main_phase == PHASE_IDLE)
+			if (m_main_phase == PHASE_IDLE)
 			{
 				LOG("BMC command %02x '%s'\n", data, commands[m_cmdr]);
-				main_phase = PHASE_CMD;
+				m_main_phase = PHASE_CMD;
 				start_command(m_cmdr);
 			}
 		}

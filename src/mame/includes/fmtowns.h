@@ -86,6 +86,7 @@ struct towns_video_controller
 	uint8_t towns_vblank_flag = 0;
 	uint8_t towns_layer_ctrl = 0;
 	emu_timer* sprite_timer = nullptr;
+	emu_timer* vblank_end_timer = nullptr;
 };
 
 class towns_state : public driver_device
@@ -280,7 +281,6 @@ private:
 	optional_shared_ptr<uint16_t> m_nvram16;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint8_t towns_system_r(offs_t offset);
 	void towns_system_w(offs_t offset, uint8_t data);
@@ -387,25 +387,17 @@ private:
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
-	static const device_timer_id TIMER_FREERUN = 1;
-	static const device_timer_id TIMER_INTERVAL2 = 2;
-	static const device_timer_id TIMER_KEYBOARD = 3;
-	static const device_timer_id TIMER_MOUSE = 4;
-	static const device_timer_id TIMER_WAIT = 5;
-	static const device_timer_id TIMER_CDSTATUS = 6;
-	static const device_timer_id TIMER_CDDA = 7;
-	static const device_timer_id TIMER_SPRITES = 8;
-	void freerun_inc();
-	void intervaltimer2_timeout();
-	void poll_keyboard();
-	void mouse_timeout();
-	void wait_end();
+	TIMER_CALLBACK_MEMBER(freerun_inc);
+	TIMER_CALLBACK_MEMBER(intervaltimer2_timeout);
+	TIMER_CALLBACK_MEMBER(poll_keyboard);
+	TIMER_CALLBACK_MEMBER(mouse_timeout);
+	TIMER_CALLBACK_MEMBER(wait_end);
 	void towns_cd_set_status(uint8_t st0, uint8_t st1, uint8_t st2, uint8_t st3);
 	void towns_cdrom_execute_command(cdrom_image_device* device);
 	void towns_cdrom_play_cdda(cdrom_image_device* device);
 	void towns_cdrom_read(cdrom_image_device* device);
-	void towns_cd_status_ready();
-	void towns_delay_cdda(cdrom_image_device* dev);
+	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
+	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
 
 	u8 m_rtc_d = 0;
 	bool m_rtc_busy = false;
@@ -414,7 +406,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
-	void draw_sprites();
+	TIMER_CALLBACK_MEMBER(draw_sprites);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);

@@ -1105,7 +1105,7 @@ void ksys573_state::update_disc()
 
 void ksys573_state::driver_start()
 {
-	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( ksys573_state::atapi_xfer_end ),this ) );
+	m_atapi_timer = timer_alloc( FUNC( ksys573_state::atapi_xfer_end ), this );
 	m_atapi_timer->adjust( attotime::never );
 
 	for (int i = 0; i < 2; i++)

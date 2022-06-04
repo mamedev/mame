@@ -507,13 +507,13 @@ int bq48x2_device::get_delay()
 
 void bq48x2_device::device_start()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_clock_cb), this));
+	m_clock_timer = timer_alloc(FUNC(bq48x2_device::rtc_clock_cb), this);
 
 	// Periodic timer
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_periodic_cb), this));
+	m_periodic_timer = timer_alloc(FUNC(bq48x2_device::rtc_periodic_cb), this);
 
 	// Watchdog timer
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_watchdog_cb), this));
+	m_watchdog_timer = timer_alloc(FUNC(bq48x2_device::rtc_watchdog_cb), this);
 
 	// Interrupt line
 	m_interrupt_cb.resolve_safe();

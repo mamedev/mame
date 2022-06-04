@@ -134,7 +134,7 @@ private:
 void mark5_state::machine_start()
 {
 	m_out_x.resolve();
-	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
+	m_irqtimer = timer_alloc(FUNC(mark5_state::interrupt), this);
 
 	// register for savestates
 	save_item(NAME(m_dac_data));

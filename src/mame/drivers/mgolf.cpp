@@ -15,11 +15,6 @@
 class mgolf_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -32,6 +27,12 @@ public:
 	void mgolf(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void cpu_map(address_map &map);
+
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t wram_r(offs_t offset);
 	uint8_t dial_r();
@@ -48,12 +49,6 @@ private:
 
 	void update_plunger();
 	double calc_plunger_pos();
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	void cpu_map(address_map &map);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -142,19 +137,6 @@ void mgolf_state::update_plunger(  )
 			m_time_pushed = machine().time();
 
 		m_prev = val;
-	}
-}
-
-
-void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_INTERRUPT:
-		interrupt_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mgolf_state::device_timer");
 	}
 }
 
@@ -346,7 +328,7 @@ GFXDECODE_END
 
 void mgolf_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_interrupt_timer = timer_alloc(FUNC(mgolf_state::interrupt_callback), this);
 
 	save_item(NAME(m_prev));
 	save_item(NAME(m_mask));

@@ -85,9 +85,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	required_device<cpu_device> m_maincpu;
+	TIMER_CALLBACK_MEMBER(seconds_tick);
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	required_device<cpu_device> m_maincpu;
 
 private:
 	uint8_t ddrs[3]{};

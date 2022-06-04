@@ -123,7 +123,7 @@ rectangle pentagon_state::get_screen_area()
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0) + /*???*/ m_maincpu->clocks_to_attotime(3), TIMER_IRQ_ON, 0);
+	m_irq_on_timer->adjust(m_screen->time_until_pos(0) + /*???*/ m_maincpu->clocks_to_attotime(3));
 }
 
 uint8_t pentagon_state::beta_neutral_r(offs_t offset)

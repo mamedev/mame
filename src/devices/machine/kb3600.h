@@ -83,7 +83,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(perform_scan);
 
 	devcb_read16 m_read_x0, m_read_x1, m_read_x2, m_read_x3, m_read_x4, m_read_x5, m_read_x6, m_read_x7, m_read_x8;
 	devcb_read_line m_read_shift, m_read_control;

@@ -36,13 +36,10 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(update_intl);
 
 private:
-	enum {
-		TIMER_INTL
-	};
-
 	void vblank_callback(screen_device &screen, bool state);
 	void vblank_update();
 

@@ -9,14 +9,12 @@
 #include "emu.h"
 #include "uv201.h"
 
-
+#define VERBOSE (1)
+#include "logmacro.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG         1
-
 
 // screen parameters
 #define SCREEN_WIDTH                232
@@ -119,10 +117,10 @@ void uv201_device::device_start()
 	m_read_db.resolve_safe(0);
 
 	// allocate timers
-	m_timer_y_odd = timer_alloc(TIMER_Y_ODD);
-	m_timer_y_even = timer_alloc(TIMER_Y_EVEN);
-	m_timer_hblank_on = timer_alloc(TIMER_HBLANK_ON);
-	m_timer_hblank_off = timer_alloc(TIMER_HBLANK_OFF);
+	m_timer_y_odd = timer_alloc(FUNC(uv201_device::y_update_tick), this);
+	m_timer_y_even = timer_alloc(FUNC(uv201_device::y_update_tick), this);
+	m_timer_hblank_on = timer_alloc(FUNC(uv201_device::hblank_on), this);
+	m_timer_hblank_off = timer_alloc(FUNC(uv201_device::hblank_off), this);
 
 	initialize_palette();
 
@@ -161,40 +159,33 @@ void uv201_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(uv201_device::y_update_tick)
 {
-	int scanline = screen().vpos();
-
-	switch (id)
+	if ((m_cmd & COMMAND_INT) && !(m_cmd & COMMAND_FRZ))
 	{
-	case TIMER_Y_ODD:
-	case TIMER_Y_EVEN:
-		if ((m_cmd & COMMAND_INT) && !(m_cmd & COMMAND_FRZ))
-		{
-			if (LOG) logerror("Y-Interrupt at scanline %u\n", scanline);
+		int scanline = screen().vpos();
+		LOG("Y-Interrupt at scanline %u\n", scanline);
 
-			m_freeze_y = scanline;
+		m_freeze_y = scanline;
 
-			m_write_ext_int(ASSERT_LINE);
-			m_write_ext_int(CLEAR_LINE);
-		}
-		break;
-
-	case TIMER_HBLANK_ON:
-		m_write_hblank(1);
-
-		m_timer_hblank_off->adjust(attotime::from_ticks( HBLANK_WIDTH, m_clock ) );
-		break;
-
-	case TIMER_HBLANK_OFF:
-		m_write_hblank(0);
-
-		m_timer_hblank_on->adjust(attotime::from_ticks( VISAREA_WIDTH, m_clock ) );
-		break;
+		m_write_ext_int(ASSERT_LINE);
+		m_write_ext_int(CLEAR_LINE);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(uv201_device::hblank_on)
+{
+	m_write_hblank(1);
+	m_timer_hblank_off->adjust(attotime::from_ticks(HBLANK_WIDTH, m_clock));
+}
+
+TIMER_CALLBACK_MEMBER(uv201_device::hblank_off)
+{
+	m_write_hblank(0);
+	m_timer_hblank_on->adjust(attotime::from_ticks(VISAREA_WIDTH, m_clock));
 }
 
 
@@ -287,7 +278,7 @@ void uv201_device::do_partial_update()
 {
 	int vpos = screen().vpos();
 
-	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
+	LOG("Partial screen update at scanline %u\n", vpos);
 
 	screen().update_partial(vpos);
 }
@@ -306,13 +297,13 @@ uint8_t uv201_device::read(offs_t offset)
 	case REGISTER_X_FREEZE:
 		data = m_freeze_x;
 
-		if (LOG) logerror("X-Freeze %02x\n", data);
+		LOG("X-Freeze %02x\n", data);
 		break;
 
 	case REGISTER_Y_FREEZE_LOW:
 		data = m_freeze_y & 0xff;
 
-		if (LOG) logerror("Y-Freeze Low %02x\n", data);
+		LOG("Y-Freeze Low %02x\n", data);
 		break;
 
 	case REGISTER_Y_FREEZE_HIGH:
@@ -333,20 +324,20 @@ uint8_t uv201_device::read(offs_t offset)
 
 		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
 
-		if (LOG) logerror("Y-Freeze High %02x\n", data);
+		LOG("Y-Freeze High %02x\n", data);
 		break;
 
 	case REGISTER_CURRENT_Y_LOW:
 		data = get_field_vpos() & 0xff;
 
-		if (LOG) logerror("Current-Y Low %02x\n", data);
+		LOG("Current-Y Low %02x\n", data);
 		break;
 
 	default:
 		if (offset < 0x90)
 			data = m_ram[offset];
 		else
-			if (LOG) logerror("Unknown VLSI read from %02x!\n", offset);
+			LOG("Unknown VLSI read from %02x!\n", offset);
 	}
 
 	return data;
@@ -362,7 +353,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case REGISTER_Y_INTERRUPT:
-		if (LOG) logerror("Y-Interrupt %02x\n", data);
+		LOG("Y-Interrupt %02x\n", data);
 
 		if (m_y_int != data)
 		{
@@ -387,7 +378,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("Final Modifier %02x\n", data);
+		LOG("Final Modifier %02x\n", data);
 
 		do_partial_update();
 		m_fmod = data & 0x1f;
@@ -409,7 +400,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("Background %02x\n", data);
+		LOG("Background %02x\n", data);
 
 		do_partial_update();
 		m_bg = data & 0x1f;
@@ -431,7 +422,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("Command %02x\n", data);
+		LOG("Command %02x\n", data);
 
 		if (IS_CHANGED(COMMAND_YINT_H_O))
 		{
@@ -521,7 +512,7 @@ uint32_t uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		int xcopy = BIT(dx_int_xcopy, 7);
 		uint8_t x = RAM_XORD(RAM_X);
 
-		if (LOG) logerror("Object %u xord %u y %u x %u dy %u dx %u xcopy %u color %u rp %04x\n", i, xord, y, x, dy, dx, xcopy, color, rp);
+		LOG("Object %u xord %u y %u x %u dy %u dx %u xcopy %u color %u rp %04x\n", i, xord, y, x, dy, dx, xcopy, color, rp);
 
 		if (rp == 0) continue;
 		if (y > SCREEN_HEIGHT) continue;

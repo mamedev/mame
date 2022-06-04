@@ -288,6 +288,7 @@ csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
 cubo.cpp
+cucaracha.cpp
 cultures.cpp
 cupidon.cpp
 cv1k.cpp
@@ -500,7 +501,6 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
-gokidetor.cpp
 goldart.cpp
 goldngam.cpp
 goldnpkr.cpp
@@ -1383,6 +1383,7 @@ toaplan2.cpp
 toki.cpp
 toki_ms.cpp
 tomcat.cpp
+tomsadvs.cpp
 tonton.cpp
 toobin.cpp
 topspeed.cpp

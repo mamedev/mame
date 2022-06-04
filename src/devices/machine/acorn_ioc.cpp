@@ -51,7 +51,7 @@ void acorn_ioc_device::device_resolve_objects()
 void acorn_ioc_device::device_start()
 {
 	for (int i=0; i <4; i++)
-		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acorn_ioc_device::timer_tick), this));
+		m_timers[i] = timer_alloc(FUNC(acorn_ioc_device::timer_tick), this);
 
 	save_item(NAME(m_ir));
 	save_item(NAME(m_if));

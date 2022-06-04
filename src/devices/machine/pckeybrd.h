@@ -40,7 +40,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(poll_keys);
+
 	void queue_insert(uint8_t data);
 	void clear_buffer();
 

@@ -121,7 +121,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -134,7 +133,7 @@ protected:
 	void drawlines( int first, int last );
 	void soundport_w( int offset, int data );
 	void sound_start();
-	void raster_interrupt_gen();
+	TIMER_CALLBACK_MEMBER(raster_interrupt_gen);
 
 	const int  m_variant;
 

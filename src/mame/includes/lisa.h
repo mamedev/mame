@@ -79,22 +79,22 @@ struct clock_regs_t
 
 struct lisa_features_t
 {
-	unsigned int has_fast_timers : 1;   /* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
-										/* Note that the beep routine in boot ROMs implies that
-										VIA clock is 1.25 times faster with fast timers than with
-										slow timers.  I read the schematics again and again, and
-										I simply don't understand : in one case the VIA is
-										connected to the 68k E clock, which is CPUCK/10, and in
-										another case, to a generated PH2 clock which is CPUCK/4,
-										with additional logic to keep it in phase with the 68k
-										memory cycle.  After hearing the beep when MacWorks XL
-										boots, I bet the correct values are .625 MHz and .5 MHz.
-										Maybe the schematics are wrong, and PH2 is CPUCK/8.
-										Maybe the board uses a 6522 variant with different
-										timings. */
+	bool has_fast_timers;   /* I/O board VIAs are clocked at 1.25 MHz (?) instead of .5 MHz (?) (Lisa 2/10, Mac XL) */
+							/* Note that the beep routine in boot ROMs implies that
+							VIA clock is 1.25 times faster with fast timers than with
+							slow timers.  I read the schematics again and again, and
+							I simply don't understand : in one case the VIA is
+							connected to the 68k E clock, which is CPUCK/10, and in
+							another case, to a generated PH2 clock which is CPUCK/4,
+							with additional logic to keep it in phase with the 68k
+							memory cycle.  After hearing the beep when MacWorks XL
+							boots, I bet the correct values are .625 MHz and .5 MHz.
+							Maybe the schematics are wrong, and PH2 is CPUCK/8.
+							Maybe the board uses a 6522 variant with different
+							timings. */
 	floppy_hardware_t floppy_hardware;
-	unsigned int has_double_sided_floppy : 1;   /* true on lisa 1 and *hacked* lisa 2/10 / Mac XL */
-	unsigned int has_mac_xl_video : 1;  /* modified video for MacXL */
+	bool has_double_sided_floppy;   /* true on lisa 1 and *hacked* lisa 2/10 / Mac XL */
+	bool has_mac_xl_video;          /* modified video for MacXL */
 };
 
 
@@ -162,6 +162,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
+	emu_timer *m_cops_cmd_timer = nullptr;
 	uint8_t *m_ram_ptr = nullptr;
 	uint8_t *m_rom_ptr = nullptr;
 	uint8_t *m_videoROM_ptr = nullptr;

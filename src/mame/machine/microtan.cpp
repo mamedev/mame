@@ -365,7 +365,7 @@ void microtan_state::init_microtan()
 {
 	init_gfx2();
 
-	m_pulse_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microtan_state::pulse_nmi), this));
+	m_pulse_nmi_timer = timer_alloc(FUNC(microtan_state::pulse_nmi), this);
 }
 
 void microtan_state::machine_start()

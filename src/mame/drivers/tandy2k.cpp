@@ -924,8 +924,8 @@ void tandy2k_state::machine_start()
 
 	program.install_ram(0x00000, ram_size - 1, ram);
 
-	m_mouse_timer = timer_alloc(MOUS_TIMER);
-	m_mcu_delay = timer_alloc(MCU_DELAY);
+	m_mouse_timer = timer_alloc(FUNC(tandy2k_state::update_mouse), this);
+	m_mcu_delay = timer_alloc(FUNC(tandy2k_state::mcu_delay_cb), this);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -961,31 +961,26 @@ void tandy2k_state::device_reset_after_children()
 	m_pc_keyboard->enable(0);
 }
 
-void tandy2k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tandy2k_state::update_mouse)
 {
-	switch (id)
-	{
-		case MOUS_TIMER:
-		{
-			uint16_t x = m_x_axis->read();
-			uint16_t y = m_y_axis->read();
-			uint16_t dx = x - m_mouse_x;
-			uint16_t dy = y - m_mouse_y;
-			m_mouse_x = x;
-			m_mouse_y = y;
-			m_clkmouse_cnt = 5;
-			m_clkmouse_cmd[4] = 'A';
-			m_clkmouse_cmd[3] = dx & 0xff;
-			m_clkmouse_cmd[2] = dx >> 8;
-			m_clkmouse_cmd[1] = dy & 0xff;
-			m_clkmouse_cmd[0] = dy >> 8;
-			m_pic1->ir2_w(1);
-			break;
-		}
-		case MCU_DELAY:
-			m_pic1->ir2_w(1);
-			break;
-	}
+	uint16_t x = m_x_axis->read();
+	uint16_t y = m_y_axis->read();
+	uint16_t dx = x - m_mouse_x;
+	uint16_t dy = y - m_mouse_y;
+	m_mouse_x = x;
+	m_mouse_y = y;
+	m_clkmouse_cnt = 5;
+	m_clkmouse_cmd[4] = 'A';
+	m_clkmouse_cmd[3] = dx & 0xff;
+	m_clkmouse_cmd[2] = dx >> 8;
+	m_clkmouse_cmd[1] = dy & 0xff;
+	m_clkmouse_cmd[0] = dy >> 8;
+	m_pic1->ir2_w(1);
+}
+
+TIMER_CALLBACK_MEMBER(tandy2k_state::mcu_delay_cb)
+{
+	m_pic1->ir2_w(1);
 }
 
 rgb_t tandy2k_state::IRGB(uint32_t raw)

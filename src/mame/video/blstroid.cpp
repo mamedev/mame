@@ -70,8 +70,8 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 
 void blstroid_state::video_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);
+	m_irq_off_timer = timer_alloc(FUNC(blstroid_state::irq_off), this);
+	m_irq_on_timer = timer_alloc(FUNC(blstroid_state::irq_on), this);
 
 	m_scanline_int_state = false;
 
@@ -86,22 +86,14 @@ void blstroid_state::video_start()
  *
  *************************************/
 
-void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(blstroid_state::irq_off)
 {
-	switch (id)
-	{
-		case TIMER_IRQ_OFF:
-			/* clear the interrupt */
-			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-			break;
-		case TIMER_IRQ_ON:
-			/* generate the interrupt */
-			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-			break;
-		default:
-			atarigen_state::device_timer(timer, id, param);
-			break;
-	}
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(blstroid_state::irq_on)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
 

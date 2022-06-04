@@ -242,12 +242,6 @@ namespace {
 class cat_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_KEYBOARD,
-		TIMER_COUNTER_6MS
-	};
-
 	cat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -277,7 +271,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -898,18 +891,6 @@ static INPUT_PORTS_START( cat )
 INPUT_PORTS_END
 
 
-void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_COUNTER_6MS:
-		counter_6ms_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in cat_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 {
 	// This is effectively also the KTOBF (guessed: acronym for "Keyboard Timer Out Bit Flip")
@@ -935,7 +916,7 @@ void cat_state::machine_start()
 	m_wdt_counter = 0;
 	m_video_enable = 1;
 	m_video_invert = 0;
-	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
+	m_6ms_timer = timer_alloc(FUNC(cat_state::counter_6ms_callback), this);
 	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 

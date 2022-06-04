@@ -40,7 +40,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -49,7 +48,7 @@ protected:
 
 	virtual void send_to_display(uint8_t data) = 0;
 
-	void check_external_panel_server();
+	TIMER_CALLBACK_MEMBER(check_external_panel_server);
 
 	virtual const std::string get_front_panel_html_file() const { return ""; }
 	virtual const std::string get_front_panel_js_file() const { return ""; }

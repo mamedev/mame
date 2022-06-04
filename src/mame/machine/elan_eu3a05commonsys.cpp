@@ -228,19 +228,12 @@ void elan_eu3a05commonsys_device::map(address_map &map)
 }
 
 
-void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(elan_eu3a05commonsys_device::unknown_timer_tick)
 {
-	switch (id)
-	{
-		case TIMER_UNK:
-		{
-			// rad_bb3 unmasks the interrupt, but the jumps use pointers in RAM, which haven't been set up at the time
-			// of unmasking, so we need to find some kind of global enable / disable, or timer enable.
-			if (m_allow_timer_irq)
-				generate_custom_interrupt(m_whichtimer);
-			break;
-		}
-	}
+	// rad_bb3 unmasks the interrupt, but the jumps use pointers in RAM, which haven't been set up at the time
+	// of unmasking, so we need to find some kind of global enable / disable, or timer enable.
+	if (m_allow_timer_irq)
+		generate_custom_interrupt(m_whichtimer);
 }
 
 
@@ -254,7 +247,7 @@ void elan_eu3a05commonsys_device::device_start()
 	save_item(NAME(m_custom_irq_vector));
 	save_item(NAME(m_custom_nmi_vector));
 
-	m_unk_timer = timer_alloc(TIMER_UNK);
+	m_unk_timer = timer_alloc(FUNC(elan_eu3a05commonsys_device::unknown_timer_tick), this);
 	m_unk_timer->adjust(attotime::never);
 }
 

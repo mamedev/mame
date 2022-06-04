@@ -34,7 +34,24 @@ public:
 	void wpc_dot(machine_config &config);
 
 protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void wpc_dot_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(vblank_tick);
+	TIMER_CALLBACK_MEMBER(trigger_irq);
+
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(snd_reply_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(firq_w);
+	void rombank_w(uint8_t data);
+	void dmdbank_w(offs_t offset, uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -43,23 +60,6 @@ protected:
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
 	required_memory_bank_array<6> m_dmdbanks;
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	static const device_timer_id TIMER_VBLANK = 0;
-	static const device_timer_id TIMER_IRQ = 1;
-
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	void wpc_rombank_w(uint8_t data);
-	void wpc_dmdbank_w(offs_t offset, uint8_t data);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	uint16_t m_vblank_count = 0U;

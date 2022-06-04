@@ -439,7 +439,7 @@ void fp6000_state::pit_timer2_w(int state)
 
 void fp6000_state::machine_start()
 {
-	m_pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fp6000_state::pit_timer0_clear), this));
+	m_pit_timer = timer_alloc(FUNC(fp6000_state::pit_timer0_clear), this);
 }
 
 void fp6000_state::machine_reset()
