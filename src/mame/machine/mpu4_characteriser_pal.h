@@ -918,6 +918,56 @@ public:
 	static constexpr uint8_t thestreak_characteriser_prot[8] = { 0x00, 0x38, 0x30, 0x28, 0x20, 0x38, 0x30, 0x20 }; // some elements don't go through the scramble!
 
 
+	// games with sequence starting
+	// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc dc 58 54 04 90 a8 e8 ec 6c c0 b0 2c c0 3c d4 a4 38 54 84 38 58 d4 20 90 ac ec 68 c0 34 88 ec 64 94 2c c0 b4 ac 68 c4 bc d4 a0 34 00 9c 00
+	// used by
+	// Viz          "VZ__1.0"
+	// Gold Strike  "G4S 2.0" (doesn't use lamp scramble)
+	// Magic Dragon "DMD 1.0" (doesn't use lamp scramble? doesn't boot)
+	static constexpr uint8_t magicdragon_characteriser_prot[8] = { 0x00, 0x18, 0x10, 0x18, 0x10, 0x18, 0x10, 0x10 }; // verified against Viz
+
+
+	// games with sequence starting
+	// 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68 a4 58 70 80 dc 74 84 58 30 44 90 4c e4 98 74 00 94 48 24 90 08 60 d4 4c e0 18 74 80 dc 74 c4 dc 70 84 9c 74 84 dc f4 88 2c a0 dc 00
+	// Top The Lot  "T4L 1.0" (doesn't use lamp scramble)
+	// Monte Carlo  "MX052.0"
+	//              "MX102.0"
+	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x50, 0x10, 0x50, 0x10, 0x10 }; // maybe
+
+
+	// games with sequence starting
+	// 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
+	// Monte Carlo   "MC 2.0"
+	static constexpr uint8_t montealt_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x30, 0x10, 0x30, 0x10, 0x10 }; // maybe
+
+
+	// games with sequence starting
+	// 00 50 10 a0 68 14 b0 88 bc e4 48
+	// Prize Monte Carlo "MT054.0"
+	//                   "MT104.0"
+	static constexpr uint8_t przmontealt_characteriser_prot[8] = { 0x00, 0x70, 0x50, 0x60, 0x40, 0x70, 0x50, 0x40 }; // maybe
+
+
+	// games with sequence starting
+	// 00 44 44 4c d0 30 18 cc f8 9c 9c 9c dc 9c
+	// Andy's Full House    "AFU 0.2"
+	// Say No More          "SNM 2.0"
+	static constexpr uint8_t saynomore_characteriser_prot[8] = { 0x00, 0x58, 0x40, 0x18, 0x08, 0x50, 0x40, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
+	// Andy Loves Flo  "AL3 0.1"
+	static constexpr uint8_t andyfloalt_characteriser_prot[8] = { 0x00, 0x30, 0x30, 0x10, 0x10, 0x30, 0x30, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
+	// Andy Loves Flo   "AL4 2.1"
+	// Andy Loves Flo   "AL_ 2.4"
+	// Dutch Cherryo    "DCH 1.4"
+	static constexpr uint8_t cheryo_characteriser_prot[8] = { 0x00, 0x68, 0x40, 0x28, 0x20, 0x48, 0x40, 0x00 }; // good?
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -925,22 +975,6 @@ public:
 	***************************************************************/
 
 
-
-
-	// games with sequence starting
-	// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc dc 58 54 04 90 a8 e8 ec 6c c0 b0 2c c0 3c d4 a4 38 54 84 38 58 d4 20 90 ac ec 68 c0 34 88 ec 64 94 2c c0 b4 ac 68 c4 bc d4 a0 34 00 9c 00
-	// used by
-	// Viz          "VZ__1.0"
-	// Gold Strike  "G4S 2.0" (doesn't use lamp scramble)
-	// Magic Dragon "DMD 1.0" (doesn't use lamp scramble? doesn't boot)
-	static constexpr uint8_t magicdragon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68 a4 58 70 80 dc 74 84 58 30 44 90 4c e4 98 74 00 94 48 24 90 08 60 d4 4c e0 18 74 80 dc 74 c4 dc 70 84 9c 74 84 dc f4 88 2c a0 dc 00
-	// Top The Lot  "T4L 1.0"
-	// Monte Carlo  "MX052.0"
-	//              "MX102.0"
-	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c 64 18 7c 38 74 0c 20 18 74 00 14 48 2c 68 24 1c 30 40 18 30 08 6c 2c 68 28 24 58 7c 34 4c 6c 28 64 1c 74 0c 6c 2c 60 14 00 5c 00
@@ -982,12 +1016,7 @@ public:
 	// Dutch Broadway    "DBR 1.1" (doesn't use lamp scramble? doesn't boot)
 	static constexpr uint8_t phr_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
-	// Andy Loves Flo   "AL4 2.1"
-	// Andy Loves Flo   "AL_ 2.4"
-	// Dutch Cherryo    "DCH 1.4"
-	static constexpr uint8_t cheryo_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting
 	// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
@@ -1108,11 +1137,6 @@ public:
 	// Crazy Cavern (Nova) "GCV 0.5"
 	static constexpr uint8_t bdash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 44 44 4c d0 30 18 cc f8 9c 9c 9c dc 9c
-	// Andy's Full House    "AFU 0.2"
-	// Say No More          "SNM 2.0"
-	static constexpr uint8_t saynomore_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
@@ -1149,10 +1173,6 @@ public:
 	//                "CHU 0.1"
 	static constexpr uint8_t hittopalt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
-	// Andy Loves Flo  "AL3 0.1"
-	static constexpr uint8_t andyfloalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
@@ -1160,16 +1180,7 @@ public:
 	//              "AC5 1.0"
 	static constexpr uint8_t andycappalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
-	// Monte Carlo   "MC 2.0"
-	static constexpr uint8_t montealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 50 10 a0 68 14 b0 88 bc e4 48
-	// Prize Monte Carlo "MT054.0"
-	//                   "MT104.0"
-	static constexpr uint8_t przmontealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
