@@ -697,8 +697,8 @@ void midzeus_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		if (((old_control ^ m_gun_control) & pmask) != 0 && (m_gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
-			m_gun_x[player] = m_io_gun_x[player]->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
-			m_gun_y[player] = m_io_gun_y[player]->read() * visarea.height() / 255 + visarea.min_y;
+			m_gun_x[player] = m_io_gun_x[player]->read() * visarea.width() / 255 + (0.0127 * visarea.width()) + visarea.min_x + BEAM_XOFFS;
+			m_gun_y[player] = m_io_gun_y[player]->read() * visarea.height() / 255 + (0.0354 * visarea.height()) + visarea.min_y;
 			m_gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, m_gun_y[player] - BEAM_DY), std::max(0, m_gun_x[player] - BEAM_DX)), player);
 		}
 	}
