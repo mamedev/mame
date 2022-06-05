@@ -9938,7 +9938,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- The file in the floppy disks are the same of the other French release, but the files' date are newer -->
+	<!-- The files inside the floppy disks are the same of the other French release, but the files' date are newer -->
 	<software name="aitdfr1" cloneof="aitd">
 		<description>Alone in the Dark (France, newer)</description>
 		<year>1992</year>
