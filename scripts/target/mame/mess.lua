@@ -3390,6 +3390,8 @@ createMESSProjects(_target, _subtarget, "pc")
 files {
 	MAME_DIR .. "src/mame/drivers/asst128.cpp",
 	MAME_DIR .. "src/mame/drivers/europc.cpp",
+	MAME_DIR .. "src/mame/machine/europc_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/europc_kbd.h",
 	MAME_DIR .. "src/mame/drivers/genpc.cpp",
 	MAME_DIR .. "src/mame/drivers/ibmpc.cpp",
 	MAME_DIR .. "src/mame/drivers/ibmpcjr.cpp",
