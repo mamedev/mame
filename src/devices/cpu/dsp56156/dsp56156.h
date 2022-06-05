@@ -23,8 +23,9 @@
 #define DSP56156_IRQ_MODC  2
 #define DSP56156_IRQ_RESET 3  /* Is this needed? */
 
-
 namespace DSP_56156 {
+
+class dsp56156_device;
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -182,15 +183,14 @@ struct dsp56156_core
 	uint8_t   repFlag;    // Knowing if we're in a 'repeat' state (dunno how the processor does this)
 	uint32_t  repAddr;    // The address of the instruction to repeat...
 
-
-	/* MAME internal stuff */
+	// MAME internal stuff
 	int icount;
 
 	uint32_t          ppc;
 	uint32_t          op;
-	int             interrupt_cycles;
-	void            (*output_pins_changed)(uint32_t pins);
-	cpu_device *device;
+	int               interrupt_cycles;
+	void              (*output_pins_changed)(uint32_t pins);
+	dsp56156_device   *device;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache cache;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific program;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific data;
@@ -211,10 +211,13 @@ public:
 	void host_interface_write(uint8_t offset, uint8_t data);
 	uint8_t host_interface_read(uint8_t offset);
 
-	uint16_t get_peripheral_memory(uint16_t addr);
-
 	void dsp56156_program_map(address_map &map);
 	void dsp56156_x_data_map(address_map &map);
+
+	auto portc_cb() { return portC_cb.bind(); }
+
+	void output_portc(uint16_t value) { portC_cb(value); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -245,6 +248,8 @@ private:
 	required_shared_ptr<uint16_t> m_program_ram;
 
 	dsp56156_core m_core;
+
+	devcb_write16 portC_cb;
 
 	void agu_init();
 	void alu_init();

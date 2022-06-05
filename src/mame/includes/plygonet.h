@@ -13,12 +13,6 @@
 #include "tilemap.h"
 
 
-static const uint16_t dsp56156_bank00_size = 0x1000;
-static const uint16_t dsp56156_bank01_size = 0x1000;
-static const uint16_t dsp56156_bank02_size = 0x4000;
-static const uint16_t dsp56156_shared_ram_16_size = 0x2000;
-static const uint16_t dsp56156_bank04_size = 0x1fc0;
-
 class polygonet_state : public driver_device
 {
 public:
@@ -33,8 +27,10 @@ public:
 		m_palette(*this, "palette"),
 		m_k054321(*this, "k054321"),
 		m_shared_ram(*this, "shared_ram"),
-		m_dsp56156_p_mirror(*this, "dsp56156_p_mirror"),
-		m_dsp56156_p_8000(*this, "dsp56156_p_8000")
+		m_dsp_p_mirror(*this, "dsp_p_mirror"),
+		m_dsp_p_8000(*this, "dsp_p_8000"),
+		m_inputs(*this, "IN%u", 0U),
+		m_eepromout(*this, "EEPROMOUT")
 	{ }
 
 	void plygonet(machine_config &config);
@@ -54,10 +50,12 @@ private:
 	/* 68k-side shared ram */
 	required_shared_ptr<uint32_t> m_shared_ram;
 
-	required_shared_ptr<uint16_t> m_dsp56156_p_mirror;
-	required_shared_ptr<uint16_t> m_dsp56156_p_8000;
+	required_shared_ptr<uint16_t> m_dsp_p_mirror;
+	required_shared_ptr<uint16_t> m_dsp_p_8000;
 
-	ioport_port *m_inputs[4]{};
+	required_ioport_array<4> m_inputs;
+	required_ioport m_eepromout;
+
 	uint8_t m_sys0 = 0;
 	uint8_t m_sys1 = 0;
 
@@ -73,52 +71,68 @@ private:
 	uint8_t m_sound_intck = 0;
 
 	/* memory buffers */
-	uint16_t m_dsp56156_bank00_ram[2 * 8 * dsp56156_bank00_size]; /* 2 bank sets, 8 potential banks each */
-	uint16_t m_dsp56156_bank01_ram[2 * 8 * dsp56156_bank01_size];
-	uint16_t m_dsp56156_bank02_ram[2 * 8 * dsp56156_bank02_size];
-	uint16_t m_dsp56156_shared_ram_16[2 * 8 * dsp56156_shared_ram_16_size];
-	uint16_t m_dsp56156_bank04_ram[2 * 8 * dsp56156_bank04_size];
+	std::unique_ptr<uint16_t[]> m_dsp_bank00_ram;
+	std::unique_ptr<uint16_t[]> m_dsp_bank01_ram;
+	std::unique_ptr<uint16_t[]> m_dsp_bank02_ram;
+	std::unique_ptr<uint16_t[]> m_dsp_shared_ram_16;
+	std::unique_ptr<uint16_t[]> m_dsp_bank04_ram;
 
-	void polygonet_sys_w(offs_t offset, uint8_t data);
-	uint8_t polygonet_inputs_r(offs_t offset);
+	/* DSP information */
+	uint16_t m_dsp_portc;
+	uint8_t m_dsp_bank_group;
+	uint8_t m_dsp_bank_num;
+	uint32_t m_dsp_bank_offsets[5];
+
+	void sys_w(offs_t offset, uint8_t data);
+	uint8_t inputs_r(offs_t offset);
 	void sound_irq_w(uint32_t data);
 	uint32_t dsp_host_interface_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t shared_ram_read(offs_t offset, uint32_t mem_mask = ~0);
 	void shared_ram_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void dsp_w_lines(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void dsp_host_interface_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t network_r();
-	uint16_t dsp56156_bootload_r();
-	uint16_t dsp56156_ram_bank00_read(offs_t offset);
-	void dsp56156_ram_bank00_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dsp56156_ram_bank01_read(offs_t offset);
-	void dsp56156_ram_bank01_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dsp56156_ram_bank02_read(offs_t offset);
-	void dsp56156_ram_bank02_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dsp56156_shared_ram_read(offs_t offset);
-	void dsp56156_shared_ram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dsp56156_ram_bank04_read(offs_t offset);
-	void dsp56156_ram_bank04_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_bootload_r();
+	void dsp_portc_write(uint16_t data);
+	uint8_t dsp_bank_group();
+	uint8_t dsp_bank_num(uint8_t bank_group);
+	uint16_t dsp_ram_bank00_read(offs_t offset);
+	void dsp_ram_bank00_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_ram_bank01_read(offs_t offset);
+	void dsp_ram_bank01_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_ram_bank02_read(offs_t offset);
+	void dsp_ram_bank02_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_shared_ram_read(offs_t offset);
+	void dsp_shared_ram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_ram_bank04_read(offs_t offset);
+	void dsp_ram_bank04_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_ctrl_w(uint8_t data);
-	uint32_t polygonet_ttl_ram_r(offs_t offset);
-	void polygonet_ttl_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t polygonet_roz_ram_r(offs_t offset);
-	void polygonet_roz_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ttl_ram_r(offs_t offset);
+	void ttl_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t roz_ram_r(offs_t offset);
+	void roz_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
-	TILEMAP_MAPPER_MEMBER(plygonet_scan);
-	TILEMAP_MAPPER_MEMBER(plygonet_scan_cols);
+	TILEMAP_MAPPER_MEMBER(scan_rows);
+	TILEMAP_MAPPER_MEMBER(scan_cols);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 
 	void dsp_data_map(address_map &map);
 	void dsp_program_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	static const uint16_t dsp_bank00_size;
+	static const uint16_t dsp_bank01_size;
+	static const uint16_t dsp_bank02_size;
+	static const uint16_t dsp_shared_ram_16_size;
+	static const uint16_t dsp_bank04_size;
 };
 
 #endif // MAME_INCLUDES_PLYGONET_H
