@@ -6,7 +6,7 @@ IGS017 / IGS031 video device
 
 what's the difference between IGS017 and IGS031? encryption?
 
-all the known IGS017 / IGS031 games use same memory map, is the IGS017 / IGS031
+all the known IGS017 / IGS031 games use the same memory map, is the IGS017 / IGS031
 providing the interface to the 8255, or is it coincidence?
 
 */
@@ -17,7 +17,6 @@ providing the interface to the 8255, or is it coincidence?
 void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
-//  map(0x1800, 0x1bff).ram() //.w("palette", FUNC(palette_device::write).share("palette");
 	map(0x1800, 0x1bff).ram().w(FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 
@@ -29,7 +28,6 @@ void igs017_igs031_device::map(address_map &map)
 
 	map(0x4000, 0x5fff).ram().w(FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
 	map(0x6000, 0x7fff).ram().w(FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
-
 }
 
 u8 igs017_igs031_device::i8255_r(offs_t offset)
@@ -260,7 +258,7 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cl
 	if (addr + dimx * dimy >= m_sprites_gfx_size)
 		return;
 
-	/* Start drawing */
+	// Start drawing
 	const u16 pal = 0x100 + (color << 5);
 	const u8 *source_base = &m_sprites_gfx[addr];
 	const u8 transparent_color = 0x1f;
@@ -389,7 +387,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 		popmessage("a: %08X w: %03X p: %02x-%02x-%02x",a,w,m_sprites_gfx[a/3*3+0],m_sprites_gfx[a/3*3+1],m_sprites_gfx[a/3*3+2]);
 		m_debug_addr = a;
 		m_debug_width = w;
-		osd_sleep(osd_ticks_per_second() / 1000 * 200);
+		osd_sleep(osd_ticks_per_second() / 1000 * 200 / 4);
 		return 1;
 	}
 #endif
