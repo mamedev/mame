@@ -502,13 +502,8 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// bgfx does not work with wayland
 	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && ((strcmp(options().video(), "auto") == 0) || (strcmp(options().video(), "bgfx") == 0)))
-	{
-		osd_printf_verbose("BGFX does not work with wayland, overriding SDL videodriver to '%s' ...\n", "x11");
-		SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		osd_setenv(SDLENV_VIDEODRIVER, "x11", 1);
-		SDL_InitSubSystem(SDL_INIT_VIDEO);
-	}
-
+		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
+	
 	osd_sdl_info();
 
 	defines_verbose();
