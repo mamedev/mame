@@ -37872,10 +37872,6 @@ galaxyr                         // (c) 1983
 galaxyrp                        // (c) 1983
 sblazerp                        // (c) 1983
 
-@source:segam1.cpp
-bingpty                         // ?
-unkm1                           // ?
-
 @source:segaorun.cpp
 outrun                          // Revision B
 outrunb                         // 1986 (protected beta bootleg)
@@ -38247,6 +38243,11 @@ svs                             // 1994.?? Super Visual Soccer
 titlef                          // 1993.?? Title Fight (World)
 titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
+
+@source:segasm1.cpp
+tinkerbl						// (c) 1990 Sega
+unkm1                           // (c) 1992 Sega
+bingpty                         // (c) 1994 Sega
 
 @source:segasp.cpp
 aminosan                        // 2010.?? Aminosan (satellite)
