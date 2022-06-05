@@ -2777,7 +2777,6 @@ files {
 	MAME_DIR .. "src/mame/audio/m79amb.cpp",
 	MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/includes/mw8080bw.h",
-	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/mw8080bw.h",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
