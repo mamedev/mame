@@ -147,7 +147,7 @@ namespace plib
 		template <typename ST>
 		void save_state([[maybe_unused]] ST &st)
 		{
-			/* no state to save */
+			// no state to save
 		}
 
 	private:

@@ -51,19 +51,6 @@
 #define NL_USE_ACADEMIC_SOLVERS (1)
 #endif
 
-/// \brief  Store input values in logic_terminal_t.
-///
-/// Set to 1 to store values in logic_terminal_t instead of
-/// accessing them indirectly by pointer from logic_net_t.
-/// This approach is stricter and should identify bugs in
-/// the netlist core faster.
-/// By default it is disabled since it is not as fast as
-/// the default approach. It is up to 20% slower.
-///
-#ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
-#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0) // FIXME: Move to config struct later
-#endif
-
 /// \brief Use backward Euler integration
 ///
 /// This will use backward Euler instead of trapezoidal integration.
@@ -77,6 +64,35 @@
 #define NL_USE_BACKWARD_EULER (1) // FIXME: Move to config struct later
 #endif
 
+/// \brief  Compile with core terminals owned by net_t
+///
+/// Set to 1 to enable that net_t owns core terminal collection.
+/// In addition, this approach will use plib::list_t so that the doubled linked
+/// list pointers are part of the core_terminal_t.
+///
+/// This approach requires that terminals at each point in time are only owned
+/// by one net. The approach helped to identify bugs. Since the approach
+/// involves that containers are located in different locations, it needs a
+/// pre-processor define.
+///
+/// By default the setting is currently disabled.
+///
+#ifndef NL_USE_INPLACE_CORE_TERMS
+#define NL_USE_INPLACE_CORE_TERMS (0)
+#endif
+
+/// \brief Use alternative truth table execution approach
+///
+/// Enabling this will define a separate truth table execution approach which
+/// will use a separate delegate for each input. This approach needs more
+/// refinement yet. It works, but is not as fast as the standard approach.
+///
+/// Unfortunately this has to be macro since it needs another member variable.
+///
+#ifndef NL_USE_TT_ALTERNATIVE
+#define NL_USE_TT_ALTERNATIVE (0)
+#endif
+
 /// \brief  Compile matrix solvers using the __float128 type.
 ///
 /// Defaults to \ref PUSE_FLOAT128
@@ -84,15 +100,6 @@
 #define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
-/// \brief Avoid unnecessary queue pushes
-///
-/// Enable the setting below to avoid queue pushes were at execution
-/// no action will be taken. This is academically cleaner, but slower than
-/// allowing this to happen and filter it during during "process".
-/// This is used in core/nets.h
-#ifndef AVOID_NOOP_QUEUE_PUSHES
-#define AVOID_NOOP_QUEUE_PUSHES (0)  // FIXME: Move to config struct later
-#endif
 
 //============================================================
 //  DEBUGGING
@@ -216,6 +223,42 @@ namespace netlist
 		///  FIXME: More work needed. Review magic numbers.
 		///
 		using fptype = double;
+
+		/// \brief  Store input values in logic_terminal_t.
+		///
+		/// Set to 1 to store values in logic_terminal_t instead of
+		/// accessing them indirectly by pointer from logic_net_t.
+		/// This approach is stricter and should identify bugs in
+		/// the netlist core faster. The approach needs
+		/// NL_USE_INPLACE_CORE_TERMS enabled to achieve some performance.
+		///
+		/// By default it is disabled since it is not as fast as
+		/// the default approach. It is ~20% slower.
+		///
+		using use_copy_instead_of_reference = std::integral_constant<bool, false>;
+
+		/// \brief Avoid unnecessary queue pushes
+		///
+		/// Enable the setting below to avoid queue pushes were at execution
+		/// no action will be taken. This is academically cleaner, but
+		/// ~6% slower than allowing this to happen and filter it during
+		/// during "process".
+		///
+		using avoid_noop_queue_pushes = std::integral_constant<bool, false>;
+
+		/// \brief Which sorted queue to use
+		///
+		/// Use timed_queue_heap to use stdc++ heap functions instead of the
+		/// linear processing queue. This slows down execution by about 35%
+		/// on a Kaby Lake.
+		///
+		/// The default is the  linear queue.
+
+		// template <class A, class T>
+		// using timed_queue = plib::timed_queue_heap<A, T>;
+
+		template <typename A, typename T>
+		using timed_queue = plib::timed_queue_linear<A, T>;
 	};
 
 	/// \brief  Netlist configuration.
@@ -225,6 +268,9 @@ namespace netlist
 	///
 	struct config : public config_default
 	{
+		//using mempool_align = std::integral_constant<std::size_t, 32>;
+		//using avoid_noop_queue_pushes = std::integral_constant<bool, true>;
+		//using use_copy_instead_of_reference = std::integral_constant<bool, true>;
 	};
 
 	using nl_fptype = config::fptype;

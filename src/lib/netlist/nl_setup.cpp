@@ -35,7 +35,7 @@ namespace netlist
 	{
 		pstring alias_fqn = build_fqn(alias);
 		pstring out_fqn = build_fqn(out);
-		register_alias_nofqn(alias_fqn, out_fqn);
+		register_alias_no_fqn(alias_fqn, out_fqn);
 	}
 
 	void nlparse_t::register_dip_alias_arr(const pstring &terms)
@@ -70,7 +70,7 @@ namespace netlist
 
 	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
 		const std::vector<pstring> &params_and_connections,
-		factory::element_t **felem)
+		factory::element_t **factory_element)
 	{
 
 		auto *f = factory().factory_by_name(classname);
@@ -98,25 +98,25 @@ namespace netlist
 
 		if (!params_and_connections.empty())
 		{
-			auto ptok(params_and_connections.begin());
-			auto ptok_end(params_and_connections.end());
+			auto token_ptr(params_and_connections.begin());
+			auto token_end(params_and_connections.end());
 
 			for (const pstring &tp : parameter_list)
 			{
 				if (plib::startsWith(tp, "+"))
 				{
-					if (ptok == ptok_end)
+					if (token_ptr == token_end)
 					{
 						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 						//break;
 					}
-					pstring output_name = *ptok;
+					pstring output_name = *token_ptr;
 					log().debug("Link: {1} {2}", tp, output_name);
 
 					register_link(name + "." + tp.substr(1), output_name);
-					++ptok;
+					++token_ptr;
 				}
 				else if (plib::startsWith(tp, "@"))
 				{
@@ -127,30 +127,30 @@ namespace netlist
 				}
 				else
 				{
-					if (ptok == params_and_connections.end())
+					if (token_ptr == token_end)
 					{
 						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 					}
-					pstring paramfq = name + "." + tp;
+					pstring fully_qualified_name = name + "." + tp;
 
-					log().debug("Default parameter: {1}\n", paramfq);
+					log().debug("Default parameter: {1}\n", fully_qualified_name);
 
-					register_param(paramfq, *ptok);
+					register_param(fully_qualified_name, *token_ptr);
 
-					++ptok;
+					++token_ptr;
 				}
 			}
-			if (ptok != params_and_connections.end())
+			if (token_ptr != params_and_connections.end())
 			{
 				MF_PARAM_COUNT_EXCEEDED_2 err(name, params_and_connections.size());
 				log().fatal(err);
 				throw nl_exception(err);
 			}
 		}
-		if (felem != nullptr)
-			*felem = f;
+		if (factory_element != nullptr)
+			*factory_element = f;
 	}
 
 	void nlparse_t::register_hint(const pstring &object_name, const pstring &hint_name)
@@ -240,7 +240,7 @@ namespace netlist
 		{
 			if (idx->second.find("$(") == pstring::npos)
 			{
-				//* There may be reason ... so make it an INFO
+				// There may be reason ... so make it an INFO
 				log().info(MI_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn,
 					idx->second, val));
 			}
@@ -248,7 +248,7 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_defparam(const pstring &name, const pstring &def)
+	void nlparse_t::register_default_param(const pstring &name, const pstring &def)
 	{
 		// strip " from stringified strings
 		pstring val(def);
@@ -256,7 +256,7 @@ namespace netlist
 			val = def.substr(1, def.length() - 2);
 		// Replace "@." with the current namespace
 		val = plib::replace_all(val, "@.", namespace_prefix());
-		m_abstract.m_defparams.emplace_back(namespace_prefix() + name, val);
+		m_abstract.m_default_params.emplace_back(namespace_prefix() + name, val);
 	}
 
 	factory::list_t &nlparse_t::factory() noexcept
@@ -284,17 +284,17 @@ namespace netlist
 		register_param(frontier_name + ".RIN", r_IN);
 		register_param(frontier_name + ".ROUT", r_OUT);
 		register_link(frontier_name + ".G", "GND");
-		pstring attfn = build_fqn(attach);
+		pstring attach_fully_qualified_name = build_fqn(attach);
 		pstring front_fqn = build_fqn(frontier_name);
 		bool found = false;
 		for (auto & link  : m_abstract.m_links)
 		{
-			if (link.first == attfn)
+			if (link.first == attach_fully_qualified_name)
 			{
 				link.first = front_fqn + ".I";
 				found = true;
 			}
-			else if (link.second == attfn)
+			else if (link.second == attach_fully_qualified_name)
 			{
 				link.second = front_fqn + ".I";
 				found = true;
@@ -329,7 +329,7 @@ namespace netlist
 		return namespace_prefix() + obj_name;
 	}
 
-	void nlparse_t::register_alias_nofqn(const pstring &alias, const pstring &out)
+	void nlparse_t::register_alias_no_fqn(const pstring &alias, const pstring &out)
 	{
 		if (!m_abstract.m_alias.insert({alias, out}).second)
 		{
@@ -414,12 +414,12 @@ namespace netlist
 	void nlparse_t::remove_connections(const pstring &pin)
 	{
 		// FIXME: check use_cases - remove_connections may be dead
-		pstring pinfn = build_fqn(pin);
+		pstring pin_fully_qualified_name = build_fqn(pin);
 		bool found = false;
 
 		for (auto link = m_abstract.m_links.begin(); link != m_abstract.m_links.end(); )
 		{
-			if ((link->first == pinfn) || (link->second == pinfn))
+			if ((link->first == pin_fully_qualified_name) || (link->second == pin_fully_qualified_name))
 			{
 				log().verbose("removing connection: {1} <==> {2}\n", link->first, link->second);
 				link = m_abstract.m_links.erase(link);
@@ -732,7 +732,12 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 	m_proxy_cnt++;
 	// connect all existing terminals to new net
 
-	for (auto & p : nlstate().core_terms(out.net()))
+	// Get a copy first
+	auto temp_terminals(out.net().core_terms_copy());
+	// remove all terminals from out.net()
+	out.net().remove_all_terminals();
+
+	for (detail::core_terminal_t * p : temp_terminals)
 	{
 		p->clear_net(); // de-link from all nets ...
 		if (!connect(new_proxy->proxy_term(), *p))
@@ -743,9 +748,8 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 					new_proxy->proxy_term().name(), (*p).name()));
 		}
 	}
-	nlstate().core_terms(out.net()).clear();
 
-	add_terminal(out.net(), new_proxy->in());
+	out.net().add_terminal(new_proxy->in());
 
 	auto *proxy(new_proxy.get());
 	if (!m_proxies.insert({&out, proxy}).second)
@@ -762,7 +766,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
 	gsl_Expects(inp.is_logic());
 
-	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
+	const auto &logic_input_terminal = dynamic_cast<const logic_input_t &>(inp);
 
 	auto iter_proxy(m_proxies.find(&inp));
 
@@ -770,8 +774,10 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 		return iter_proxy->second;
 
 	log().debug("connect_terminal_input: connecting proxy\n");
-	auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate,
-		plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt), &incast);
+	auto new_proxy =
+		logic_input_terminal.logic_family()->create_a_d_proxy(m_nlstate,
+			plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt),
+			&logic_input_terminal);
 
 	auto *ret(new_proxy.get());
 
@@ -784,7 +790,11 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 
 	if (inp.has_net())
 	{
-		for (detail::core_terminal_t * p : nlstate().core_terms(inp.net()))
+		auto temp_terminals(inp.net().core_terms_copy());
+
+		inp.net().remove_all_terminals();
+
+		for (detail::core_terminal_t * p : temp_terminals)
 		{
 			// inp may already belongs to the logic net. Thus skip it here.
 			// It will be removed by the clear further down.
@@ -800,10 +810,9 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 				}
 			}
 		}
-		nlstate().core_terms(inp.net()).clear(); // clear the list
 	}
 	inp.clear_net();
-	add_terminal(ret->out().net(), inp);
+	ret->out().net().add_terminal(inp);
 	m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
 	return ret;
 }
@@ -856,7 +865,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 	{
 		auto *proxy = get_a_d_proxy(in);
 
-		add_terminal(out.net(), proxy->proxy_term());
+		out.net().add_terminal(proxy->proxy_term());
 	}
 	else if (out.is_logic() && in.is_analog())
 	{
@@ -870,7 +879,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 		if (in.has_net())
 			merge_nets(out.net(), in.net());
 		else
-			add_terminal(out.net(), in);
+			out.net().add_terminal(in);
 	}
 }
 
@@ -918,7 +927,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 				log().info(MI_CONNECTING_1_TO_2_SAME_NET(in.name(), out.name(), in.net().name()));
 		}
 		else
-			add_terminal(out.net(), in);
+			out.net().add_terminal(in);
 	}
 	else if (out.is_logic())
 	{
@@ -944,23 +953,23 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1,detail::core_termina
 	else if (t2.has_net())
 	{
 		log().debug("T2 has net\n");
-		add_terminal(t2.net(), t1);
+		t2.net().add_terminal(t1);
 	}
 	else if (t1.has_net())
 	{
 		log().debug("T1 has net\n");
-		add_terminal(t1.net(), t2);
+		t1.net().add_terminal(t2);
 	}
 	else
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = plib::make_owned<analog_net_t>(nlstate().pool(), m_nlstate,"net." + t1.name());
-		auto *anetp = anet.get();
-		m_nlstate.register_net(std::move(anet));
-		t1.set_net(anetp);
-		add_terminal(*anetp, t2);
-		add_terminal(*anetp, t1);
+		auto new_net_uptr = plib::make_owned<analog_net_t>(nlstate().pool(), m_nlstate,"net." + t1.name());
+		auto *new_net_ptr = new_net_uptr.get();
+		m_nlstate.register_net(std::move(new_net_uptr));
+		t1.set_net(new_net_ptr);
+		new_net_ptr->add_terminal(t2);
+		new_net_ptr->add_terminal(t1);
 	}
 }
 
@@ -974,7 +983,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 			ret = connect(t2, t1.net().rail_terminal());
 		if (!ret)
 		{
-			for (auto & t : nlstate().core_terms(t1.net()))
+			for (detail::core_terminal_t * t : t1.net().core_terms_copy())
 			{
 				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t2, *t);
@@ -989,7 +998,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 			ret = connect(t1, t2.net().rail_terminal());
 		if (!ret)
 		{
-			for (auto & t : nlstate().core_terms(t2.net()))
+			for (detail::core_terminal_t * t : t2.net().core_terms_copy())
 			{
 				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t1, *t);
@@ -1168,14 +1177,14 @@ void setup_t::resolve_inputs()
 		}
 		else if (is_nc_pin)
 		{
-			/* ignore */
+			// ignore
 		}
 		else if (!term->has_net())
 		{
 			log().error(ME_TERMINAL_1_WITHOUT_NET(name_da));
 			err = true;
 		}
-		else if (nlstate().core_terms(term->net()).empty())
+		else if (term->net().core_terms_empty())
 		{
 			if (term->is_logic_input())
 				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(name_da));
@@ -1224,26 +1233,13 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::add_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false)
-{
-	for (auto &t : nlstate().core_terms(net))
-		if (t == &terminal)
-		{
-			log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(net.name(), t->name()));
-			throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(net.name(), t->name()));
-		}
-
-	terminal.set_net(&net);
-
-	nlstate().core_terms(net).push_back(&terminal);
-}
-
+#if 0
 void setup_t::remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false)
 {
-	if (plib::container::contains(nlstate().core_terms(net), &terminal))
+	if (plib::container::contains(net.core_terms(), &terminal))
 	{
 		terminal.set_net(nullptr);
-		plib::container::remove(nlstate().core_terms(net), &terminal);
+		net.core_terms().remove(&terminal);
 	}
 	else
 	{
@@ -1251,12 +1247,18 @@ void setup_t::remove_terminal(detail::net_t &net, detail::core_terminal_t &termi
 		throw nl_exception(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), net.name()));
 	}
 }
+#endif
 
 void setup_t::move_connections(detail::net_t &net, detail::net_t &dest_net)
 {
-	for (auto &ct : nlstate().core_terms(net))
-		add_terminal(dest_net, *ct);
-	nlstate().core_terms(net).clear();
+	auto temp(net.core_terms_copy());
+
+	net.remove_all_terminals();
+
+	for (detail::core_terminal_t * ct : temp)
+	{
+		dest_net.add_terminal(*ct);
+	}
 }
 
 
@@ -1290,15 +1292,15 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 
 		model = i->second;
 	}
-	pstring xmodel = plib::left(model, pos);
+	pstring base_model = plib::left(model, pos);
 
-	if (xmodel == "_")
+	if (base_model == "_")
 		map["COREMODEL"] = key;
 	else
 	{
-		auto i = m_models.find(xmodel);
+		auto i = m_models.find(base_model);
 		if (i != m_models.end())
-			model_parse(xmodel, map);
+			model_parse(base_model, map);
 		else
 			throw nl_exception(MF_MODEL_NOT_FOUND(model_in));
 	}
@@ -1531,7 +1533,7 @@ void setup_t::delete_empty_nets()
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
 			[](device_arena::owned_ptr<detail::net_t> &net)
 			{
-				if (net->state().core_terms(*net).empty())
+				if (net->core_terms_empty())
 				{
 					// FIXME: need to remove from state->m_core_terms as well.
 					net->state().log().verbose("Deleting net {1} ...", net->name());
@@ -1552,13 +1554,13 @@ void setup_t::prepare_to_run()
 
 	if (!env_log_setting.empty())
 	{
-		const auto loglist(plib::psplit(env_log_setting, ':'));
-		m_parser.register_dynamic_log_devices(loglist);
+		const auto list_of_logs(plib::psplit(env_log_setting, ':'));
+		m_parser.register_dynamic_log_devices(list_of_logs);
 	}
 
-	// create defparams first!
+	// create default parameters first!
 
-	for (auto & e : m_abstract.m_defparams)
+	for (auto & e : m_abstract.m_default_params)
 	{
 		auto param(plib::make_unique<param_str_t, host_arena>(nlstate(), e.first, e.second));
 		register_param_t(*param);
@@ -1684,7 +1686,7 @@ void setup_t::prepare_to_run()
 
 	for (auto &n : m_nlstate.nets())
 	{
-		for (auto & term : m_nlstate.core_terms(*n))
+		for (detail::core_terminal_t * term : n->core_terms_copy())
 			if (term->delegate().isnull())
 			{
 				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));

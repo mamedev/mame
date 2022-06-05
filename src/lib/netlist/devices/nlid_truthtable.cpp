@@ -41,7 +41,7 @@ namespace netlist::devices {
 				const pstring &model,
 				truth_table_t &ttp, const std::vector<pstring> &desc)
 		: device_t(owner, name, model)
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 		, m_state(*this, "m_state", 0)
 #endif
 		, m_ign(*this, "m_ign", 0)
@@ -61,25 +61,26 @@ namespace netlist::devices {
 		{
 			int active_outputs = 0;
 			m_ign = 0;
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 			m_state = 0;
 #endif
 			for (std::size_t i = 0; i < m_NI; ++i)
 			{
 				m_I[i].activate();
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 				m_state |= (m_I[i]() << i);
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && !exec().nl_state().core_terms(q.net()).empty())
-					active_outputs++;
+				if (q.has_net())
+					if (!q.net().core_terms_empty())
+						active_outputs++;
 			set_active_outputs(active_outputs);
 		}
 
 		NETLIB_HANDLERI(inputs)
 		{
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 			m_state = 0;
 			for (std::size_t i = 0; i < m_NI; ++i)
 			{
@@ -89,7 +90,7 @@ namespace netlist::devices {
 			process<true>();
 		}
 
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 		template <std::size_t N>
 		void update_N() noexcept
 		{
@@ -122,7 +123,7 @@ namespace netlist::devices {
 
 			if (doOUT)
 			{
-#if !USE_TT_ALTERNATIVE
+#if !NL_USE_TT_ALTERNATIVE
 				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
 					if (ign & 1)
 						I->activate();
@@ -150,7 +151,7 @@ namespace netlist::devices {
 				}
 
 			const type_t output_state(m_ttp.m_out_state[new_state]);
-			type_t out(output_state & m_outmask);
+			const type_t out(output_state & m_outmask);
 
 			m_ign = output_state >> m_NO;
 
@@ -171,7 +172,7 @@ namespace netlist::devices {
 			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
 				if (ign & 1)
 					I->inactivate();
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 			m_state = new_state;
 #endif
 		}
@@ -195,7 +196,7 @@ namespace netlist::devices {
 		plib::static_vector<logic_input_t, m_NI> m_I;
 		plib::static_vector<logic_output_t, m_NO> m_Q;
 
-#if USE_TT_ALTERNATIVE
+#if NL_USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
 #endif
 		state_var<type_t>   m_ign;
@@ -214,18 +215,18 @@ namespace netlist::devices {
 	{
 		using type = T;
 
-		pbitset() noexcept : m_bs(0) { }
-		pbitset(T v) noexcept : m_bs(v) { }
+		constexpr pbitset() noexcept : m_bs(0) { }
+		constexpr pbitset(T v) noexcept : m_bs(v) { }
 
-		pbitset &set() noexcept { *this = all_bits(); return *this; }
-		pbitset &set(std::size_t bit) noexcept { m_bs |= (static_cast<T>(1) << bit); return *this; }
-		pbitset &reset() noexcept { *this = no_bits(); return *this; }
-		pbitset &reset(std::size_t bit) noexcept { m_bs &= ~(static_cast<T>(1) << bit); return *this; }
+		constexpr pbitset &set() noexcept { *this = all_bits(); return *this; }
+		constexpr pbitset &set(std::size_t bit) noexcept { m_bs |= (static_cast<T>(1) << bit); return *this; }
+		constexpr pbitset &reset() noexcept { *this = no_bits(); return *this; }
+		constexpr pbitset &reset(std::size_t bit) noexcept { m_bs &= ~(static_cast<T>(1) << bit); return *this; }
 
-		pbitset flip() const noexcept { return pbitset(~m_bs); }
-		pbitset flip(std::size_t bit) const noexcept { return pbitset(m_bs ^ (static_cast<T>(1) << bit)); }
+		constexpr pbitset flip() const noexcept { return pbitset(~m_bs); }
+		constexpr pbitset flip(std::size_t bit) const noexcept { return pbitset(m_bs ^ (static_cast<T>(1) << bit)); }
 
-		std::size_t count() const noexcept
+		constexpr std::size_t count() const noexcept
 		{
 			std::size_t ret(0);
 			for (T v = m_bs; v != 0; v = v >> 1)
@@ -236,8 +237,8 @@ namespace netlist::devices {
 		}
 		constexpr bool test(const std::size_t bit) const { return ((m_bs >> bit) & 1) == 1; }
 
-		operator T&() noexcept  { return m_bs; }
-		operator const T&() const noexcept { return m_bs; }
+		constexpr operator T&() noexcept  { return m_bs; }
+		constexpr operator const T&() const noexcept { return m_bs; }
 		constexpr T as_uint() const noexcept { return m_bs; }
 
 		constexpr bool all() const noexcept { return *this == all_bits(); }
@@ -254,7 +255,7 @@ namespace netlist::devices {
 		///
 		/// \returns pbitset
 		///
-		pbitset expand_and(pbitset b) const noexcept
+		constexpr pbitset expand_and(pbitset b) const noexcept
 		{
 			pbitset ret;
 			T v( m_bs);
@@ -271,8 +272,8 @@ namespace netlist::devices {
 			return ret;
 		}
 
-		static constexpr pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
-		static constexpr pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
+		static constexpr const pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
+		static constexpr const pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};
@@ -285,12 +286,12 @@ namespace netlist::devices {
 
 	struct packed_int
 	{
-		packed_int(void *data, std::size_t bits) noexcept
+		constexpr packed_int(void *data, std::size_t bits) noexcept
 		: m_data(data)
 		, m_size(bits)
 		{}
 
-		void set(size_t pos, std::uint_least64_t val) noexcept
+		constexpr void set(size_t pos, std::uint_least64_t val) noexcept
 		{
 			switch (m_size)
 			{
@@ -302,7 +303,7 @@ namespace netlist::devices {
 			}
 		}
 
-		std::uint_least64_t operator[] (size_t pos) const noexcept
+		constexpr std::uint_least64_t operator[] (size_t pos) const noexcept
 		{
 			switch (m_size)
 			{
@@ -315,7 +316,7 @@ namespace netlist::devices {
 			}
 		}
 
-		std::uint_least64_t mask() const noexcept
+		constexpr std::uint_least64_t mask() const noexcept
 		{
 			switch (m_size)
 			{
@@ -346,7 +347,7 @@ namespace netlist::devices {
 		{
 		}
 
-		void parse(const std::vector<pstring> &truthtable);
+		void parse(const std::vector<pstring> &truth_table);
 
 	private:
 		void parse_line(unsigned cur, std::vector<pstring> list,
@@ -382,7 +383,7 @@ namespace netlist::devices {
 		std::vector<pstring> outputs(plib::psplit(io[1], ','));
 		nl_assert_always(outputs.size() == m_NO, "output count wrong");
 
-#if !USE_TT_ALTERNATIVE
+#if !NL_USE_TT_ALTERNATIVE
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
@@ -393,18 +394,18 @@ namespace netlist::devices {
 		{
 			inout[i] = plib::trim(inout[i]);
 		}
-		if (0 < m_NI) m_I.emplace(0, *this, inout[0]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<0>, this));
-		if (1 < m_NI) m_I.emplace(1, *this, inout[1]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<1>, this));
-		if (2 < m_NI) m_I.emplace(2, *this, inout[2]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<2>, this));
-		if (3 < m_NI) m_I.emplace(3, *this, inout[3]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<3>, this));
-		if (4 < m_NI) m_I.emplace(4, *this, inout[4]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<4>, this));
-		if (5 < m_NI) m_I.emplace(5, *this, inout[5]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<5>, this));
-		if (6 < m_NI) m_I.emplace(6, *this, inout[6]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<6>, this));
-		if (7 < m_NI) m_I.emplace(7, *this, inout[7]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<7>, this));
-		if (8 < m_NI) m_I.emplace(8, *this, inout[8]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<8>, this));
-		if (9 < m_NI) m_I.emplace(9, *this, inout[9]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<9>, this));
-		if (10 < m_NI) m_I.emplace(10, *this, inout[10]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<10>, this));
-		if (11 < m_NI) m_I.emplace(11, *this, inout[11]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<11>, this));
+		if (0 < m_NI) m_I.emplace_back(*this, inout[0], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<0>, this));
+		if (1 < m_NI) m_I.emplace_back(*this, inout[1], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<1>, this));
+		if (2 < m_NI) m_I.emplace_back(*this, inout[2], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<2>, this));
+		if (3 < m_NI) m_I.emplace_back(*this, inout[3], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<3>, this));
+		if (4 < m_NI) m_I.emplace_back(*this, inout[4], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<4>, this));
+		if (5 < m_NI) m_I.emplace_back(*this, inout[5], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<5>, this));
+		if (6 < m_NI) m_I.emplace_back(*this, inout[6], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<6>, this));
+		if (7 < m_NI) m_I.emplace_back(*this, inout[7], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<7>, this));
+		if (8 < m_NI) m_I.emplace_back(*this, inout[8], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<8>, this));
+		if (9 < m_NI) m_I.emplace_back(*this, inout[9], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<9>, this));
+		if (10 < m_NI) m_I.emplace_back(*this, inout[10], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<10>, this));
+		if (11 < m_NI) m_I.emplace_back(*this, inout[11], nl_delegate(&nld_truth_table_t<m_NI, m_NO>::update_N<11>, this));
 #endif
 		for (std::size_t i=0; i < m_NO; i++)
 		{
@@ -437,20 +438,20 @@ namespace netlist::devices {
 		{
 			using tt_type = nld_truth_table_t<m_NI, m_NO>;
 
-			if (!m_ttbl)
+			if (!m_table)
 			{
-				m_ttbl = plib::make_unique<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t>(pool);
+				m_table = plib::make_unique<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t>(pool);
 				truth_table_parser desc_s(m_NO, m_NI,
-						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
-						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
+						packed_int(m_table->m_out_state.data(), sizeof(m_table->m_out_state[0]) * 8),
+						m_table->m_timing_index.data(), m_table->m_timing_nt.data());
 
 				desc_s.parse(m_desc);
 			}
 
-			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_ttbl, m_desc);
+			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_table, m_desc);
 		}
 	private:
-		device_arena::unique_ptr<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t> m_ttbl;
+		device_arena::unique_ptr<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t> m_table;
 	};
 
 	tt_bitset truth_table_parser::calculate_ignored_inputs(tt_bitset state) const
@@ -562,13 +563,13 @@ namespace netlist::devices {
 		}
 	}
 
-	void truth_table_parser::parse(const std::vector<pstring> &truthtable)
+	void truth_table_parser::parse(const std::vector<pstring> &truth_table)
 	{
 		unsigned line = 0;
 
-		pstring ttline(truthtable[line]);
+		pstring tt_line(truth_table[line]);
 		line++;
-		ttline = truthtable[line];
+		tt_line = truth_table[line];
 		line++;
 
 		for (unsigned j=0; j < m_size; j++)
@@ -577,9 +578,9 @@ namespace netlist::devices {
 		for (int j=0; j < 16; j++)
 			m_timing_nt[j] = netlist_time::zero();
 
-		while (!ttline.empty())
+		while (!tt_line.empty())
 		{
-			std::vector<pstring> io(plib::psplit(ttline,'|'));
+			std::vector<pstring> io(plib::psplit(tt_line,'|'));
 			// checks
 			nl_assert_always(io.size() == 3, "io.count mismatch");
 			std::vector<pstring> inout(plib::psplit(io[0], ','));
@@ -590,7 +591,7 @@ namespace netlist::devices {
 			nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 			tt_bitset val = 0;
-			std::vector<uint_least8_t> tindex;
+			std::vector<uint_least8_t> indexes;
 
 			//
 			// FIXME: evaluation of outputs should be done in parse_line to
@@ -610,14 +611,14 @@ namespace netlist::devices {
 				while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 					k++;
 				m_timing_nt[k] = t;
-				tindex.push_back(k); //[j] = k;
+				indexes.push_back(k); //[j] = k;
 			}
 
-			parse_line(0, inout, 0 , val, tindex);
-			if (line < truthtable.size())
-				ttline = truthtable[line];
+			parse_line(0, inout, 0 , val, indexes);
+			if (line < truth_table.size())
+				tt_line = truth_table[line];
 			else
-				ttline = "";
+				tt_line = "";
 			line++;
 		}
 
@@ -666,9 +667,9 @@ namespace netlist::factory {
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
-		{ using xtype = devices::netlist_factory_truth_table_t<n, m>; \
+		{ using dev_type = devices::netlist_factory_truth_table_t<n, m>; \
 			auto cs=s; \
-			ret = plib::make_unique<xtype, host_arena>(desc.name, std::move(cs)); } \
+			ret = plib::make_unique<dev_type, host_arena>(desc.name, std::move(cs)); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \

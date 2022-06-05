@@ -83,11 +83,11 @@ namespace plib {
 		m_token_queue = nullptr;
 	}
 
-
 	void token_reader_t::require_token(const token_id_t &token_num)
 	{
 		require_token(get_token(), token_num);
 	}
+
 	void token_reader_t::require_token(const token_t &tok, const token_id_t &token_num)
 	{
 		if (!tok.is(token_num))

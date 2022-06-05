@@ -55,7 +55,7 @@
 		setup.register_param(NET_STR(name), NET_STR(val));
 
 #define DEFPARAM(name, val)                                                    \
-		setup.register_defparam(NET_STR(name), NET_STR(val));
+		setup.register_default_param(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_hint(# name , ".HINT_" # val);
@@ -168,7 +168,7 @@ namespace netlist
 
 		void register_model(const pstring &model_in);
 		void register_alias(const pstring &alias, const pstring &out);
-		void register_alias_nofqn(const pstring &alias, const pstring &out);
+		void register_alias_no_fqn(const pstring &alias, const pstring &out);
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
@@ -181,7 +181,7 @@ namespace netlist
 			register_dev(classname, name, std::vector<pstring>());
 		}
 
-		void register_hint(const pstring &objname, const pstring &hint_name);
+		void register_hint(const pstring &object_name, const pstring &hint_name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
@@ -191,7 +191,7 @@ namespace netlist
 		void register_param(const pstring &param, const pstring &value);
 
 		// DEFPARAM support
-		void register_defparam(const pstring &name, const pstring &def);
+		void register_default_param(const pstring &name, const pstring &def);
 
 		template <typename T>
 		std::enable_if_t<plib::is_arithmetic<T>::value>

@@ -101,8 +101,8 @@ namespace netlist
 
 		param_enum_t(core_device_t &device, const pstring &name, T val) noexcept(false);
 
-		T operator()() const noexcept { return m_param; }
-		operator T() const noexcept { return m_param; }
+		constexpr T operator()() const noexcept { return m_param; }
+		constexpr operator T() const noexcept { return m_param; }
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 
 		pstring value_string() const override

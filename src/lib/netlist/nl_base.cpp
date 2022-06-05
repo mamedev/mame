@@ -137,8 +137,8 @@ namespace netlist
 		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
-		//m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
-		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
+		//#m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
+		//#m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
 		pstring dir = "src/lib/netlist/";
@@ -166,6 +166,24 @@ namespace netlist
 		m_lib = std::move(lib);
 	}
 
+	void netlist_t::reset()
+	{
+		log().debug("Searching for main clock\n");
+		m_main_clock = m_state.get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
+
+		log().debug("Searching for solver\n");
+		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
+
+		// Don't reset time
+		//m_time = netlist_time_ext::zero();
+		m_queue.clear();
+		if (m_main_clock != nullptr)
+			m_main_clock->m_Q.net().set_next_scheduled_time(m_time);
+		//if (m_solver != nullptr)
+		//  m_solver->reset();
+
+		m_state.reset();
+	}
 
 	void netlist_t::stop()
 	{
@@ -176,15 +194,40 @@ namespace netlist
 			m_solver->stop();
 	}
 
+	void netlist_t::print_stats() const
+	{
+		if (m_use_stats)
+		{
+			netlist_state_t::stats_info si{m_queue, m_stat_mainloop, m_perf_out_processed};
+			m_state.print_stats(si);
+		}
+		log().verbose("Current pool memory allocated: {1:12} kB", nl_state().pool().cur_alloc() >> 10);
+		log().verbose("Maximum pool memory allocated: {1:12} kB", nl_state().pool().max_alloc() >> 10);
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// netlist_state_t
+	// ----------------------------------------------------------------------------------------
+
 	std::size_t netlist_state_t::find_net_id(const detail::net_t *net) const
 	{
+		// special case for queue end processing items
+		if (net == nullptr)
+			return std::numeric_limits<std::size_t>::max() - 1;
+
 		for (std::size_t i = 0; i < m_nets.size(); i++)
 			if (m_nets[i].get() == net)
 				return i;
+
 		return std::numeric_limits<std::size_t>::max();
 	}
+
 	detail::net_t *netlist_state_t::net_by_id(std::size_t id) const
 	{
+		// special case for queue end processing items
+		if (id == std::numeric_limits<std::size_t>::max() - 1)
+			return nullptr;
+
 		return m_nets[id].get();
 	}
 
@@ -274,25 +317,6 @@ namespace netlist
 		return plib::pfmt("{1}.{2}.{3}")(NL_VERSION_MAJOR, NL_VERSION_MINOR, NL_VERSION_PATCHLEVEL);
 	}
 
-	void netlist_t::reset()
-	{
-		log().debug("Searching for main clock\n");
-		m_main_clock = m_state.get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
-
-		log().debug("Searching for solver\n");
-		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
-
-		// Don't reset time
-		//m_time = netlist_time_ext::zero();
-		m_queue.clear();
-		if (m_main_clock != nullptr)
-			m_main_clock->m_Q.net().set_next_scheduled_time(m_time);
-		//if (m_solver != nullptr)
-		//  m_solver->reset();
-
-		m_state.reset();
-	}
-
 	void netlist_state_t::free_setup_resources()
 	{
 		m_setup = nullptr;
@@ -339,7 +363,7 @@ namespace netlist
 				for (auto &n : m_nets)
 				{
 					n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
-					for (auto & term : core_terms(*n))
+					for (detail::core_terminal_t * term : n->core_terms_copy())
 					{
 						if (!plib::container::contains(t, &term->delegate()))
 						{
@@ -368,17 +392,6 @@ namespace netlist
 		// the above may screw up m_active and the list
 		rebuild_lists();
 
-	}
-
-	void netlist_t::print_stats() const
-	{
-		if (m_use_stats)
-		{
-			netlist_state_t::stats_info si{m_queue, m_stat_mainloop, m_perf_out_processed};
-			m_state.print_stats(si);
-		}
-		log().verbose("Current pool memory allocated: {1:12} kB", nl_state().pool().cur_alloc() >> 10);
-		log().verbose("Maximum pool memory allocated: {1:12} kB", nl_state().pool().max_alloc() >> 10);
 	}
 
 	void netlist_state_t::print_stats(stats_info &si) const
@@ -431,7 +444,7 @@ namespace netlist
 					/ gsl::narrow<plib::pperftime_t<true>::type>(200000);
 
 			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
-			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
+			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sort_move());
 			log().verbose("Queue Removes  {1:15}", si.m_queue.m_prof_remove());
 			log().verbose("");
 
@@ -475,7 +488,6 @@ namespace netlist
 		}
 		return ret;
 	}
-
 
 	// ----------------------------------------------------------------------------------------
 	// core_device_t
@@ -525,7 +537,7 @@ namespace netlist
 		pstring alias = this->name() + "." + name;
 
 		// everything already fully qualified
-		state().parser().register_alias_nofqn(alias, term.name());
+		state().parser().register_alias_no_fqn(alias, term.name());
 	}
 
 	void base_device_t::register_sub_alias(const pstring &name, const pstring &aliased)
@@ -534,7 +546,7 @@ namespace netlist
 		pstring aliased_fqn = this->name() + "." + aliased;
 
 		// everything already fully qualified
-		state().parser().register_alias_nofqn(alias, aliased_fqn);
+		state().parser().register_alias_no_fqn(alias, aliased_fqn);
 	}
 
 	void base_device_t::connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2)
@@ -619,14 +631,13 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : exec().nl_state().core_terms(*this))
+		for (core_terminal_t * term : core_terms_ref())
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
 				term->set_copied_input(m_cur_Q);
 			}
 	}
-
 
 	void detail::net_t::reset() noexcept
 	{
@@ -644,7 +655,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : exec().nl_state().core_terms(*this))
+		for (core_terminal_t * ct : core_terms_copy())
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
@@ -652,6 +663,63 @@ namespace netlist
 			ct->set_copied_input(m_cur_Q);
 		}
 	}
+
+#if NL_USE_INPLACE_CORE_TERMS
+	void detail::net_t::remove_terminal(detail::core_terminal_t &term)
+	{
+		m_core_terms.remove(&term);
+	}
+
+	void detail::net_t::remove_all_terminals()
+	{
+		m_core_terms.clear();
+	}
+
+	void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
+	{
+		for (detail::core_terminal_t * t : m_core_terms)
+			if (t == &terminal)
+			{
+				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
+				throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
+			}
+
+		terminal.set_net(this);
+
+		m_core_terms.push_back(&terminal);
+	}
+
+#else
+	void detail::net_t::remove_terminal(detail::core_terminal_t &term)
+	{
+		//net.core_terms().remove(p);
+		for (auto pp = state().core_terms(*this).begin(); pp != state().core_terms(*this).end(); pp++)
+			if (*pp == &term)
+			{
+				state().core_terms(*this).erase(pp);
+				break;
+			}
+	}
+
+	void detail::net_t::remove_all_terminals()
+	{
+		state().core_terms(*this).clear();
+	}
+
+	void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
+	{
+		for (detail::core_terminal_t * t : state().core_terms(*this))
+			if (t == &terminal)
+			{
+				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
+				throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
+			}
+
+		terminal.set_net(this);
+
+		state().core_terms(*this).push_back(&terminal);
+	}
+#endif
 
 	// ----------------------------------------------------------------------------------------
 	// logic_net_t
@@ -685,9 +753,7 @@ namespace netlist
 	detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
 			const state_e state, nl_delegate delegate)
 	: device_object_t(&dev, dev.name() + "." + aname)
-	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
-	, m_Q(*this, "m_Q", 0)
-	#endif
+	, m_Q_CIR(*this, "m_Q", 0)
 	, m_delegate(delegate)
 	, m_net(nullptr)
 	, m_state(*this, "m_state", state)
@@ -998,7 +1064,7 @@ namespace netlist
 	{
 		netlist_time_ext stop(m_time + delta);
 
-		qpush(stop, nullptr);
+		queue_push(stop, nullptr);
 
 		if (m_main_clock == nullptr)
 		{

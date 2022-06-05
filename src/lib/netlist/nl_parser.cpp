@@ -330,7 +330,7 @@ void parser_t::frontier()
 {
 	require_token(m_tok_paren_left);
 	// don't do much
-	pstring attachat = get_identifier();
+	pstring attach_at = get_identifier();
 	require_token(m_tok_comma);
 	auto tok = get_token();
 	auto r_IN = stringify_expression(tok);
@@ -339,7 +339,7 @@ void parser_t::frontier()
 	auto r_OUT = stringify_expression(tok);
 	require_token(tok, m_tok_paren_right);
 
-	m_setup.register_frontier(attachat, r_IN, r_OUT);
+	m_setup.register_frontier(attach_at, r_IN, r_OUT);
 }
 
 void parser_t::net_include()
@@ -472,14 +472,14 @@ void parser_t::netdev_default_param()
 	if (tok.is_type(token_type::STRING))
 	{
 		m_setup.log().debug("Parser: DefParam: {1} {2}\n", param, tok.str());
-		m_setup.register_defparam(param, tok.str());
+		m_setup.register_default_param(param, tok.str());
 		require_token(m_tok_paren_right);
 	}
 	else
 	{
 		auto val = stringify_expression(tok);
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
-		m_setup.register_defparam(param, val);
+		m_setup.register_default_param(param, val);
 		require_token(tok, m_tok_paren_right);
 	}
 }
@@ -519,7 +519,7 @@ void parser_t::device(const pstring &dev_type)
 	while (tok.is(m_tok_comma))
 	{
 		tok = get_token();
-		if (/*tok.is_type(token_type::IDENTIFIER) ||*/ tok.is_type(token_type::STRING))
+		if (tok.is_type(token_type::STRING))
 		{
 			params.push_back(tok.str());
 			tok = get_token();
