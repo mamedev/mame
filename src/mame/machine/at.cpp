@@ -110,7 +110,7 @@ void at_mb_device::device_add_mconfig(machine_config &config)
 	ISA16(config, m_isabus, 0);
 	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
 	m_isabus->set_iospace(":maincpu", AS_IO);
-	m_isabus->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
+	m_isabus->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir1_w)); // in place of irq 2 on at irq 9 is used
 	m_isabus->irq3_callback().set("pic8259_master", FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set("pic8259_master", FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set("pic8259_master", FUNC(pic8259_device::ir5_w));
