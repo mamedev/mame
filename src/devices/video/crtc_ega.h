@@ -13,7 +13,7 @@
 #define CRTC_EGA_BEGIN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
 #define CRTC_EGA_ROW_UPDATE(_name)   void _name(bitmap_ind16 &bitmap,    \
 												const rectangle &cliprect, uint16_t ma, uint8_t ra,                 \
-												uint16_t y, uint8_t x_count, int8_t cursor_x)
+												uint16_t y, uint8_t x, int8_t cursor_x)
 #define CRTC_EGA_END_UPDATE(_name)   void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
@@ -33,6 +33,7 @@ public:
 	auto res_out_hsync_callback() { return m_res_out_hsync_cb.bind(); }
 	auto res_out_vsync_callback() { return m_res_out_vsync_cb.bind(); }
 	auto res_out_vblank_callback() { return m_res_out_vblank_cb.bind(); }
+	auto res_out_irq_callback() { return m_res_out_irq_cb.bind(); }
 
 	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_row_update_callback(T &&... args) { m_row_update_cb.set(std::forward<T>(args)...); }
@@ -79,6 +80,7 @@ private:
 	devcb_write_line   m_res_out_hsync_cb;
 	devcb_write_line   m_res_out_vsync_cb;
 	devcb_write_line   m_res_out_vblank_cb;
+	devcb_write_line   m_res_out_irq_cb;
 
 	/* if specified, this gets called before any pixel update,
 	 optionally return a pointer that will be passed to the
@@ -108,7 +110,6 @@ private:
 	uint8_t   m_preset_row_scan;  /* 0x08 */
 	uint8_t   m_byte_panning;     /* 0x08 */
 	uint8_t   m_max_ras_addr;     /* 0x09 */
-	uint8_t   m_scan_doubling;        /* 0x09 */
 	uint8_t   m_cursor_start_ras; /* 0x0a */
 	uint8_t   m_cursor_disable;       /* 0x0a */
 	uint8_t   m_cursor_end_ras;       /* 0x0b */
@@ -118,8 +119,7 @@ private:
 	uint16_t  m_light_pen_addr;       /* 0x10/0x11 */
 	uint16_t  m_vert_retr_start;  /* 0x10/0x07 */
 	uint8_t   m_vert_retr_end;        /* 0x11 */
-	uint8_t   m_protect;          /* 0x11 */
-	uint8_t   m_bandwidth;            /* 0x11 */
+	uint8_t   m_irq_enable;            /* 0x11 */
 	uint16_t  m_vert_disp_end;        /* 0x12/0x07 */
 	uint8_t   m_offset;               /* 0x13 */
 	uint8_t   m_underline_loc;        /* 0x14 */
@@ -171,7 +171,6 @@ private:
 	uint16_t  m_hsync_off_pos;
 	uint16_t  m_vsync_on_pos;
 	uint16_t  m_vsync_off_pos;
-	uint16_t  m_current_disp_addr;    /* the display address currently drawn */
 	uint8_t   m_light_pen_latched;
 	bool    m_has_valid_parameters;
 
