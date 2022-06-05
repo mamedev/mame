@@ -2,6 +2,9 @@
 // copyright-holders:
 
 /*
+
+Belly Bomber by Namco (1994)
+
 Dangerous Bar by Namco (1994)
 https://www.youtube.com/watch?v=XwZoXtkZ9qo
 
@@ -109,6 +112,20 @@ void dangbar_state::dangbar(machine_config &config)
 	C140(config, "c140", 49.152_MHz_XTAL / 384 / 6).add_route(ALL_OUTPUTS, "mono", 0.75); // 21.333kHz, copied from other Namco drivers
 }
 
+/** Belly Bomber (named Dodongadon in Japan).
+  Main PCB named "Namco Main PCB / Hi-Pric P41 B 8813960102 (8813970102)".
+  Additional I/O PCB named "Namco M98 Drive PCB / Hi-Pric P1 B" with three Oki M82C55A-2 and four Fujitsu MB86520. */
+ROM_START( bellybmbr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "da_2_mp_0.2c", 0x00000, 0x08000, CRC(7e141f1f) SHA1(69e13d4d1d68486b16f5527138605f29b599e57d) ) // 27C256
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "da_2_sn_0.8a", 0x00000, 0x20000, CRC(f98bb7ef) SHA1(d6124ee630a8759ae010062432598f06442c81f1) )
+
+	ROM_REGION16_BE( 0x200000, "c140", 0 )
+	ROM_LOAD16_BYTE( "da_2_vd_0.14a",   0x000000, 0x080000, CRC(4cfe110a) SHA1(bbdb01c88a160e33f5ac1cec0cb3e35b2e172ccb) )
+	ROM_LOAD16_BYTE( "da_1_voi-2a.13a", 0x100000, 0x080000, CRC(1e365e55) SHA1(fcad79d4603b9a2711d21f33fc2959b9765bacf4) )
+ROM_END
 
 ROM_START( dangbar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -140,5 +157,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, sspanic, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, dangbar, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_IS_SKELETON_MECHANICAL )

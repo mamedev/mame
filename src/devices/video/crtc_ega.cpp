@@ -27,7 +27,7 @@ crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag,
 	, m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0)
 	, m_ena_vert_access(0), m_de_skew(0)
 	, m_horiz_retr_start(0), m_horiz_retr_end(0), m_horiz_retr_skew(0)
-	, m_vert_total(0), m_preset_row_scan(0), m_byte_panning(0), m_max_ras_addr(0)
+	, m_vert_total(0), m_preset_row_scan(0), m_max_ras_addr(0)
 	, m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0)
 	, m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0)
 	, m_vert_retr_start(0), m_vert_retr_end(0)
@@ -106,7 +106,6 @@ void crtc_ega_device::register_w(uint8_t data)
 					m_line_compare      = ((data & 0x10) << 4) | (m_line_compare & 0x00ff);
 					break;
 		case 0x08:  m_preset_row_scan   =   data & 0x1f;
-					m_byte_panning      = ((data & 0x60) >> 5);
 					break;
 		case 0x09:  m_max_ras_addr      =   data & 0x1f;
 					break;
@@ -280,7 +279,7 @@ void crtc_ega_device::set_vblank(int state)
 
 		if (!m_res_out_vblank_cb.isnull())
 			m_res_out_vblank_cb(m_vblank);
-		if (!m_res_out_irq_cb.isnull() && m_irq_enable)
+		if (!m_res_out_irq_cb.isnull() && !m_irq_enable)
 			m_res_out_irq_cb(m_vblank);
 	}
 }
@@ -532,6 +531,7 @@ uint32_t crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		uint16_t y;
 		uint16_t disp_addr = m_disp_start_addr + (m_offset << 1) * cliprect.min_y;
+		uint8_t row_preset = m_preset_row_scan;
 
 		assert(!m_row_update_cb.isnull());
 
@@ -543,7 +543,7 @@ uint32_t crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
-			uint8_t ra = y % (m_max_ras_addr + 1);
+			uint8_t ra = (y + row_preset) % (m_max_ras_addr + 1);
 
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = m_cursor_state &&
@@ -572,7 +572,10 @@ uint32_t crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 				disp_addr += (m_offset << 1);
 
 			if (y == m_line_compare)
+			{
+				row_preset = 0;
 				disp_addr = 0;
+			}
 		}
 
 		/* call the tear down function if any */
@@ -625,7 +628,6 @@ void crtc_ega_device::device_start()
 	m_horiz_retr_end = 0;
 	m_horiz_retr_skew = 0;
 	m_preset_row_scan = 0;
-	m_byte_panning = 0;
 	m_cursor_start_ras = 0x20;
 	m_cursor_disable = 0;
 	m_cursor_end_ras = 0;
@@ -679,7 +681,6 @@ void crtc_ega_device::device_start()
 	save_item(NAME(m_horiz_retr_skew));
 	save_item(NAME(m_vert_total));
 	save_item(NAME(m_preset_row_scan));
-	save_item(NAME(m_byte_panning));
 	save_item(NAME(m_max_ras_addr));
 	save_item(NAME(m_cursor_disable));
 	save_item(NAME(m_cursor_skew));
@@ -691,6 +692,7 @@ void crtc_ega_device::device_start()
 	save_item(NAME(m_vert_blank_start));
 	save_item(NAME(m_vert_blank_end));
 	save_item(NAME(m_line_compare));
+	save_item(NAME(m_irq_enable));
 }
 
 

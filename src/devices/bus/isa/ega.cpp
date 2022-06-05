@@ -507,23 +507,23 @@ ROM_END
 
 INPUT_PORTS_START( ega )
 	PORT_START( "config" )
-	PORT_CONFNAME( 0x0f, 0x09, "dipswitches" )
-	PORT_CONFSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )                            /* DIAG: ?? 40 cols, RGBI */
-	PORT_CONFSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )                            /* DIAG: ?? 80 cols, RGBI */
-	PORT_CONFSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )           /* DIAG: ?? 80 cols, RGBI */
-	PORT_CONFSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )                         /* DIAG: Color Display 40 cols, RrGgBb */
-	PORT_CONFSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
-	PORT_CONFSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
-	PORT_CONFSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )                          /* DIAG: Color Display 40 cols, RGBI */
-	PORT_CONFSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )                          /* DIAG: Color Display 80 cols, RGBI */
-	PORT_CONFSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )         /* DIAG: Color Display 80 cols, RGBI */
-	PORT_CONFSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )                       /* DIAG: Color Display 40 cols, RrGgBb */
-	PORT_CONFSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
-	PORT_CONFSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
-	PORT_CONFSETTING( 0x03, "1100 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x0b, "1101 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x07, "1110 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x0f, "1111 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPNAME( 0x0f, 0x09, "Display Type" )
+	PORT_DIPSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )                            /* DIAG: ?? 40 cols, RGBI */
+	PORT_DIPSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )                            /* DIAG: ?? 80 cols, RGBI */
+	PORT_DIPSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )           /* DIAG: ?? 80 cols, RGBI */
+	PORT_DIPSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )                         /* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_DIPSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
+	PORT_DIPSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
+	PORT_DIPSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )                          /* DIAG: Color Display 40 cols, RGBI */
+	PORT_DIPSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )                          /* DIAG: Color Display 80 cols, RGBI */
+	PORT_DIPSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )         /* DIAG: Color Display 80 cols, RGBI */
+	PORT_DIPSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )                       /* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_DIPSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
+	PORT_DIPSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
+	PORT_DIPSETTING( 0x03, "1100 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x0b, "1101 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x07, "1110 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x0f, "1111 - RESERVED" )                                                 /* ??, RGBI */
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -554,7 +554,7 @@ void isa8_ega_device::device_add_mconfig(machine_config &config)
 	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
 	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
 	m_crtc_ega->res_out_vblank_callback().set(FUNC(isa8_ega_device::vblank_changed));
-	m_crtc_ega->res_out_irq_callback().set([this](int state) { m_isa->irq2_w(state); });
+	m_crtc_ega->res_out_irq_callback().set([this](int state) { m_irq = state; m_isa->irq2_w(state); });
 }
 
 //-------------------------------------------------
@@ -588,7 +588,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
-	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
+	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_irq(0), m_video_mode(0),
 	m_palette(*this, "palette")
 {
 }
@@ -669,6 +669,7 @@ void isa8_ega_device::device_reset()
 	m_vsync = 0;
 	m_vblank = 0;
 	m_display_enable = 0;
+	m_irq = 0;
 
 	install_banks();
 
@@ -754,7 +755,7 @@ void isa8_ega_device::install_banks()
 	}
 }
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::ega_update_row )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::ega_update_row )
 {
 	if (m_video_mode == EGA_MODE_GRAPHICS)
 		pc_ega_graphics(bitmap, cliprect, ma, ra, y, x, cursor_x);
@@ -791,7 +792,7 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 }
 
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
 	uint16_t  *p = &bitmap.pix(y, x * 8);
 
@@ -852,7 +853,7 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 }
 
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 {
 	uint16_t  *p = &bitmap.pix(y, x * ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 ) );
 
@@ -1289,7 +1290,7 @@ uint8_t isa8_ega_device::pc_ega8_3c0_r(offs_t offset)
 
 			data = ( data & 0x0f );
 			data |= ( ( m_feature_control & 0x03 ) << 5 );
-			data |= ( m_vsync ? 0x00 : 0x80 );
+			data |= ( m_irq ? 0x00 : 0x80 );
 			data |= ( ( ( dips >> ( ( ( m_misc_output & 0x0c ) >> 2 ) ) ) & 0x01 ) << 4 );
 		}
 		break;

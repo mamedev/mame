@@ -11,7 +11,7 @@
 
 
 #define CRTC_EGA_BEGIN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
-#define CRTC_EGA_ROW_UPDATE(_name)   void _name(bitmap_ind16 &bitmap,    \
+#define CRTC_EGA_PIXEL_UPDATE(_name)   void _name(bitmap_ind16 &bitmap,    \
 												const rectangle &cliprect, uint16_t ma, uint8_t ra,                 \
 												uint16_t y, uint8_t x, int8_t cursor_x)
 #define CRTC_EGA_END_UPDATE(_name)   void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -108,7 +108,6 @@ private:
 	uint8_t   m_horiz_retr_skew;  /* 0x05 */
 	uint16_t  m_vert_total;           /* 0x06/0x07 */
 	uint8_t   m_preset_row_scan;  /* 0x08 */
-	uint8_t   m_byte_panning;     /* 0x08 */
 	uint8_t   m_max_ras_addr;     /* 0x09 */
 	uint8_t   m_cursor_start_ras; /* 0x0a */
 	uint8_t   m_cursor_disable;       /* 0x0a */

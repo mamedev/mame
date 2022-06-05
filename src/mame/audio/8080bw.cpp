@@ -26,7 +26,6 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 {
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
-	save_item(NAME(m_port_3_last_extra));
 }
 
 /*************************************
@@ -71,7 +70,7 @@ static const char *const invaders_sample_names[] =
 
 
 /* left in for all games that hack into invaders samples for audio */
-void _8080bw_state::invaders_samples_audio(machine_config &config)
+void invaders_clone_state::invaders_samples_audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
@@ -1073,12 +1072,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::invrvnge_port03_w(uint8_t data)
+void invrvnge_state::port03_w(uint8_t data)
 {
 	m_sound_data = data;
 }
 
-void _8080bw_state::invrvnge_port05_w(uint8_t data)
+void invrvnge_state::port05_w(uint8_t data)
 {
 	/*
 	    00 - normal play
@@ -1090,11 +1089,11 @@ void _8080bw_state::invrvnge_port05_w(uint8_t data)
 	m_screen_red = BIT(data, 4);
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
-		// no sound-related writes?
+	// no sound-related writes?
 }
 
 // The timer frequency controls the speed of the sounds
-TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(invrvnge_state::nmi_timer)
 {
 	m_timer_state ^= 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_timer_state ? ASSERT_LINE : CLEAR_LINE );
@@ -1107,15 +1106,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
 /* - Press Left or Right to choose game to play     */
 /****************************************************/
 
-void _8080bw_state::rollingc_sh_port_w(uint8_t data)
+void rollingc_state::rollingc_sh_port_w(uint8_t data)
 {
-	uint8_t rising_bits = data & ~m_port_3_last_extra;
+	uint8_t rising_bits = data & ~m_port_3_last;
 
 	if (BIT(rising_bits, 1)) m_samples->start(4, 0); // Steering
 	if (BIT(rising_bits, 2)) m_samples->start(0, 1); // Collision
 	if (BIT(rising_bits, 4)) m_samples->start(1, 8); // Computer car is starting to move
 
-	m_port_3_last_extra = data;
+	m_port_3_last = data;
 }
 
 
@@ -1259,9 +1258,9 @@ void _8080bw_state::crashrd_port05_w(uint8_t data)
 /* No information available as what the correct sounds are         */
 /*******************************************************************/
 
-void _8080bw_state::yosakdon_sh_port_1_w(uint8_t data)
+void yosakdon_state::sh_port_1_w(uint8_t data)
 {
-	uint8_t rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	if (BIT(rising_bits, 0)) m_samples->start(0, 3);        //  Game Over
 	if (BIT(rising_bits, 1)) m_samples->start(2, 0);        //  Bird dead
@@ -1271,12 +1270,12 @@ void _8080bw_state::yosakdon_sh_port_1_w(uint8_t data)
 
 	machine().sound().system_mute(!BIT(data, 5));
 
-	m_port_1_last_extra = data;
+	m_port_1_last = data;
 }
 
-void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
+void yosakdon_state::sh_port_2_w(uint8_t data)
 {
-	uint8_t rising_bits = data & ~m_port_2_last_extra;
+	uint8_t rising_bits = data & ~m_port_2_last;
 
 	if (BIT(rising_bits, 0)) m_samples->start(1, 6);        // Ready? , Game Over
 	if (BIT(rising_bits, 2)) m_samples->start(3, 7);        // Big bird dead
@@ -1287,7 +1286,7 @@ void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
-	m_port_2_last_extra = data;
+	m_port_2_last = data;
 }
 
 
@@ -1297,20 +1296,20 @@ void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-void _8080bw_state::shuttlei_sh_port_1_w(uint8_t data)
+void shuttlei_state::sh_port_1_w(uint8_t data)
 {
 	/* bit 3 is high while you are alive and playing */
-	uint8_t rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	if (rising_bits & 0x01) m_samples->start(4, 4);         /* Fleet move */
 	if (rising_bits & 0x02) m_samples->start(5, 8);         /* Extra Tank */
 
 	m_sn->enable_w(data & 0x04 ? 0:1);              /* UFO */
 
-	m_port_1_last_extra = data;
+	m_port_1_last = data;
 }
 
-void _8080bw_state::shuttlei_sh_port_2_w(uint8_t data)
+void shuttlei_state::sh_port_2_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -1338,14 +1337,14 @@ void _8080bw_state::shuttlei_sh_port_2_w(uint8_t data)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-void _8080bw_state::darthvdr_00_w(uint8_t data)
+void darthvdr_state::darthvdr_00_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 0) & ioport(CABINET_PORT_TAG)->read();
 }
 
-void _8080bw_state::darthvdr_08_w(uint8_t data)
+void darthvdr_state::darthvdr_08_w(uint8_t data)
 {
-	uint8_t rising_bits = data & ~m_port_1_last_extra;
+	uint8_t rising_bits = data & ~m_port_1_last;
 
 	machine().sound().system_mute(!BIT(data, 0));
 
@@ -1365,7 +1364,7 @@ void _8080bw_state::darthvdr_08_w(uint8_t data)
 		if (m_fleet_step > 6) m_fleet_step = 3;
 	}
 
-	m_port_1_last_extra = data;
+	m_port_1_last = data;
 }
 
 

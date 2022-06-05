@@ -11826,6 +11826,7 @@ dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
 
 @source:dangbar.cpp
+bellybmbr                       //
 dangbar                         //
 sspanic                         //
 
@@ -14254,6 +14255,9 @@ pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 @source:freeway.cpp
 freeway
 freewaya
+
+@source:frenzyxprss.cpp
+frenzyxprss                     // (c) 2001 ICE / Uniana
 
 @source:fresh.cpp
 fresh                           // (c) Chain Leisure
@@ -20529,6 +20533,7 @@ kidnikib                        // bootleg
 kidnikiu                        // (c) 1986 + Data East USA license
 kungfub                         // bootleg
 kungfub2                        // bootleg
+kungfub3s                       // bootleg
 kungfum                         // (c) 1984
 kungfumd                        // (c) 1984 + Data East license
 ldrun                           // (c) 1984 licensed from Broderbund
@@ -35743,6 +35748,7 @@ hb_jailb                        // Jail Break (Qps)
 hb_jailba                       //
 hb_jkrwl                        // Jokers Wild (Fairgames)
 hb_jkrwla                       //
+hb_junglet                      // Jungle Treasures (Sega)
 hb_medal                        // Medallion Job (Qps)
 hb_mrmon                        // Mr. Money (Qps)
 hb_mrmona                       //
