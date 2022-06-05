@@ -16,6 +16,8 @@
     20 MHz and 32 MHz oscillators are present near the 68k, Z80, and YM3438.
     A 4.9152 MHz oscillator is near the video chips.
 
+    To get past the boot error on Tinker Bell, F1 is mapped to the cabinet reset switch.
+
     TODO:
     - Inputs (inserting a coin freezes some of the text on screen, what's next?)
     - Verify sound latch location on Tinker Bell vs. the comms games
@@ -139,14 +141,13 @@ u32 systemm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	screen.priority().fill(0);
 	bitmap.fill(0, cliprect);
 
-	std::vector<int> order;
-	order.resize(12);
+	int order[12];
 	for (int i = 0; i < 12; i++)
 	{
 		order[i] = i;
 	}
 
-	std::sort(order.begin(), order.end(), layer_sort(m_mixer.target()));
+	std::sort(std::begin(order), std::end(order), layer_sort(m_mixer.target()));
 
 	int level = 0;
 	for (int i = 0; i < 12; i++)
