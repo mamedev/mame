@@ -79,10 +79,6 @@ void swim2_device::device_reset()
 	m_last_sync = machine().time().as_ticks(clock());
 }
 
-void swim2_device::device_timer(emu_timer &, device_timer_id, int)
-{
-}
-
 void swim2_device::set_floppy(floppy_image_device *floppy)
 {
 	if(m_floppy == floppy)

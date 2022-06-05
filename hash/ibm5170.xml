@@ -8105,84 +8105,84 @@ license:CC0
 		<publisher>Borland</publisher>
 		<info name="version" value="3.01" />
 		<part name="flop01" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk01.img" size="368640" crc="d1412b21" sha1="4fc367a229031dd3134100eece7bfb9b3b8dbd2d"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk01.img" size="368640" crc="d1412b21" sha1="4fc367a229031dd3134100eece7bfb9b3b8dbd2d"/>
+			</dataarea>
 		</part>
 		<part name="flop02" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk02.img" size="368640" crc="56e083c3" sha1="aea7a20f9e22ab78d9377e3dce1ac5fdee83fbed"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk02.img" size="368640" crc="56e083c3" sha1="aea7a20f9e22ab78d9377e3dce1ac5fdee83fbed"/>
+			</dataarea>
 		</part>
 		<part name="flop03" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk03.img" size="368640" crc="0bfcd167" sha1="b29c61e067d450090f611bf0f7ae58881124e984"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk03.img" size="368640" crc="0bfcd167" sha1="b29c61e067d450090f611bf0f7ae58881124e984"/>
+			</dataarea>
 		</part>
 		<part name="flop04" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk04.img" size="368640" crc="cbed452b" sha1="0e6bf5519349297d377704bcd1e9568b12ad706d"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk04.img" size="368640" crc="cbed452b" sha1="0e6bf5519349297d377704bcd1e9568b12ad706d"/>
+			</dataarea>
 		</part>
 		<part name="flop05" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk05.img" size="368640" crc="43bf368f" sha1="0e59b71c067ad578a73ed8b9a9ad8fb52766efbd"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk05.img" size="368640" crc="43bf368f" sha1="0e59b71c067ad578a73ed8b9a9ad8fb52766efbd"/>
+			</dataarea>
 		</part>
 		<part name="flop06" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk06.img" size="368640" crc="d5314389" sha1="46ba14cb52f0c7f04753023eff77ccc8f40c3911"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk06.img" size="368640" crc="d5314389" sha1="46ba14cb52f0c7f04753023eff77ccc8f40c3911"/>
+			</dataarea>
 		</part>
 		<part name="flop07" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk07.img" size="368640" crc="27f29554" sha1="150436b12138ef74b154b5080658ed97a7849cb0"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk07.img" size="368640" crc="27f29554" sha1="150436b12138ef74b154b5080658ed97a7849cb0"/>
+			</dataarea>
 		</part>
 		<part name="flop08" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk08.img" size="368640" crc="19549090" sha1="6c16e114571422ce71c8ad8ef9f07c518724b506"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk08.img" size="368640" crc="19549090" sha1="6c16e114571422ce71c8ad8ef9f07c518724b506"/>
+			</dataarea>
 		</part>
 		<part name="flop09" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk09.img" size="368640" crc="29cf72df" sha1="a019ddbb81baa4afbed94cea10f8cb63f64b1937"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk09.img" size="368640" crc="29cf72df" sha1="a019ddbb81baa4afbed94cea10f8cb63f64b1937"/>
+			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk10.img" size="368640" crc="385d1f10" sha1="0850e25d4d418822cccb1c6aefd3131bffe814ff"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk10.img" size="368640" crc="385d1f10" sha1="0850e25d4d418822cccb1c6aefd3131bffe814ff"/>
+			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk11.img" size="368640" crc="cee1c377" sha1="f9eea75e284c59f71f9adad6fa4da3287c451fec"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk11.img" size="368640" crc="cee1c377" sha1="f9eea75e284c59f71f9adad6fa4da3287c451fec"/>
+			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk12.img" size="368640" crc="7aa5fe5f" sha1="95238693de43a1f6a8062a0b09d920f6c39ea18b"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk12.img" size="368640" crc="7aa5fe5f" sha1="95238693de43a1f6a8062a0b09d920f6c39ea18b"/>
+			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk13.img" size="368640" crc="159151e7" sha1="71082a91f55aebe8d0efa21cb8afedc3482131e9"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk13.img" size="368640" crc="159151e7" sha1="71082a91f55aebe8d0efa21cb8afedc3482131e9"/>
+			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk14.img" size="368640" crc="6df1d631" sha1="ba39fba55d21da98c294df456980724bbb83cc7a"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk14.img" size="368640" crc="6df1d631" sha1="ba39fba55d21da98c294df456980724bbb83cc7a"/>
+			</dataarea>
 		</part>
 		<part name="flop15" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk15.img" size="368640" crc="710bc39f" sha1="985a1ff252c17fe91aba5f40994dda853389c5d1"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk15.img" size="368640" crc="710bc39f" sha1="985a1ff252c17fe91aba5f40994dda853389c5d1"/>
+			</dataarea>
 		</part>
 		<part name="flop16" interface="floppy_5_25">
-				<dataarea name="flop" size="368640">
-						<rom name="borland_paradox_3.01_German_disk16.img" size="368640" crc="8941eb6a" sha1="ebe7bad7a92505664ec3a61aad4065dd6e72ca7a"/>
-				</dataarea>
+			<dataarea name="flop" size="368640">
+				<rom name="borland_paradox_3.01_German_disk16.img" size="368640" crc="8941eb6a" sha1="ebe7bad7a92505664ec3a61aad4065dd6e72ca7a"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -15562,7 +15562,7 @@ license:CC0
 	</software>
 
 	<!-- Worked until MAME 0.211. From 0.212 version, it stopped working -->
-	<!-- Seems to be an emulation issue due to the copy protection track  -->
+	<!-- Seems to be an emulation issue due to the copy protection track -->
 	<!-- Reported @MameTesters.org: entry ID 08171 -->
 	<software name="lemmings" supported="no">
 		<!-- Dumped via Kryoflux -->

@@ -56,18 +56,18 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(hblank_onoff_tick);
 
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 
 private:
-	static const device_timer_id TIMER_HBLANK = 0;
 	void scanline_callback();
 	void update_leds();
 	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
@@ -106,32 +106,33 @@ private:
 
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
-	emu_timer *m_hblank_timer;
+	emu_timer *m_hblank_timer = nullptr;
+	emu_timer *m_beepoff_timer = nullptr;
 
-	uint8_t m_long_beep;
-	uint8_t m_kb_control;
-	uint8_t m_kb_data;
-	uint8_t m_kb_flag0;
-	uint8_t m_kb_flag;
-	uint8_t m_kb_ruslat;
-	uint8_t m_latch;
+	uint8_t m_long_beep = 0;
+	uint8_t m_kb_control = 0;
+	uint8_t m_kb_data = 0;
+	uint8_t m_kb_flag0 = 0;
+	uint8_t m_kb_flag = 0;
+	uint8_t m_kb_ruslat = 0;
+	uint8_t m_latch = 0;
 
 	struct
 	{
-		uint8_t cursor;
-		uint8_t enable;
-		uint8_t line25;
-		uint32_t ptr1;
-		uint32_t ptr2;
+		uint8_t cursor = 0;
+		uint8_t enable = 0;
+		uint8_t line25 = 0;
+		uint32_t ptr1 = 0;
+		uint32_t ptr2 = 0;
 	} m_video;
 
-	uint8_t m_serial_rx_ready;
-	uint8_t m_serial_rx_char;
-	uint8_t m_serial_tx_ready;
-	int m_hblank;
-	int m_vpos;
-	int m_marker_scanline;
-	bool m_kbd_sdv;
+	uint8_t m_serial_rx_ready = 0;
+	uint8_t m_serial_rx_char = 0;
+	uint8_t m_serial_tx_ready = 0;
+	int m_hblank = 0;
+	int m_vpos = 0;
+	int m_marker_scanline = 0;
+	bool m_kbd_sdv = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_videoram;

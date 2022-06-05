@@ -520,7 +520,7 @@ void namcona1_state::vreg_w(offs_t offset, u16 data, u16 mem_mask)
 		break;
 
 	case 0x1a / 2:
-		m_mEnableInterrupts = 1;
+		m_enable_interrupts = 1;
 		/* interrupt enable mask; 0 enables INT level */
 		break;
 	case 0xb0 / 2:
@@ -746,9 +746,9 @@ void namcona1_state::port8_w(u8 data)
 
 void namcona1_state::machine_start()
 {
-	m_mEnableInterrupts = 0;
+	m_enable_interrupts = 0;
 	std::fill(std::begin(m_mcu_mailbox), std::end(m_mcu_mailbox), 0);
-	save_item(NAME(m_mEnableInterrupts));
+	save_item(NAME(m_enable_interrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));
 	save_item(NAME(m_mcu_port4));
@@ -756,7 +756,7 @@ void namcona1_state::machine_start()
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_mcu_port8));
 
-	m_scan_timer = timer_alloc(TIMER_SCANLINE);
+	m_scan_timer = timer_alloc(FUNC(namcona1_state::set_scanline_interrupt), this);
 }
 
 // the MCU boots the 68000
@@ -991,7 +991,7 @@ GFXDECODE_END
 
 void namcona1_state::scanline_interrupt(int scanline)
 {
-	const u16 enabled = m_mEnableInterrupts ? ~m_vreg[0x1a / 2] : 0;
+	const u16 enabled = m_enable_interrupts ? ~m_vreg[0x1a / 2] : 0;
 
 	// vblank
 	if (scanline == 224)
@@ -1013,12 +1013,9 @@ void namcona1_state::scanline_interrupt(int scanline)
 	}
 }
 
-void namcona1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(namcona1_state::set_scanline_interrupt)
 {
-	if (id == TIMER_SCANLINE)
-	{
-		scanline_interrupt(m_screen->vpos());
-	}
+	scanline_interrupt(m_screen->vpos());
 }
 
 void namcona1_state::c69(machine_config &config)

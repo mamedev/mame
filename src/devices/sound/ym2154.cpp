@@ -177,7 +177,7 @@ void ym2154_device::write(offs_t offset, u8 data)
 void ym2154_device::device_start()
 {
 	// allocate our timer
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(ym2154_device::delayed_irq), this);
 
 	// resolve the handlers
 	m_update_irq.resolve();
@@ -237,10 +237,10 @@ void ym2154_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  sound_stream_update - generate sound data
+//  delayed_irq -
 //-------------------------------------------------
 
-void ym2154_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ym2154_device::delayed_irq)
 {
 	update_irq_state(1);
 	m_timer->adjust((2048 - m_timer_count) * attotime::from_hz(sample_rate()));

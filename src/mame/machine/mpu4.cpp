@@ -693,15 +693,10 @@ void mpu4_state::ic24_setup()
 }
 
 
-void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 {
-	switch(id)
-	{
-	case TIMER_IC24:
-		m_ic23_active=0;
-		ic24_output(1);
-		break;
-	}
+	m_ic23_active=0;
+	ic24_output(1);
 }
 
 
@@ -1256,10 +1251,10 @@ all eight meters are driven from this port, giving the 8 line driver chip
 
 	//This may be overkill, but the meter sensing is VERY picky
 
-	int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
-							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
-							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
-							m_meters->GetActivity(6) | m_meters->GetActivity(7);
+	int combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
+							m_meters->get_activity(2) | m_meters->get_activity(3) |
+							m_meters->get_activity(4) | m_meters->get_activity(5) |
+							m_meters->get_activity(6) | m_meters->get_activity(7);
 
 	if(combined_meter)
 	{
@@ -2167,7 +2162,7 @@ void mpu4_state::mpu4_config_common()
 	m_digits.resolve();
 	m_triacs.resolve();
 
-	m_ic24_timer = timer_alloc(TIMER_IC24);
+	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
 	m_lamp_strobe_ext_persistence = 0;
 }
 

@@ -209,12 +209,12 @@ other supported games as well.
 
 void m72_state::machine_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
+	m_scanline_timer = timer_alloc(FUNC(m72_state::scanline_interrupt), this);
 }
 
 MACHINE_START_MEMBER(m72_state,kengo)
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
+	m_scanline_timer = timer_alloc(FUNC(m72_state::kengo_scanline_interrupt), this);
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::synch_callback)

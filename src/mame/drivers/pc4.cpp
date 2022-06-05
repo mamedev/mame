@@ -198,8 +198,8 @@ void pc4_state::machine_start()
 	m_rombank->configure_entries(0, 8, rom_base, 0x4000);
 	m_rombank->set_entry(0);
 
-	m_busy_timer = timer_alloc(BUSY_TIMER);
-	m_blink_timer = timer_alloc(BLINKING_TIMER);
+	m_busy_timer = timer_alloc(FUNC(pc4_state::clear_busy_flag), this);
+	m_blink_timer = timer_alloc(FUNC(pc4_state::blink_tick), this);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	for (int i=0; i<8; i++)

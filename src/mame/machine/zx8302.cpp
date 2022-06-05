@@ -188,9 +188,9 @@ void zx8302_device::device_start()
 	m_in_raw2_cb.resolve_safe(0);
 
 	// allocate timers
-	m_baudx4_timer = timer_alloc(TIMER_BAUDX4);
-	m_rtc_timer = timer_alloc(TIMER_RTC);
-	m_gap_timer = timer_alloc(TIMER_GAP);
+	m_baudx4_timer = timer_alloc(FUNC(zx8302_device::baudx4_tick), this);
+	m_rtc_timer = timer_alloc(FUNC(zx8302_device::rtc_tick), this);
+	m_gap_timer = timer_alloc(FUNC(zx8302_device::trigger_gap_int), this);
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rtc_clock / 32768));
 	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
@@ -217,29 +217,23 @@ void zx8302_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void zx8302_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(zx8302_device::baudx4_tick)
 {
-	switch (id)
-	{
-	case TIMER_BAUDX4:
-		m_baudx4 = !m_baudx4;
-		m_out_baudx4_cb(m_baudx4);
-		break;
+	m_baudx4 = !m_baudx4;
+	m_out_baudx4_cb(m_baudx4);
+}
 
-	case TIMER_RTC:
-		m_ctr++;
-		break;
+TIMER_CALLBACK_MEMBER(zx8302_device::rtc_tick)
+{
+	m_ctr++;
+}
 
-	case TIMER_GAP:
-		trigger_interrupt(INT_GAP);
-		break;
-
-	default:
-		break;
-	}
+TIMER_CALLBACK_MEMBER(zx8302_device::trigger_gap_int)
+{
+	trigger_interrupt(INT_GAP);
 }
 
 

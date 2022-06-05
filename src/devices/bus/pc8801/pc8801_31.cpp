@@ -82,7 +82,7 @@ void pc8801_31_device::device_resolve_objects()
 
 void pc8801_31_device::device_start()
 {
-	m_sel_off_timer = timer_alloc(0);
+	m_sel_off_timer = timer_alloc(FUNC(pc8801_31_device::select_off), this);
 
 	save_item(NAME(m_clock_hb));
 	save_item(NAME(m_cddrive_enable));
@@ -102,14 +102,9 @@ void pc8801_31_device::device_reset()
 	m_sel_off_timer->adjust(attotime::never);
 }
 
-void pc8801_31_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc8801_31_device::select_off)
 {
-	switch(id)
-	{
-		case 0:
-			m_scsibus->ctrl_w(0, 0, nscsi_device::S_SEL);
-			break;
-	}
+	m_scsibus->ctrl_w(0, 0, nscsi_device::S_SEL);
 }
 
 

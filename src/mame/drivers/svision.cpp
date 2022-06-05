@@ -430,17 +430,17 @@ WRITE_LINE_MEMBER(svision_state::frame_int_w)
 
 void svision_state::init_svision()
 {
-	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
+	m_svision.timer1 = timer_alloc(FUNC(svision_state::svision_timer), this);
 	m_dma_finished = false;
 	m_pet.on = false;
 }
 
 void svision_state::init_svisions()
 {
-	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
+	m_svision.timer1 = timer_alloc(FUNC(svision_state::svision_timer), this);
 	m_dma_finished = false;
 	m_pet.on = true;
-	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
+	m_pet.timer = timer_alloc(FUNC(svision_state::svision_pet_timer), this);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( svision_state::cart_load )

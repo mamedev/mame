@@ -211,11 +211,6 @@ mm1_keyboard_device::mm1_keyboard_device(const machine_config &mconfig, const ch
 {
 }
 
-enum
-{
-	SCAN_TIMER,
-};
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -226,7 +221,7 @@ void mm1_keyboard_device::device_start()
 	m_write_kbst.resolve_safe();
 
 	// allocate timers
-	m_scan_timer = timer_alloc(SCAN_TIMER);
+	m_scan_timer = timer_alloc(FUNC(mm1_keyboard_device::scan_keyboard), this);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// add notification request for system shut down (to play back the power switch sound once more)
@@ -244,10 +239,10 @@ void mm1_keyboard_device::shut_down_mm1()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  scan_keyboard
 //-------------------------------------------------
 
-void mm1_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm1_keyboard_device::scan_keyboard)
 {
 	// handle scan timer
 	uint8_t data = 0xff;

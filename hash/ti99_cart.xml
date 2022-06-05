@@ -1866,7 +1866,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Softlist entry for Fathom (beta). Prototype cartridge image.  -->
+<!-- Softlist entry for Fathom (beta). Prototype cartridge image. -->
 	<software name="fathomb">
 		<description>Fathom (beta)</description>
 		<year>1983</year>
@@ -4383,7 +4383,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Softlist entry for Tombstone City - 21st Century. CRC16 for ROM invalid, unless the first 16 bytes and the bytes at 0ff6-0ffd are changed from FF to 00.  -->
+<!-- Softlist entry for Tombstone City - 21st Century. CRC16 for ROM invalid, unless the first 16 bytes and the bytes at 0ff6-0ffd are changed from FF to 00. -->
 	<software name="tombstn">
 		<description>Tombstone City - 21st Century</description>
 		<year>1981</year>

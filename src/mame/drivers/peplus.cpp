@@ -1340,7 +1340,7 @@ void peplus_state::machine_start()
 	m_bnkb.resolve();
 	m_bnkc.resolve();
 
-	m_assert_lp_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peplus_state::assert_lp), this));
+	m_assert_lp_timer = timer_alloc(FUNC(peplus_state::assert_lp), this);
 
 	save_item(NAME(m_last_cycles));
 	save_item(NAME(m_coin_state));

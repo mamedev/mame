@@ -459,7 +459,7 @@ uint8_t mos6560_device::bus_r()
  mos6560_raster_interrupt_gen
 -------------------------------------------------*/
 
-void mos6560_device::raster_interrupt_gen()
+TIMER_CALLBACK_MEMBER(mos6560_device::raster_interrupt_gen)
 {
 	m_rasterline++;
 	if (m_rasterline >= m_total_lines)
@@ -760,7 +760,7 @@ void mos6560_device::device_start()
 	}
 
 	// allocate timers
-	m_line_timer = timer_alloc(TIMER_LINE);
+	m_line_timer = timer_alloc(FUNC(mos6560_device::raster_interrupt_gen), this);
 	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 
 	// initialize sound
@@ -860,20 +860,6 @@ void mos6560_device::device_reset()
 	m_noisesamples = 1;
 }
 
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_LINE:
-		raster_interrupt_gen();
-		break;
-	}
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update

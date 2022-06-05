@@ -1029,6 +1029,15 @@ static INPUT_PORTS_START( cookbib2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cookbib2c )
+	PORT_INCLUDE(cookbib2)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Language ) )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( English ) ) // Korean in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) ) // English in test mode
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cookbib3 )
 	PORT_START("DSW1")  /* 500000.w */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
@@ -2722,6 +2731,35 @@ ROM_START( cookbib2b )
 	ROM_LOAD( "ua8.040", 0x100000, 0x80000, CRC(caa25138) SHA1(784111255777f5774abf4d34c0a95b5e23a14c9f) )
 ROM_END
 
+// PCB is marked: "YFTE3" and "951121" on component side
+// EPROMs are labelled: "UNICO"
+ROM_START( cookbib2c ) // no ROM matches any of the other sets
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "unico.uh12",  0x00001, 0x40000, CRC(be021efa) SHA1(87e169e4987f4c31bcda147d0bf5f7fdbaa52f38) )
+	ROM_LOAD16_BYTE( "unico.ui12",  0x00000, 0x40000, CRC(ed49a0e5) SHA1(fbb6c45559d82ec84253aac5e4e6ff0a8c4d04e0) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "unico.u1", 0x00000, 0x10000 , CRC(f1100b20) SHA1(92c78e028e9020743b68744a759a11638cf2c971) )
+
+	ROM_REGION( 0x2000, "protection", 0 ) /* P87C52EBPN (XSC6407A) Code (8052) */
+	ROM_LOAD( "87c52.mcu", 0x0000, 0x2000 , NO_DUMP ) /* not dumped yet */
+
+	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there
+
+	   this one is hacked from the old cookbib2 one, absolute code jump needed to be changed at least */
+	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x000, 0x200, BAD_DUMP CRC(b956f056) SHA1(aa9a73e8546b027ae8ef30b03524d302d07cae92) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "unico.uj15", 0x00000, 0x20000, CRC(ae5cc9e5) SHA1(f001c00fea76795ad2d7f4f0e436abecbc7ff00d) )
+
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "unico.ua4", 0x000000, 0x80000, CRC(3de7a813) SHA1(fdf7e0a092a2056bd7e6443e035c86dde94a2300) )
+	ROM_LOAD( "unico.ua5", 0x080000, 0x80000, CRC(6d543788) SHA1(efcd4f45e2bcdffcdd650c6e3bd543e877ce205a) )
+	ROM_LOAD( "unico.ua6", 0x100000, 0x40000, CRC(13cc9bf4) SHA1(dec3561d953699ced17231b76980663fdcd6e155) )
+ROM_END
+
 ROM_START( cookbib3 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(65134893) SHA1(b1f26794d1a85893aedf55adb2195ad244f90132) )
@@ -3073,9 +3111,10 @@ GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, init_to
 GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, empty_init,    ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, init_hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, empty_init,    ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2,   0,        semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
+GAME( 1996, cookbib2,   0,        semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English, set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
+GAME( 1996, cookbib2c,  cookbib2, semiprot,    cookbib2c,snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English / Korean)", MACHINE_SUPPORTS_SAVE ) // in this set the language switch actually works but its effects are inverted to what test mode shows. Sticker on PCB shows 95 so maybe earliest set?
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 1)", MACHINE_SUPPORTS_SAVE )

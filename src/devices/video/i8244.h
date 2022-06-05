@@ -111,11 +111,13 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	TIMER_CALLBACK_MEMBER(hblank_start);
+	TIMER_CALLBACK_MEMBER(vblank_start);
 
 	virtual void set_default_params();
 	inline bool is_ntsc() { return m_vtotal == 263; }
@@ -128,10 +130,6 @@ protected:
 	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	/* timers */
-	static constexpr device_timer_id TIMER_VBLANK_START = 0;
-	static constexpr device_timer_id TIMER_HBLANK_START = 1;
 
 	// callbacks
 	devcb_write_line m_irq_func;

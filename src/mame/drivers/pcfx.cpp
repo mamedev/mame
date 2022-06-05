@@ -28,20 +28,16 @@ public:
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_huc6261(*this, "huc6261") { }
+		m_huc6261(*this, "huc6261"),
+		m_pads(*this, "P%u", 1U) { }
 
 	void pcfx(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint16_t irq_read(offs_t offset);
@@ -59,7 +55,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( irq13_w );
 	DECLARE_WRITE_LINE_MEMBER( irq14_w );
 	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq15_w );
-	TIMER_CALLBACK_MEMBER(pad_func);
+	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
@@ -77,12 +73,14 @@ private:
 	};
 
 	pcfx_pad_t m_pad;
+	emu_timer *m_pad_timers[2];
 
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
+	required_ioport_array<2> m_pads;
 };
 
 
@@ -141,25 +139,12 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	return res;
 }
 
-void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PAD_FUNC:
-		pad_func(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");
-	}
-}
-
+template <int Pad>
 TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 {
-	const char *const padnames[] = { "P1", "P2" };
-
-	m_pad.latch[param] = ioport(padnames[param])->read();
-	m_pad.status[param] |= 8;
-	m_pad.ctrl[param] &= ~1; // ack TX line
+	m_pad.latch[Pad] = m_pads[Pad]->read();
+	m_pad.status[Pad] |= 8;
+	m_pad.ctrl[Pad] &= ~1; // ack TX line
 	// TODO: pad IRQ
 	set_irq_line(11, 1);
 }
@@ -178,7 +163,7 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 		*/
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
-			timer_set(attotime::from_usec(1000), TIMER_PAD_FUNC, port_type); // TODO: time
+			m_pad_timers[port_type]->adjust(attotime::from_usec(1000)); // TODO: time
 		}
 
 		m_pad.ctrl[port_type] = data & 7;
@@ -415,6 +400,9 @@ void pcfx_state::machine_start()
 		m_pad.status[i] = 0;
 		m_pad.latch[i] = 0;
 	};
+
+	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
+	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
 }
 
 void pcfx_state::machine_reset()

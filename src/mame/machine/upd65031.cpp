@@ -305,9 +305,9 @@ void upd65031_device::device_start()
 	m_out_mem_cb.resolve();
 
 	// allocate timers
-	m_rtc_timer = timer_alloc(TIMER_RTC);
-	m_flash_timer = timer_alloc(TIMER_FLASH);
-	m_speaker_timer = timer_alloc(TIMER_SPEAKER);
+	m_rtc_timer = timer_alloc(FUNC(upd65031_device::rtc_tick), this);
+	m_flash_timer = timer_alloc(FUNC(upd65031_device::flash_tick), this);
+	m_speaker_timer = timer_alloc(FUNC(upd65031_device::speaker_tick), this);
 	m_rtc_timer->adjust(attotime::from_msec(5), 0, attotime::from_msec(5));
 	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	m_speaker_timer->reset();
@@ -380,114 +380,102 @@ void upd65031_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd65031_device::rtc_tick)
 {
-	switch (id)
+	// if a key is pressed sets the interrupt
+	if ((m_int & INT_GINT) && (m_int & INT_KEY) && m_read_kb(0) != 0xff)
 	{
-	case TIMER_RTC:
+		LOG("%s: Keyboard interrupt!\n", machine().describe_context());
 
-		// if a key is pressed sets the interrupt
-		if ((m_int & INT_GINT) && (m_int & INT_KEY) && m_read_kb(0) != 0xff)
-		{
-			LOG("%s: Keyboard interrupt!\n", machine().describe_context());
+		// awakes CPU from snooze on key down
+		if (m_mode == STATE_SNOOZE)
+			set_mode(STATE_AWAKE);
 
-			// awakes CPU from snooze on key down
-			if (m_mode == STATE_SNOOZE)
-				set_mode(STATE_AWAKE);
-
-			m_sta |= STA_KEY;
-		}
-		else
-		{
-			m_sta &= ~STA_KEY;
-		}
-
-		// hold clock at reset? - in this mode it doesn't update
-		if (!(m_com & COM_RESTIM))
-		{
-			bool irq_change = false;
-
-			// update 5 millisecond counter
-			m_tim[0]++;
-
-			// tick
-			if (m_tim[0] & 1)
-			{
-				// set tick int has occurred
-				if (m_tmk & TSTA_TICK)
-				{
-					m_tsta |= TSTA_TICK;
-					irq_change = true;
-				}
-			}
-
-			if (m_tim[0] == 128)    // on the rising edge of TIM0 bit 7
-			{
-				// set seconds int has occurred
-				if (m_tmk & TSTA_SEC)
-				{
-					m_tsta |= TSTA_SEC;
-					irq_change = true;
-				}
-			}
-
-			if (m_tim[0] == 200)
-			{
-				m_tim[0] = 0;
-				m_tim[1]++;
-
-				if (m_tim[1] == 32) // on the rising edge of TIM1 bit 5
-				{
-					// set minutes int has occurred
-					if (m_tmk & TSTA_MIN)
-					{
-						m_tsta |= TSTA_MIN;
-						irq_change = true;
-					}
-				}
-
-				if (m_tim[1] == 60)
-				{
-					m_tim[1] = 0;
-					m_tim[2]++;
-
-					if (m_tim[2] == 0) // overflowed from 255
-					{
-						m_tim[3]++;
-
-						if (m_tim[3] == 0) // overflowed from 255
-						{
-							m_tim[4]++;
-
-							if (m_tim[4] == 32)
-								m_tim[4] = 0;
-						}
-					}
-				}
-			}
-
-			if ((m_int & INT_GINT) && (m_int & INT_TIME) && irq_change && !(m_sta & STA_FLAPOPEN))
-			{
-				set_mode(STATE_AWAKE);
-
-				update_rtc_interrupt();
-			}
-
-			// refresh interrupt
-			interrupt_refresh();
-		}
-		break;
-	case TIMER_FLASH:
-		m_flash = !m_flash;
-		break;
-	case TIMER_SPEAKER:
-		m_speaker_state = !m_speaker_state;
-		m_write_spkr(m_speaker_state ? 1 : 0);
-		break;
+		m_sta |= STA_KEY;
 	}
+	else
+	{
+		m_sta &= ~STA_KEY;
+	}
+
+	// hold clock at reset? - in this mode it doesn't update
+	if (!(m_com & COM_RESTIM))
+	{
+		bool irq_change = false;
+
+		// update 5 millisecond counter
+		m_tim[0]++;
+
+		// tick
+		if (m_tim[0] & 1)
+		{
+			// set tick int has occurred
+			if (m_tmk & TSTA_TICK)
+			{
+				m_tsta |= TSTA_TICK;
+				irq_change = true;
+			}
+		}
+
+		if (m_tim[0] == 200)
+		{
+			m_tim[0] = 0;
+			m_tim[1]++;
+
+			if (m_tim[1] == 32) // on the rising edge of TIM1 bit 5
+			{
+				// set minutes int has occurred
+				if (m_tmk & TSTA_MIN)
+				{
+					m_tsta |= TSTA_MIN;
+					irq_change = true;
+				}
+			}
+
+			if (m_tim[1] == 60)
+			{
+				m_tim[1] = 0;
+				m_tim[2]++;
+
+				if (m_tim[2] == 0) // overflowed from 255
+				{
+					m_tim[3]++;
+
+					if (m_tim[3] == 0) // overflowed from 255
+					{
+						m_tim[4]++;
+
+						if (m_tim[4] == 32)
+							m_tim[4] = 0;
+					}
+				}
+			}
+		}
+
+		if ((m_int & INT_GINT) && (m_int & INT_TIME) && irq_change && !(m_sta & STA_FLAPOPEN))
+		{
+			set_mode(STATE_AWAKE);
+
+			update_rtc_interrupt();
+		}
+
+		// refresh interrupt
+		interrupt_refresh();
+	}
+}
+
+TIMER_CALLBACK_MEMBER(upd65031_device::flash_tick)
+{
+	m_flash = !m_flash;
+}
+
+TIMER_CALLBACK_MEMBER(upd65031_device::speaker_tick)
+{
+	m_speaker_state = !m_speaker_state;
+	m_write_spkr(m_speaker_state ? 1 : 0);
 }
 
 

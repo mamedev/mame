@@ -59,7 +59,7 @@ void upd7004_device::device_start()
 	m_in_cb.resolve_all_safe(0x3ff);
 
 	// allocate timers
-	m_cycle_timer = timer_alloc();
+	m_cycle_timer = timer_alloc(FUNC(upd7004_device::update_state), this);
 	m_cycle_timer->adjust(attotime::never);
 
 	// register for save states
@@ -71,10 +71,10 @@ void upd7004_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_state -
 //-------------------------------------------------
 
-void upd7004_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd7004_device::update_state)
 {
 	switch (m_state)
 	{

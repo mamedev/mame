@@ -20,12 +20,6 @@
 class dec8_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DEC8_I8751,
-		TIMER_DEC8_M6502
-	};
-
 	dec8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -58,9 +52,11 @@ public:
 	void gondo(machine_config &config);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(mcu_irq_clear);
+	TIMER_CALLBACK_MEMBER(audiocpu_nmi_clear);
 
 	uint8_t i8751_h_r();
 	uint8_t i8751_l_r();

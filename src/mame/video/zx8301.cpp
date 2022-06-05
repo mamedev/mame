@@ -137,8 +137,8 @@ void zx8301_device::device_start()
 	m_write_vsync.resolve_safe();
 
 	// allocate timers
-	m_vsync_timer = timer_alloc(TIMER_VSYNC);
-	m_flash_timer = timer_alloc(TIMER_FLASH);
+	m_vsync_timer = timer_alloc(FUNC(zx8301_device::output_vsync), this);
+	m_flash_timer = timer_alloc(FUNC(zx8301_device::toggle_flash), this);
 
 	// adjust timer periods
 	m_vsync_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
@@ -155,22 +155,18 @@ void zx8301_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(zx8301_device::output_vsync)
 {
-	switch (id)
-	{
-	case TIMER_VSYNC:
-		//m_vsync = !m_vsync;
-		m_write_vsync(m_vsync);
-		break;
+	//m_vsync = !m_vsync;
+	m_write_vsync(m_vsync);
+}
 
-	case TIMER_FLASH:
-		m_flash = !m_flash;
-		break;
-	}
+TIMER_CALLBACK_MEMBER(zx8301_device::toggle_flash)
+{
+	m_flash = !m_flash;
 }
 
 

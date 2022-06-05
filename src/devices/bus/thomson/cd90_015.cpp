@@ -61,15 +61,15 @@ void cd90_015_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 }
 
-void cd90_015_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cd90_015_device::motor_tick)
 {
-	m_floppy[id]->get_device()->mon_w(1);
+	m_floppy[param]->get_device()->mon_w(1);
 }
 
 void cd90_015_device::device_start()
 {
 	for(int i=0; i != 4; i++)
-		m_motor_timer[i] = timer_alloc(i);
+		m_motor_timer[i] = timer_alloc(FUNC(cd90_015_device::motor_tick), this);
 	save_item(NAME(m_select));
 }
 
@@ -101,7 +101,7 @@ void cd90_015_device::select_w(u8 data)
 		if(started & (1 << i)) {
 			if(m_floppy[i]->get_device()) {
 				m_floppy[i]->get_device()->mon_w(0);
-				m_motor_timer[i]->adjust(attotime::from_seconds(5));
+				m_motor_timer[i]->adjust(attotime::from_seconds(5), i);
 			}
 		}
 

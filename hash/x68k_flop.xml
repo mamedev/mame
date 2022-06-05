@@ -30392,7 +30392,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="souhoutv">
-		<!--  there also exists a bootable version, but it has been made for emulator usage... -->
+		<!-- there also exists a bootable version, but it has been made for emulator usage... -->
 		<description>Souhou Blue Phoenix Taste Version</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>

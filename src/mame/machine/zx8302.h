@@ -89,7 +89,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -97,17 +96,14 @@ protected:
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
 
+	TIMER_CALLBACK_MEMBER(baudx4_tick);
+	TIMER_CALLBACK_MEMBER(rtc_tick);
+	TIMER_CALLBACK_MEMBER(trigger_gap_int);
+
 	inline void trigger_interrupt(uint8_t line);
 	inline void transmit_ipc_data();
 
 private:
-	enum
-	{
-		TIMER_BAUDX4 = 0,
-		TIMER_RTC,
-		TIMER_GAP
-	};
-
 	enum
 	{
 		IPC_START,

@@ -201,8 +201,8 @@ void hle_device::device_add_mconfig(machine_config &config)
 void hle_device::device_start()
 {
 	m_leds.resolve();
-	m_click_timer = timer_alloc(TIMER_CLICK);
-	m_beep_timer = timer_alloc(TIMER_BEEP);
+	m_click_timer = timer_alloc(FUNC(hle_device::click_off), this);
+	m_beep_timer = timer_alloc(FUNC(hle_device::beep_off), this);
 
 	save_item(NAME(m_make_count));
 	save_item(NAME(m_keyclick));
@@ -247,23 +247,16 @@ void hle_device::device_reset()
 	start_processing(attotime::from_hz(600));
 }
 
-void hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hle_device::click_off)
 {
-	switch (id)
-	{
-	case TIMER_CLICK:
-		m_beeper_state &= ~BEEPER_CLICK;
-		m_beeper->set_state(m_beeper_state ? 1 : 0);
-		break;
+	m_beeper_state &= ~BEEPER_CLICK;
+	m_beeper->set_state(m_beeper_state ? 1 : 0);
+}
 
-	case TIMER_BEEP:
-		m_beeper_state &= ~BEEPER_BELL;
-		m_beeper->set_state(m_beeper_state ? 1 : 0);
-		break;
-
-	default:
-		break;
-	}
+TIMER_CALLBACK_MEMBER(hle_device::beep_off)
+{
+	m_beeper_state &= ~BEEPER_BELL;
+	m_beeper->set_state(m_beeper_state ? 1 : 0);
 }
 
 void hle_device::tra_callback()

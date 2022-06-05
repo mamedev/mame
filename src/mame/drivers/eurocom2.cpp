@@ -84,6 +84,10 @@ public:
 	void microtrol(machine_config &config);
 
 protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t fdc_aux_r(offs_t offset);
@@ -99,10 +103,7 @@ protected:
 
 	void eurocom2_map(address_map &map);
 
-	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(toggle_sst);
 
 	emu_timer *m_sst = nullptr;
 
@@ -226,7 +227,7 @@ WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(eurocom2_state::toggle_sst)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);
@@ -393,7 +394,7 @@ void eurocom2_state::machine_reset()
 
 void eurocom2_state::machine_start()
 {
-	m_sst = timer_alloc(0);
+	m_sst = timer_alloc(FUNC(eurocom2_state::toggle_sst), this);
 	m_tmpbmp.allocate(VC_DISP_HORZ, VC_DISP_VERT);
 	m_kbd_data = 0;
 }

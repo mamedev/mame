@@ -59,26 +59,25 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(send_tick);
+	TIMER_CALLBACK_MEMBER(receive_tick);
 
 private:
 	// internal device state
-	static const device_timer_id TIMER_SEND    = 0;
-	static const device_timer_id TIMER_RECEIVE = 1;
-
 	emu_timer*  m_send_timer = nullptr;       // timer for send data
 	emu_timer*  m_receive_timer = nullptr;    // timer for receive data
-	uint8_t       m_state = 0;            // transfer status
-	uint32_t      m_bytes_count = 0;      // number of bytes transferred
-	uint8_t       m_current_byte = 0;     // byte in transfer
-	uint8_t       m_enabled = 0;          // enable/disable
+	uint8_t     m_state = 0;            // transfer status
+	uint32_t    m_bytes_count = 0;      // number of bytes transferred
+	uint8_t     m_current_byte = 0;     // byte in transfer
+	uint8_t     m_enabled = 0;          // enable/disable
 
-	uint8_t       m_busy = 0;             // CTS
-	uint8_t       m_dout = 0;             // DTR
-	uint8_t       m_xout = 0;             // TXD
-	uint8_t       m_xin = 0;              // RXD
-	uint8_t       m_din = 0;              // DSR
-	uint8_t       m_ack = 0;              // RTS
+	uint8_t     m_busy = 0;             // CTS
+	uint8_t     m_dout = 0;             // DTR
+	uint8_t     m_xout = 0;             // TXD
+	uint8_t     m_xin = 0;              // RXD
+	uint8_t     m_din = 0;              // DSR
+	uint8_t     m_ack = 0;              // RTS
 };
 
 // device type definition

@@ -444,7 +444,7 @@ void h01x_state::machine_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_cassette_data));
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback), this));
+	m_cassette_data_timer = timer_alloc(FUNC(h01x_state::cassette_data_callback), this);
 	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));
 }
 

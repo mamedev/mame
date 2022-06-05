@@ -62,7 +62,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(timer_elapsed);
 
 	void base_map(address_map &map);
 	u16 m_id;
@@ -117,13 +118,15 @@ private:
 	u32 cursinit_r();
 	void cursinit_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	static constexpr int sounddma_ch_size = 2;
-	u32 m_sndcur = 0, m_sndend = 0;
-	u32 m_sndcur_reg[sounddma_ch_size]{}, m_sndend_reg[sounddma_ch_size]{};
-	bool m_sndstop_reg[sounddma_ch_size]{}, m_sndlast_reg[sounddma_ch_size]{};
-	bool m_sndbuffer_ok[sounddma_ch_size]{};
-	bool m_sound_dma_on = false;
-	u8 m_sndcur_buffer = 0;
+	u32 m_sndcur;
+	u32 m_sndend;
+	u32 m_sndcur_reg[2];
+	u32 m_sndend_reg[2];
+	bool m_sndstop_reg[2];
+	bool m_sndlast_reg[2];
+	bool m_sndbuffer_ok[2];
+	bool m_sound_dma_on;
+	u8 m_sndcur_buffer;
 	inline void sounddma_swap_buffer();
 	template <unsigned Which> u32 sdcur_r();
 	template <unsigned Which> void sdcur_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -138,11 +141,6 @@ private:
 	inline void flush_irq(unsigned Which);
 	template <unsigned Which> inline void trigger_irq(u8 irq_type);
 
-	static constexpr int timer_ch_size = 2;
-	enum {
-		T0_TIMER = 1,
-		T1_TIMER
-	};
 	inline void trigger_timer(unsigned Which);
 	u16 m_timer_in[2];
 	u16 m_timer_out[2];

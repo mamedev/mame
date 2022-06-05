@@ -81,11 +81,7 @@ class votrhv_state : public driver_device
 public:
 	votrhv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_votrax(*this, "votrax")
 		, m_reset(*this, "reset")
-		, m_swarray(*this, "SW.%u", 0U)
-		, m_leds(*this, "led_%u", 0U)
 		, m_latchx(0)
 		, m_latchy(0)
 		, m_latcha_flop(false)
@@ -93,10 +89,11 @@ public:
 		, m_latcha_in(false)
 		, m_latchb_in(false)
 		, m_scanflag(false)
+		, m_maincpu(*this, "maincpu")
+		, m_votrax(*this, "votrax")
+		, m_swarray(*this, "SW.%u", 0U)
+		, m_leds(*this, "led_%u", 0U)
 	{ }
-
-	// overrides
-	virtual void device_start() override;
 
 	void votrhv(machine_config &config);
 	void hc110(machine_config &config);
@@ -105,19 +102,28 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(key_pressed);
 	DECLARE_WRITE_LINE_MEMBER(pho_done);
 
-	static const device_timer_id TIMER_RESUME = 0;
-	static const device_timer_id TIMER_SCAN = 1;
-private:
-	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+	required_device<input_merger_device> m_reset;
+
+	uint8_t m_latchx;
+	uint8_t m_latchy;
+	bool m_latcha_flop;
+	bool m_latchb_flop;
+	bool m_latcha_in;
+	bool m_latchb_in;
+	bool m_scanflag;
+
+private:
 	void mem_map(address_map &map);
 
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
-protected:
-	required_device<input_merger_device> m_reset;
-private:
+
+	TIMER_CALLBACK_MEMBER(resume_tick);
+
 	optional_ioport_array<16> m_swarray;
 	output_finder<5> m_leds;
 
@@ -128,16 +134,6 @@ private:
 	uint8_t latcha_rst_r();
 	uint8_t latchb_rst_r();
 
-protected:
-	uint8_t m_latchx;
-	uint8_t m_latchy;
-	bool m_latcha_flop;
-	bool m_latchb_flop;
-	bool m_latcha_in;
-	bool m_latchb_in;
-	bool m_scanflag;
-	emu_timer* m_scan_timer = nullptr;
-private:
 	emu_timer* m_resume_timer = nullptr;
 };
 
@@ -147,11 +143,18 @@ public:
 	hc120_state(const machine_config &mconfig, device_type type, const char *tag)
 		: votrhv_state(mconfig, type, tag)
 	{ }
+
 private:
-	virtual void device_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	virtual void key_check() override;
 	virtual uint8_t input_r() override;
 	virtual void latchx_w(uint8_t data) override;
+
+	TIMER_CALLBACK_MEMBER(scan_keys);
+
+	emu_timer* m_scan_timer = nullptr;
 };
 
 /******************************************************************************
@@ -192,12 +195,12 @@ void votrhv_state::mem_map(address_map &map)
 	// 2800-2fff open bus
 	map(0x3000, 0x3000).mirror(0x87ff).w(FUNC(votrhv_state::latchy_w));
 	// 3800-3fff open bus
-	map(0x4000, 0x5fff).mirror(0x8000).rom().region("maincpu",0x4000); // Mask ROMs
+	map(0x4000, 0x5fff).mirror(0x8000).rom().region("maskrom", 0);
 	map(0x6000, 0x6000).mirror(0x87ff).r(FUNC(votrhv_state::latcha_rst_r));
 	map(0x6800, 0x6800).mirror(0x87ff).r(FUNC(votrhv_state::latchb_rst_r));
 	// 7000-77ff open bus
 	// 7800-79ff open bus
-	map(0x7a00, 0x7fff).mirror(0x8000).rom().region("maincpu",0x7a00); // boot PROMs
+	map(0x7a00, 0x7fff).mirror(0x8000).rom().region("bootrom", 0);
 }
 
 
@@ -391,30 +394,23 @@ INPUT_PORTS_END
  Timer and machine/start/reset handlers
 ******************************************************************************/
 
-void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(votrhv_state::resume_tick)
 {
-	switch(id)
-	{
-		case TIMER_RESUME:
-			// shut the timer OFF
-			m_resume_timer->adjust(attotime::never);
-			m_resume_timer->enable(false);
-			// pull the cpu out of reset
-			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			break;
-		case TIMER_SCAN:
-			// invert the scan state bit
-			m_scanflag = !m_scanflag;
-			if (m_scan_timer) m_scan_timer->adjust(attotime::from_seconds(1));
-			break;
-	}
+	// pull the cpu out of reset
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-void votrhv_state::device_start()
+TIMER_CALLBACK_MEMBER(hc120_state::scan_keys)
 {
-	m_resume_timer = timer_alloc(TIMER_RESUME);
-	m_resume_timer->adjust(attotime::never);
-	m_resume_timer->enable(false);
+	// invert the scan state bit
+	m_scanflag = !m_scanflag;
+	m_scan_timer->adjust(attotime::from_seconds(1));
+}
+
+void votrhv_state::machine_start()
+{
+	m_resume_timer = timer_alloc(FUNC(votrhv_state::resume_tick), this);
+
 	m_leds.resolve();
 
 	save_item(NAME(m_latchx));
@@ -426,12 +422,22 @@ void votrhv_state::device_start()
 	save_item(NAME(m_scanflag));
 }
 
-// hc-120 variant for scan_timer
-void hc120_state::device_start()
+void votrhv_state::machine_reset()
 {
-	m_scan_timer = timer_alloc(TIMER_SCAN);
+	m_resume_timer->adjust(attotime::never);
+}
+
+// hc-120 variant for scan_timer
+void hc120_state::machine_start()
+{
+	votrhv_state::machine_start();
+
+	m_scan_timer = timer_alloc(FUNC(hc120_state::scan_keys), this);
+}
+
+void hc120_state::machine_reset()
+{
 	m_scan_timer->adjust(attotime::from_seconds(1)); // hc-120 specific; adjustable, guessed 1hz to 2hz? needs measurement
-	votrhv_state::device_start();
 }
 
 /******************************************************************************
@@ -442,8 +448,8 @@ WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 {
 	if (state == CLEAR_LINE)
 	{
-		// is the timer already running/non-zero? if not, start it.
-		if (!m_resume_timer->enabled())
+		// if the timer is not already running, start it.
+		if (m_resume_timer->remaining().is_never())
 		{
 			m_resume_timer->adjust(attotime::from_hz(2'000'000/2/0x20));
 		}
@@ -692,15 +698,17 @@ void votrhv_state::hc110(machine_config &config)
 ******************************************************************************/
 
 ROM_START(hc110)
-	ROM_REGION(0x8000, "maincpu", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
-	//ROM_LOAD("ea8316e030.ic9", 0x4000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260)) // used on older firmware?
-	ROM_LOAD("ea8316e144.ic9", 0x4000, 0x0800, CRC(636415ee) SHA1(9699ea75eed566447d8682f52665b01c1e876981))
-	ROM_LOAD("ea8316e031.ic8", 0x4800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
-	ROM_LOAD("ea8316e032.ic7", 0x5000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
-	ROM_LOAD("ea8316e033.ic6", 0x5800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
+	ROM_REGION(0x8000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
+	//ROM_LOAD("ea8316e030.ic9", 0x0000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260)) // used on older firmware?
+	ROM_LOAD("ea8316e144.ic9", 0x0000, 0x0800, CRC(636415ee) SHA1(9699ea75eed566447d8682f52665b01c1e876981))
+	ROM_LOAD("ea8316e031.ic8", 0x0800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
+	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
+	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
+
+	ROM_REGION(0x0600, "bootrom", 0)
 	// ic12 is unpopulated
-	ROM_LOAD("7031r2.sn74s472.ic11",     0x7c00, 0x0200, CRC(6ef744c9) SHA1(6a92e520adb3c47b849241648ec2ca4107edfd8f))
-	ROM_LOAD("7031r3.sn74s472.ic10",     0x7e00, 0x0200, CRC(0800b0e6) SHA1(9e0481bf6c5feaf6506ac241a2baf83fb9342033))
+	ROM_LOAD("7031r2.sn74s472.ic11", 0x0200, 0x0200, CRC(6ef744c9) SHA1(6a92e520adb3c47b849241648ec2ca4107edfd8f))
+	ROM_LOAD("7031r3.sn74s472.ic10", 0x0400, 0x0200, CRC(0800b0e6) SHA1(9e0481bf6c5feaf6506ac241a2baf83fb9342033))
 
 	ROM_REGION16_BE(0x200, "s1818c", 0) // 1818C SYNTHESIZER BOARD; MCM14524 CMOS 256x4 mask ROMs holding the phoneme data
 	ROMX_LOAD("scm46109pk.mcm14524.u30", 0x000, 0x100, CRC(6a1292fe) SHA1(67c8ac71e22de134a651dd5cad06d26b27894154), ROM_SKIP(1) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
@@ -709,14 +717,16 @@ ROM_START(hc110)
 ROM_END
 
 ROM_START(hc120) // ic10 and ic11 are Rev B? is there an older revision undumped?
-	ROM_REGION(0x8000, "maincpu", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
-	ROM_LOAD("ea8316e030.ic9", 0x4000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260))
-	ROM_LOAD("ea8316e031.ic8", 0x4800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
-	ROM_LOAD("ea8316e032.ic7", 0x5000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
-	ROM_LOAD("ea8316e033.ic6", 0x5800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
+	ROM_REGION(0x2000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
+	ROM_LOAD("ea8316e030.ic9", 0x0000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260))
+	ROM_LOAD("ea8316e031.ic8", 0x0800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
+	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
+	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
+
+	ROM_REGION(0x0600, "bootrom", 0)
 	// ic12 is unpopulated
-	ROM_LOAD("7037__r2b.sn74s472.ic11",    0x7c00, 0x0200, CRC(44de1bb1) SHA1(53e6811baf37af5da0648e906fee6c6acf259b82))
-	ROM_LOAD("7037__r3b.sn74s472.ic10",    0x7e00, 0x0200, CRC(688be8c7) SHA1(c9bdc7472cabcdddc23e63f45afbfcc835bb8f69))
+	ROM_LOAD("7037__r2b.sn74s472.ic11", 0x0200, 0x0200, CRC(44de1bb1) SHA1(53e6811baf37af5da0648e906fee6c6acf259b82))
+	ROM_LOAD("7037__r3b.sn74s472.ic10", 0x0400, 0x0200, CRC(688be8c7) SHA1(c9bdc7472cabcdddc23e63f45afbfcc835bb8f69))
 
 	ROM_REGION16_BE(0x200, "s1818c", 0) // 1818C SYNTHESIZER BOARD; MCM14524 CMOS 256x4 mask ROMs holding the phoneme data
 	ROMX_LOAD("scm46109pk.mcm14524.u30", 0x000, 0x100, CRC(6a1292fe) SHA1(67c8ac71e22de134a651dd5cad06d26b27894154), ROM_SKIP(1) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)

@@ -48,6 +48,7 @@ one - Xylogics 472 (Controller 1/2 inch TAPE with PERTEC interface)
 #include "bus/multibus/multibus.h"
 
 #include "bus/multibus/labtam_3232.h"
+#include "bus/multibus/labtam_vducom.h"
 #include "bus/multibus/labtam_z80sbc.h"
 
 #define VERBOSE 0
@@ -88,6 +89,7 @@ void labtam_state::machine_reset()
 static void labtam_cards(device_slot_interface &device)
 {
 	device.option_add("labtam_3232",   LABTAM_3232);
+	device.option_add("labtam_vducom", LABTAM_VDUCOM);
 	device.option_add("labtam_z80sbc", LABTAM_Z80SBC);
 }
 
@@ -99,7 +101,7 @@ void labtam_state::labtam(machine_config &config)
 	MULTIBUS_SLOT(config, "slot:1", m_bus, labtam_cards, nullptr, false);
 	MULTIBUS_SLOT(config, "slot:2", m_bus, labtam_cards, nullptr, false);
 	MULTIBUS_SLOT(config, "slot:3", m_bus, labtam_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:4", m_bus, labtam_cards, nullptr, false); // TODO: 8086 VDU/COMM
+	MULTIBUS_SLOT(config, "slot:4", m_bus, labtam_cards, "labtam_vducom", false);
 	MULTIBUS_SLOT(config, "slot:5", m_bus, labtam_cards, "labtam_z80sbc", false);
 }
 

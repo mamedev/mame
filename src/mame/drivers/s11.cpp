@@ -159,37 +159,32 @@ static INPUT_PORTS_START( s11 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s11_state::irq_timer)
 {
-	switch(id)
+	// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
+	m_timer_count += 0x20;
+	m_timer_count &= 0x3fff;
+	// handle the reset case (happens on the high level of Eclock, so supersedes the firing of the timer int)
+	if (BIT(m_timer_count, 5) && (m_timer_irq_active || m_pia_irq_active))
 	{
-	case TIMER_IRQ:
-		// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
-		m_timer_count += 0x20;
-		m_timer_count &= 0x3fff;
-		// handle the reset case (happens on the high level of Eclock, so supersedes the firing of the timer int)
-		if (BIT(m_timer_count, 5) && (m_timer_irq_active || m_pia_irq_active))
-		{
-			m_timer_count = 0;
-			m_timer_irq_active = false;
-		}
-		else // handle the timer int firing case
-		{
-#ifndef S11_W15
-			// W14 jumper present (Q7), W15 absent (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 7, 3) == 7);
-#else
-			// W14 jumper absent (Q7), W15 present (Q10)
-			m_timer_irq_active = (BIT(m_timer_count, 8, 3) == 7);
-#endif
-		}
-
-		m_mainirq->in_w<0>(m_timer_irq_active);
-		if(m_pias)
-			m_pias->cb1_w(m_timer_irq_active);
-		m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-		break;
+		m_timer_count = 0;
+		m_timer_irq_active = false;
 	}
+	else // handle the timer int firing case
+	{
+#ifndef S11_W15
+		// W14 jumper present (Q7), W15 absent (Q10)
+		m_timer_irq_active = (BIT(m_timer_count, 7, 3) == 7);
+#else
+		// W14 jumper absent (Q7), W15 present (Q10)
+		m_timer_irq_active = (BIT(m_timer_count, 8, 3) == 7);
+#endif
+	}
+
+	m_mainirq->in_w<0>(m_timer_irq_active);
+	if (m_pias)
+		m_pias->cb1_w(m_timer_irq_active);
+	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 }
 
 INPUT_CHANGED_MEMBER( s11_state::main_nmi )
@@ -408,8 +403,8 @@ void s11_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_lamp_data));
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+	m_irq_timer = timer_alloc(FUNC(s11_state::irq_timer), this);
+	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 }
 
 void s11_state::machine_reset()
@@ -429,8 +424,6 @@ void s11_state::init_s11()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
-	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 }
 
 void s11_state::s11(machine_config &config)

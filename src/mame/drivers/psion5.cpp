@@ -80,10 +80,10 @@ void psion5mx_state::machine_start()
 
 	save_item(NAME(m_ports));
 
-	m_timers[0] = timer_alloc(TID_TIMER1);
-	m_timers[1] = timer_alloc(TID_TIMER2);
-	m_periodic = timer_alloc(TID_PERIODIC);
-	m_rtc_ticker = timer_alloc(TID_RTC_TICKER);
+	m_timers[0] = timer_alloc(FUNC(psion5mx_state::update_timer1), this);
+	m_timers[1] = timer_alloc(FUNC(psion5mx_state::update_timer2), this);
+	m_periodic = timer_alloc(FUNC(psion5mx_state::update_periodic_irq), this);
+	m_rtc_ticker = timer_alloc(FUNC(psion5mx_state::update_rtc), this);
 }
 
 void psion5mx_state::machine_reset()
@@ -127,36 +127,37 @@ void psion5mx_state::check_interrupts()
 	m_maincpu->set_input_line(ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void psion5mx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(psion5mx_state::update_timer1)
 {
-	switch (id)
+	update_timer(0);
+	if (BIT(m_buzzer_ctrl, 1))
 	{
-		case TID_TIMER1:
-			update_timer(0);
-			if (BIT(m_buzzer_ctrl, 1))
-			{
-				m_speaker->level_w(BIT(m_timer_value[0], 15));
-			}
-			break;
-		case TID_TIMER2:
-			update_timer(1);
-			break;
-		case TID_PERIODIC:
-			LOGMASKED(LOG_IRQ, "Flagging periodic IRQ\n");
-			m_pending_ints |= (1 << IRQ_TINT);
-			check_interrupts();
-			break;
-		case TID_RTC_TICKER:
-			if ((m_pwrsr & 0x3f) == 0x3f)
-			{
-				m_rtc++;
-				m_pwrsr &= ~0x3f;
-			}
-			else
-			{
-				m_pwrsr++;
-			}
-			break;
+		m_speaker->level_w(BIT(m_timer_value[0], 15));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(psion5mx_state::update_timer2)
+{
+	update_timer(1);
+}
+
+TIMER_CALLBACK_MEMBER(psion5mx_state::update_periodic_irq)
+{
+	LOGMASKED(LOG_IRQ, "Flagging periodic IRQ\n");
+	m_pending_ints |= (1 << IRQ_TINT);
+	check_interrupts();
+}
+
+TIMER_CALLBACK_MEMBER(psion5mx_state::update_rtc)
+{
+	if ((m_pwrsr & 0x3f) == 0x3f)
+	{
+		m_rtc++;
+		m_pwrsr &= ~0x3f;
+	}
+	else
+	{
+		m_pwrsr++;
 	}
 }
 

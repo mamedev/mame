@@ -35,26 +35,19 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	devcb_read16 m_guny_in;
-	devcb_read16 m_gunx_in;
-
-	inline void check_video_irq();
-
-	static const device_timer_id TIMER_SCREENPOS = 2;
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void check_video_irq();
+	TIMER_CALLBACK_MEMBER(screenpos_hit);
 
 	void do_sprite_dma(uint32_t len);
 
-	uint16_t m_video_regs[0x100];
-
+	devcb_read16 m_guny_in;
+	devcb_read16 m_gunx_in;
 	devcb_read16 m_sprlimit_read_cb;
-
-	emu_timer *m_screenpos_timer;
+	devcb_write_line m_video_irq_cb;
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -62,10 +55,10 @@ protected:
 	required_shared_ptr<uint16_t> m_hcompram;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
-
-	devcb_write_line m_video_irq_cb;
-
 	required_device<spg_renderer_device> m_renderer;
+
+	emu_timer *m_screenpos_timer;
+	uint16_t m_video_regs[0x100];
 };
 
 class spg24x_video_device : public spg2xx_video_device

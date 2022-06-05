@@ -312,15 +312,6 @@ void qs1000_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle deferred writes and
-//  resets as a timer callback
-//-------------------------------------------------
-void qs1000_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-}
-
-
-//-------------------------------------------------
 //  p0_r
 //-------------------------------------------------
 uint8_t  qs1000_device::p0_r()

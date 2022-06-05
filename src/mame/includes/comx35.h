@@ -61,17 +61,14 @@ private:
 	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_d6;
 	required_ioport m_modifiers;
+	emu_timer *m_reset_done_timer = nullptr;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-	enum
-	{
-		TIMER_ID_RESET
-	};
+	TIMER_CALLBACK_MEMBER(reset_done);
 
 	void check_interrupt();
 

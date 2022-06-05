@@ -57,7 +57,7 @@ void hd44352_device::device_start()
 {
 	m_on_cb.resolve_safe();
 
-	m_on_timer = timer_alloc(ON_TIMER);
+	m_on_timer = timer_alloc(FUNC(hd44352_device::on_tick), this);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 
 	save_item( NAME(m_control_lines));
@@ -112,20 +112,12 @@ void hd44352_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hd44352_device::on_tick)
 {
-	switch(id)
+	if (m_control_lines & 0x40)
 	{
-		case ON_TIMER:
-			if (m_control_lines & 0x40)
-			{
-				m_on_cb(ASSERT_LINE);
-				m_on_cb(CLEAR_LINE);
-			}
-			break;
+		m_on_cb(ASSERT_LINE);
+		m_on_cb(CLEAR_LINE);
 	}
 }
 

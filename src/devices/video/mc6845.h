@@ -132,7 +132,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	attotime cclks_to_attotime(uint64_t clocks) const { return clocks_to_attotime(clocks * m_clk_scale); }
 	uint64_t attotime_to_cclks(const attotime &duration) const { return attotime_to_clocks(duration) / m_clk_scale; }
@@ -188,20 +187,10 @@ protected:
 	int16_t   m_cursor_x;
 
 	/* timers */
-	static const device_timer_id TIMER_LINE = 0;
-	static const device_timer_id TIMER_DE_OFF = 1;
-	static const device_timer_id TIMER_CUR_ON = 2;
-	static const device_timer_id TIMER_CUR_OFF = 3;
-	static const device_timer_id TIMER_HSYNC_ON = 4;
-	static const device_timer_id TIMER_HSYNC_OFF = 5;
-	static const device_timer_id TIMER_LIGHT_PEN_LATCH = 6;
-	static const device_timer_id TIMER_UPD_ADR = 7;
-	static const device_timer_id TIMER_UPD_TRANS = 8;
-
 	emu_timer *m_line_timer;
 	emu_timer *m_de_off_timer;
-	emu_timer *m_cur_on_timer;
-	emu_timer *m_cur_off_timer;
+	emu_timer *m_cursor_on_timer;
+	emu_timer *m_cursor_off_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_light_pen_latch_timer;
@@ -237,7 +226,15 @@ protected:
 	void set_cur(int state);
 	bool match_line();
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
-	void handle_line_timer();
+	TIMER_CALLBACK_MEMBER(handle_line_timer);
+	TIMER_CALLBACK_MEMBER(de_off_tick);
+	TIMER_CALLBACK_MEMBER(cursor_on);
+	TIMER_CALLBACK_MEMBER(cursor_off);
+	TIMER_CALLBACK_MEMBER(hsync_on);
+	TIMER_CALLBACK_MEMBER(hsync_off);
+	TIMER_CALLBACK_MEMBER(latch_light_pen);
+	TIMER_CALLBACK_MEMBER(adr_update_tick);
+	TIMER_CALLBACK_MEMBER(transparent_update_tick);
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -425,13 +422,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 16; }
+
+	TIMER_CALLBACK_MEMBER(block_copy_tick);
 
 	const address_space_config      m_videoram_space_config;
 
@@ -462,8 +460,6 @@ protected:
 
 	virtual void update_cursor_state() override;
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-
-	static const device_timer_id TIMER_BLOCK_COPY = 9;
 
 	emu_timer *m_block_copy_timer;
 

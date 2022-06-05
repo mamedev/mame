@@ -89,18 +89,17 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
 	virtual void plus3_update_memory() { }
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
 
-	enum
-	{
-		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF // tsconf assumes it last know. if need more add above or fix references in clones
-	};
+	TIMER_CALLBACK_MEMBER(irq_on);
+	TIMER_CALLBACK_MEMBER(irq_off);
+
+	emu_timer *m_irq_on_timer;
+	emu_timer *m_irq_off_timer;
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -120,8 +119,6 @@ protected:
 	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
 	s8 m_contention_offset = -1;
 	u64 m_int_at;
-
-	emu_timer *m_irq_off_timer;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);

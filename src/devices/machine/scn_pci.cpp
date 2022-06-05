@@ -303,7 +303,7 @@ void scn2641_device::device_resolve_objects()
 void scn_pci_device::device_start()
 {
 	// Create timer for baud rate generator
-	m_brg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scn_pci_device::brg_tick), this));
+	m_brg_timer = timer_alloc(FUNC(scn_pci_device::brg_tick), this);
 
 	// Save state
 	save_item(NAME(m_rhr));

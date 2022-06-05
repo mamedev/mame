@@ -31,7 +31,7 @@ public:
 	uint8_t fmscsi_r(offs_t offset);
 	void fmscsi_w(offs_t offset, uint8_t data);
 
-	void set_phase(int phase);
+	TIMER_CALLBACK_MEMBER(set_phase);
 	int get_phase(void);
 	void set_input_line(uint8_t line, uint8_t state);
 	uint8_t get_input_line(uint8_t line);
@@ -42,13 +42,10 @@ protected:
 	// device-level overrides (none are required, but these are common)
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(update_transfer);
 
 private:
-	// internal device state goes here
-	static const device_timer_id TIMER_TRANSFER = 0;
-	static const device_timer_id TIMER_PHASE = 1;
-
 	int get_scsi_cmd_len(uint8_t cbyte);
 	void stop_transfer();
 

@@ -62,6 +62,7 @@ bbc_cartslot_device::bbc_cartslot_device(const machine_config &mconfig, const ch
 #include "bus/electron/cart/abr.h"
 #include "bus/electron/cart/aqr.h"
 #include "click.h"
+#include "mastersd.h"
 #include "mega256.h"
 #include "mr8000.h"
 #include "msc.h"
@@ -73,6 +74,7 @@ void bbcm_cart(device_slot_interface &device)
 	device.option_add_internal("abr", ELECTRON_ABR);
 	device.option_add_internal("aqr", ELECTRON_AQR);
 	device.option_add_internal("click", BBC_CLICK);
+	device.option_add_internal("mastersd", BBC_MASTERSD);
 	device.option_add_internal("mega256", BBC_MEGA256);
 	device.option_add_internal("mr8000", BBC_MR8000);
 	device.option_add_internal("msc", BBC_MSC);

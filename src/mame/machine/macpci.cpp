@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER(macpci_state::mac_adb_via_out_cb2)
 
 void macpci_state::machine_start()
 {
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macpci_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macpci_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 }
 

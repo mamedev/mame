@@ -174,9 +174,6 @@ public:
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
-		//m_i8251_rx_timer(nullptr),
-		//m_i8251_tx_timer(nullptr),
-		//m_sync_timer(nullptr),
 
 		m_capsshift(*this, "CAPSSHIFT"),
 		m_dipsw(*this, "SWITCHES"),
@@ -186,27 +183,50 @@ public:
 		m_basic_led(*this, "basic_led"),
 		m_hardcopy_led(*this, "hardcopy_led"),
 		m_l1_led(*this, "l1_led"),
-		m_l2_led(*this, "l2_led")
+		m_l2_led(*this, "l2_led"),
+		m_vg_timer(nullptr)
+		//m_i8251_rx_timer(nullptr),
+		//m_i8251_tx_timer(nullptr),
+		//m_i8251_sync_timer(nullptr)
 	{
 	}
 
 	void vk100(machine_config &config);
 
-	void init_vk100();
-
 private:
-	enum
-	{
-		TIMER_EXECUTE_VG
-	};
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	void vk100_mem(address_map &map);
+	void vk100_io(address_map &map);
+
+	void vgLD_X(offs_t offset, uint8_t data);
+	void vgLD_Y(offs_t offset, uint8_t data);
+	void vgERR(uint8_t data);
+	void vgSOPS(uint8_t data);
+	void vgPAT(uint8_t data);
+	void vgPMUL(uint8_t data);
+	void vgREG(offs_t offset, uint8_t data);
+	void vgEX(offs_t offset, uint8_t data);
+	void KBDW(uint8_t data);
+	uint8_t vk100_keyboard_column_r(offs_t offset);
+	uint8_t SYSTAT_A(offs_t offset);
+	uint8_t SYSTAT_B();
+
+	TIMER_CALLBACK_MEMBER(execute_vg);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	uint8_t vram_read();
+	uint8_t vram_attr_read();
+	MC6845_UPDATE_ROW(crtc_update_row);
+	void vram_write(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
-	//required_device<> m_i8251_rx_timer;
-	//required_device<> m_i8251_tx_timer;
-	//required_device<> m_sync_timer;
 
 	required_ioport m_capsshift;
 	required_ioport m_dipsw;
@@ -219,6 +239,10 @@ private:
 	output_finder<> m_l1_led;
 	output_finder<> m_l2_led;
 
+	emu_timer* m_vg_timer;
+	//emu_timer* m_i8251_rx_timer;
+	//emu_timer* m_i8251_tx_timer;
+	//emu_timer* m_i8251_sync_timer;
 	uint8_t* m_vram;
 	uint8_t* m_trans;
 	uint8_t* m_pattern;
@@ -248,36 +272,6 @@ private:
 	uint8_t m_ACTS;
 	uint8_t m_ADSR;
 	ioport_port* m_col_array[16];
-
-	void vgLD_X(offs_t offset, uint8_t data);
-	void vgLD_Y(offs_t offset, uint8_t data);
-	void vgERR(uint8_t data);
-	void vgSOPS(uint8_t data);
-	void vgPAT(uint8_t data);
-	void vgPMUL(uint8_t data);
-	void vgREG(offs_t offset, uint8_t data);
-	void vgEX(offs_t offset, uint8_t data);
-	void KBDW(uint8_t data);
-	uint8_t vk100_keyboard_column_r(offs_t offset);
-	uint8_t SYSTAT_A(offs_t offset);
-	uint8_t SYSTAT_B();
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	TIMER_CALLBACK_MEMBER(execute_vg);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
-	uint8_t vram_read();
-	uint8_t vram_attr_read();
-	MC6845_UPDATE_ROW(crtc_update_row);
-	void vram_write(uint8_t data);
-
-	void vk100_io(address_map &map);
-	void vk100_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 // vram access functions:
@@ -347,18 +341,6 @@ void vk100_state::vram_write(uint8_t data)
 	if (VG_WOPS&0x08) block = (block&0x0FFF)|(((uint16_t)VG_WOPS&0xF0)<<8);
 	m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
 	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
-}
-
-void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_EXECUTE_VG:
-		execute_vg(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in vk100_state::device_timer");
-	}
 }
 
 /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
@@ -441,7 +423,11 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		m_vgPAT_Mask >>= 1; // shift the mask
 		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (m_vgGO) timer_set(attotime::from_hz(XTAL(45'619'200)/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO)
+	{
+		// /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+		m_vg_timer->adjust(attotime::from_hz(XTAL(45'619'200)/3/12/2));
+	}
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -564,7 +550,7 @@ void vk100_state::vgEX(offs_t offset, uint8_t data)
 	m_vgDownCount = VG_DU; // set down counter to length of major vector
 	m_VG_MODE = offset&3;
 	m_vgGO = 1;
-	timer_set(attotime::zero, TIMER_EXECUTE_VG);
+	m_vg_timer->adjust(attotime::zero);
 }
 
 
@@ -980,6 +966,12 @@ void vk100_state::machine_start()
 		sprintf(kbdcol,"COL%X", i);
 		m_col_array[i] = ioport(kbdcol);
 	}
+
+	m_vg_timer = timer_alloc(FUNC(vk100_state::execute_vg), this);
+	// TODO: figure out the best way to bring up the i8251 timers
+	//m_i8251_rx_timer = timer_alloc(FUNC(vk100_state::i8251_rx_tick), this);
+	//m_i8251_tx_timer = timer_alloc(FUNC(vk100_state::i8251_tx_tick), this);
+	//m_i8251_sync_timer = timer_alloc(FUNC(vk100_state::i8251_sync), this);
 }
 
 WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
@@ -1003,15 +995,6 @@ WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 	logerror("callback: RTS state changed to %d\n", state);
 	// TODO: only change this during loopback mode!
 	m_ACTS = state;
-}
-
-void vk100_state::init_vk100()
-{
-	// figure out how the heck to initialize the timers here
-	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
-	//m_i8251_tx_timer = timer_alloc(TID_I8251_TX);
-	//m_i8251_sync_timer = timer_alloc(TID_SYNC);
-	//machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
 }
 
 void vk100_state::video_start()
@@ -1290,4 +1273,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME        FLAGS */
-COMP( 1980, vk100, 0,      0,      vk100,   vk100, vk100_state, init_vk100, "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1980, vk100, 0,      0,      vk100,   vk100, vk100_state, empty_init, "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

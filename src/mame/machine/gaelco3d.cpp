@@ -189,6 +189,7 @@ gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const 
 	m_last_in_msg_cnt(0),
 	m_slack_cnt(0),
 	m_sync_timer(nullptr),
+	m_status_set_timer(nullptr),
 	m_in_ptr(nullptr),
 	m_out_ptr(nullptr),
 	m_os_shmem(nullptr),
@@ -206,7 +207,8 @@ void gaelco_serial_device::device_start()
 	assert(strlen(tag()) < 20);
 
 	m_irq_handler.resolve_safe();
-	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::link_cb), this));
+	m_sync_timer = timer_alloc(FUNC(gaelco_serial_device::link_cb), this);
+	m_status_set_timer = timer_alloc(FUNC(gaelco_serial_device::set_status_cb), this);
 
 	/* register for save states */
 	//save_item(NAME(earom->offset));
@@ -239,7 +241,9 @@ void gaelco_serial_device::device_start()
 
 void gaelco_serial_device::device_reset()
 {
-	m_status = GAELCOSER_STATUS_READY    |GAELCOSER_STATUS_IRQ_ENABLE ;
+	m_status_set_timer->adjust(attotime::never);
+
+	m_status = GAELCOSER_STATUS_READY | GAELCOSER_STATUS_IRQ_ENABLE;
 
 	m_last_in_msg_cnt = -1;
 	m_slack_cnt = LINK_SLACK_B;
@@ -274,7 +278,7 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
 
 void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 {
-	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
+	m_status_set_timer->adjust(attotime::from_hz(wait), (mask << 8) | set);
 }
 
 void gaelco_serial_device::process_in()

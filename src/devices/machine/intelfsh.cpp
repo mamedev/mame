@@ -531,7 +531,7 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 void intelfsh_device::device_start()
 {
 	m_data = std::make_unique<uint8_t []>(m_size);
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_flash_mode) );
@@ -541,10 +541,10 @@ void intelfsh_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  delay_tick - handle delayed commands/events
 //-------------------------------------------------
 
-void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 {
 	switch( m_flash_mode )
 	{

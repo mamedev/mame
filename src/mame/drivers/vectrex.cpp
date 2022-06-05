@@ -27,7 +27,7 @@ void vectrex_state::vectrex_map(address_map &map)
 {
 	map(0x0000, 0x7fff).noprw(); // cart area, handled at machine_start
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(vectrex_state::via_r), FUNC(vectrex_state::via_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -106,7 +106,7 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 300);
 	m_screen->set_visarea(0, 399, 0, 299);
-	m_screen->set_screen_update(FUNC(vectrex_base_state::screen_update_vectrex));
+	m_screen->set_screen_update(FUNC(vectrex_base_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -114,18 +114,18 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 
 	AY8912(config, m_ay8912, 6_MHz_XTAL / 4);
 	m_ay8912->port_a_read_callback().set_ioport("BUTTONS");
-	m_ay8912->port_a_write_callback().set(FUNC(vectrex_base_state::vectrex_psg_port_w));
+	m_ay8912->port_a_write_callback().set(FUNC(vectrex_base_state::psg_port_w));
 	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	/* via */
 	MOS6522(config, m_via6522_0, 6_MHz_XTAL / 4);
-	m_via6522_0->readpa_handler().set(FUNC(vectrex_base_state::vectrex_via_pa_r));
-	m_via6522_0->readpb_handler().set(FUNC(vectrex_base_state::vectrex_via_pb_r));
-	m_via6522_0->writepa_handler().set(FUNC(vectrex_base_state::v_via_pa_w));
-	m_via6522_0->writepb_handler().set(FUNC(vectrex_base_state::v_via_pb_w));
-	m_via6522_0->ca2_handler().set(FUNC(vectrex_base_state::v_via_ca2_w));
-	m_via6522_0->cb2_handler().set(FUNC(vectrex_base_state::v_via_cb2_w));
-	m_via6522_0->irq_handler().set(FUNC(vectrex_base_state::vectrex_via_irq));
+	m_via6522_0->readpa_handler().set(FUNC(vectrex_base_state::via_pa_r));
+	m_via6522_0->readpb_handler().set(FUNC(vectrex_base_state::via_pb_r));
+	m_via6522_0->writepa_handler().set(FUNC(vectrex_base_state::via_pa_w));
+	m_via6522_0->writepb_handler().set(FUNC(vectrex_base_state::via_pb_w));
+	m_via6522_0->ca2_handler().set(FUNC(vectrex_base_state::via_ca2_w));
+	m_via6522_0->cb2_handler().set(FUNC(vectrex_base_state::via_cb2_w));
+	m_via6522_0->irq_handler().set(FUNC(vectrex_base_state::via_irq));
 }
 
 void vectrex_state::vectrex(machine_config &config)
@@ -198,7 +198,7 @@ void raaspec_state::raaspec_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0xa000, 0xa000).w(FUNC(raaspec_state::raaspec_led_w));
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(FUNC(raaspec_state::via_r), FUNC(raaspec_state::via_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -229,7 +229,7 @@ void raaspec_state::raaspec(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	m_via6522_0->readpb_handler().set(FUNC(raaspec_state::vectrex_s1_via_pb_r));
+	m_via6522_0->readpb_handler().set(FUNC(raaspec_state::s1_via_pb_r));
 }
 
 ROM_START(raaspec)

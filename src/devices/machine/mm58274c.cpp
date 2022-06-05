@@ -61,9 +61,9 @@ mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag,
 
 void mm58274c_device::device_start()
 {
-	m_increment_rtc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58274c_device::rtc_increment_cb),this));
+	m_increment_rtc = timer_alloc(FUNC(mm58274c_device::rtc_increment_cb), this);
 	m_increment_rtc->adjust(attotime::zero, 0, attotime::from_msec(100));
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58274c_device::rtc_interrupt_cb),this));
+	m_interrupt_timer = timer_alloc(FUNC(mm58274c_device::rtc_interrupt_cb), this);
 
 	// register for state saving
 	save_item(NAME(m_mode24));

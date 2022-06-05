@@ -450,9 +450,9 @@ void bq4847_device::update_int()
 
 void bq4847_device::device_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::update_callback), this));
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::periodic_callback), this));
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::watchdog_callback), this));
+	m_update_timer = timer_alloc(FUNC(bq4847_device::update_callback), this);
+	m_periodic_timer = timer_alloc(FUNC(bq4847_device::periodic_callback), this);
+	m_watchdog_timer = timer_alloc(FUNC(bq4847_device::watchdog_callback), this);
 
 	m_int_handler.resolve_safe();
 	m_wdo_handler.resolve_safe();

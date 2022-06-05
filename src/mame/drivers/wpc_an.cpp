@@ -119,7 +119,26 @@ public:
 	void init_wpc_an();
 
 private:
+	// driver_device overrides
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 	void wpc_an_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(vblank_tick);
+	TIMER_CALLBACK_MEMBER(trigger_irq);
+
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(snd_reply_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(firq_w);
+	uint8_t sound_ctrl_r();
+	void sound_ctrl_w(uint8_t data);
+	uint8_t sound_data_r();
+	void sound_data_w(uint8_t data);
+	void sound_s11_w(uint8_t data);
+	void rombank_w(uint8_t data);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -128,25 +147,6 @@ private:
 	required_memory_bank m_cpubank;
 	required_device<wpc_device> m_wpc;
 	output_finder<32> m_digits;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	static const device_timer_id TIMER_VBLANK = 0;
-	static const device_timer_id TIMER_IRQ = 1;
-
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	uint8_t wpc_sound_ctrl_r();
-	void wpc_sound_ctrl_w(uint8_t data);
-	uint8_t wpc_sound_data_r();
-	void wpc_sound_data_w(uint8_t data);
-	void wpc_sound_s11_w(uint8_t data);
-	void wpc_rombank_w(uint8_t data);
 
 	uint16_t m_vblank_count = 0U;
 	uint32_t m_irq_count = 0U;
@@ -283,56 +283,52 @@ static INPUT_PORTS_START( wpc_an )
 INPUT_PORTS_END
 
 
-void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wpc_an_state::vblank_tick)
 {
-	int x;
-	switch(id)
+	// update LED segments
+	for(int x = 0; x < 16; x++)
 	{
-	case TIMER_VBLANK:
-		// update LED segments
-		for(x=0;x<16;x++)
-		{
-			m_digits[x] = bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-			m_digits[x+16] = bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
-		}
-		m_wpc->reset_alphanumeric();
-		m_vblank_count++;
-		break;
-	case TIMER_IRQ:
-		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
-		break;
+		m_digits[x] = bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+		m_digits[x+16] = bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 	}
+	m_wpc->reset_alphanumeric();
+	m_vblank_count++;
 }
 
-void wpc_an_state::wpc_rombank_w(uint8_t data)
+TIMER_CALLBACK_MEMBER(wpc_an_state::trigger_irq)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+void wpc_an_state::rombank_w(uint8_t data)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpcsnd_reply_w)
+WRITE_LINE_MEMBER(wpc_an_state::snd_reply_w)
 {
 	if(state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpc_irq_w)
+WRITE_LINE_MEMBER(wpc_an_state::irq_w)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpc_firq_w)
+WRITE_LINE_MEMBER(wpc_an_state::firq_w)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
 
-uint8_t wpc_an_state::wpc_sound_ctrl_r()
+uint8_t wpc_an_state::sound_ctrl_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->ctrl_r();  // ack FIRQ?
 	return 0;
 }
 
-void wpc_an_state::wpc_sound_ctrl_w(uint8_t data)
+void wpc_an_state::sound_ctrl_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -343,14 +339,14 @@ void wpc_an_state::wpc_sound_ctrl_w(uint8_t data)
 		m_wpcsnd->ctrl_w(data);
 }
 
-uint8_t wpc_an_state::wpc_sound_data_r()
+uint8_t wpc_an_state::sound_data_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->data_r();
 	return 0;
 }
 
-void wpc_an_state::wpc_sound_data_w(uint8_t data)
+void wpc_an_state::sound_data_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -361,7 +357,7 @@ void wpc_an_state::wpc_sound_data_w(uint8_t data)
 		m_wpcsnd->data_w(data);
 }
 
-void wpc_an_state::wpc_sound_s11_w(uint8_t data)
+void wpc_an_state::sound_s11_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -409,9 +405,9 @@ void wpc_an_state::init_wpc_an()
 	m_cpubank->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 	m_cpubank->set_entry(0);
 
-	m_vblank_timer = timer_alloc(TIMER_VBLANK);
+	m_vblank_timer = timer_alloc(FUNC(wpc_an_state::vblank_tick), this);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(wpc_an_state::trigger_irq), this);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
 
 	m_bankmask = ((memregion("maincpu")->bytes()-0x10000) >> 14) - 1;
@@ -429,14 +425,14 @@ void wpc_an_state::wpc_an_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
 
 	WPCASIC(config, m_wpc, 0);
-	m_wpc->irq_callback().set(FUNC(wpc_an_state::wpc_irq_w));
-	m_wpc->firq_callback().set(FUNC(wpc_an_state::wpc_firq_w));
-	m_wpc->bank_write().set(FUNC(wpc_an_state::wpc_rombank_w));
-	m_wpc->sound_ctrl_read().set(FUNC(wpc_an_state::wpc_sound_ctrl_r));
-	m_wpc->sound_ctrl_write().set(FUNC(wpc_an_state::wpc_sound_ctrl_w));
-	m_wpc->sound_data_read().set(FUNC(wpc_an_state::wpc_sound_data_r));
-	m_wpc->sound_data_write().set(FUNC(wpc_an_state::wpc_sound_data_w));
-	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::wpc_sound_s11_w));
+	m_wpc->irq_callback().set(FUNC(wpc_an_state::irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_an_state::firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_an_state::rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_an_state::sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_an_state::sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_an_state::sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_an_state::sound_data_w));
+	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::sound_s11_w));
 
 	config.set_default_layout(layout_wpc_an);
 }
@@ -448,7 +444,7 @@ void wpc_an_state::wpc_an(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	WPCSND(config, m_wpcsnd);
 	m_wpcsnd->set_romregion("sound1");
-	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::wpcsnd_reply_w));
+	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

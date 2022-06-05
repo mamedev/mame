@@ -89,7 +89,7 @@ mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t 
 void mie_device::device_start()
 {
 	maple_device::device_start();
-	timer = timer_alloc(0);
+	timer = timer_alloc(FUNC(mie_device::update_irq_reply), this);
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));
@@ -143,16 +143,15 @@ void mie_device::control_w(offs_t offset, uint8_t data)
 	}
 }
 
-void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mie_device::update_irq_reply)
 {
-	timer->adjust(attotime::never);
 	if(control & CTRL_RXB) {
 		control &= ~CTRL_RXB;
 		control |= CTRL_RFB;
 		raise_irq(maple_irqlevel);
 	}
 	if(control & (CTRL_TXB|CTRL_CTXB)) {
-		reply_ready();
+		reply_ready(0);
 		lreg -= reply_size;
 		if(reply_partial) {
 			control &= ~CTRL_CTXB;
@@ -312,7 +311,7 @@ void mie_device::lreg_w(uint8_t data)
 
 uint8_t mie_device::jvs_r()
 {
-	if (jvs_lcr & 0x80)
+	if(jvs_lcr & 0x80)
 		return 0;
 
 	const uint8_t *buf;
@@ -325,7 +324,7 @@ uint8_t mie_device::jvs_r()
 
 void mie_device::jvs_w(uint8_t data)
 {
-	if (jvs_lcr & 0x80)
+	if(jvs_lcr & 0x80)
 		return;
 
 	jvs->push(data);

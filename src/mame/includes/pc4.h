@@ -28,12 +28,10 @@ public:
 	void pc4(machine_config &config);
 
 protected:
-	static const device_timer_id BUSY_TIMER = 0;
-	static const device_timer_id BLINKING_TIMER = 1;
-
 	virtual void machine_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
+	TIMER_CALLBACK_MEMBER(blink_tick);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

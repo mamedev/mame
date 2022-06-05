@@ -49,6 +49,7 @@ public:
 		m_custom_map(nullptr),
 		m_shangon_video(false),
 		m_scanline_timer(nullptr),
+		m_irq2_gen_timer(nullptr),
 		m_irq2_state(0),
 		m_adc_select(0),
 		m_vblank_irq_state(0),
@@ -108,18 +109,12 @@ protected:
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
 
-	// timer IDs
-	enum
-	{
-		TID_SCANLINE,
-		TID_IRQ2_GEN,
-		TID_SOUND_WRITE
-	};
-
 	// device overrides
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	// internal helpers
 	void update_main_irqs();
@@ -155,14 +150,14 @@ protected:
 	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
-	read16m_delegate   m_custom_io_r;
+	read16m_delegate    m_custom_io_r;
 	write16s_delegate   m_custom_io_w;
 	const uint8_t *     m_custom_map;
 	bool                m_shangon_video;
 
 	// internal state
 	emu_timer *         m_scanline_timer;
-	emu_timer *         m_irq2_gen_timer = nullptr;
+	emu_timer *         m_irq2_gen_timer;
 	uint8_t             m_irq2_state;
 	uint8_t             m_adc_select;
 	uint8_t             m_vblank_irq_state;

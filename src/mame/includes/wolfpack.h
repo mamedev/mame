@@ -33,10 +33,21 @@ public:
 	template <int Bit> DECLARE_READ_LINE_MEMBER(dial_r);
 
 private:
-	enum
-	{
-		TIMER_PERIODIC
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void main_map(address_map &map);
+
+	void wolfpack_palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	TIMER_CALLBACK_MEMBER(periodic_callback);
+	void draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t misc_r();
 	void high_explo_w(uint8_t data);
@@ -66,22 +77,6 @@ private:
 	void torpedo_v_w(uint8_t data);
 	void word_w(uint8_t data);
 	void start_speech_w(uint8_t data);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	void wolfpack_palette(palette_device &palette) const;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	TIMER_CALLBACK_MEMBER(periodic_callback);
-	void draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void main_map(address_map &map);
 
 	// devices, pointers
 	required_shared_ptr<uint8_t> m_alpha_num_ram;

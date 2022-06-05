@@ -90,49 +90,25 @@ public:
 		m_tape_in_latch(1)
 	{ }
 
+	void abc80(machine_config &config);
+	void abc80_video(machine_config &config);
+
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	required_device<z80_device> m_maincpu;
-	required_device<z80pio_device> m_pio;
-	required_device<sn76477_device> m_csg;
-	required_device<cassette_image_device> m_cassette;
-	required_device<abcbus_slot_device> m_bus;
-	required_device<abc80_keyboard_device> m_kb;
-	required_device<ram_device> m_ram;
-	required_device<rs232_port_device> m_rs232;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	required_memory_region m_rom;
-	required_memory_region m_mmu_rom;
-	required_memory_region m_char_rom;
-	required_memory_region m_hsync_prom;
-	required_memory_region m_vsync_prom;
-	required_memory_region m_line_prom;
-	required_memory_region m_attr_prom;
-	memory_share_creator<uint8_t> m_video_ram;
-
-	enum
-	{
-		TIMER_ID_SCANLINE,
-		TIMER_ID_CASSETTE,
-		TIMER_ID_BLINK,
-		TIMER_ID_VSYNC_ON,
-		TIMER_ID_VSYNC_OFF,
-		TIMER_ID_FAKE_KEYBOARD_CLEAR
-	};
-
-	enum
-	{
-		BOFA = 0xfe1c,
-		EOFA = 0xfe1e,
-		HEAD = 0xfe20
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
+protected:
 	virtual void machine_start() override;
-
 	virtual void video_start() override;
+
+	void abc80_mem(address_map &map);
+	void abc80_io(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(scanline_tick);
+	TIMER_CALLBACK_MEMBER(cassette_update);
+	TIMER_CALLBACK_MEMBER(blink_tick);
+	TIMER_CALLBACK_MEMBER(vsync_on);
+	TIMER_CALLBACK_MEMBER(vsync_off);
+	TIMER_CALLBACK_MEMBER(clear_keyboard);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void draw_scanline(bitmap_rgb32 &bitmap, int y);
@@ -154,11 +130,37 @@ public:
 
 	enum
 	{
+		BOFA = 0xfe1c,
+		EOFA = 0xfe1e,
+		HEAD = 0xfe20
+	};
+
+	enum
+	{
 		MMU_XM      = 0x01,
 		MMU_ROM     = 0x02,
 		MMU_VRAMS   = 0x04,
 		MMU_RAM     = 0x08
 	};
+
+	required_device<z80_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
+	required_device<sn76477_device> m_csg;
+	required_device<cassette_image_device> m_cassette;
+	required_device<abcbus_slot_device> m_bus;
+	required_device<abc80_keyboard_device> m_kb;
+	required_device<ram_device> m_ram;
+	required_device<rs232_port_device> m_rs232;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_memory_region m_rom;
+	required_memory_region m_mmu_rom;
+	required_memory_region m_char_rom;
+	required_memory_region m_hsync_prom;
+	required_memory_region m_vsync_prom;
+	required_memory_region m_line_prom;
+	required_memory_region m_attr_prom;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	// keyboard state
 	int m_key_data = 0;
@@ -184,10 +186,7 @@ public:
 	emu_timer *m_blink_timer = nullptr;
 	emu_timer *m_vsync_on_timer = nullptr;
 	emu_timer *m_vsync_off_timer = nullptr;
-	void abc80(machine_config &config);
-	void abc80_video(machine_config &config);
-	void abc80_io(address_map &map);
-	void abc80_mem(address_map &map);
+	emu_timer *m_keyboard_clear_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_ABC80_H

@@ -96,15 +96,7 @@ public:
 	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000; accessed by a static function in machine/amstrad.cpp
 
 protected:
-	enum
-	{
-		TIMER_PC2_LOW,
-		TIMER_VIDEO_UPDATE,
-		TIMER_SET_RESOLUTION
-	};
-
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -122,6 +114,10 @@ private:
 	int m_system_type = 0;
 	uint8_t m_aleste_mode = 0;
 	int m_plus_irq_cause = 0;
+
+	emu_timer *m_pc2_low_timer = nullptr;
+	emu_timer *m_video_update_timer = nullptr;
+	emu_timer *m_set_resolution_timer = nullptr;
 
 /****************************
  * Gate Array data (CPC) -
@@ -213,6 +209,7 @@ private:
 	unsigned char m_Psg_FunctionSelected = 0;
 	int m_previous_ppi_portc_w = 0;
 	uint8_t m_amx_mouse_data = 0;
+	void alloc_timers();
 	void amstrad_plus_asic_4000_w(offs_t offset, uint8_t data);
 	void amstrad_plus_asic_6000_w(offs_t offset, uint8_t data);
 	uint8_t amstrad_plus_asic_4000_r(offs_t offset);

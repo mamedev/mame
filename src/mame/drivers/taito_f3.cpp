@@ -424,16 +424,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(taito_f3_state::trigger_int3)
 {
-	switch (id)
-	{
-	case TIMER_F3_INTERRUPT3:
-		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in taito_f3_state::device_timer");
-	}
+	m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::interrupt2)
@@ -444,7 +437,7 @@ INTERRUPT_GEN_MEMBER(taito_f3_state::interrupt2)
 
 void taito_f3_state::machine_start()
 {
-	m_interrupt3_timer = timer_alloc(TIMER_F3_INTERRUPT3);
+	m_interrupt3_timer = timer_alloc(FUNC(taito_f3_state::trigger_int3), this);
 
 	save_item(NAME(m_coin_word));
 }

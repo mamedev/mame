@@ -149,13 +149,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int1_w);
 	DECLARE_WRITE_LINE_MEMBER(int2_w);
 
+	TIMER_CALLBACK_MEMBER(timer0_callback);
+	TIMER_CALLBACK_MEMBER(rx_callback);
+	TIMER_CALLBACK_MEMBER(tx_callback);
+
 	// external callbacks
 	void uart_rx(uint8_t data);
 	void uart_ctsn(int state);
-
-	void timer0_callback();
-	void rx_callback();
-	void tx_callback();
 
 	// register structures
 	struct i2c_regs_t
@@ -264,7 +264,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
@@ -276,10 +275,6 @@ protected:
 private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
-
-	static constexpr device_timer_id TIMER_TMR0 = 0;
-	static constexpr device_timer_id TIMER_UART_RX = 1;
-	static constexpr device_timer_id TIMER_UART_TX = 2;
 
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);

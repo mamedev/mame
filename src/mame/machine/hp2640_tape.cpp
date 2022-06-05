@@ -45,10 +45,11 @@
 #include "hp2640_tape.h"
 
 // Debugging
-#include "logmacro.h"
-#undef VERBOSE
-#define VERBOSE 0
+
 //#define VERBOSE (LOG_GENERAL)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // Bit manipulation
 namespace {
@@ -67,12 +68,6 @@ namespace {
 		w |= BIT_MASK<T>(n);
 	}
 }
-
-// Timers
-enum {
-	GAP_TMR_ID,
-	CELL_TMR_ID
-};
 
 // Constants
 constexpr double FAST_SPEED = 60.0;             // Fast speed: 60 ips
@@ -258,8 +253,8 @@ void hp2640_tape_device::device_start()
 	m_led0_handler.resolve_safe();
 	m_led1_handler.resolve_safe();
 
-	m_gap_timer = timer_alloc(GAP_TMR_ID);
-	m_cell_timer = timer_alloc(CELL_TMR_ID);
+	m_gap_timer = timer_alloc(FUNC(hp2640_tape_device::gap_timer_tick), this);
+	m_cell_timer = timer_alloc(FUNC(hp2640_tape_device::cell_timer_tick), this);
 
 	save_item(NAME(m_selected_drive));
 	save_item(NAME(m_cmd_reg));
@@ -311,37 +306,33 @@ void hp2640_tape_device::device_reset()
 	m_cell_timer->reset();
 }
 
-void hp2640_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp2640_tape_device::gap_timer_tick)
 {
-	LOG("TMR %d @%s\n" , id , machine().time().to_string());
+	LOG("TMR 0 @%s\n", machine().time().to_string());
 
-	switch (id) {
-	case GAP_TMR_ID:
-		m_gap = !m_gap;
-		if (m_gap) {
-			set_gap();
+	m_gap = !m_gap;
+	if (m_gap) {
+		set_gap();
+	} else {
+		LOG("GAP ENDS\n");
+		load_gap_timer();
+		if (m_isf) {
+			load_modulus();
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hp2640_tape_device::cell_timer_tick)
+{
+	LOG("TMR 1 @%s\n", machine().time().to_string());
+
+	if (m_current_op == hp_dc100_tape_device::OP_READ) {
+		m_cell_cnt++;
+		if (m_cell_cnt == 15) {
+			restart_cell_cnt();
 		} else {
-			LOG("GAP ENDS\n");
-			load_gap_timer();
-			if (m_isf) {
-				load_modulus();
-			}
+			load_modulus();
 		}
-		break;
-
-	case CELL_TMR_ID:
-		if (m_current_op == hp_dc100_tape_device::OP_READ) {
-			m_cell_cnt++;
-			if (m_cell_cnt == 15) {
-				restart_cell_cnt();
-			} else {
-				load_modulus();
-			}
-		}
-		break;
-
-	default:
-		break;
 	}
 }
 

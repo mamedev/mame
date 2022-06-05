@@ -1653,7 +1653,7 @@ void tms5220_device::device_start()
 	/* initialize a stream */
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
-	m_timer_io_ready = timer_alloc(0);
+	m_timer_io_ready = timer_alloc(FUNC(tms5220_device::set_io_ready), this);
 
 	/* not during reset which is called from within a write! */
 	m_io_ready = true;
@@ -1729,60 +1729,49 @@ void tms5220_device::device_reset()
 
 }
 
-/**********************************************************************************************
-
-     True timing
-
-***********************************************************************************************/
-
-void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
 {
-	switch(id)
+	/* bring up to date first */
+	m_stream->update();
+	LOGMASKED(LOG_IO_READY, "m_timer_io_ready timer fired, param = %02x, m_rs_ws = %02x\n", param, m_rs_ws);
+	if (param) // low->high ready state
 	{
-	case 0: // m_timer_io_ready
-		/* bring up to date first */
-		m_stream->update();
-		LOGMASKED(LOG_IO_READY, "m_timer_io_ready timer fired, param = %02x, m_rs_ws = %02x\n", param, m_rs_ws);
-		if (param) // low->high ready state
+		switch (m_rs_ws)
 		{
-			switch (m_rs_ws)
+		case 0x02:
+			/* Write */
+			LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Attempting to service write...\n");
+			if ((m_fifo_count >= FIFO_SIZE) && m_DDIS) // if FIFO is full and we're in speak external mode
 			{
-			case 0x02:
-				/* Write */
-				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Attempting to service write...\n");
-				if ((m_fifo_count >= FIFO_SIZE) && m_DDIS) // if FIFO is full and we're in speak external mode
-				{
-					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: in SPKEXT and FIFO was full! cannot service write now, delaying 16 cycles...\n");
-					m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
-					break;
-				}
-				else
-				{
-					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
-					data_write(m_write_latch);
-					m_io_ready = param;
-					break;
-				}
-			case 0x01:
-				/* Read */
-				m_read_latch = status_read(true);
-				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02x\n", m_read_latch);
-				m_io_ready = param;
+				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: in SPKEXT and FIFO was full! cannot service write now, delaying 16 cycles...\n");
+				m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
 				break;
-			case 0x03:
-				/* High Impedance */
-				m_io_ready = param;
-				break;
-			case 0x00:
-				/* illegal */
+			}
+			else
+			{
+				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
+				data_write(m_write_latch);
 				m_io_ready = param;
 				break;
 			}
+		case 0x01:
+			/* Read */
+			m_read_latch = status_read(true);
+			LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02x\n", m_read_latch);
+			m_io_ready = param;
+			break;
+		case 0x03:
+			/* High Impedance */
+			m_io_ready = param;
+			break;
+		case 0x00:
+			/* illegal */
+			m_io_ready = param;
+			break;
 		}
-
-		update_ready_state();
-		break;
 	}
+
+	update_ready_state();
 }
 
 /*

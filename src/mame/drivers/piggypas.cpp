@@ -278,6 +278,30 @@ ROM_START( fidlstix )
 ROM_END
 
 /*
+ _________________________________________________________________________________________________________________
+| _______________________________  ||||||||  ||||    ||||   ||||||  ||||||| |||   ||||||||||                     |
+||                              |  ___ ___ ___ ___    ___     ___   ___ ___  ___  ___ ___ ___                    |
+|| Screen                       | |__||__||__||__|   |__|    |__|  |__||__| |__| |__||__| |__| <- 12 x EPA120    |
+||                              |   ____  ____  ____  ____                                                       |
+||______________________________|  |   | |   | |   | |   |          _________   _________   _________            |
+|                                  |___| |___| |___| |___|         |UDN2595A|  |ILQ621GB|  |ILQ621GB|   ____     |
+|                8 keys keyboard -> ____  ____  ____  ____                                             (____)    |
+|                                  |   | |   | |   | |   |          _________   _________              L7805CT   |
+|                                  |___| |___| |___| |___|         |SN74LS374  |SN74LS374                        |
+|      ______           ______    ___                                                                            |
+|     |     |          |     |   |  <-SN74LS373N   ___     ___    ______   _________             _____           |
+|     |  <-UCN5833A    |     |   |  |     ILQ621GB-> |    |  |   | OKI |   SN74LS04N     ______  LM317T ___      |
+|     |     | ___  M80C31F-> |   |  |             ILQ621GB-> |   |M82C55A               |EPROM|         EPA120   |
+| ___ |     ||  |  ___ |     |   |__|             |__|    |__|   |     |        _______ |     |         ___     -|
+||<-MDP1403 ||  | |_<-DS1232 |    ______             ___   ___   |     |       | OKI  | |     |         EPA120  -|
+||  | |MDP1403->|      |     |   |EPROM|  _______   |  |  |  |   |     |       | M6295| |     |         ___     -|
+||__| |     | ___      |     |   |     | |DS1220AD  | <-T74LS138B1     |       |______| |     |         EPA120   |
+| ___ |MDP1403->| ____ |     |   |     | |      |   |__|  |_<-T74LS138B1            ___ |     |            ___  -|
+||<-MDP1403 ||  | Xtal |     |   |     | |      |   _________    |     |           |  | |_____|         EPA120  -|
+||  | |_____||__|8.448MHz____|   |     | |      |   SN74LS08N    |     |   BA10324A-> |    ___          ___      |
+||__|   _______                  |_____| |      |                |_____|           |__|   |  |         |  |      |
+|      74HC393AP                         |______|                                 LM388N-1->_| LM388N-1->_|      |
+|________________________________________________________________________________________________________________|
 
 8.448MHz Crystal
 P-80C31-16 cpu
@@ -292,18 +316,13 @@ HD44780A00 (underneath board the LCD is mounted to)
 
 Factory Wire Mods
 
-
 Parts Side:
-
-    - Pin 1 of U25 (74LS373) pulled up and jumper wired to pin 5 of U2 (CM1232P)
+    - Pin 1 of U25 (74LS373) pulled up and jumper wired to pin 5 of U2 (CM1232P/DS1232)
 
 Solder Side:
-
     - Ground test point near C32 jumper wired to pin 2 of J8
-      (pin 2 of J8 connected to pins 5 and 6 of L6 (CM1232P))
-
+      (pin 2 of J8 connected to pins 5 and 6 of L6 (CM1232P/DS1232))
     - Pin 1 of J1 jumper wired with a 1K +/-5% 1/4 watt resistor to pin 10 of J1
-
 */
 ROM_START( hoopitup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -311,6 +330,14 @@ ROM_START( hoopitup )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sound ad5.u14", 0x00000, 0x40000, CRC(e6f647c3) SHA1(8f208af76e5f94b5db479ecbd65922fd834250cf) )
+ROM_END
+
+ROM_START( hoopitup21 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "program.u6", 0x00000, 0x08000, CRC(17508556) SHA1(32a4ba732bb6efccb2ce89696f80a8265306b079) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sound.u14", 0x00000, 0x40000, CRC(cf3eb5ef) SHA1(0ac06f87ab75986d2ca6f8cb80d6ae7bd964e54f) )
 ROM_END
 
 // bad dump of program rom
@@ -342,21 +369,21 @@ ROM_END
 
 
 
-
-
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
-GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1992, piggypas,   0,    piggypas, piggypas, piggypas_state,     empty_init, ROT0, "Doyle & Assoc.",               "Piggy Pass (version 04.40)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
-GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1992, hoopshot,   0,    piggypas, piggypas, piggypas_state,     empty_init, ROT0, "Doyle & Assoc.",               "Hoop Shot (version 05.22)",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-//  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1996, rndrndqs,   0,    fidlstix, piggypas, piggypas_state,     empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+// Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
+GAME( 1995, fidlstix,   0,    fidlstix, piggypas, piggypas_state,     empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)",                   MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // Quick $ilver   Development Co.    11/20/95     HoopItUp REV 23
-GAME( 1995, hoopitup,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Atari Games", "Hoop it Up World Tour - 3 on 3 (Rev 23)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1995, hoopitup,   0,    fidlstix, piggypas, piggypas_state,     empty_init, ROT0, "Atari Games",                  "Hoop it Up World Tour - 3 on 3 (Rev 23)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+// Quick $ilver   Development Co.    07/25/95     HoopItUp REV 21
+GAME( 1995, hoopitup21, hoopitup, fidlstix, piggypas, piggypas_state, empty_init, ROT0, "Atari Games",                  "Hoop it Up World Tour - 3 on 3 (Rev 21)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 199?, jackbean,   0,    piggypas, piggypas, piggypas_state,     empty_init, ROT0, "Doyle & Assoc.",               "Jack & The Beanstalk (Doyle & Assoc.?)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 199?, dumpump,    0,    piggypas, piggypas, piggypas_state,     empty_init, ROT0, "Doyle & Assoc.",               "Dump The Ump",                            MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 199?, 3lilpigs,   0,    piggypas, piggypas, piggypas_state,     empty_init, ROT0,                                 "Doyle & Assoc.", "3 Lil' Pigs",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

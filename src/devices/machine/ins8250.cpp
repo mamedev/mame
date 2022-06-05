@@ -689,7 +689,7 @@ void ins8250_uart_device::device_reset()
 
 void ns16550_device::device_start()
 {
-	m_timeout = timer_alloc();
+	m_timeout = timer_alloc(FUNC(ns16550_device::timeout_expired), this);
 	ins8250_uart_device::device_start();
 	save_item(NAME(m_rintlvl));
 	save_item(NAME(m_rfifo));
@@ -713,13 +713,10 @@ void ns16550_device::device_reset()
 	ins8250_uart_device::device_reset();
 }
 
-void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ns16550_device::timeout_expired)
 {
-	if(!id)
-	{
-		trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
-		m_timeout->adjust(attotime::never);
-	}
+	trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
+	m_timeout->adjust(attotime::never);
 }
 
 void ns16550_device::push_tx(u8 data)

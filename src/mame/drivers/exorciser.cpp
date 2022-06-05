@@ -168,11 +168,6 @@ public:
 		, m_floppy3(*this, "floppy3")
 	{ }
 
-	enum
-	{
-		TIMER_TRACE,
-	};
-
 	void exorciser(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
@@ -221,7 +216,8 @@ private:
 
 	u8 m_restart_count;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	emu_timer *m_trace_timer;
+	TIMER_CALLBACK_MEMBER(assert_trace);
 
 	void pia_dbg_pa_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia_dbg_ca1_r);
@@ -509,16 +505,9 @@ WRITE_LINE_MEMBER(exorciser_state::pia_dbg_ca2_w)
 }
 
 
-void exorciser_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(exorciser_state::assert_trace)
 {
-	switch (id)
-	{
-	case TIMER_TRACE:
-		m_mainnmi->input_merger_device::in_w<1>(ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in exorciser_state::device_timer");
-	}
+	m_mainnmi->input_merger_device::in_w<1>(ASSERT_LINE);
 }
 
 // Note the trace timer delay is actually 11 cycles, but is stretched to 16
@@ -534,7 +523,7 @@ WRITE_LINE_MEMBER(exorciser_state::pia_dbg_cb2_w)
 		if (!maincpu_clock)
 			maincpu_clock = 10000000;
 
-		timer_set(attotime::from_ticks(16, maincpu_clock), TIMER_TRACE);
+		m_trace_timer->adjust(attotime::from_ticks(16, maincpu_clock));
 	}
 	else
 		m_mainnmi->input_merger_device::in_w<1>(CLEAR_LINE);
@@ -627,6 +616,8 @@ void exorciser_state::machine_start()
 	save_item(NAME(m_stop_enabled));
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_data_ready));
+
+	m_trace_timer = timer_alloc(FUNC(exorciser_state::assert_trace), this);
 }
 
 static DEVICE_INPUT_DEFAULTS_START(exorterm)

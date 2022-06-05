@@ -15513,7 +15513,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- The Limited Edition shares the same disc as the regular edition but includes a sticker sheet. -->
-	 <software name="gundambo">
+	<software name="gundambo">
 		<!--
 		<rom name="Gundam Battle Online v1.006 (2001)(Bandai)(NTSC)(JP)[!][T-13304M-0719 2M3].gdi" size="149" md5="928106e4e4e93e38f9bd99aafc5d0649" sha1="9410768ca30d25a4ec88bb8c381b9021c60ae0fc"/>
 		<rom name="track01.bin" size="1058400" md5="7fe43b9a30b1bb29002fef68a3bd5e81" sha1="6a17626a960764c426497c3a8cb4b793c2809ae2"/>
@@ -22955,7 +22955,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--  Both the German/French/Italian (T-9502D-87) and English/Spanish/Dutch (T-9502D-76) release share the same disc (T-9502D-50). -->
+	<!-- Both the German/French/Italian (T-9502D-87) and English/Spanish/Dutch (T-9502D-76) release share the same disc (T-9502D-50). -->
 	<software name="ncreatr2e" cloneof="ncreatr2">
 		<!--
 		<rom name="Nightmare Creatures II v1.004 (2000)(Konami)(PAL)(M4)[!].gdi" size="2867" md5="50ea8dc03d7912d790afcef93190854f" sha1="a86dbd67794c8354f65c823356385d54bafb9f4a"/>

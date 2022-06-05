@@ -28,7 +28,7 @@ void znmcu_device::device_start()
 	m_dataout_handler.resolve_safe();
 	m_dsr_handler.resolve_safe();
 
-	m_mcu_timer = timer_alloc(0);
+	m_mcu_timer = timer_alloc(FUNC(znmcu_device::mcu_tick), this);
 
 	m_dataout_handler(1);
 	m_dsr_handler(1);
@@ -96,7 +96,7 @@ WRITE_LINE_MEMBER(znmcu_device::write_clock)
 	}
 }
 
-void znmcu_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(znmcu_device::mcu_tick)
 {
 	m_dsr_handler(param);
 

@@ -190,7 +190,7 @@ protected:
 	uint16_t hdds3_xdsp_control_r(offs_t offset);
 	void hdds3_xdsp_control_w(offs_t offset, uint16_t data);
 
-	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
+	TIMER_CALLBACK_MEMBER( xdsp_sport1_irq_off_callback );
 
 	uint16_t hdgsp_control_lo_r(offs_t offset);
 	void hdgsp_control_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -306,18 +306,18 @@ protected:
 	output_finder<4> m_sel;
 	output_finder<> m_wheel;
 
-	uint8_t                   m_hd34010_host_access = 0;
+	uint8_t                 m_hd34010_host_access = 0;
 
 	optional_shared_ptr<uint16_t> m_msp_ram;
 
-	uint16_t *                m_dsk_ram = nullptr;
-	uint16_t *                m_dsk_rom = nullptr;
+	uint16_t *              m_dsk_ram = nullptr;
+	uint16_t *              m_dsk_rom = nullptr;
 	optional_device<eeprom_parallel_28xx_device> m_dsk_10c;
 	optional_device<eeprom_parallel_28xx_device> m_dsk_30c;
-	uint8_t                   m_dsk_pio_access = 0;
+	uint8_t                 m_dsk_pio_access = 0;
 
-	uint16_t *                m_m68k_sloop_base = nullptr;
-	uint16_t *                m_m68k_sloop_alt_base = nullptr;
+	uint16_t *              m_m68k_sloop_base = nullptr;
+	uint16_t *              m_m68k_sloop_alt_base = nullptr;
 
 	required_device<timekeeper_device> m_200e;
 	required_device<eeprom_parallel_28xx_device> m_210e;
@@ -331,25 +331,25 @@ protected:
 
 	optional_shared_ptr<uint32_t> m_dsp32_ram;
 
-	uint16_t *                m_gsp_protection = nullptr;
+	uint16_t *              m_gsp_protection = nullptr;
 
-	uint16_t *                m_gsp_speedup_addr[2]{};
+	uint16_t *              m_gsp_speedup_addr[2]{};
 	offs_t                  m_gsp_speedup_pc = 0;
 
-	uint16_t *                m_msp_speedup_addr = nullptr;
+	uint16_t *              m_msp_speedup_addr = nullptr;
 	offs_t                  m_msp_speedup_pc = 0;
 
-	uint16_t *                m_ds3_speedup_addr = nullptr;
+	uint16_t *              m_ds3_speedup_addr = nullptr;
 	offs_t                  m_ds3_speedup_pc = 0;
 	offs_t                  m_ds3_transfer_pc = 0;
 
-	uint32_t *                m_rddsp32_sync[2]{};
+	uint32_t *              m_rddsp32_sync[2]{};
 
-	uint32_t                  m_gsp_speedup_count[4]{};
-	uint32_t                  m_msp_speedup_count[4]{};
-	uint32_t                  m_adsp_speedup_count[4]{};
+	uint32_t                m_gsp_speedup_count[4]{};
+	uint32_t                m_msp_speedup_count[4]{};
+	uint32_t                m_adsp_speedup_count[4]{};
 
-	uint8_t                   m_gsp_multisync = 0;
+	uint8_t                 m_gsp_multisync = 0;
 	optional_shared_ptr<uint16_t>  m_gsp_vram;
 	optional_shared_ptr<uint16_t>  m_gsp_control_lo;
 	optional_shared_ptr<uint16_t>  m_gsp_control_hi;
@@ -362,97 +362,98 @@ protected:
 	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
-	uint8_t                   m_irq_state = 0;
-	uint8_t                   m_gsp_irq_state = 0;
-	uint8_t                   m_msp_irq_state = 0;
-	uint8_t                   m_adsp_irq_state = 0;
-	uint8_t                   m_ds3sdsp_irq_state = 0;
-	uint8_t                   m_duart_irq_state = 0;
+	uint8_t                 m_irq_state = 0;
+	uint8_t                 m_gsp_irq_state = 0;
+	uint8_t                 m_msp_irq_state = 0;
+	uint8_t                 m_adsp_irq_state = 0;
+	uint8_t                 m_ds3sdsp_irq_state = 0;
+	uint8_t                 m_duart_irq_state = 0;
 
-	uint8_t                   m_last_gsp_shiftreg = 0;
+	uint8_t                 m_last_gsp_shiftreg = 0;
 
-	uint8_t                   m_m68k_zp1 = 0;
-	uint8_t                   m_m68k_zp2 = 0;
-	uint8_t                   m_m68k_adsp_buffer_bank = 0;
+	uint8_t                 m_m68k_zp1 = 0;
+	uint8_t                 m_m68k_zp2 = 0;
+	uint8_t                 m_m68k_adsp_buffer_bank = 0;
 
-	uint8_t                   m_adsp_halt = 0;
-	uint8_t                   m_adsp_br = 0;
-	uint8_t                   m_adsp_xflag = 0;
-	uint16_t                  m_adsp_sim_address = 0;
-	uint16_t                  m_adsp_som_address = 0;
-	uint32_t                  m_adsp_eprom_base = 0;
+	uint8_t                 m_adsp_halt = 0;
+	uint8_t                 m_adsp_br = 0;
+	uint8_t                 m_adsp_xflag = 0;
+	uint16_t                m_adsp_sim_address = 0;
+	uint16_t                m_adsp_som_address = 0;
+	uint32_t                m_adsp_eprom_base = 0;
 
 	required_region_ptr<uint16_t> m_sim_memory;
-	uint16_t                  m_som_memory[0x8000/2]{};
-	uint16_t *                m_adsp_pgm_memory_word = 0;
+	uint16_t                m_som_memory[0x8000/2]{};
+	uint16_t *              m_adsp_pgm_memory_word = 0;
 
-	uint16_t *                m_ds3_sdata_memory = 0;
-	uint32_t                  m_ds3_sdata_memory_size = 0;
+	uint16_t *              m_ds3_sdata_memory = 0;
+	uint32_t                m_ds3_sdata_memory_size = 0;
 
-	uint8_t                   m_ds3_gcmd = 0;
-	uint8_t                   m_ds3_gflag = 0;
-	uint8_t                   m_ds3_g68irqs = 0;
-	uint8_t                   m_ds3_gfirqs = 0;
-	uint8_t                   m_ds3_g68flag = 0;
-	uint8_t                   m_ds3_send = 0;
-	uint8_t                   m_ds3_reset = 0;
-	uint16_t                  m_ds3_gdata = 0;
-	uint16_t                  m_ds3_g68data = 0;
-	uint32_t                  m_ds3_sim_address = 0;
+	uint8_t                 m_ds3_gcmd = 0;
+	uint8_t                 m_ds3_gflag = 0;
+	uint8_t                 m_ds3_g68irqs = 0;
+	uint8_t                 m_ds3_gfirqs = 0;
+	uint8_t                 m_ds3_g68flag = 0;
+	uint8_t                 m_ds3_send = 0;
+	uint8_t                 m_ds3_reset = 0;
+	uint16_t                m_ds3_gdata = 0;
+	uint16_t                m_ds3_g68data = 0;
+	uint32_t                m_ds3_sim_address = 0;
 
-	uint8_t                   m_ds3_scmd = 0;
-	uint8_t                   m_ds3_sflag = 0;
-	uint8_t                   m_ds3_s68irqs = 0;
-	uint8_t                   m_ds3_sfirqs = 0;
-	uint8_t                   m_ds3_s68flag = 0;
-	uint8_t                   m_ds3_sreset = 0;
-	uint16_t                  m_ds3_sdata = 0;
-	uint16_t                  m_ds3_s68data = 0;
-	uint32_t                  m_ds3_sdata_address = 0;
-	uint16_t                  m_ds3sdsp_regs[32]{};
-	uint16_t                  m_ds3sdsp_timer_en = 0;
-	uint16_t                  m_ds3sdsp_sdata = 0;
+	uint8_t                 m_ds3_scmd = 0;
+	uint8_t                 m_ds3_sflag = 0;
+	uint8_t                 m_ds3_s68irqs = 0;
+	uint8_t                 m_ds3_sfirqs = 0;
+	uint8_t                 m_ds3_s68flag = 0;
+	uint8_t                 m_ds3_sreset = 0;
+	uint16_t                m_ds3_sdata = 0;
+	uint16_t                m_ds3_s68data = 0;
+	uint32_t                m_ds3_sdata_address = 0;
+	uint16_t                m_ds3sdsp_regs[32]{};
+	uint16_t                m_ds3sdsp_timer_en = 0;
+	uint16_t                m_ds3sdsp_sdata = 0;
 	optional_device<timer_device> m_ds3sdsp_internal_timer;
 
-	uint16_t                  m_ds3xdsp_regs[32]{};
-	uint16_t                  m_ds3xdsp_timer_en = 0;
-	uint16_t                  m_ds3xdsp_sdata = 0;
+	uint16_t                m_ds3xdsp_regs[32]{};
+	uint16_t                m_ds3xdsp_timer_en = 0;
+	uint16_t                m_ds3xdsp_sdata = 0;
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
+	emu_timer *             m_xdsp_serial_irq_off_timer = nullptr;
 
-	uint16_t                  m_adc_control = 0;
-	uint8_t                   m_adc12_select = 0;
-	uint8_t                   m_adc12_byte = 0;
-	uint16_t                  m_adc12_data = 0;
+	uint16_t                m_adc_control = 0;
+	uint8_t                 m_adc12_select = 0;
+	uint8_t                 m_adc12_byte = 0;
+	uint16_t                m_adc12_data = 0;
 
-	uint16_t                  m_hdc68k_last_wheel = 0;
-	uint16_t                  m_hdc68k_last_port1 = 0;
-	uint8_t                   m_hdc68k_wheel_edge = 0;
-	uint8_t                   m_hdc68k_shifter_state = 0;
+	uint16_t                m_hdc68k_last_wheel = 0;
+	uint16_t                m_hdc68k_last_port1 = 0;
+	uint8_t                 m_hdc68k_wheel_edge = 0;
+	uint8_t                 m_hdc68k_shifter_state = 0;
 
-	uint8_t                   m_st68k_sloop_bank = 0;
+	uint8_t                 m_st68k_sloop_bank = 0;
 	offs_t                  m_st68k_last_alt_sloop_offset = 0;
 
-	uint8_t                   m_sel_select = 0;
-	uint8_t                   m_sel1_data = 0;
-	uint8_t                   m_sel2_data = 0;
-	uint8_t                   m_sel3_data = 0;
-	uint8_t                   m_sel4_data = 0;
+	uint8_t                 m_sel_select = 0;
+	uint8_t                 m_sel1_data = 0;
+	uint8_t                 m_sel2_data = 0;
+	uint8_t                 m_sel3_data = 0;
+	uint8_t                 m_sel4_data = 0;
 
 	#define MAX_MSP_SYNC    16
-	uint32_t *                m_dataptr[MAX_MSP_SYNC]{};
-	uint32_t                  m_dataval[MAX_MSP_SYNC]{};
+	uint32_t *              m_dataptr[MAX_MSP_SYNC]{};
+	uint32_t                m_dataval[MAX_MSP_SYNC]{};
 	int                     m_next_msp_sync = 0;
 
 	/* video state */
 	offs_t                  m_vram_mask = 0;
 
-	uint8_t                   m_shiftreg_enable = 0;
+	uint8_t                 m_shiftreg_enable = 0;
 
-	uint32_t                  m_mask_table[65536 * 4]{};
-	uint16_t *                m_gsp_shiftreg_source = 0;
+	uint32_t                m_mask_table[65536 * 4]{};
+	uint16_t *              m_gsp_shiftreg_source = 0;
 
-	int8_t                    m_gfx_finescroll = 0;
-	uint8_t                   m_gfx_palettebank = 0;
+	int8_t                  m_gfx_finescroll = 0;
+	uint8_t                 m_gfx_palettebank = 0;
 	virtual void update_interrupts();
 	void init_driver();
 	void init_multisync(int compact_inputs);

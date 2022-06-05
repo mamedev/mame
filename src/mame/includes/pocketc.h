@@ -34,11 +34,10 @@ public:
 	void pocketc_base(machine_config &config);
 
 protected:
-	static const device_timer_id TIMER_POWER_UP = 0;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(power_up_done);
 
 	void pocketc_palette(palette_device &palette) const;
 

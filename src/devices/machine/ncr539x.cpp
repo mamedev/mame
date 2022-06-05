@@ -137,7 +137,7 @@ void ncr539x_device::device_start()
 	m_out_irq_cb.resolve_safe();
 	m_out_drq_cb.resolve_safe();
 
-	m_operation_timer = timer_alloc(0);
+	m_operation_timer = timer_alloc(FUNC(ncr539x_device::execute_operation), this);
 }
 
 //-------------------------------------------------
@@ -177,107 +177,99 @@ void ncr539x_device::dma_write_data(int bytes, uint8_t *pData)
 	write_data(pData, bytes);
 }
 
-void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(ncr539x_device::execute_operation)
 {
-	//printf("539X: device_timer expired, param = %d, m_command = %02x\n", param, m_command);
+	//printf("539X: m_operation_timer expired, param = %d, m_command = %02x\n", param, m_command);
 
-	switch (param)
+	// if this is a DMA command, raise DRQ now
+	if (m_command & 0x80)
 	{
-		case TIMER_539X_COMMAND:
-			// if this is a DMA command, raise DRQ now
-			if (m_command & 0x80)
+		m_out_drq_cb(ASSERT_LINE);
+	}
+
+	switch (m_command & 0x7f)
+	{
+		case 0x41:  // select without ATN steps
+			if (select(m_last_id))
 			{
-				m_out_drq_cb(ASSERT_LINE);
-			}
+				m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
+				// we should now be in the command phase
+				m_status &= ~7; // clear bus phases
+				m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
+				m_fifo_ptr = 0;
+				m_selected = true;
 
-			switch (m_command & 0x7f)
+				LOG("Selecting w/o ATN, irq_status = %02x, status = %02x!\n", m_irq_status, m_status);
+
+				// if DMA is not enabled, there should already be a command loaded into the FIFO
+				if (!(m_command & 0x80))
+				{
+					exec_fifo();
+				}
+				update_fifo_internal_state(0);
+			}
+			else
 			{
-				case 0x41:  // select without ATN steps
-					if (select(m_last_id))
-					{
-						m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
-						// we should now be in the command phase
-						m_status &= ~7; // clear bus phases
-						m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
-						m_fifo_ptr = 0;
-						m_selected = true;
-
-						LOG("Selecting w/o ATN, irq_status = %02x, status = %02x!\n", m_irq_status, m_status);
-
-						// if DMA is not enabled, there should already be a command loaded into the FIFO
-						if (!(m_command & 0x80))
-						{
-							exec_fifo();
-						}
-						update_fifo_internal_state(0);
-					}
-					else
-					{
-						LOG("Select failed, no device @ ID %d!\n", m_last_id);
-						m_status |= MAIN_STATUS_INTERRUPT;
-						m_irq_status |= IRQ_STATUS_DISCONNECTED;
-					}
-					m_out_irq_cb(ASSERT_LINE);
-					break;
-
-				case 0x42:  // Select with ATN steps
-					if (select(m_last_id))
-					{
-						m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
-						// we should now be in the command phase
-						m_status &= ~7; // clear bus phases
-						m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
-						m_fifo_ptr = 0;
-						m_selected = true;
-						LOG("Selecting with ATN, irq_status = %02x, status = %02x!\n", m_irq_status, m_status);
-
-						// if DMA is not enabled, there should already be a command loaded into the FIFO
-						if (!(m_command & 0x80))
-						{
-							exec_fifo();
-						}
-						update_fifo_internal_state(0);
-					}
-					else
-					{
-						LOG("Select failed, no device @ ID %d!\n", m_last_id);
-						m_status |= MAIN_STATUS_INTERRUPT;
-						m_irq_status |= IRQ_STATUS_DISCONNECTED;
-					}
-					m_out_irq_cb(ASSERT_LINE);
-					break;
-
-				case 0x11:  // initiator command complete
-					LOG("Initiator command complete\n");
-					m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
-					m_status &= ~7; // clear phase bits
-					m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_DATAIN;  // go to data in phase (?)
-					m_out_irq_cb(ASSERT_LINE);
-
-					// this puts status and message bytes into the FIFO (todo: what are these?)
-					m_fifo_ptr = 0;
-					m_xfer_count = 2;
-					m_buffer_remaining = m_total_data = 0;
-					m_fifo[0] = 0;  // status byte
-					m_fifo[1] = 0;  // message byte
-					m_selected = false;
-					update_fifo_internal_state(2);
-					break;
-
-				case 0x12:  // message accepted
-					LOG("Message accepted\n");
-					m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
-					m_status |= MAIN_STATUS_INTERRUPT;
-					m_out_irq_cb(ASSERT_LINE);
-					break;
-
-				default:
-					fatalerror("539x: Unhandled command %02x\n", m_command);
+				LOG("Select failed, no device @ ID %d!\n", m_last_id);
+				m_status |= MAIN_STATUS_INTERRUPT;
+				m_irq_status |= IRQ_STATUS_DISCONNECTED;
 			}
+			m_out_irq_cb(ASSERT_LINE);
+			break;
+
+		case 0x42:  // Select with ATN steps
+			if (select(m_last_id))
+			{
+				m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
+				// we should now be in the command phase
+				m_status &= ~7; // clear bus phases
+				m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
+				m_fifo_ptr = 0;
+				m_selected = true;
+				LOG("Selecting with ATN, irq_status = %02x, status = %02x!\n", m_irq_status, m_status);
+
+				// if DMA is not enabled, there should already be a command loaded into the FIFO
+				if (!(m_command & 0x80))
+				{
+					exec_fifo();
+				}
+				update_fifo_internal_state(0);
+			}
+			else
+			{
+				LOG("Select failed, no device @ ID %d!\n", m_last_id);
+				m_status |= MAIN_STATUS_INTERRUPT;
+				m_irq_status |= IRQ_STATUS_DISCONNECTED;
+			}
+			m_out_irq_cb(ASSERT_LINE);
+			break;
+
+		case 0x11:  // initiator command complete
+			LOG("Initiator command complete\n");
+			m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
+			m_status &= ~7; // clear phase bits
+			m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_DATAIN;  // go to data in phase (?)
+			m_out_irq_cb(ASSERT_LINE);
+
+			// this puts status and message bytes into the FIFO (todo: what are these?)
+			m_fifo_ptr = 0;
+			m_xfer_count = 2;
+			m_buffer_remaining = m_total_data = 0;
+			m_fifo[0] = 0;  // status byte
+			m_fifo[1] = 0;  // message byte
+			m_selected = false;
+			update_fifo_internal_state(2);
+			break;
+
+		case 0x12:  // message accepted
+			LOG("Message accepted\n");
+			m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
+			m_status |= MAIN_STATUS_INTERRUPT;
+			m_out_irq_cb(ASSERT_LINE);
 			break;
 
 		default:
-			break;
+			fatalerror("539x: Unhandled command %02x\n", m_command);
 	}
 }
 
@@ -614,11 +606,11 @@ void ncr539x_device::write(offs_t offset, uint8_t data)
 					// 1x commands happen much faster
 					if ((m_command & 0x70) == 0x10)
 					{
-						m_operation_timer->adjust(attotime::from_hz(65536), TIMER_539X_COMMAND);
+						m_operation_timer->adjust(attotime::from_hz(65536));
 					}
 					else
 					{
-						m_operation_timer->adjust(attotime::from_hz(16384), TIMER_539X_COMMAND);
+						m_operation_timer->adjust(attotime::from_hz(16384));
 					}
 					break;
 			}

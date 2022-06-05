@@ -67,12 +67,14 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
+
+	TIMER_CALLBACK_MEMBER(timer_irq);
+	TIMER_CALLBACK_MEMBER(beeper_off);
 
 private:
 	uint8_t ddrs[3];

@@ -224,15 +224,10 @@ public:
 	{
 	}
 
-	void set_interrupt(int cpunum, int level, int state);
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	static const device_timer_id TIMER_MAP_SWITCH = 0;
-	static const device_timer_id TIMER_HBLANK = 1;
-	static const device_timer_id TIMER_JAM_TIMEOUT = 2;
+	void set_interrupt(int cpunum, int level, int state);
 
 	void init_cmi2x();
 
@@ -413,11 +408,13 @@ private:
 	uint8_t m_video_data = 0;
 
 	// Memory
+	TIMER_CALLBACK_MEMBER(switch_map);
+	TIMER_CALLBACK_MEMBER(jam_timeout);
 	bool map_is_active(int cpunum, int map, uint8_t *map_info);
 	void update_address_space(int cpunum, uint8_t mapinfo);
 
 	// Video
-	void hblank();
+	TIMER_CALLBACK_MEMBER(hblank);
 	template <int Y, int X, bool ByteSize> void update_video_pos();
 
 	// Floppy
@@ -514,7 +511,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-void cmi_state::hblank()
+TIMER_CALLBACK_MEMBER(cmi_state::hblank)
 {
 	int v = m_screen->vpos();
 
@@ -964,30 +961,20 @@ template<int cpunum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
 }
 
-void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cmi_state::switch_map)
 {
-	switch (id)
-	{
-		case TIMER_MAP_SWITCH:
-		{
-			m_cpu_active_space[param] = m_cpu_map_switch[param];
-			uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
-							 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
-							 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
-			update_address_space(param, map_info);
-			m_map_switch_timer->adjust(attotime::never);
-			break;
-		}
+	m_cpu_active_space[param] = m_cpu_map_switch[param];
+	uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
+					 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
+					 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
+	update_address_space(param, map_info);
+	m_map_switch_timer->adjust(attotime::never);
+}
 
-		case TIMER_HBLANK:
-			hblank();
-			break;
-
-		case TIMER_JAM_TIMEOUT:
-			m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_jam_timeout_timer->adjust(attotime::never);
-			break;
-	}
+TIMER_CALLBACK_MEMBER(cmi_state::jam_timeout)
+{
+	m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_jam_timeout_timer->adjust(attotime::never);
 }
 
 uint8_t cmi_state::atomic_r()
@@ -2066,9 +2053,9 @@ void cmi_state::machine_start()
 	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
-	m_map_switch_timer = timer_alloc(TIMER_MAP_SWITCH);
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_jam_timeout_timer = timer_alloc(TIMER_JAM_TIMEOUT);
+	m_map_switch_timer = timer_alloc(FUNC(cmi_state::switch_map), this);
+	m_hblank_timer = timer_alloc(FUNC(cmi_state::hblank), this);
+	m_jam_timeout_timer = timer_alloc(FUNC(cmi_state::jam_timeout), this);
 
 	m_map_switch_timer->adjust(attotime::never);
 	m_hblank_timer->adjust(attotime::never);

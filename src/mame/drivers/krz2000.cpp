@@ -166,7 +166,7 @@ void k2000_state::hobbes1_write(offs_t offset, uint16_t data)
 
 void k2000_state::machine_start()
 {
-	m_boot_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k2000_state::boot_hack_timer), this));
+	m_boot_hack_timer = timer_alloc(FUNC(k2000_state::boot_hack_timer), this);
 	m_boot_hack_timer->adjust(attotime::from_seconds(2), 0, attotime::never);
 }
 

@@ -81,7 +81,7 @@ c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_con
 void c64_vizawrite_cartridge_device::device_start()
 {
 	// allocate timer
-	m_game_timer = timer_alloc();
+	m_game_timer = timer_alloc(FUNC(c64_vizawrite_cartridge_device::update_game), this);
 }
 
 
@@ -98,10 +98,11 @@ void c64_vizawrite_cartridge_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_game - update mapping flags for game
+//  data
 //-------------------------------------------------
 
-void c64_vizawrite_cartridge_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c64_vizawrite_cartridge_device::update_game)
 {
 	m_game = 1;
 }

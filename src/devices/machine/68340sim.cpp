@@ -438,7 +438,7 @@ void m68340_cpu_device::start_68340_sim()
 {
 	LOG("%s\n", FUNCNAME);
 	LOGCLOCK( " - Clock: %d [0x%08x]\n", clock(), clock());
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback),this));
+	m_irq_timer = timer_alloc(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback), this);
 
 	// resolve callbacks Port A
 	m_pa_out_cb.resolve_safe();

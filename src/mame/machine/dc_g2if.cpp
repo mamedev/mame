@@ -74,7 +74,7 @@ void dc_g2if_device::device_start()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_dma[i].end_timer = timer_alloc(i);
+		m_dma[i].end_timer = timer_alloc(FUNC(dc_g2if_device::dma_end_tick), this);
 	}
 
 	m_int_w.resolve();
@@ -121,13 +121,13 @@ void dc_g2if_device::device_reset()
 	}
 }
 
-void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dc_g2if_device::dma_end_tick)
 {
-	u8 channel = (u8)id;
-	bool dma_result = (param == 1);
+	u8 channel = (u8)(param >> 1);
+	bool dma_result = (param & 1);
 	m_dma[channel].in_progress = false;
 	m_dma[channel].start = false;
-	LOGDMAEND("DMA%d %s\n", id, dma_result ? "normal end" : "overflow error");
+	LOGDMAEND("DMA%d %s\n", channel, dma_result ? "normal end" : "overflow error");
 
 	if (dma_result)
 		m_int_w(channel, 1);
@@ -510,7 +510,7 @@ void dc_g2if_device::dma_execute(u8 channel)
 	if (m_dma[channel].mode == true)
 		m_dma[channel].enable = false;
 
-	m_dma[channel].end_timer->adjust(dma_time, dma_result);
+	m_dma[channel].end_timer->adjust(dma_time, (channel << 1) | (dma_result ? 1 : 0));
 }
 
 /*

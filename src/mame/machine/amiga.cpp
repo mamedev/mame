@@ -163,10 +163,10 @@ void amiga_state::machine_start()
 	m_chip_ram_mask = (m_chip_ram.bytes() - 1) & ~1;
 
 	// set up the timers
-	m_irq_timer = timer_alloc(TIMER_AMIGA_IRQ);
-	m_blitter_timer = timer_alloc(TIMER_AMIGA_BLITTER);
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_irq_timer = timer_alloc(FUNC(amiga_state::amiga_irq_proc), this);
+	m_blitter_timer = timer_alloc(FUNC(amiga_state::amiga_blitter_proc), this);
+	m_serial_timer = timer_alloc(FUNC(amiga_state::serial_shift), this);
+	m_scanline_timer = timer_alloc(FUNC(amiga_state::scanline_callback), this);
 
 	// start the scanline timer
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
@@ -224,27 +224,6 @@ uint16_t amiga_state::rom_mirror_r(offs_t offset, uint16_t mem_mask)
 uint32_t amiga_state::rom_mirror32_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
-}
-
-void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SCANLINE:
-		scanline_callback(param);
-		break;
-	case TIMER_AMIGA_IRQ:
-		amiga_irq_proc(param);
-		break;
-	case TIMER_AMIGA_BLITTER:
-		amiga_blitter_proc(param);
-		break;
-	case TIMER_SERIAL:
-		serial_shift();
-		break;
-	default:
-		fatalerror("Invalid timer: %d\n", id);
-	}
 }
 
 
@@ -1725,7 +1704,7 @@ void amiga_state::serial_adjust()
 	m_serial_timer->adjust(attotime::from_hz(baud) / 2, 0, attotime::from_hz(baud));
 }
 
-void amiga_state::serial_shift()
+TIMER_CALLBACK_MEMBER(amiga_state::serial_shift)
 {
 	if (CUSTOM_REG(REG_ADKCON) & ADKCON_UARTBRK)
 	{

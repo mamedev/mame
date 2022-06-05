@@ -57,7 +57,7 @@ pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, cons
 
 uint32_t pxa255_periphs_device::i2s_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
+	switch (PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
 			LOGMASKED(LOG_I2S, "pxa255_i2s_r: Serial Audio Controller Global Control Register: %08x & %08x\n", m_i2s_regs.sacr0, mem_mask);
@@ -89,7 +89,7 @@ uint32_t pxa255_periphs_device::i2s_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::i2s_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
+	switch (PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
 			LOGMASKED(LOG_I2S, "pxa255_i2s_w: Serial Audio Controller Global Control Register: %08x & %08x\n", data, mem_mask);
@@ -109,11 +109,11 @@ void pxa255_periphs_device::i2s_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			break;
 		case PXA255_SAICR:
 			LOGMASKED(LOG_I2S, "pxa255_i2s_w: Serial Audio Interrupt Clear Register: %08x & %08x\n", data, mem_mask);
-			if(m_i2s_regs.saicr & PXA255_SAICR_ROR)
+			if (m_i2s_regs.saicr & PXA255_SAICR_ROR)
 			{
 				m_i2s_regs.sasr0 &= ~PXA255_SASR0_ROR;
 			}
-			if(m_i2s_regs.saicr & PXA255_SAICR_TUR)
+			if (m_i2s_regs.saicr & PXA255_SAICR_TUR)
 			{
 				m_i2s_regs.sasr0 &= ~PXA255_SASR0_TUR;
 			}
@@ -182,7 +182,7 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	m_dma_regs.ddadr[channel] = space.read_dword(m_dma_regs.ddadr[channel]);
 
 	// Start our end-of-transfer timer
-	switch(channel)
+	switch (channel)
 	{
 		case 3:
 			m_dma_regs.timer[channel]->adjust(attotime::from_hz((147600000 / m_i2s_regs.sadiv) / (4 * 64)) * (m_dma_regs.dcmd[channel] & 0x00001fff), channel);
@@ -193,7 +193,7 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	}
 
 	// Interrupt as necessary
-	if(m_dma_regs.dcmd[channel] & PXA255_DCMD_STARTIRQEN)
+	if (m_dma_regs.dcmd[channel] & PXA255_DCMD_STARTIRQEN)
 	{
 		m_dma_regs.dcsr[channel] |= PXA255_DCSR_STARTINTR;
 	}
@@ -201,89 +201,69 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	m_dma_regs.dcsr[channel] &= ~PXA255_DCSR_STOPSTATE;
 }
 
-void pxa255_periphs_device::dma_end_tick(int channel)
+TIMER_CALLBACK_MEMBER(pxa255_periphs_device::audio_dma_end_tick)
 {
-	uint32_t sadr = m_dma_regs.dsadr[channel];
-	uint32_t tadr = m_dma_regs.dtadr[channel];
-	uint32_t count = m_dma_regs.dcmd[channel] & 0x00001fff;
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	switch (channel)
-	{
-		case 3:
-			for (uint32_t index = 0; index < count; index += 4)
-			{
-				m_words[index >> 2] = space.read_dword(sadr);
-				m_samples[(index >> 1) + 0] = (int16_t)(m_words[index >> 2] >> 16);
-				m_samples[(index >> 1) + 1] = (int16_t)(m_words[index >> 2] & 0xffff);
-				sadr += 4;
-			}
-			for (int index = 0; index < 2; index++)
-			{
-				m_dmadac[index]->flush();
-				m_dmadac[index]->transfer(index, 2, 2, count/4, m_samples.get());
-			}
-			break;
-		default:
-			for (uint32_t index = 0; index < count;)
-			{
-				switch (m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
-				{
-					case PXA255_DCMD_SIZE_8:
-						space.write_byte(tadr, space.read_byte(sadr));
-						index++;
-						break;
-					case PXA255_DCMD_SIZE_16:
-						space.write_word(tadr, space.read_word(sadr));
-						index += 2;
-						break;
-					case PXA255_DCMD_SIZE_32:
-						space.write_dword(tadr, space.read_dword(sadr));
-						index += 4;
-						break;
-					default:
-						logerror( "pxa255_dma_dma_end: Unsupported DMA size\n" );
-						break;
-				}
+	const uint32_t count = m_dma_regs.dcmd[3] & 0x00001fff;
+	uint32_t sadr = m_dma_regs.dsadr[3];
 
-				if (m_dma_regs.dcmd[channel] & PXA255_DCMD_INCSRCADDR)
-				{
-					switch(m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
-					{
-						case PXA255_DCMD_SIZE_8:
-							sadr++;
-							break;
-						case PXA255_DCMD_SIZE_16:
-							sadr += 2;
-							break;
-						case PXA255_DCMD_SIZE_32:
-							sadr += 4;
-							break;
-						default:
-							break;
-					}
-				}
-				if(m_dma_regs.dcmd[channel] & PXA255_DCMD_INCTRGADDR)
-				{
-					switch(m_dma_regs.dcmd[channel] & PXA255_DCMD_SIZE)
-					{
-						case PXA255_DCMD_SIZE_8:
-							tadr++;
-							break;
-						case PXA255_DCMD_SIZE_16:
-							tadr += 2;
-							break;
-						case PXA255_DCMD_SIZE_32:
-							tadr += 4;
-							break;
-						default:
-							break;
-					}
-				}
-			}
-			break;
+	int16_t *out_samples = &m_samples[0];
+	for (uint32_t index = 0; index < count; index += 4, sadr += 4)
+	{
+		const uint32_t word = space.read_dword(sadr);
+		*out_samples++ = (int16_t)(word >> 16);
+		*out_samples++ = (int16_t)(word & 0xffff);
 	}
 
+	for (int index = 0; index < 2; index++)
+	{
+		m_dmadac[index]->flush();
+		m_dmadac[index]->transfer(index, 2, 2, count/4, m_samples.get());
+	}
+
+	dma_finish(param);
+}
+
+TIMER_CALLBACK_MEMBER(pxa255_periphs_device::dma_end_tick)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	const uint32_t count = m_dma_regs.dcmd[param] & 0x00001fff;
+	uint32_t sadr = m_dma_regs.dsadr[param];
+	uint32_t tadr = m_dma_regs.dtadr[param];
+
+	static const uint32_t s_inc_size[4] = { 0, 1, 2, 4 };
+	const uint32_t inc_index = (m_dma_regs.dcmd[param] >> PXA255_DCMD_SIZE_SHIFT) & PXA255_DCMD_SIZE_MASK;
+	const uint32_t inc_val = s_inc_size[inc_index];
+	const uint32_t sadr_inc = (m_dma_regs.dcmd[param] & PXA255_DCMD_INCSRCADDR) ? inc_val : 0;
+	const uint32_t tadr_inc = (m_dma_regs.dcmd[param] & PXA255_DCMD_INCTRGADDR) ? inc_val : 0;
+
+	if (inc_val > 0)
+	{
+		switch (inc_val)
+		{
+			case PXA255_DCMD_SIZE_8:
+				for (uint32_t index = 0; index < count; index += inc_val, sadr += sadr_inc, tadr += tadr_inc)
+					space.write_byte(tadr, space.read_byte(sadr));
+				break;
+			case PXA255_DCMD_SIZE_16:
+				for (uint32_t index = 0; index < count; index += inc_val, sadr += sadr_inc, tadr += tadr_inc)
+					space.write_word(tadr, space.read_byte(sadr));
+				break;
+			case PXA255_DCMD_SIZE_32:
+				for (uint32_t index = 0; index < count; index += inc_val, sadr += sadr_inc, tadr += tadr_inc)
+					space.write_dword(tadr, space.read_byte(sadr));
+				break;
+			default:
+				logerror( "pxa255_dma_dma_end: Unsupported DMA size\n" );
+				break;
+		}
+	}
+
+	dma_finish(param);
+}
+
+void pxa255_periphs_device::dma_finish(int channel)
+{
 	if (m_dma_regs.dcmd[channel] & PXA255_DCMD_ENDIRQEN)
 	{
 		m_dma_regs.dcsr[channel] |= PXA255_DCSR_ENDINTR;
@@ -312,7 +292,7 @@ void pxa255_periphs_device::dma_end_tick(int channel)
 
 uint32_t pxa255_periphs_device::dma_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
+	switch (PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_DCSR0:      case PXA255_DCSR1:      case PXA255_DCSR2:      case PXA255_DCSR3:
 		case PXA255_DCSR4:      case PXA255_DCSR5:      case PXA255_DCSR6:      case PXA255_DCSR7:
@@ -389,7 +369,7 @@ void pxa255_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 				dma_load_descriptor_and_start(offset);
 			}
-			else if(!(data & PXA255_DCSR_RUN))
+			else if (!(data & PXA255_DCSR_RUN))
 			{
 				m_dma_regs.dcsr[offset] &= ~PXA255_DCSR_RUN;
 			}
@@ -455,7 +435,7 @@ void pxa255_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 */
 
-void pxa255_periphs_device::rtc_tick()
+TIMER_CALLBACK_MEMBER(pxa255_periphs_device::rtc_tick)
 {
 	m_rtc_regs.rcnr++;
 	if (BIT(m_rtc_regs.rtsr, 3))
@@ -476,7 +456,7 @@ void pxa255_periphs_device::rtc_tick()
 
 uint32_t pxa255_periphs_device::rtc_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_RTC_BASE_ADDR | (offset << 2))
+	switch (PXA255_RTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_RCNR:
 			LOGMASKED(LOG_RTC, "%s: pxa255 rtc_r: RTC Counter Register: %08x\n", machine().describe_context(), m_rtc_regs.rcnr);
@@ -499,7 +479,7 @@ uint32_t pxa255_periphs_device::rtc_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_RTC_BASE_ADDR | (offset << 2))
+	switch (PXA255_RTC_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_RCNR:
 			LOGMASKED(LOG_RTC, "pxa255 rtc_w: RTC Counter Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -552,16 +532,16 @@ void pxa255_periphs_device::ostimer_irq_check()
 	//set_irq_line(PXA255_INT_OSTIMER3, (m_ostimer_regs.oier & PXA255_OIER_E3) ? ((m_ostimer_regs.ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
 }
 
-void pxa255_periphs_device::ostimer_match_tick(int channel)
+TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match_tick)
 {
-	m_ostimer_regs.ossr |= (1 << channel);
-	m_ostimer_regs.oscr = m_ostimer_regs.osmr[channel];
+	m_ostimer_regs.ossr |= (1 << param);
+	m_ostimer_regs.oscr = m_ostimer_regs.osmr[param];
 	ostimer_irq_check();
 }
 
 uint32_t pxa255_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
+	switch (PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
 			LOGMASKED(LOG_OSTIMER, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", m_ostimer_regs.osmr[0], mem_mask);
@@ -598,14 +578,14 @@ uint32_t pxa255_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
+	switch (PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
 			LOGMASKED(LOG_OSTIMER, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask);
 			m_ostimer_regs.osmr[0] = data;
 			if (m_ostimer_regs.oier & PXA255_OIER_E0)
 			{
-				m_ostimer_regs.timer[0]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[0] - m_ostimer_regs.oscr));
+				m_ostimer_regs.timer[0]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[0] - m_ostimer_regs.oscr), 0);
 			}
 			break;
 		case PXA255_OSMR1:
@@ -828,7 +808,7 @@ void pxa255_periphs_device::gpio_bit_w(offs_t offset, uint8_t data, uint8_t mem_
 
 uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
+	switch (PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
 		{
@@ -929,7 +909,7 @@ uint32_t pxa255_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
+	switch (PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: (Invalid Write) GPIO Pin-Level Register 0: %08x & %08x\n", data, mem_mask);
@@ -1093,7 +1073,7 @@ void pxa255_periphs_device::lcd_load_dma_descriptor(address_space & space, uint3
 
 void pxa255_periphs_device::lcd_irq_check()
 {
-	if(((m_lcd_regs.lcsr & PXA255_LCSR_BS)  != 0 && (m_lcd_regs.lccr0 & PXA255_LCCR0_BM)  == 0) ||
+	if (((m_lcd_regs.lcsr & PXA255_LCSR_BS)  != 0 && (m_lcd_regs.lccr0 & PXA255_LCCR0_BM)  == 0) ||
 	   ((m_lcd_regs.lcsr & PXA255_LCSR_EOF) != 0 && (m_lcd_regs.lccr0 & PXA255_LCCR0_EFM) == 0) ||
 	   ((m_lcd_regs.lcsr & PXA255_LCSR_SOF) != 0 && (m_lcd_regs.lccr0 & PXA255_LCCR0_SFM) == 0))
 	{
@@ -1107,20 +1087,20 @@ void pxa255_periphs_device::lcd_irq_check()
 
 void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 {
-	if(m_lcd_regs.dma[channel].fdadr != 0)
+	if (m_lcd_regs.dma[channel].fdadr != 0)
 	{
 		attotime period = attotime::from_hz(20000000) * (m_lcd_regs.dma[channel].ldcmd & 0x000fffff);
 
 		m_lcd_regs.dma[channel].eof->adjust(period, channel);
 
-		if(m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_SOFINT)
+		if (m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_SOFINT)
 		{
 			m_lcd_regs.liidr = m_lcd_regs.dma[channel].fidr;
 			m_lcd_regs.lcsr |= PXA255_LCSR_SOF;
 			lcd_irq_check();
 		}
 
-		if(m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_PAL)
+		if (m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_PAL)
 		{
 			address_space &space = m_maincpu->space(AS_PROGRAM);
 			int length = m_lcd_regs.dma[channel].ldcmd & 0x000fffff;
@@ -1147,7 +1127,7 @@ void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 
 void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 {
-	if(m_lcd_regs.fbr[channel] & 1)
+	if (m_lcd_regs.fbr[channel] & 1)
 	{
 		LOGMASKED(LOG_LCD_DMA, "lcd_check_load_next_branch: Taking branch\n" );
 		m_lcd_regs.fbr[channel] &= ~1;
@@ -1157,10 +1137,10 @@ void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 		lcd_load_dma_descriptor(space, m_lcd_regs.fbr[channel] & 0xfffffff0, 0);
 		m_lcd_regs.fbr[channel] = (space.read_dword(m_lcd_regs.fbr[channel] & 0xfffffff0) & 0xfffffff0) | (m_lcd_regs.fbr[channel] & 0x00000003);
 		lcd_dma_kickoff(0);
-		if(m_lcd_regs.fbr[channel] & 2)
+		if (m_lcd_regs.fbr[channel] & 2)
 		{
 			m_lcd_regs.fbr[channel] &= ~2;
-			if(!(m_lcd_regs.lccr0 & PXA255_LCCR0_BM))
+			if (!(m_lcd_regs.lccr0 & PXA255_LCCR0_BM))
 			{
 				m_lcd_regs.lcsr |= PXA255_LCSR_BS;
 			}
@@ -1172,21 +1152,21 @@ void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 	}
 }
 
-void pxa255_periphs_device::lcd_dma_eof_tick(int channel)
+TIMER_CALLBACK_MEMBER(pxa255_periphs_device::lcd_dma_eof_tick)
 {
 	LOGMASKED(LOG_LCD_DMA, "End of frame callback\n" );
-	if(m_lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_EOFINT)
+	if (m_lcd_regs.dma[param].ldcmd & PXA255_LDCMD_EOFINT)
 	{
-		m_lcd_regs.liidr = m_lcd_regs.dma[channel].fidr;
+		m_lcd_regs.liidr = m_lcd_regs.dma[param].fidr;
 		m_lcd_regs.lcsr |= PXA255_LCSR_EOF;
 	}
-	lcd_check_load_next_branch(channel);
+	lcd_check_load_next_branch(param);
 	lcd_irq_check();
 }
 
 uint32_t pxa255_periphs_device::lcd_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
+	switch (PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_LCCR0:      // 0x44000000
 			LOGMASKED(LOG_LCD, "pxa255_lcd_r: LCD Control 0: %08x & %08x\n", m_lcd_regs.lccr0, mem_mask);
@@ -1251,7 +1231,7 @@ uint32_t pxa255_periphs_device::lcd_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
+	switch (PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_LCCR0:      // 0x44000000
 			LOGMASKED(LOG_LCD, "pxa255_lcd_w: LCD Control 0: %08x & %08x\n", data, mem_mask);
@@ -1272,7 +1252,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 		case PXA255_FBR0:       // 0x44000020
 			LOGMASKED(LOG_LCD, "pxa255_lcd_w: LCD Frame Branch Register 0: %08x & %08x\n", data, mem_mask);
 			m_lcd_regs.fbr[0] = data & 0xfffffff3;
-			if(!m_lcd_regs.dma[0].eof->enabled())
+			if (!m_lcd_regs.dma[0].eof->enabled())
 			{
 				LOGMASKED(LOG_LCD, "ch0 EOF timer is not enabled, taking branch now\n" );
 				lcd_check_load_next_branch(0);
@@ -1282,7 +1262,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 		case PXA255_FBR1:       // 0x44000024
 			LOGMASKED(LOG_LCD, "pxa255_lcd_w: LCD Frame Branch Register 1: %08x & %08x\n", data, mem_mask);
 			m_lcd_regs.fbr[1] = data & 0xfffffff3;
-			if(!m_lcd_regs.dma[1].eof->enabled())
+			if (!m_lcd_regs.dma[1].eof->enabled())
 			{
 				LOGMASKED(LOG_LCD, "ch1 EOF timer is not enabled, taking branch now\n" );
 				lcd_check_load_next_branch(1);
@@ -1307,7 +1287,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 			break;
 		case PXA255_FDADR0:     // 0x44000200
 			LOGMASKED(LOG_LCD, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask);
-			if(!m_lcd_regs.dma[0].eof->enabled())
+			if (!m_lcd_regs.dma[0].eof->enabled())
 			{
 				lcd_load_dma_descriptor(space, data & 0xfffffff0, 0);
 			}
@@ -1328,7 +1308,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 			break;
 		case PXA255_FDADR1:     // 0x44000210
 			LOGMASKED(LOG_LCD, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask);
-			if(!m_lcd_regs.dma[1].eof->enabled())
+			if (!m_lcd_regs.dma[1].eof->enabled())
 			{
 				lcd_load_dma_descriptor(space, data & 0xfffffff0, 1);
 			}
@@ -1355,7 +1335,7 @@ void pxa255_periphs_device::lcd_w(address_space &space, offs_t offset, uint32_t 
 
 uint32_t pxa255_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_POWER_BASE_ADDR | (offset << 2))
+	switch (PXA255_POWER_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_PMCR:
 			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Control Register: %08x\n", machine().describe_context(), m_power_regs.pmcr);
@@ -1405,7 +1385,7 @@ uint32_t pxa255_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::power_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_POWER_BASE_ADDR | (offset << 2))
+	switch (PXA255_POWER_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_PMCR:
 			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -1471,7 +1451,7 @@ void pxa255_periphs_device::power_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 uint32_t pxa255_periphs_device::clocks_r(offs_t offset, uint32_t mem_mask)
 {
-	switch(PXA255_CLOCKS_BASE_ADDR | (offset << 2))
+	switch (PXA255_CLOCKS_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_CCCR:
 			LOGMASKED(LOG_CLOCKS, "%s: clocks_r: Core Clock Configuration Register: %08x\n", machine().describe_context(), m_clocks_regs.cccr);
@@ -1491,7 +1471,7 @@ uint32_t pxa255_periphs_device::clocks_r(offs_t offset, uint32_t mem_mask)
 
 void pxa255_periphs_device::clocks_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	switch(PXA255_CLOCKS_BASE_ADDR | (offset << 2))
+	switch (PXA255_CLOCKS_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_CCCR:
 			LOGMASKED(LOG_CLOCKS, "%s: clocks_w: Core Clock Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -1519,20 +1499,26 @@ void pxa255_periphs_device::device_start()
 {
 	for (int index = 0; index < 16; index++)
 	{
-		m_dma_regs.timer[index] = timer_alloc(TIMER_DMA0 + index);
+		if (index != 3)
+		{
+			m_dma_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::dma_end_tick), this);
+		}
+		else
+		{
+			m_dma_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::audio_dma_end_tick), this);
+		}
 	}
 
 	for (int index = 0; index < 4; index++)
 	{
-		m_ostimer_regs.timer[index] = timer_alloc(TIMER_OSTIMER0 + index);
+		m_ostimer_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::ostimer_match_tick), this);
 	}
 
-	m_lcd_regs.dma[0].eof = timer_alloc(TIMER_LCD_EOF0);
-	m_lcd_regs.dma[1].eof = timer_alloc(TIMER_LCD_EOF0 + 1);
+	m_lcd_regs.dma[0].eof = timer_alloc(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this);
+	m_lcd_regs.dma[1].eof = timer_alloc(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this);
 
 	m_lcd_palette = make_unique_clear<uint32_t[]>(0x100);
 	m_lcd_framebuffer = make_unique_clear<uint8_t[]>(0x100000);
-	m_words = make_unique_clear<uint32_t[]>(0x800);
 	m_samples = make_unique_clear<int16_t[]>(0x1000);
 
 	m_gpio0_w.resolve_safe();
@@ -1542,7 +1528,7 @@ void pxa255_periphs_device::device_start()
 	m_gpio1_r.resolve_safe(0xffffffff);
 	m_gpio2_r.resolve_safe(0xffffffff);
 
-	m_rtc_regs.timer = timer_alloc(TIMER_RTC);
+	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
 }
 
 void pxa255_periphs_device::device_reset()
@@ -1565,18 +1551,6 @@ void pxa255_periphs_device::device_reset()
 
 	memset(&m_power_regs, 0, sizeof(m_power_regs));
 	memset(&m_clocks_regs, 0, sizeof(m_clocks_regs));
-}
-
-void pxa255_periphs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if (id < TIMER_OSTIMER0)
-		dma_end_tick(id);
-	else if (id < TIMER_LCD_EOF0)
-		ostimer_match_tick(id - TIMER_OSTIMER0);
-	else if (id < TIMER_RTC)
-		lcd_dma_eof_tick(id - TIMER_LCD_EOF0);
-	else if (id == TIMER_RTC)
-		rtc_tick();
 }
 
 uint32_t pxa255_periphs_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

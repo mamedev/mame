@@ -42,12 +42,35 @@ public:
 	void fuuki32(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_LEVEL_1_INTERRUPT,
-		TIMER_VBLANK_INTERRUPT,
-		TIMER_RASTER_INTERRUPT
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(level1_interrupt);
+	TIMER_CALLBACK_MEMBER(vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(raster_interrupt);
+
+	u8 snd_020_r(offs_t offset);
+	void snd_020_w(offs_t offset, u8 data, u8 mem_mask = ~0);
+	void sprram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sprram_r(offs_t offset);
+	u16 vregs_r(offs_t offset);
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sound_bw_w(u8 data);
+	template<int Layer> void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Layer> void vram_buffered_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	template<int Layer, int ColShift> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void tile_cb(u32 &code);
+	void colpri_cb(u32 &colour, u32 &pri_mask);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -80,34 +103,6 @@ private:
 	emu_timer   *m_level_1_interrupt_timer = nullptr;
 	emu_timer   *m_vblank_interrupt_timer = nullptr;
 	emu_timer   *m_raster_interrupt_timer = nullptr;
-
-	u8 snd_020_r(offs_t offset);
-	void snd_020_w(offs_t offset, u8 data, u8 mem_mask = ~0);
-	void sprram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 sprram_r(offs_t offset);
-	u16 vregs_r(offs_t offset);
-	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void sound_bw_w(u8 data);
-	template<int Layer> void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	template<int Layer> void vram_buffered_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	template<int Layer, int ColShift> TILE_GET_INFO_MEMBER(get_tile_info);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	void fuuki32_tile_cb(u32 &code);
-	void fuuki32_colpri_cb(u32 &colour, u32 &pri_mask);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
-
-	void fuuki32_map(address_map &map);
-	void fuuki32_sound_io_map(address_map &map);
-	void fuuki32_sound_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_FUUKIFG3_H

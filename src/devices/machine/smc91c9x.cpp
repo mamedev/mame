@@ -82,7 +82,7 @@ void smc91c9x_device::device_start()
 	m_buffer = std::make_unique<u8[]>(ETHER_BUFFER_SIZE * m_num_ebuf);
 
 	// TX timer
-	m_tx_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smc91c9x_device::tx_poll), this));
+	m_tx_poll = timer_alloc(FUNC(smc91c9x_device::tx_poll), this);
 
 	m_irq_handler.resolve_safe();
 

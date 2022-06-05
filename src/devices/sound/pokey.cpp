@@ -180,7 +180,10 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		m_serout_w_cb(*this),
 		m_keyboard_r(*this),
 		m_irq_f(*this),
-		m_output_type(LEGACY_LINEAR)
+		m_output_type(LEGACY_LINEAR),
+		m_serout_ready_timer(nullptr),
+		m_serout_complete_timer(nullptr),
+		m_serin_ready_timer(nullptr)
 {
 }
 
@@ -258,10 +261,9 @@ void pokey_device::device_start()
 
 	m_stream = stream_alloc(0, 1, clock());
 
-	timer_alloc(SYNC_WRITE);    /* timer for sync operation */
-	timer_alloc(SYNC_NOOP);
-	timer_alloc(SYNC_POT);
-	timer_alloc(SYNC_SET_IRQST);
+	m_serout_ready_timer = timer_alloc(FUNC(pokey_device::serout_ready_irq), this);
+	m_serout_complete_timer = timer_alloc(FUNC(pokey_device::serout_complete_irq), this);
+	m_serin_ready_timer = timer_alloc(FUNC(pokey_device::serin_ready_irq), this);
 
 	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
 	save_item(STRUCT_MEMBER(m_channel, m_counter));
@@ -354,61 +356,55 @@ void pokey_device::device_clock_changed()
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
-//  our sound stream
+//  timer callbacks
 //-------------------------------------------------
 
-void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pokey_device::serout_ready_irq)
 {
-	switch (id)
+	if (m_IRQEN & IRQ_SEROR)
 	{
-	case 3:
-		/* serout_ready_cb */
-		if (m_IRQEN & IRQ_SEROR)
-		{
-			m_IRQST |= IRQ_SEROR;
-			if (!m_irq_f.isnull())
-				m_irq_f(IRQ_SEROR);
-		}
-		break;
-	case 4:
-		/* serout_complete */
-		if (m_IRQEN & IRQ_SEROC)
-		{
-			m_IRQST |= IRQ_SEROC;
-			if (!m_irq_f.isnull())
-				m_irq_f(IRQ_SEROC);
-		}
-		break;
-	case 5:
-		/* serin_ready */
-		if (m_IRQEN & IRQ_SERIN)
-		{
-			m_IRQST |= IRQ_SERIN;
-			if (!m_irq_f.isnull())
-				m_irq_f(IRQ_SERIN);
-		}
-		break;
-	case SYNC_WRITE:
-		{
-			offs_t offset = (param >> 8) & 0xff;
-			uint8_t data = param & 0xff;
-			write_internal(offset, data);
-		}
-		break;
-	case SYNC_NOOP:
-		/* do nothing, caused by a forced resync */
-		break;
-	case SYNC_POT:
-		//logerror("x %02x \n", (param & 0x20));
-		m_ALLPOT |= (param & 0xff);
-		break;
-	case SYNC_SET_IRQST:
-		m_IRQST |=  (param & 0xff);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pokey_device::device_timer");
+		m_IRQST |= IRQ_SEROR;
+		if (!m_irq_f.isnull())
+			m_irq_f(IRQ_SEROR);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::serout_complete_irq)
+{
+	if (m_IRQEN & IRQ_SEROC)
+	{
+		m_IRQST |= IRQ_SEROC;
+		if (!m_irq_f.isnull())
+			m_irq_f(IRQ_SEROC);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::serin_ready_irq)
+{
+	if (m_IRQEN & IRQ_SERIN)
+	{
+		m_IRQST |= IRQ_SERIN;
+		if (!m_irq_f.isnull())
+			m_irq_f(IRQ_SERIN);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::sync_write)
+{
+	offs_t offset = (param >> 8) & 0xff;
+	uint8_t data = param & 0xff;
+	write_internal(offset, data);
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::sync_pot)
+{
+	//logerror("x %02x \n", (param & 0x20));
+	m_ALLPOT |= (param & 0xff);
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::sync_set_irqst)
+{
+	m_IRQST |=  (param & 0xff);
 }
 
 void pokey_device::execute_run()
@@ -531,7 +527,7 @@ void pokey_device::step_pot()
 	}
 	// some pots latched?
 	if (upd != 0)
-		synchronize(SYNC_POT, upd);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_pot), this), upd);
 }
 
 /*
@@ -755,7 +751,7 @@ uint8_t pokey_device::read(offs_t offset)
 {
 	int data, pot;
 
-	synchronize(SYNC_NOOP); /* force resync */
+	machine().scheduler().synchronize(); /* force resync */
 
 	switch (offset & 15)
 	{
@@ -849,7 +845,7 @@ uint8_t pokey_device::read(offs_t offset)
 
 void pokey_device::write(offs_t offset, uint8_t data)
 {
-	synchronize(SYNC_WRITE, (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_write), this), (offset << 8) | data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)
@@ -946,9 +942,9 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 		 * loaders from Ballblazer and Escape from Fractalus
 		 * The real times are unknown
 		 */
-		timer_set(attotime::from_usec(200), 3);
+		m_serout_ready_timer->adjust(attotime::from_usec(200));
 		/* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-		timer_set(attotime::from_usec(2000), 4);// FUNC(pokey_serout_complete), 0, p);
+		m_serout_complete_timer->adjust(attotime::from_usec(2000));
 		break;
 
 	case IRQEN_C:
@@ -1023,7 +1019,7 @@ WRITE_LINE_MEMBER( pokey_device::sid_w )
 
 void pokey_device::serin_ready(int after)
 {
-	timer_set(m_clock_period * after, 5, 0);
+	m_serin_ready_timer->adjust(m_clock_period * after, 0);
 }
 
 //-------------------------------------------------

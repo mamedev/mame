@@ -101,7 +101,7 @@ void tc0180vcu_device::device_start()
 	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
 
 	screen().register_vblank_callback(vblank_state_delegate(&tc0180vcu_device::vblank_callback, this));
-	m_intl_timer = timer_alloc(TIMER_INTL);
+	m_intl_timer = timer_alloc(FUNC(tc0180vcu_device::update_intl), this);
 
 	save_item(NAME(m_bg_rambank));
 	save_item(NAME(m_fg_rambank));
@@ -162,19 +162,13 @@ void tc0180vcu_device::vblank_callback(screen_device &screen, bool state)
 }
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
+//  update_intl
 //-------------------------------------------------
 
-void tc0180vcu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tc0180vcu_device::update_intl)
 {
-	switch (id)
-	{
-	case TIMER_INTL:
-		m_inth_callback(CLEAR_LINE);
-		m_intl_callback(ASSERT_LINE);
-		break;
-	}
+	m_inth_callback(CLEAR_LINE);
+	m_intl_callback(ASSERT_LINE);
 }
 
 

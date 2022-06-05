@@ -1316,7 +1316,7 @@ void diablo_hd_device::device_start()
 
 	m_packs = 1;        // FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
-	m_timer = timer_alloc(1);
+	m_timer = timer_alloc(FUNC(diablo_hd_device::sector_mark_tick), this);
 }
 
 void diablo_hd_device::device_reset()
@@ -1386,7 +1386,7 @@ void diablo_hd_device::device_reset()
 		return;
 	// for units with a CHD assigned to them start the timer
 	m_bits = std::make_unique<std::unique_ptr<uint32_t[]>[]>(m_pages);
-	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+	m_timer->adjust(m_sector_time - m_sector_mark_0_time);
 	read_sector();
 }
 
@@ -1401,9 +1401,9 @@ void diablo_hd_device::device_reset()
  * @param id timer id
  * @param arg argument supplied to timer_insert (unused)
  */
-void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(diablo_hd_device::sector_mark_tick)
 {
-	LOG_DRIVE(9,"[DHD%u]   TIMER id=%d param=%d @%.0fns\n", m_unit, id, param, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
+	LOG_DRIVE(9, "[DHD%u]   TIMER param=%d @%.0fns\n", m_unit, param, m_timer->elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
 	if (!m_disk)
 		return;
 
@@ -1412,20 +1412,20 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		// assert sector mark
 		sector_mark_0();
 		// next sector timer event is in the middle between sector_mark going 0 and back to 1
-		timer.adjust(m_sector_mark_0_time, 1);
+		m_timer->adjust(m_sector_mark_0_time, 1);
 		break;
 	case 1:
 		/* call the sector_callback, if any */
 		if (m_sector_callback)
 			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
 		// next sector timer event is deassert of sector_mark_0 (set to 1)
-		timer.adjust(m_sector_mark_1_time, 2);
+		m_timer->adjust(m_sector_mark_1_time, 2);
 		break;
 	case 2:
 		// deassert sector mark
 		sector_mark_1();
 		// next sector timer event is sector_mark_0 for next sector
-		timer.adjust(m_sector_time - m_sector_mark_0_time, 0);
+		m_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
 		break;
 	}
 }

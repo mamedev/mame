@@ -111,22 +111,18 @@ void scc8530_legacy_device::resetchannel(int ch)
 }
 
 /*-------------------------------------------------
-    scc8530_baud_expire - baud rate timer expiry
+    baud_expire - baud rate timer expiry
 -------------------------------------------------*/
 
-void scc8530_legacy_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(scc8530_legacy_device::baud_expire)
 {
-	Chan *pChan = &channel[id];
-	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
-	int rate;
+	Chan *pChan = &channel[param];
+	int brconst = pChan->reg_val[13] << 8 | pChan->reg_val[14];
+	int rate = 0;
 
 	if (brconst)
 	{
 		rate = clock() / brconst;
-	}
-	else
-	{
-		rate = 0;
 	}
 
 	// is baud counter IRQ enabled on this channel?
@@ -146,11 +142,11 @@ void scc8530_legacy_device::device_timer(emu_timer &timer, device_timer_id id, i
 	if (rate)
 	{
 		attotime attorate = attotime::from_hz(rate);
-		timer.adjust(attorate, 0, attorate);
+		channel[param].baudtimer->adjust(attorate, param, attorate);
 	}
 	else
 	{
-		timer.adjust(attotime::never, 0, attotime::never);
+		channel[param].baudtimer->adjust(attotime::never, param, attotime::never);
 	}
 }
 
@@ -172,8 +168,8 @@ void scc8530_legacy_device::device_start()
 	lastIRQStat = 0;
 	IRQType = IRQ_NONE;
 
-	channel[0].baudtimer = timer_alloc(0);
-	channel[1].baudtimer = timer_alloc(1);
+	channel[0].baudtimer = timer_alloc(FUNC(scc8530_legacy_device::baud_expire), this);
+	channel[1].baudtimer = timer_alloc(FUNC(scc8530_legacy_device::baud_expire), this);
 }
 
 

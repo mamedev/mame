@@ -72,7 +72,7 @@ device_memory_interface::space_config_vector at28c16_device::memory_space_config
 
 void at28c16_device::device_start()
 {
-	m_write_timer = timer_alloc(0);
+	m_write_timer = timer_alloc( FUNC( at28c16_device::write_complete ), this );
 
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );
@@ -229,12 +229,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 }
 
 
-void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER( at28c16_device::write_complete )
 {
-	switch( id )
-	{
-	case 0:
-		m_last_write = -1;
-		break;
-	}
+	m_last_write = -1;
 }

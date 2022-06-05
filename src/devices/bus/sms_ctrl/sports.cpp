@@ -11,29 +11,28 @@ Release data from the Sega Retro project:
 
 TODO:
 
-- For low-level emulation, a device for the TMP42C66P, a Toshiba 4bit
-  microcontroller, needs to be created, but a dump of its internal ROM
-  seems to be required.
+- For low-level emulation, a device for the TMP42C66P, a Toshiba 4-bit
+  microcontroller, is needed along with a dump of its internal ROM.
 - Auto-repeat and Control/Sports mode switches are not emulated.
 
 Notes:
 
   Games designed for the US model of the Sports Pad controller use the
-  TH line of the controller port to select which nibble, of the two axis
-  bytes, will be read at a time. The Japanese cartridge Sports Pad Soccer
-  uses a different mode when not detect a SMSJ, because the Sega Mark III
-  lacks the TH line. There is a different Sports Pad model released in
-  Japan and no information was found about it supporting both modes, so
+  TH line of the controller port to select which nibble of the two axis
+  to read. The Japanese cartridge Sports Pad Soccer uses a different mode
+  when it does not detect use by a Japanese SMS console, because the Sega
+  Mark III lacks the TH line. There was a different Sports Pad model released
+  in Japan and no information was found about it supporting both modes, so
   that model is currently emulated as a different device (see sportsjp.c).
 
   It was discovered that games designed for the Paddle Controller, released
-  in Japan, switch to a mode incompatible with the original Paddle when
-  detect the system region as Export. Similar to how the US model of the
-  Sports Pad works, that mode uses the TH line as output to select which
+  in Japan, will switch to a mode incompatible with the original Paddle when
+  the system region is detected as Export. Similar to how the US model of the
+  Sports Pad works, that mode uses the TH line as an output to select which
   nibble of the X axis will be read. So, on an Export console version,
   paddle games are somewhat playable with the US Sport Pad model, though it
-  needs to be used inverted and the trackball needs to be moved slowly, else
-  the software for the paddle think it's moving backward.
+  needs to be used inverted and the trackball needs to be moved slowly,
+  otherwise the software for the paddle think it's moving backward.
   See http://mametesters.org/view.php?id=5872 for discussion.
 
 **********************************************************************/
@@ -53,28 +52,20 @@ DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD, sms_sports_pad_device, "sms_sports_pad", "Seg
 #define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL(10'738'635)/3/512)
 
 
-void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sms_sports_pad_device::read_tick)
 {
-	switch (id)
+	// values for x and y axis need to be reset for Sports Pad games, but
+	// are not reset for paddle games, so it was assumed the reset occurs
+	// only when this timer fires after the read state reaches its maximum value.
+	if (m_read_state == 3)
 	{
-	case TIMER_SPORTSPAD:
-		// values for x and y axis need to be resetted for Sports Pad games, but
-		// are not resetted for paddle games, so it was assumed the reset occurs
-		// only when this timer fires after the read state reached maximum value.
-		if (m_read_state == 3)
-		{
-			m_x_axis_reset_value = m_sports_x->read();
-			m_y_axis_reset_value = m_sports_y->read();
-		}
-		else
-		{
-			// set to maximum value, so it wraps to 0 at next increment
-			m_read_state = 3;
-		}
-
-		break;
-	default:
-		throw emu_fatalerror("sms_sports_pad_device(%s): Unknown timer ID", tag());
+		m_x_axis_reset_value = m_sports_x->read();
+		m_y_axis_reset_value = m_sports_y->read();
+	}
+	else
+	{
+		// set to maximum value, so it wraps to 0 at next increment
+		m_read_state = 3;
 	}
 }
 
@@ -169,7 +160,7 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	m_sports_y(*this, "SPORTS_Y"),
 	m_read_state(0),
 	m_th_pin_state(0),
-	m_x_axis_reset_value(0x80), // value 0x80 helps when start playing paddle games.
+	m_x_axis_reset_value(0x80), // value 0x80 helps when starting paddle games.
 	m_y_axis_reset_value(0x80),
 	m_interval(SPORTS_PAD_INTERVAL),
 	m_sportspad_timer(nullptr)
@@ -183,7 +174,7 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 
 void sms_sports_pad_device::device_start()
 {
-	m_sportspad_timer = timer_alloc(TIMER_SPORTSPAD);
+	m_sportspad_timer = timer_alloc(FUNC(sms_sports_pad_device::read_tick), this);
 
 	save_item(NAME(m_read_state));
 	save_item(NAME(m_th_pin_state));
@@ -191,20 +182,10 @@ void sms_sports_pad_device::device_start()
 	save_item(NAME(m_y_axis_reset_value));
 }
 
-
-//-------------------------------------------------
-//  sms_peripheral_r - sports pad read
-//-------------------------------------------------
-
 uint8_t sms_sports_pad_device::peripheral_r()
 {
 	return m_sports_in->read();
 }
-
-
-//-------------------------------------------------
-//  sms_peripheral_w - sports pad write
-//-------------------------------------------------
 
 void sms_sports_pad_device::peripheral_w(uint8_t data)
 {

@@ -481,7 +481,7 @@ void intv_state::intvkbd_periph_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint16_t intv_state::intv_stic_r(offs_t offset)
+uint16_t intv_state::stic_r(offs_t offset)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		return m_stic->read(offset);
@@ -489,14 +489,14 @@ uint16_t intv_state::intv_stic_r(offs_t offset)
 		return offset;
 }
 
-void intv_state::intv_stic_w(offs_t offset, uint16_t data)
+void intv_state::stic_w(offs_t offset, uint16_t data)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		m_stic->write(offset, data);
 }
 
 
-uint16_t intv_state::intv_gram_r(offs_t offset)
+uint16_t intv_state::gram_r(offs_t offset)
 {
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
@@ -505,31 +505,31 @@ uint16_t intv_state::intv_gram_r(offs_t offset)
 		return offset;
 }
 
-void intv_state::intv_gram_w(offs_t offset, uint16_t data)
+void intv_state::gram_w(offs_t offset, uint16_t data)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		m_stic->gram_write(offset, data);
 }
 
-uint16_t intv_state::intv_ram8_r(offs_t offset)
+uint16_t intv_state::ram8_r(offs_t offset)
 {
 	//logerror("%x = ram8_r(%x)\n",state->m_ram8[offset],offset);
 	return (int)m_ram8[offset];
 }
 
-void intv_state::intv_ram8_w(offs_t offset, uint16_t data)
+void intv_state::ram8_w(offs_t offset, uint16_t data)
 {
 	//logerror("ram8_w(%x) = %x\n",offset,data);
 	m_ram8[offset] = data&0xff;
 }
 
-uint16_t intv_state::intv_ram16_r(offs_t offset)
+uint16_t intv_state::ram16_r(offs_t offset)
 {
 	//logerror("%x = ram16_r(%x)\n",state->m_ram16[offset],offset);
 	return (int)m_ram16[offset];
 }
 
-void intv_state::intv_ram16_w(offs_t offset, uint16_t data)
+void intv_state::ram16_w(offs_t offset, uint16_t data)
 {
 	//logerror("%g: WRITING TO GRAM offset = %d\n",machine.time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
@@ -639,16 +639,21 @@ void intv_state::machine_start()
 
 		m_cart->save_ram();
 	}
+
+	m_int2_complete_timer = timer_alloc(FUNC(intv_state::interrupt2_complete), this);
+	m_int_complete_timer = timer_alloc(FUNC(intv_state::interrupt_complete), this);
+	for (int row = 0; row < stic_device::BACKTAB_HEIGHT; row++)
+		m_btb_fill_timers[row] = timer_alloc(FUNC(intv_state::btb_fill), this);
 }
 
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
+TIMER_CALLBACK_MEMBER(intv_state::interrupt_complete)
 {
 	m_maincpu->set_input_line(CP1610_INT_INTRM, CLEAR_LINE);
 	m_bus_copy_mode = 0;
 }
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
+TIMER_CALLBACK_MEMBER(intv_state::btb_fill)
 {
 	uint8_t row = m_backtab_row;
 	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
@@ -659,7 +664,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 	m_backtab_row += 1;
 }
 
-INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
+INTERRUPT_GEN_MEMBER(intv_state::interrupt)
 {
 	int delay = m_stic->read_row_delay();
 	m_maincpu->set_input_line(CP1610_INT_INTRM, ASSERT_LINE);
@@ -668,10 +673,13 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	m_backtab_row = 0;
 
 	m_maincpu->adjust_icount(-(12*stic_device::ROW_BUSRQ+stic_device::FRAME_BUSRQ)); // Account for stic cycle stealing
-	timer_set(m_maincpu->cycles_to_attotime(stic_device::VBLANK_END), TIMER_INTV_INTERRUPT_COMPLETE);
+	m_int_complete_timer->adjust(m_maincpu->cycles_to_attotime(stic_device::VBLANK_END));
 	for (int row = 0; row < stic_device::BACKTAB_HEIGHT; row++)
 	{
-		timer_set(m_maincpu->cycles_to_attotime(stic_device::FIRST_FETCH-stic_device::FRAME_BUSRQ+stic_device::CYCLES_PER_SCANLINE*stic_device::Y_SCALE*delay + (stic_device::CYCLES_PER_SCANLINE*stic_device::Y_SCALE*stic_device::CARD_HEIGHT - stic_device::ROW_BUSRQ)*row), TIMER_INTV_BTB_FILL);
+		const uint32_t row_cycles = (stic_device::CYCLES_PER_SCANLINE * stic_device::Y_SCALE * stic_device::CARD_HEIGHT - stic_device::ROW_BUSRQ) * row;
+		const uint32_t total_cycles = stic_device::FIRST_FETCH - stic_device::FRAME_BUSRQ + stic_device::CYCLES_PER_SCANLINE * stic_device::Y_SCALE * delay + row_cycles;
+		attotime duration = m_maincpu->cycles_to_attotime(total_cycles);
+		m_btb_fill_timers[row]->adjust(duration);
 	}
 
 	if (delay == 0)

@@ -68,10 +68,6 @@ private:
 
 void milton_state::machine_start()
 {
-	// zerofill
-	m_data = 0;
-	m_control = 0xff;
-
 	// register for savestates
 	save_item(NAME(m_data));
 	save_item(NAME(m_control));

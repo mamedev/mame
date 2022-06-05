@@ -468,9 +468,9 @@ void jpmimpct_state::slides_non_video_w(offs_t offset, uint16_t data, uint16_t m
 	}
 	}
 
-	int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
-						 m_meters->GetActivity(2) | m_meters->GetActivity(3) |
-						 m_meters->GetActivity(4);
+	int combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
+						 m_meters->get_activity(2) | m_meters->get_activity(3) |
+						 m_meters->get_activity(4);
 
 	if (combined_meter)
 	{

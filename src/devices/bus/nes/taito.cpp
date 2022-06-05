@@ -120,7 +120,7 @@ void nes_x1_005_device::pcb_reset()
 void nes_x1_017_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_x1_017_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -217,7 +217,7 @@ void nes_tc0190fmc_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -359,15 +359,12 @@ u8 nes_x1_005_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_x1_017_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_x1_017_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
-	{
-		if ((m_irq_enable & 0x05) == 1 && m_irq_count) // counting enabled?
-			m_irq_count--;
-		if (!m_irq_count && BIT(m_irq_enable, 1))
-			set_irq_line(ASSERT_LINE);
-	}
+	if ((m_irq_enable & 0x05) == 1 && m_irq_count) // counting enabled?
+		m_irq_count--;
+	if (!m_irq_count && BIT(m_irq_enable, 1))
+		set_irq_line(ASSERT_LINE);
 }
 
 void nes_x1_017_device::set_chr()

@@ -51,8 +51,7 @@ private:
 	void websocket_incoming(std::shared_ptr<webpp::ws_client::Message> message);
 	void websocket_error(const std::error_code& code);
 	void websocket_closed(int i, const std::string& msg);
-	void open_websocket();
-	void device_timer(emu_timer &timer, device_timer_id id, int param);
+	TIMER_CALLBACK_MEMBER(open_websocket);
 
 	void send(const char* message);
 	void send(u8* message, int len);

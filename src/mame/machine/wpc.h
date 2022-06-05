@@ -78,9 +78,6 @@
 class wpc_device : public device_t
 {
 public:
-	static constexpr device_timer_id TIMER_IRQ = 1;
-	static constexpr device_timer_id TIMER_ZEROCROSS = 2;
-
 	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read(offs_t offset);
@@ -111,7 +108,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(zerocross_set);
 
 private:
 	uint8_t m_shift_addr_high;

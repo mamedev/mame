@@ -382,7 +382,7 @@ inline void abc77_device::serial_output(int state)
 //  serial_clock -
 //-------------------------------------------------
 
-inline void abc77_device::serial_clock()
+TIMER_CALLBACK_MEMBER(abc77_device::serial_clock)
 {
 	m_clock = !m_clock;
 
@@ -442,10 +442,10 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 void abc77_device::device_start()
 {
 	// allocate timers
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_serial_timer = timer_alloc(FUNC(abc77_device::serial_clock), this);
 	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
 
-	m_reset_timer = timer_alloc(TIMER_RESET);
+	m_reset_timer = timer_alloc(FUNC(abc77_device::reset_tick), this);
 }
 
 
@@ -469,21 +469,12 @@ void abc77_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  reset_tick - handle delayed reset
 //-------------------------------------------------
 
-void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(abc77_device::reset_tick)
 {
-	switch (id)
-	{
-	case TIMER_SERIAL:
-		serial_clock();
-		break;
-
-	case TIMER_RESET:
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		break;
-	}
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
