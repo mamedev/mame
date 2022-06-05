@@ -34,7 +34,7 @@ crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag,
 	, m_irq_enable(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0)
 	, m_vert_blank_start(0), m_vert_blank_end(0)
 	, m_mode_control(0), m_line_compare(0), m_register_address_latch(0)
-	, m_cursor_state(false), m_cursor_blink_count(0)
+	, m_start_addr_latch(0), m_cursor_state(false), m_cursor_blink_count(0)
 	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0)
 	, m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0)
 	, m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0)
@@ -115,8 +115,8 @@ void crtc_ega_device::register_w(uint8_t data)
 		case 0x0b:  m_cursor_end_ras    =   data & 0x1f;
 					m_cursor_skew       = ((data & 0x60) >> 5);
 					break;
-		case 0x0c:  m_disp_start_addr   = ((data & 0xff) << 8) | (m_disp_start_addr & 0x00ff); break;
-		case 0x0d:  m_disp_start_addr   = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
+		case 0x0c:  m_start_addr_latch   = ((data & 0xff) << 8) | (m_start_addr_latch & 0x00ff); break;
+		case 0x0d:  m_start_addr_latch   = ((data & 0xff) << 0) | (m_start_addr_latch & 0xff00); break;
 		case 0x0e:  m_cursor_addr       = ((data & 0xff) << 8) | (m_cursor_addr & 0x00ff); break;
 		case 0x0f:  m_cursor_addr       = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
 		case 0x10:  m_vert_retr_start   = ((data & 0xff) << 0) | (m_vert_retr_start & 0x0100); break;
@@ -281,6 +281,8 @@ void crtc_ega_device::set_vblank(int state)
 			m_res_out_vblank_cb(m_vblank);
 		if (!m_res_out_irq_cb.isnull() && !m_irq_enable)
 			m_res_out_irq_cb(m_vblank);
+		if (state)
+			m_disp_start_addr = m_start_addr_latch;
 	}
 }
 
@@ -633,6 +635,7 @@ void crtc_ega_device::device_start()
 	m_cursor_end_ras = 0;
 	m_cursor_skew = 0;
 	m_disp_start_addr = 0;
+	m_start_addr_latch = 0;
 	m_light_pen_addr = 0;
 	m_vert_retr_end = 0;
 	m_offset = 0;
@@ -668,6 +671,7 @@ void crtc_ega_device::device_start()
 	save_item(NAME(m_cursor_start_ras));
 	save_item(NAME(m_cursor_end_ras));
 	save_item(NAME(m_disp_start_addr));
+	save_item(NAME(m_start_addr_latch));
 	save_item(NAME(m_cursor_addr));
 	save_item(NAME(m_light_pen_addr));
 	save_item(NAME(m_light_pen_latched));
