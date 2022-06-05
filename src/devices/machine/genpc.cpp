@@ -1059,11 +1059,23 @@ ioport_constructor pc_noppi_mb_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc_noppi_mb );
 }
 
+uint8_t pc_noppi_mb_device::pc_ppi_porta_r()
+{
+	return m_ppi_shift_register;
+}
+
+uint8_t pc_noppi_mb_device::pc_ppi_portb_r()
+{
+	return m_ppi_portb;
+}
+
 void pc_noppi_mb_device::map(address_map &map)
 {
 	map(0x0000, 0x000f).rw("dma8237", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0060).r(FUNC(pc_noppi_mb_device::pc_ppi_porta_r));
+	map(0x0061, 0x0061).rw(FUNC(pc_noppi_mb_device::pc_ppi_portb_r), FUNC(pc_noppi_mb_device::pc_ppi_portb_w));
 	map(0x0080, 0x008f).w(FUNC(pc_noppi_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(FUNC(pc_noppi_mb_device::nmi_enable_w));
 }
