@@ -1988,10 +1988,10 @@ void supracan_state::machine_start()
 
 	save_item(NAME(m_video_regs));
 
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::video_callback), this));
-	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::hbl_callback), this));
-	m_line_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::line_on_callback), this));
-	m_line_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::line_off_callback), this));
+	m_video_timer = timer_alloc(FUNC(supracan_state::video_callback), this);
+	m_hbl_timer = timer_alloc(FUNC(supracan_state::hbl_callback), this);
+	m_line_on_timer = timer_alloc(FUNC(supracan_state::line_on_callback), this);
+	m_line_off_timer = timer_alloc(FUNC(supracan_state::line_off_callback), this);
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x3fffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));

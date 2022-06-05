@@ -63,6 +63,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_flash(*this, "flash")
 		, m_membank(*this, "membank%u", 0U)
+		, m_on_button(*this, "ON")
+		, m_keys(*this, "BIT%u", 0U)
 	{
 	}
 
@@ -86,6 +88,8 @@ private:
 	optional_shared_ptr<uint8_t> m_nvram;
 	optional_device<intelfsh8_device> m_flash;
 	optional_device_array<address_map_bank_device, 4> m_membank;
+	required_ioport m_on_button;
+	required_ioport_array<8> m_keys;
 
 	ti85_model m_model{};
 
@@ -125,6 +129,7 @@ private:
 	emu_timer *m_ti85_timer = nullptr;
 	emu_timer *m_ti83_1st_timer = nullptr;
 	emu_timer *m_ti83_2nd_timer = nullptr;
+
 	uint8_t ti85_port_0000_r();
 	uint8_t ti8x_keypad_r();
 	uint8_t ti85_port_0006_r();
@@ -196,8 +201,9 @@ private:
 	TIMER_CALLBACK_MEMBER(ti83_timer1_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
+	TIMER_CALLBACK_MEMBER(crystal_timer_tick);
+
 	//crystal timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void ti83pse_count(uint8_t timer, uint8_t data);
 
 	emu_timer *m_crystal_timer1 = nullptr;

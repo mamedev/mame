@@ -207,8 +207,8 @@ void riscii_series_device::device_start()
 
 	set_icountptr(m_icount);
 
-	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::timer0), this));
-	m_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::speech_timer), this));
+	m_timer0 = timer_alloc(FUNC(riscii_series_device::timer0), this);
+	m_speech_timer = timer_alloc(FUNC(riscii_series_device::speech_timer), this);
 
 	state_add<u32>(RII_PC, "PC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask);
 	state_add<u32>(STATE_GENPC, "GENPC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask).noshow();

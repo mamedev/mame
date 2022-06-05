@@ -203,7 +203,7 @@ void f5220_kbd_device::device_start()
 	m_int_handler.resolve_safe();
 
 	// timer for initial keyboard data
-	m_reset_timer = timer_alloc(0);
+	m_reset_timer = timer_alloc(FUNC(f5220_kbd_device::reset_done), this);
 	m_reset_timer->adjust(attotime::from_msec(1000));
 
 	// register for state saving
@@ -224,12 +224,13 @@ void f5220_kbd_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - device-specific timer
+//  reset_done - flag an interrupt to indicate
+//  the device has come out of reset
 //-------------------------------------------------
 
-void f5220_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(f5220_kbd_device::reset_done)
 {
-	logerror("Reset\n");
+	logerror("Reset Done\n");
 
 	m_int_handler(1);
 	m_int_handler(0);

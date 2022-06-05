@@ -482,7 +482,7 @@ uint8_t itech8_state::slikshot_z80_control_r()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
+TIMER_CALLBACK_MEMBER(itech8_state::delayed_z80_control_w)
 {
 	int data = param;
 
@@ -509,7 +509,7 @@ TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
 
 void itech8_state::slikshot_z80_control_w(uint8_t data)
 {
-	synchronize(TIMER_DELAYED_Z80_CONTROL, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_z80_control_w), this), data);
 }
 
 

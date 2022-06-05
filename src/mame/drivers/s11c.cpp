@@ -145,10 +145,7 @@ void s11c_state::machine_reset()
 
 void s11c_state::init_s11c()
 {
-	emu_timer* timer = timer_alloc(TIMER_IRQ);
 	set_invert(true);
-	set_timer(timer);
-	timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 }
 
 void s11c_state::init_s11c7()

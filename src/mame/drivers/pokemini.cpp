@@ -38,21 +38,6 @@ public:
 	void pokemini(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_SECONDS,
-		TIMER_256HZ,
-		TIMER_1,
-		TIMER_1_HI,
-		TIMER_2,
-		TIMER_2_HI,
-		TIMER_3,
-		TIMER_3_HI,
-		TIMER_PRC
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
@@ -110,15 +95,15 @@ private:
 
 	void check_irqs();
 	void update_sound();
-	void seconds_timer_callback();
-	void timer_256hz_callback();
-	void timer1_callback();
-	void timer1_hi_callback();
-	void timer2_callback();
-	void timer2_hi_callback();
-	void timer3_callback();
-	void timer3_hi_callback();
-	void prc_counter_callback();
+	TIMER_CALLBACK_MEMBER(seconds_timer_callback);
+	TIMER_CALLBACK_MEMBER(timer_256hz_callback);
+	TIMER_CALLBACK_MEMBER(timer1_callback);
+	TIMER_CALLBACK_MEMBER(timer1_hi_callback);
+	TIMER_CALLBACK_MEMBER(timer2_callback);
+	TIMER_CALLBACK_MEMBER(timer2_hi_callback);
+	TIMER_CALLBACK_MEMBER(timer3_callback);
+	TIMER_CALLBACK_MEMBER(timer3_hi_callback);
+	TIMER_CALLBACK_MEMBER(prc_counter_callback);
 };
 
 
@@ -335,7 +320,7 @@ void pokemini_state::update_sound()
 }
 
 
-void pokemini_state::seconds_timer_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::seconds_timer_callback)
 {
 	if ( m_pm_reg[0x08] & 0x01 )
 	{
@@ -352,7 +337,7 @@ void pokemini_state::seconds_timer_callback()
 }
 
 
-void pokemini_state::timer_256hz_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer_256hz_callback)
 {
 	if ( m_pm_reg[0x40] & 0x01 )
 	{
@@ -386,7 +371,7 @@ void pokemini_state::timer_256hz_callback()
 }
 
 
-void pokemini_state::timer1_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer1_callback)
 {
 	m_pm_reg[0x36] -= 1;
 	/* Check for underflow of timer */
@@ -414,7 +399,7 @@ void pokemini_state::timer1_callback()
 }
 
 
-void pokemini_state::timer1_hi_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer1_hi_callback)
 {
 	m_pm_reg[0x37] -= 1;
 	/* Check for underflow of timer */
@@ -427,7 +412,7 @@ void pokemini_state::timer1_hi_callback()
 }
 
 
-void pokemini_state::timer2_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer2_callback)
 {
 	m_pm_reg[0x3E] -= 1;
 	/* Check for underflow of timer */
@@ -455,7 +440,7 @@ void pokemini_state::timer2_callback()
 }
 
 
-void pokemini_state::timer2_hi_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer2_hi_callback)
 {
 	m_pm_reg[0x3F] -= 1;
 	/* Check for underfow of timer */
@@ -468,7 +453,7 @@ void pokemini_state::timer2_hi_callback()
 }
 
 
-void pokemini_state::timer3_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer3_callback)
 {
 	m_pm_reg[0x4E] -= 1;
 	/* Check for underflow of timer */
@@ -504,7 +489,7 @@ void pokemini_state::timer3_callback()
 }
 
 
-void pokemini_state::timer3_hi_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::timer3_hi_callback)
 {
 	m_pm_reg[0x4F] -= 1;
 	/* Check for underflow of timer */
@@ -1533,7 +1518,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 }
 
 
-void pokemini_state::prc_counter_callback()
+TIMER_CALLBACK_MEMBER(pokemini_state::prc_counter_callback)
 {
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 	m_prc.count++;
@@ -1675,66 +1660,23 @@ void pokemini_state::machine_start()
 	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */
-	m_timers.seconds_timer = timer_alloc(TIMER_SECONDS);
+	m_timers.seconds_timer = timer_alloc(FUNC(pokemini_state::seconds_timer_callback), this);
 	m_timers.seconds_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
-	m_timers.hz256_timer = timer_alloc(TIMER_256HZ);
+	m_timers.hz256_timer = timer_alloc(FUNC(pokemini_state::timer_256hz_callback), this);
 	m_timers.hz256_timer->adjust(attotime::zero, 0, attotime::from_hz(256));
 
-	m_timers.timer1 = timer_alloc(TIMER_1);
-	m_timers.timer1_hi = timer_alloc(TIMER_1_HI);
-	m_timers.timer2 = timer_alloc(TIMER_2);
-	m_timers.timer2_hi = timer_alloc(TIMER_2_HI);
-	m_timers.timer3 = timer_alloc(TIMER_3);
-	m_timers.timer3_hi = timer_alloc(TIMER_3_HI);
+	m_timers.timer1 = timer_alloc(FUNC(pokemini_state::timer1_callback), this);
+	m_timers.timer1_hi = timer_alloc(FUNC(pokemini_state::timer1_hi_callback), this);
+	m_timers.timer2 = timer_alloc(FUNC(pokemini_state::timer2_callback), this);
+	m_timers.timer2_hi = timer_alloc(FUNC(pokemini_state::timer2_hi_callback), this);
+	m_timers.timer3 = timer_alloc(FUNC(pokemini_state::timer3_callback), this);
+	m_timers.timer3_hi = timer_alloc(FUNC(pokemini_state::timer3_hi_callback), this);
 
 	/* Set up the PRC */
 	m_prc.max_frame_count = 2;
-	m_prc.count_timer = timer_alloc(TIMER_PRC);
+	m_prc.count_timer = timer_alloc(FUNC(pokemini_state::prc_counter_callback), this);
 	m_prc.count_timer->adjust( attotime::zero, 0, m_maincpu->cycles_to_attotime(55640 / 65) );
-}
-
-
-void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TIMER_SECONDS:
-			seconds_timer_callback();
-			break;
-
-		case TIMER_256HZ:
-			timer_256hz_callback();
-			break;
-
-		case TIMER_1:
-			timer1_callback();
-			break;
-
-		case TIMER_1_HI:
-			timer1_hi_callback();
-			break;
-
-		case TIMER_2:
-			timer2_callback();
-			break;
-
-		case TIMER_2_HI:
-			timer2_hi_callback();
-			break;
-
-		case TIMER_3:
-			timer3_callback();
-			break;
-
-		case TIMER_3_HI:
-			timer3_hi_callback();
-			break;
-
-		case TIMER_PRC:
-			prc_counter_callback();
-			break;
-	}
 }
 
 

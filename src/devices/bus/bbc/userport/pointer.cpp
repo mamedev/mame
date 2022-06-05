@@ -151,7 +151,7 @@ bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char
 
 void bbc_pointer_device::device_start()
 {
-	m_pointer_timer = timer_alloc();
+	m_pointer_timer = timer_alloc(FUNC(bbc_pointer_device::update), this);
 }
 
 
@@ -176,7 +176,7 @@ void bbc_pointer_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void bbc_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(bbc_pointer_device::update)
 {
 	int x = m_pointer_x->read();
 	int y = m_pointer_y->read();

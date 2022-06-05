@@ -68,7 +68,7 @@ void fromance_state::init_common(  )
 	m_fg_tilemap->set_transparent_pen(15);
 
 	/* reset the timer */
-	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fromance_state::crtc_interrupt_gen),this));
+	m_crtc_timer = timer_alloc(FUNC(fromance_state::crtc_interrupt_gen), this);
 
 	/* state save */
 	save_item(NAME(m_selected_videoram));

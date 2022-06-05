@@ -112,12 +112,7 @@ public:
 	void write(u8 data);
 
 protected:
-	gottlieb_sound_r1_device(
-			const machine_config &mconfig,
-			device_type type,
-			const char *tag,
-			device_t *owner,
-			uint32_t clock);
+	gottlieb_sound_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -180,17 +175,15 @@ public:
 	void write(u8 data);
 
 protected:
-	gottlieb_sound_p4_device(
-			const machine_config &mconfig,
-			device_type type,
-			const char *tag,
-			device_t *owner,
-			uint32_t clock);
+	gottlieb_sound_p4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(set_nmi);
+	TIMER_CALLBACK_MEMBER(clear_nmi);
+	TIMER_CALLBACK_MEMBER(update_latch);
 
 	// internal communications
 	uint8_t speech_data_r();
@@ -208,14 +201,6 @@ protected:
 	void nmi_timer_adjust();
 	void nmi_state_update();
 
-	// timer IDs
-	enum
-	{
-		TID_NMI_GENERATE,
-		TID_NMI_CLEAR,
-		TID_SOUND_LATCH_WRITE
-	};
-
 	// devices
 	required_device<m6502_device>   m_dcpu;
 	optional_device<m6502_device>   m_dcpu2;
@@ -224,16 +209,18 @@ protected:
 	required_device<ay8913_device>  m_ay2;
 
 	// internal state
-	emu_timer * m_nmi_timer = 0;
-	uint8_t       m_nmi_rate = 0;
-	uint8_t       m_nmi_state = 0;
-	uint8_t       m_dcpu_latch = 0;
-	uint8_t       m_ycpu_latch = 0;
-	uint8_t       m_speech_control = 0;
-	uint8_t       m_last_command = 0;
-	uint8_t       m_psg_latch = 0;
-	uint8_t       m_psg_data_latch = 0;
-	uint8_t       m_dcpu2_latch = 0;
+	emu_timer *   m_nmi_timer;
+	emu_timer *   m_nmi_clear_timer;
+	emu_timer *   m_latch_timer;
+	uint8_t       m_nmi_rate;
+	uint8_t       m_nmi_state;
+	uint8_t       m_dcpu_latch;
+	uint8_t       m_ycpu_latch;
+	uint8_t       m_speech_control;
+	uint8_t       m_last_command;
+	uint8_t       m_psg_latch;
+	uint8_t       m_psg_data_latch;
+	uint8_t       m_dcpu2_latch;
 };
 
 
@@ -284,12 +271,7 @@ public:
 	gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	gottlieb_sound_p5_device(
-			const machine_config &mconfig,
-			device_type type,
-			const char *tag,
-			device_t *owner,
-			uint32_t clock);
+	gottlieb_sound_p5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

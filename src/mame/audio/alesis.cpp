@@ -33,6 +33,11 @@ alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, ALESIS_DM3AG, tag, owner, clock)
 	, m_dac(*this, "dac")
 	, m_samples(*this, DEVICE_SELF)
+	, m_dac_update_timer(nullptr)
+	, m_output_active(false)
+	, m_count(0)
+	, m_shift(0)
+	, m_cur_sample(0)
 {
 }
 
@@ -55,7 +60,7 @@ void alesis_dm3ag_device::device_add_mconfig(machine_config &config)
 
 void alesis_dm3ag_device::device_start()
 {
-	m_dac_update_timer = timer_alloc(TIMER_DAC_UPDATE);
+	m_dac_update_timer = timer_alloc(FUNC(alesis_dm3ag_device::dac_update), this);
 }
 
 //-------------------------------------------------
@@ -75,9 +80,10 @@ void alesis_dm3ag_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  dac_update - update the DAC output
 //-------------------------------------------------
-void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+
+TIMER_CALLBACK_MEMBER(alesis_dm3ag_device::dac_update)
 {
 	if (m_output_active)
 	{

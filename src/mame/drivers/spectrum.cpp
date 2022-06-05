@@ -737,6 +737,8 @@ void spectrum_state::machine_reset()
 	m_port_fe_data = -1;
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
+	m_irq_on_timer->adjust(attotime::never);
+	m_irq_off_timer->adjust(attotime::never);
 }
 
 /* F4 Character Displayer */
@@ -755,27 +757,22 @@ static GFXDECODE_START( gfx_spectrum )
 	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
-void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spectrum_state::irq_on)
 {
-	switch (id)
-	{
-	case TIMER_IRQ_ON:
-		m_int_at = m_maincpu->total_cycles();
-		m_int_at -= m_maincpu->attotime_to_cycles(m_maincpu->local_time() - machine().time());
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
-		break;
-	case TIMER_IRQ_OFF:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in spectrum_state::device_timer");
-	}
+	m_int_at = m_maincpu->total_cycles();
+	m_int_at -= m_maincpu->attotime_to_cycles(m_maincpu->local_time() - machine().time());
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+}
+
+TIMER_CALLBACK_MEMBER(spectrum_state::irq_off)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0, get_screen_area().left()), TIMER_IRQ_ON);
+	m_irq_on_timer->adjust(m_screen->time_until_pos(0, get_screen_area().left()));
 }
 
 void spectrum_state::spectrum_common(machine_config &config)

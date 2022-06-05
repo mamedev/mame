@@ -90,14 +90,6 @@
     CONSTANTS
 ***************************************************************************/
 
-enum
-{
-	TIMER_CART,
-	TIMER_NMI,
-	TIMER_HALT
-};
-
-
 // definitions of RPK PCBs in layout.xml
 static const char *coco_rpk_pcbdefs[] =
 {
@@ -149,11 +141,11 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 void cococart_slot_device::device_start()
 {
-	for(int i=0; i<TIMER_POOL; i++ )
+	for(int i=0; i < TIMER_POOL; i++ )
 	{
-		m_cart_line.timer[i]    = timer_alloc(TIMER_CART);
-		m_nmi_line.timer[i]     = timer_alloc(TIMER_NMI);
-		m_halt_line.timer[i]    = timer_alloc(TIMER_HALT);
+		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
+		m_nmi_line.timer[i]     = timer_alloc(FUNC(cococart_slot_device::nmi_line_timer_tick), this);
+		m_halt_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::halt_line_timer_tick), this);
 	}
 
 	m_cart_line.timer_index     = 0;
@@ -204,26 +196,35 @@ void cococart_slot_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer callbacks
+//  cart_line_timer_tick - update the output
+//  value for the cart's line to PIA1 CB1
 //-------------------------------------------------
 
-void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cococart_slot_device::cart_line_timer_tick)
 {
-	switch(id)
-	{
-		case TIMER_CART:
-			set_line(line::CART, m_cart_line, (line_value) param);
-			break;
-
-		case TIMER_NMI:
-			set_line(line::NMI, m_nmi_line, (line_value) param);
-			break;
-
-		case TIMER_HALT:
-			set_line(line::HALT, m_halt_line, (line_value) param);
-			break;
-	}
+	set_line(line::CART, m_cart_line, (line_value) param);
 }
+
+//-------------------------------------------------
+//  nmi_line_timer_tick - update the output
+//  value sent to the CPU's NMI line
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(cococart_slot_device::nmi_line_timer_tick)
+{
+	set_line(line::NMI, m_nmi_line, (line_value) param);
+}
+
+//-------------------------------------------------
+//  halt_line_timer_tick - update the output
+//  value sent to the CPU's HALT line
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(cococart_slot_device::halt_line_timer_tick)
+{
+	set_line(line::HALT, m_halt_line, (line_value) param);
+}
+
 
 
 //-------------------------------------------------

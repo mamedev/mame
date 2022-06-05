@@ -421,7 +421,7 @@ void laserbat_state_base::machine_start()
 {
 	// start rendering scanlines
 	m_screen->register_screen_bitmap(m_bitmap);
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer = timer_alloc(FUNC(laserbat_state_base::video_line), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(1, 0));
 
 	save_item(NAME(m_gfx2_base));
@@ -458,19 +458,6 @@ void laserbat_state::machine_start()
 
 	save_item(NAME(m_keys));
 }
-
-void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SCANLINE:
-		video_line(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in laserbat_state_base::device_timer");
-	}
-}
-
 
 void laserbat_state_base::laserbat_base(machine_config &config)
 {

@@ -30,15 +30,15 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void set_prg();
 	virtual void set_chr();
 
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+
 	u16 m_irq_count;
 	int m_irq_enable;
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 
 	u8 m_mmc_prg_bank[4];

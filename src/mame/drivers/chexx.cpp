@@ -126,14 +126,7 @@ public:
 	void mem(address_map &map);
 
 protected:
-	enum
-	{
-		TIMER_UPDATE
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	void update();
+	TIMER_CALLBACK_MEMBER(update);
 
 	// digitalker
 	void digitalker_set_bank(uint8_t bank);
@@ -283,16 +276,6 @@ void chexx_state::mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
-void chexx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_UPDATE:
-		update();
-		break;
-	}
-}
-
 void chexx_state::lamp_w(uint8_t data)
 {
 	m_lamp = data;
@@ -373,7 +356,7 @@ void chexx_state::machine_start()
 	m_leds.resolve();
 	m_lamps.resolve();
 
-	m_update_timer = timer_alloc(TIMER_UPDATE);
+	m_update_timer = timer_alloc(FUNC(chexx_state::update), this);
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)
@@ -396,7 +379,7 @@ void chexx_state::machine_reset()
 	m_update_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
-void chexx_state::update()
+TIMER_CALLBACK_MEMBER(chexx_state::update)
 {
 	// NMI on coin-in
 	uint8_t coin = (~m_coin->read()) & 0x03;

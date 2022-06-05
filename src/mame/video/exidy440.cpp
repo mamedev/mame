@@ -52,8 +52,8 @@ void exidy440_state::video_start()
 	m_local_paletteram = std::make_unique<uint8_t[]>(512 * 2);
 	memset(m_local_paletteram.get(), 0, 512 * 2);
 
-	m_beam_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy440_state::beam_firq_callback), this));
-	m_collide_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy440_state::collide_firq_callback), this));
+	m_beam_firq_timer = timer_alloc(FUNC(exidy440_state::beam_firq_callback), this);
+	m_collide_firq_timer = timer_alloc(FUNC(exidy440_state::collide_firq_callback), this);
 }
 
 

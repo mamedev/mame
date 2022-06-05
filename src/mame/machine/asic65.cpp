@@ -11,8 +11,10 @@
 
 #include <algorithm>
 
-#define LOG_ASIC        0
+#define LOG_ASIC        (1U << 1)
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 #define PARAM_WRITE     0
 #define COMMAND_WRITE   1
@@ -87,6 +89,7 @@ DEFINE_DEVICE_TYPE(ASIC65, asic65_device, "asic65", "Atari ASIC65")
 
 asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ASIC65, tag, owner, clock)
+	, m_synced_write_timer(nullptr)
 	, m_asic65_type(0)
 	, m_command(0)
 	, m_yorigin(0x1800)
@@ -101,7 +104,6 @@ asic65_device::asic65_device(const machine_config &mconfig, const char *tag, dev
 	, m_xflg(0)
 	, m_68data(0)
 	, m_tdata(0)
-	, m_log(nullptr)
 {
 	std::fill(std::begin(m_param), std::end(m_param), 0);
 }
@@ -126,6 +128,8 @@ void asic65_device::device_start()
 	save_item(NAME(m_68data));
 	save_item(NAME(m_tdata));
 	save_item(NAME(m_param));
+
+	m_synced_write_timer = timer_alloc(FUNC(asic65_device::synced_write), this);
 }
 
 //-------------------------------------------------
@@ -169,32 +173,22 @@ void asic65_device::reset_line(int state)
  *
  *************************************/
 
-void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(asic65_device::synced_write)
 {
-	switch (id)
-	{
-	case TIMER_M68K_ASIC65_DEFERRED_W:
-		m_tfull = 1;
-		m_cmd = param >> 16;
-		m_tdata = param;
-		if (m_asic65_type == ASIC65_ROMBASED)
-			m_ourcpu->set_input_line(0, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in asic65_device::device_timer");
-	}
+	m_tfull = 1;
+	m_cmd = param >> 16;
+	m_tdata = param;
+	if (m_asic65_type == ASIC65_ROMBASED)
+		m_ourcpu->set_input_line(0, ASSERT_LINE);
 }
 
 
 void asic65_device::data_w(offs_t offset, u16 data)
 {
-	/* logging */
-	if (LOG_ASIC && !m_log) m_log = fopen("m_log", "w");
-
 	/* rom-based use a deferred write mechanism */
 	if (m_asic65_type == ASIC65_ROMBASED)
 	{
-		synchronize(TIMER_M68K_ASIC65_DEFERRED_W, data | (offset << 16));
+		m_synced_write_timer->adjust(attotime::zero, data | (offset << 16));
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
@@ -202,7 +196,7 @@ void asic65_device::data_w(offs_t offset, u16 data)
 	/* parameters go to offset 0 */
 	if (!(offset & 1))
 	{
-		if (m_log) fprintf(m_log, " W=%04X", data);
+		LOGMASKED(LOG_ASIC, "%s: Write %04X", machine().describe_context(), data);
 
 		/* add to the parameter list, but don't overflow */
 		m_param[m_param_index++] = data;
@@ -214,7 +208,7 @@ void asic65_device::data_w(offs_t offset, u16 data)
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[m_asic65_type][data] : OP_UNKNOWN;
-		if (m_log) fprintf(m_log, "\n%s %c%04X:", machine().describe_context().c_str(), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		LOGMASKED(LOG_ASIC, "%s: Command %c %04X", machine().describe_context(), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		m_command = data;
@@ -452,8 +446,7 @@ u16 asic65_device::read()
 		}
 	}
 
-	if (LOG_ASIC && !m_log) m_log = fopen("m_log", "w");
-	if (m_log) fprintf(m_log, " (R=%04X)", result);
+	LOGMASKED(LOG_ASIC, "%s: Read %04X", machine().describe_context(), result);
 
 	return result;
 }

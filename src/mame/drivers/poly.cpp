@@ -196,11 +196,14 @@ INPUT_PORTS_END
 void poly_state::machine_start()
 {
 	m_dat_bank = 0;
+	m_protect_timer = timer_alloc(FUNC(poly_state::set_protect), this);
 }
 
 
 void poly_state::machine_reset()
 {
+	m_protect_timer->adjust(attotime::never);
+
 	//m_kr2376->set_input_pin(kr2376_device::KR2376_DSII, 0);
 	//m_kr2376->set_input_pin(kr2376_device::KR2376_PII, 0);
 

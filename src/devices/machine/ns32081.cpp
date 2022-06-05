@@ -102,7 +102,7 @@ void ns32081_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_tcy));
 
-	m_complete = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32081_device::complete), this));
+	m_complete = timer_alloc(FUNC(ns32081_device::complete), this);
 }
 
 void ns32081_device::device_reset()

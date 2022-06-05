@@ -226,6 +226,9 @@ void laserdisc_device::device_start()
 	init_video();
 	init_audio();
 
+	// register our timer
+	m_vbi_fetch_timer = timer_alloc(FUNC(laserdisc_device::fetch_vbi_data), this);
+
 	// register callbacks
 	machine().configuration().config_register(
 			"laserdisc",
@@ -349,35 +352,30 @@ void laserdisc_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  fetch_vbi_data - perform an update and
+//  process the track that was read, including
+//  VBI data
 //-------------------------------------------------
 
-void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(laserdisc_device::fetch_vbi_data)
 {
-	switch (id)
-	{
-		case TID_VBI_FETCH:
-		{
-			// wait for previous read and decode to finish
-			process_track_data();
+	// wait for previous read and decode to finish
+	process_track_data();
 
-			// update current track based on slider speed
-			update_slider_pos();
+	// update current track based on slider speed
+	update_slider_pos();
 
-			// update the state
-			add_and_clamp_track(player_update(m_metadata[m_fieldnum], m_fieldnum, machine().time()));
+	// update the state
+	add_and_clamp_track(player_update(m_metadata[m_fieldnum], m_fieldnum, machine().time()));
 
-			// flush any audio before we read more
-			m_stream->update();
+	// flush any audio before we read more
+	m_stream->update();
 
-			// start reading the track data for the next round
-			m_fieldnum ^= 1;
-			read_track_data();
-			break;
-		}
-	}
+	// start reading the track data for the next round
+	m_fieldnum ^= 1;
+	read_track_data();
 }
 
 
@@ -948,8 +946,8 @@ void laserdisc_device::vblank_state_changed(screen_device &screen, bool vblank_s
 		// call the player's VSYNC callback
 		player_vsync(m_metadata[m_fieldnum], m_fieldnum, machine().time());
 
-		// set a timer to begin fetching the next frame just before the VBI data would be fetched
-		timer_set(screen.time_until_pos(16*2), TID_VBI_FETCH);
+		// set our timer to begin fetching the next frame just before the VBI data would be fetched
+		m_vbi_fetch_timer->adjust(screen.time_until_pos(16*2));
 	}
 }
 

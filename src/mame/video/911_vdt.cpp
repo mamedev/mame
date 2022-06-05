@@ -152,13 +152,6 @@ vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-enum
-{
-	BLINK_TIMER,
-	BEEP_TIMER,
-	LINE_TIMER
-};
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -177,9 +170,9 @@ void vdt911_device::device_start()
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
 	/*m_blink_clock =*/
 
-	m_blink_timer = timer_alloc(BLINK_TIMER);
-	m_beep_timer = timer_alloc(BEEP_TIMER);
-	m_line_timer = timer_alloc(LINE_TIMER);
+	m_blink_timer = timer_alloc(FUNC(vdt911_device::blink_tick), this);
+	m_beep_timer = timer_alloc(FUNC(vdt911_device::beep_off), this);
+	m_line_timer = timer_alloc(FUNC(vdt911_device::line_tick), this);
 
 	m_blink_timer->adjust(attotime::from_msec(0), 0, attotime::from_msec(250));
 
@@ -255,22 +248,22 @@ void vdt911_device::device_reset()
 /*
     Timer callbacks
 */
-void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+
+TIMER_CALLBACK_MEMBER(vdt911_device::blink_tick)
 {
-	switch (id)
-	{
-	case BLINK_TIMER:
-		m_blink_state = !m_blink_state;
-		break;
-	case BEEP_TIMER:
-		m_beeper->set_state(0);
-		break;
-	case LINE_TIMER:
-		check_keyboard();
-		m_lineint_line(ASSERT_LINE);
-		m_lineint_line(CLEAR_LINE);
-		break;
-	}
+	m_blink_state = !m_blink_state;
+}
+
+TIMER_CALLBACK_MEMBER(vdt911_device::beep_off)
+{
+	m_beeper->set_state(0);
+}
+
+TIMER_CALLBACK_MEMBER(vdt911_device::line_tick)
+{
+	check_keyboard();
+	m_lineint_line(ASSERT_LINE);
+	m_lineint_line(CLEAR_LINE);
 }
 
 /*

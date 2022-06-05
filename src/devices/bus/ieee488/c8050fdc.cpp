@@ -112,7 +112,7 @@ void c8050_fdc_device::device_start()
 	m_write_error.resolve_safe();
 
 	// allocate timer
-	t_gen = timer_alloc(0);
+	t_gen = timer_alloc(FUNC(c8050_fdc_device::update_state), this);
 
 	// register for state saving
 	save_item(NAME(m_mtr0));
@@ -141,10 +141,10 @@ void c8050_fdc_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_state - pump our 'live' events
 //-------------------------------------------------
 
-void c8050_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c8050_fdc_device::update_state)
 {
 	live_sync();
 	live_run();

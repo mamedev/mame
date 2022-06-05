@@ -295,13 +295,11 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 }
 
 //-------------------------------------------------
-//  device_timer - device-specific timers
+//  tc_zero_tick
 //-------------------------------------------------
 
-void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc80s31_device::tc_zero_tick)
 {
-	assert(id == 0);
-
 	m_fdc->tc_w(false);
 
 	// several games tries to scan invalid IDs from their structures, if this hits then
@@ -326,7 +324,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void pc80s31_device::device_start()
 {
-	m_tc_zero_timer = timer_alloc(0);
+	m_tc_zero_timer = timer_alloc(FUNC(pc80s31_device::tc_zero_tick), this);
 
 	save_item(NAME(m_irq_vector));
 }

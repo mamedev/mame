@@ -427,17 +427,17 @@ void nes_vt02_vt03_soc_device::chr_w(offs_t offset, uint8_t data)
 
 
 
-void nes_vt02_vt03_soc_device::scanline_irq(int scanline, int vblank, int blanked)
+void nes_vt02_vt03_soc_device::scanline_irq(int scanline, bool vblank, bool blanked)
 {
 	video_irq(false, scanline, vblank, blanked);
 }
 
-void nes_vt02_vt03_soc_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_vt02_vt03_soc_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	video_irq(true, scanline, vblank, blanked);
 }
 
-void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, int vblank, int blanked)
+void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank, bool blanked)
 {
 	//TSYNEN
 	if (((m_410x[0xb] >> 7) & 0x01) == hblank)

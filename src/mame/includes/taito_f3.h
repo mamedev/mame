@@ -134,17 +134,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
-	enum
-	{
-		TIMER_F3_INTERRUPT3
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void device_post_load(void) override;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void device_post_load(void) override;
+
+	TIMER_CALLBACK_MEMBER(trigger_int3);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<watchdog_timer_device> m_watchdog;

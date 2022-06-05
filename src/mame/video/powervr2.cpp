@@ -1900,19 +1900,19 @@ void powervr2_device::process_ta_fifo()
 		switch (tafifo_listtype)
 		{
 			case DISPLAY_LIST_OPAQUE:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this));
+				opaque_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_OPAQUE_MOD:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this));
+				opaque_modifier_volume_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_TRANS:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this));
+				translucent_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_TRANS_MOD:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this));
+				translucent_modifier_volume_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_PUNCH_THROUGH:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this));
+				punch_through_irq_timer->adjust(attotime::from_usec(100));
 				break;
 		}
 		tafifo_listtype = DISPLAY_LIST_NONE; // no list being received
@@ -3879,10 +3879,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	// TODO: accurate timing
-	machine().scheduler().timer_set(
-		state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4),
-		timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this)
-	);
+	dma_irq_timer->adjust(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4));
 }
 
 INPUT_PORTS_START( powervr2 )
@@ -3918,14 +3915,21 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-//  vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-//  vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
-	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
-	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
+//  vbout_timer = timer_alloc(FUNC(powervr2_device::vbout), this);
+//  vbin_timer = timer_alloc(FUNC(powervr2_device::vbin), this);
+	hbin_timer = timer_alloc(FUNC(powervr2_device::hbin), this);
+	yuv_timer_end = timer_alloc(FUNC(powervr2_device::yuv_convert_end), this);
 
-	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
-	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
-	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
+	endofrender_timer_isp = timer_alloc(FUNC(powervr2_device::endofrender_isp), this);
+	endofrender_timer_tsp = timer_alloc(FUNC(powervr2_device::endofrender_tsp), this);
+	endofrender_timer_video = timer_alloc(FUNC(powervr2_device::endofrender_video), this);
+
+	opaque_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_list_irq), this);
+	opaque_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this);
+	translucent_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_list_irq), this);
+	translucent_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this);
+	punch_through_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_punch_through_list_irq), this);
+	dma_irq_timer = timer_alloc(FUNC(powervr2_device::pvr_dma_irq), this);
 
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 

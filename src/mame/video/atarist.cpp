@@ -625,8 +625,8 @@ void st_video_device::device_resolve_objects()
 
 void st_video_device::device_start()
 {
-	m_shifter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_video_device::shifter_tick), this));
-	m_glue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_video_device::glue_tick), this));
+	m_shifter_timer = timer_alloc(FUNC(st_video_device::shifter_tick), this);
+	m_glue_timer = timer_alloc(FUNC(st_video_device::glue_tick), this);
 
 //  m_shifter_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(4)); // 125 ns
 	m_glue_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(16)); // 500 ns

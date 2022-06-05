@@ -205,10 +205,12 @@ private:
 
 	emu_timer   *m_cdda_fadeout_timer = nullptr;
 	emu_timer   *m_cdda_fadein_timer = nullptr;
-	double  m_cdda_volume = 0;
+	double       m_cdda_volume = 0;
 	emu_timer   *m_adpcm_fadeout_timer = nullptr;
 	emu_timer   *m_adpcm_fadein_timer = nullptr;
-	double  m_adpcm_volume = 0;
+	double       m_adpcm_volume = 0;
+
+	emu_timer   *m_ack_clear_timer = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);

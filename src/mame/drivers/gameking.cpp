@@ -234,8 +234,8 @@ uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_r
 
 void gameking_state::init_gameking()
 {
-	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
-	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));
+	timer1 = timer_alloc(FUNC(gameking_state::gameking_timer), this);
+	timer2 = timer_alloc(FUNC(gameking_state::gameking_timer2), this);
 }
 
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)

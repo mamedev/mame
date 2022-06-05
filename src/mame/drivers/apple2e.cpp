@@ -1056,7 +1056,7 @@ void apple2e_state::machine_start()
 
 	if ((m_has_laser_mouse) || (m_isace500) || (m_isace2200))
 	{
-		m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2e_state::update_laserprn_strobe), this));
+		m_strobe_timer = timer_alloc(FUNC(apple2e_state::update_laserprn_strobe), this);
 		m_next_strobe = 1U;
 	}
 

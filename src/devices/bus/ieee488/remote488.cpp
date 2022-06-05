@@ -188,11 +188,12 @@
 #include "remote488.h"
 
 // Debugging
-#include "logmacro.h"
-#define LOG_PARSER_MASK (LOG_GENERAL << 1)
+#define LOG_PARSER_MASK (1U << 1)
 #define LOG_PARSER(...) LOGMASKED(LOG_PARSER_MASK, __VA_ARGS__)
-#undef VERBOSE
-#define VERBOSE LOG_GENERAL
+
+#define VERBOSE (LOG_GENERAL)
+
+#include "logmacro.h"
 
 // Bit manipulation
 namespace {
@@ -222,16 +223,16 @@ namespace {
 }
 
 // Message types
-constexpr char MSG_SIGNAL_CLEAR  = 'R'; // I/O: Clear signal(s)
-constexpr char MSG_SIGNAL_SET    = 'S'; // I/O: Set signal(s)
-constexpr char MSG_DATA_BYTE     = 'D'; // I/O: Cmd/data byte (no EOI)
-constexpr char MSG_END_BYTE      = 'E'; // I/O: Data byte (with EOI)
-constexpr char MSG_PP_DATA       = 'P'; // I:   Parallel poll data
-constexpr char MSG_PP_REQUEST    = 'Q'; // O:   Request PP data
-constexpr char MSG_ECHO_REQ      = 'J'; // O:   Heartbeat msg: echo request
-constexpr char MSG_ECHO_REPLY    = 'K'; // I:   Heartbeat msg: echo reply
-constexpr char MSG_CHECKPOINT    = 'X'; // I/O: Checkpoint in byte stream
-constexpr char MSG_CP_REACHED    = 'Y'; // I/O: Checkpoint reached
+constexpr char MSG_SIGNAL_CLEAR       = 'R'; // I/O: Clear signal(s)
+constexpr char MSG_SIGNAL_SET         = 'S'; // I/O: Set signal(s)
+constexpr char MSG_DATA_BYTE          = 'D'; // I/O: Cmd/data byte (no EOI)
+constexpr char MSG_END_BYTE           = 'E'; // I/O: Data byte (with EOI)
+constexpr char MSG_PP_DATA            = 'P'; // I:   Parallel poll data
+constexpr char MSG_PP_REQUEST         = 'Q'; // O:   Request PP data
+constexpr char MSG_ECHO_REQ           = 'J'; // O:   Heartbeat msg: echo request
+constexpr char MSG_ECHO_REPLY         = 'K'; // I:   Heartbeat msg: echo reply
+constexpr char MSG_CHECKPOINT         = 'X'; // I/O: Checkpoint in byte stream
+constexpr char MSG_CHECKPOINT_REACHED = 'Y'; // I/O: Checkpoint reached
 
 // Timings
 constexpr unsigned POLL_PERIOD_US   = 20;   // Poll period (µs)
@@ -304,9 +305,9 @@ void remote488_device::ieee488_ren(int state)
 
 void remote488_device::device_start()
 {
-	m_poll_timer = timer_alloc(TMR_ID_POLL);
-	m_hb_timer = timer_alloc(TMR_ID_HEARTBEAT);
-	m_ah_timer = timer_alloc(TMR_ID_AH);
+	m_poll_timer = timer_alloc(FUNC(remote488_device::process_input_msgs), this);
+	m_hb_timer = timer_alloc(FUNC(remote488_device::heartbeat_tick), this);
+	m_ah_timer = timer_alloc(FUNC(remote488_device::checkpoint_timeout_tick), this);
 }
 
 void remote488_device::device_reset()
@@ -327,7 +328,7 @@ void remote488_device::device_reset()
 
 	m_ibf = false;
 	m_flush_bytes = false;
-	m_waiting_cp = false;
+	m_waiting_checkpoint = false;
 	bus_reset();
 }
 
@@ -344,7 +345,7 @@ void remote488_device::bus_reset()
 	update_pp();
 }
 
-void remote488_device::process_input_msgs()
+TIMER_CALLBACK_MEMBER(remote488_device::process_input_msgs)
 {
 	uint8_t data;
 	char msg_ch;
@@ -383,13 +384,13 @@ void remote488_device::process_input_msgs()
 			break;
 
 		case MSG_CHECKPOINT:
-			send_update(MSG_CP_REACHED , m_flush_bytes);
+			send_update(MSG_CHECKPOINT_REACHED , m_flush_bytes);
 			m_flush_bytes = false;
 			break;
 
-		case MSG_CP_REACHED:
-			if (m_waiting_cp) {
-				m_waiting_cp = false;
+		case MSG_CHECKPOINT_REACHED:
+			if (m_waiting_checkpoint) {
+				m_waiting_checkpoint = false;
 				update_ah_fsm();
 			}
 			break;
@@ -403,29 +404,19 @@ void remote488_device::process_input_msgs()
 	}
 }
 
-void remote488_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(remote488_device::heartbeat_tick)
 {
-	switch (id) {
-	case TMR_ID_POLL:
-		process_input_msgs();
-		break;
+	if (m_connected && m_connect_cnt && --m_connect_cnt == 0) {
+		set_connection(false);
+	}
+	send_update(MSG_ECHO_REQ , 0);
+}
 
-	case TMR_ID_HEARTBEAT:
-		if (m_connected && m_connect_cnt && --m_connect_cnt == 0) {
-			set_connection(false);
-		}
-		send_update(MSG_ECHO_REQ , 0);
-		break;
-
-	case TMR_ID_AH:
-		if (!m_waiting_cp) {
-			LOG("CP T/O\n");
-			ah_checkpoint();
-		}
-		break;
-
-	default:
-		break;
+TIMER_CALLBACK_MEMBER(remote488_device::checkpoint_timeout_tick)
+{
+	if (!m_waiting_checkpoint) {
+		LOG("Checkpoint T/O\n");
+		ah_checkpoint();
 	}
 }
 
@@ -570,7 +561,7 @@ bool remote488_device::is_msg_type(char c)
 		c == MSG_PP_DATA ||
 		c == MSG_ECHO_REPLY ||
 		c == MSG_CHECKPOINT ||
-		c == MSG_CP_REACHED;
+		c == MSG_CHECKPOINT_REACHED;
 }
 
 bool remote488_device::is_terminator(char c)
@@ -668,7 +659,7 @@ bool remote488_device::is_local_atn_active() const
 
 void remote488_device::ah_checkpoint()
 {
-	m_waiting_cp = true;
+	m_waiting_checkpoint = true;
 	m_ah_timer->reset();
 	send_update(MSG_CHECKPOINT , 0);
 }
@@ -698,7 +689,7 @@ void remote488_device::update_ah_fsm()
 			case REM_AH_ACDS:
 				if (m_bus->dav_r()) {
 					m_ah_state = REM_AH_ACRS;
-				} else if (!m_waiting_cp) {
+				} else if (!m_waiting_checkpoint) {
 					uint8_t dio = ~m_bus->dio_r();
 
 					if (!m_bus->eoi_r()) {

@@ -24,25 +24,11 @@ void electron_state::waitforramsync()
 	m_maincpu->adjust_icount(-cycles);
 }
 
-
-void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 {
-	switch (id)
-	{
-	case TIMER_TAPE_HANDLER:
-		electron_tape_timer_handler(param);
-		break;
-	case TIMER_SETUP_BEEP:
-		setup_beep(param);
-		break;
-	case TIMER_SCANLINE_INTERRUPT:
-		electron_scanline_interrupt(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in electron_state::device_timer");
-	}
+	m_beeper->set_state( 0 );
+	m_beeper->set_clock( 300 );
 }
-
 
 void electron_state::electron_tape_start()
 {
@@ -583,20 +569,14 @@ void electron_state::electron_interrupt_handler(int mode, int interrupt)
    Machine Initialisation functions
 ***************************************/
 
-TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
-{
-	m_beeper->set_state( 0 );
-	m_beeper->set_clock( 300 );
-}
-
 void electron_state::machine_start()
 {
 	m_capslock_led.resolve();
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
-	timer_set(attotime::zero, TIMER_SETUP_BEEP);
-	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
+	m_tape_timer = timer_alloc(FUNC(electron_state::electron_tape_timer_handler), this);
+	m_beep_timer = timer_alloc(FUNC(electron_state::setup_beep), this);
 
 	/* register save states */
 	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
@@ -630,6 +610,9 @@ void electron_state::machine_reset()
 
 	m_mrb_mapped = true;
 	m_vdu_drivers = false;
+
+	m_tape_timer->adjust(attotime::never);
+	m_beep_timer->adjust(attotime::never);
 }
 
 void electronsp_state::machine_start()

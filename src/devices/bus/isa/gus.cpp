@@ -140,7 +140,7 @@ void gf1_device::adlib_w(offs_t offset, uint8_t data)
 	}
 }
 
-void gf1_device::update_volume_ramps()
+TIMER_CALLBACK_MEMBER(gf1_device::update_volume_ramps)
 {
 	int x;
 
@@ -207,43 +207,39 @@ void gf1_device::update_volume_ramps()
 	}
 }
 
-void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gf1_device::adlib_timer1_tick)
 {
-	switch(id)
+	if(m_adlib_timer1_enable != 0)
 	{
-	case ADLIB_TIMER1:
-		if(m_adlib_timer1_enable != 0)
+		if(m_timer1_count == 0xff)
 		{
-			if(m_timer1_count == 0xff)
-			{
-				m_adlib_status |= 0xc0;
-				m_timer1_count = m_timer1_value;
-				if(m_timer_ctrl & 0x04)
-					m_timer1_irq_handler(1);
-			}
-			m_timer1_count++;
+			m_adlib_status |= 0xc0;
+			m_timer1_count = m_timer1_value;
+			if(m_timer_ctrl & 0x04)
+				m_timer1_irq_handler(1);
 		}
-		break;
-	case ADLIB_TIMER2:
-		if(m_adlib_timer2_enable != 0)
-		{
-			if(m_timer2_count == 0xff)
-			{
-				m_adlib_status |= 0xa0;
-				m_timer2_count = m_timer2_value;
-				if(m_timer_ctrl & 0x08)
-					m_timer2_irq_handler(1);
-			}
-			m_timer2_count++;
-		}
-		break;
-	case DMA_TIMER:
-		m_drq1_handler(1);
-		break;
-	case VOL_RAMP_TIMER:
-		update_volume_ramps();
-		break;
+		m_timer1_count++;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(gf1_device::adlib_timer2_tick)
+{
+	if(m_adlib_timer2_enable != 0)
+	{
+		if(m_timer2_count == 0xff)
+		{
+			m_adlib_status |= 0xa0;
+			m_timer2_count = m_timer2_value;
+			if(m_timer_ctrl & 0x08)
+				m_timer2_irq_handler(1);
+		}
+		m_timer2_count++;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(gf1_device::dma_tick)
+{
+	m_drq1_handler(1);
 }
 
 void gf1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -406,10 +402,10 @@ void gf1_device::device_start()
 	m_stream = stream_alloc(0,2,clock() / (14 * 16));
 
 	// init timers
-	m_timer1 = timer_alloc(ADLIB_TIMER1);
-	m_timer2 = timer_alloc(ADLIB_TIMER2);
-	m_dmatimer = timer_alloc(DMA_TIMER);
-	m_voltimer = timer_alloc(VOL_RAMP_TIMER);
+	m_timer1 = timer_alloc(FUNC(gf1_device::adlib_timer1_tick), this);
+	m_timer2 = timer_alloc(FUNC(gf1_device::adlib_timer2_tick), this);
+	m_dmatimer = timer_alloc(FUNC(gf1_device::dma_tick), this);
+	m_voltimer = timer_alloc(FUNC(gf1_device::update_volume_ramps), this);
 
 	save_item(NAME(m_wave_ram));
 

@@ -67,19 +67,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(color);
 
 private:
-	required_device<m68000_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_vram;
-	required_shared_ptr<uint16_t> m_fontram;
-	required_device_array<ns16450_device, 2> m_uart;
-	required_device<screen_device> m_screen;
-	required_device<kbdc8042_device> m_kbdc;
-	required_device<palette_device> m_palette;
-	required_device<beep_device> m_beep;
-
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void machine_reset() override;
 	virtual void device_post_load() override;
+
+	void tv990_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(trigger_row_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -93,11 +87,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	void tv990_mem(address_map &map);
+	required_device<m68000_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_fontram;
+	required_device_array<ns16450_device, 2> m_uart;
+	required_device<screen_device> m_screen;
+	required_device<kbdc8042_device> m_kbdc;
+	required_device<palette_device> m_palette;
+	required_device<beep_device> m_beep;
 
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer = nullptr;
-	int m_rowh = 0, m_width = 0, m_height = 0;
+	int m_rowh = 0;
+	int m_width = 0;
+	int m_height = 0;
 };
 
 WRITE_LINE_MEMBER(tv990_state::vblank_irq)
@@ -112,7 +115,7 @@ WRITE_LINE_MEMBER(tv990_state::vblank_irq)
 
 void tv990_state::machine_start()
 {
-	m_rowtimer = timer_alloc();
+	m_rowtimer = timer_alloc(FUNC(tv990_state::trigger_row_irq), this);
 
 	save_item(NAME(tvi1111_regs));
 	save_item(NAME(m_rowh));
@@ -120,7 +123,7 @@ void tv990_state::machine_start()
 	save_item(NAME(m_height));
 }
 
-void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tv990_state::trigger_row_irq)
 {
 	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);

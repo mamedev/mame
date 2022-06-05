@@ -62,8 +62,8 @@ void wd1000_device::device_start()
 	m_drq_cb.resolve();
 
 	// Allocate timers
-	m_seek_timer = timer_alloc(TIMER_SEEK);
-	m_drq_timer = timer_alloc(TIMER_DRQ);
+	m_seek_timer = timer_alloc(FUNC(wd1000_device::update_seek), this);
+	m_drq_timer = timer_alloc(FUNC(wd1000_device::delayed_drq), this);
 
 	// Empty buffer.
 	m_buffer_index = 0;
@@ -111,47 +111,45 @@ void wd1000_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - device-specific timer
+//  update_seek -
 //-------------------------------------------------
 
-void wd1000_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(wd1000_device::update_seek)
 {
-	switch (tid)
+	m_drive_cylinder[drive()] = param;
+	m_status |= S_SC;
+
+	switch (m_command >> 4)
 	{
-	case TIMER_SEEK:
-
-		m_drive_cylinder[drive()] = param;
-		m_status |= S_SC;
-
-		switch (m_command >> 4)
-		{
-		case CMD_RESTORE:
-			cmd_restore();
-			break;
-
-		case CMD_SEEK:
-			cmd_seek();
-			break;
-
-		case CMD_READ_SECTOR:
-			cmd_read_sector();
-			break;
-
-		case CMD_WRITE_SECTOR:
-			cmd_write_sector();
-			break;
-
-		case CMD_WRITE_FORMAT:
-			cmd_format_sector();
-			break;
-		}
-
+	case CMD_RESTORE:
+		cmd_restore();
 		break;
 
-	case TIMER_DRQ:
-		set_drq();
+	case CMD_SEEK:
+		cmd_seek();
+		break;
+
+	case CMD_READ_SECTOR:
+		cmd_read_sector();
+		break;
+
+	case CMD_WRITE_SECTOR:
+		cmd_write_sector();
+		break;
+
+	case CMD_WRITE_FORMAT:
+		cmd_format_sector();
 		break;
 	}
+}
+
+//-------------------------------------------------
+//  delayed_drq - set DRQ after a necessary delay
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(wd1000_device::delayed_drq)
+{
+	set_drq();
 }
 
 void wd1000_device::set_error(int error)

@@ -1046,7 +1046,7 @@ void cadash_state::machine_start()
 {
 	base_state::machine_start();
 
-	m_int5_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cadash_state::interrupt5), this));
+	m_int5_timer = timer_alloc(FUNC(cadash_state::interrupt5), this);
 }
 
 WRITE_LINE_MEMBER(base_state::screen_vblank)

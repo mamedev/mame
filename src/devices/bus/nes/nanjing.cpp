@@ -91,7 +91,7 @@ void nes_nanjing_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_nanjing_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_nanjing_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (BIT(m_reg[0], 7))
 	{

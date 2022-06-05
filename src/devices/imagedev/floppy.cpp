@@ -447,7 +447,7 @@ void floppy_image_device::device_start()
 	stp = 1;
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
-	index_timer = timer_alloc(0);
+	index_timer = timer_alloc(FUNC(floppy_image_device::index_resync), this);
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
@@ -525,11 +525,6 @@ void floppy_image_device::device_reset()
 	cache_clear();
 }
 
-void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	index_resync();
-}
-
 const floppy_image_format_t *floppy_image_device::identify(std::string_view filename)
 {
 	util::core_file::ptr fd;
@@ -565,7 +560,7 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	revolution_start_time = mon ? attotime::never : machine().time();
 	revolution_count = 0;
 
-	index_resync();
+	index_resync(0);
 
 	wpt = 1; // disk sleeve is covering the sensor
 	if (!cur_wpt_cb.isnull())
@@ -875,7 +870,7 @@ void floppy_image_device::mon_w(int state)
 		} else {
 			ready_counter = 2;
 		}
-		index_resync();
+		index_resync(0);
 	}
 
 	/* on -> off */
@@ -900,7 +895,7 @@ attotime floppy_image_device::time_next_index()
 }
 
 /* index pulses at rpm/60 Hz, and stays high for ~2ms at 300rpm */
-void floppy_image_device::index_resync()
+TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 {
 	if(revolution_start_time.is_never()) {
 		if(idx) {

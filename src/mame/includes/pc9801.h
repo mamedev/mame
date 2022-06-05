@@ -288,13 +288,7 @@ protected:
 	struct {
 		uint8_t mode = 0;
 		uint8_t tile[4]{}, tile_index = 0;
-	}m_grcg;
-
-	enum
-	{
-		TIMER_VBIRQ,
-		TIMER_FDC_TRIGGER
-	};
+	} m_grcg;
 
 	uint16_t tvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -382,7 +376,7 @@ public:
 	void init_pc9801vm_kanji();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(fdc_trigger);
 
 	void pc9801rs_io(address_map &map);
 	void pc9801rs_map(address_map &map);

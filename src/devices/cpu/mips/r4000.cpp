@@ -187,7 +187,7 @@ void r4000_base_device::device_start()
 
 	m_hard_reset = true;
 
-	m_cp0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(r4000_base_device::cp0_timer_callback), this));
+	m_cp0_timer = timer_alloc(FUNC(r4000_base_device::cp0_timer_callback), this);
 
 	// compute icache line selection mask and allocate tag and data
 	unsigned const config_ic = (m_cp0[CP0_Config] & CONFIG_IC) >> 9;

@@ -85,12 +85,6 @@ public:
 	void sorcererb(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_SERIAL,
-		TIMER_CASSETTE,
-	};
-
 	u8 portfd_r();
 	u8 portfe_r();
 	void portfd_w(u8 data);
@@ -114,7 +108,6 @@ protected:
 	emu_timer *m_serial_timer = nullptr;
 	emu_timer *m_cassette_timer = nullptr;
 	cass_data_t m_cass_data;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_pcg;

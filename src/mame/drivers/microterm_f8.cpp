@@ -93,7 +93,7 @@ void microterm_f8_state::machine_start()
 	m_attrlatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
-	m_baud_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microterm_f8_state::baud_clock), this));
+	m_baud_clock = timer_alloc(FUNC(microterm_f8_state::baud_clock), this);
 	m_baud_clock->adjust(attotime::zero, 0);
 
 	save_item(NAME(m_port00));

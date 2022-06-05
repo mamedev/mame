@@ -51,13 +51,6 @@ public:
 	void flyball(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_POT_ASSERT,
-		TIMER_POT_CLEAR,
-		TIMER_QUARTER
-	};
-
 	uint8_t input_r();
 	uint8_t scanline_r();
 	uint8_t potsense_r();
@@ -81,10 +74,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(joystick_callback);
+	TIMER_CALLBACK_MEMBER(pot_clear_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 	void flyball_map(address_map &map);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -181,23 +174,9 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(flyball_state::pot_clear_callback)
 {
-	switch (id)
-	{
-	case TIMER_POT_ASSERT:
-		joystick_callback(param);
-		break;
-	case TIMER_POT_CLEAR:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	case TIMER_QUARTER:
-		quarter_callback(param);
-		break;
-
-	default:
-		throw emu_fatalerror("Unknown id in flyball_state::device_timer");
-	}
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -448,9 +427,9 @@ void flyball_state::machine_start()
 	memcpy(ROM, &buf[0], len);
 
 	for (int i = 0; i < 64; i++)
-		m_pot_assert_timer[i] = timer_alloc(TIMER_POT_ASSERT);
-	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
-	m_quarter_timer = timer_alloc(TIMER_QUARTER);
+		m_pot_assert_timer[i] = timer_alloc(FUNC(flyball_state::joystick_callback), this);
+	m_pot_clear_timer = timer_alloc(FUNC(flyball_state::pot_clear_callback), this);
+	m_quarter_timer = timer_alloc(FUNC(flyball_state::quarter_callback), this);
 	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));

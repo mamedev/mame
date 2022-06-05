@@ -50,7 +50,7 @@ ioport_constructor null_modem_device::device_input_ports() const
 
 void null_modem_device::device_start()
 {
-	m_timer_poll = timer_alloc(TIMER_POLL);
+	m_timer_poll = timer_alloc(FUNC(null_modem_device::update_queue), this);
 }
 
 WRITE_LINE_MEMBER(null_modem_device::update_serial)
@@ -81,23 +81,10 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 void null_modem_device::device_reset()
 {
 	update_serial(0);
-	queue();
+	update_queue(0);
 }
 
-void null_modem_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_POLL:
-		queue();
-		break;
-
-	default:
-		break;
-	}
-}
-
-void null_modem_device::queue()
+TIMER_CALLBACK_MEMBER(null_modem_device::update_queue)
 {
 	if (is_transmit_register_empty())
 	{
@@ -131,7 +118,7 @@ void null_modem_device::tra_callback()
 
 void null_modem_device::tra_complete()
 {
-	queue();
+	update_queue(0);
 }
 
 void null_modem_device::rcv_complete()

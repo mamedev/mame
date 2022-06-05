@@ -27,11 +27,6 @@ public:
 	void init_ohpaipee();
 
 private:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
@@ -90,7 +85,7 @@ private:
 	void ohpaipee_map(address_map &map);
 	void togenkyo_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };
 
 #endif // MAME_INCLUDES_NBMJ8900_H

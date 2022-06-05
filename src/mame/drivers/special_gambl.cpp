@@ -60,16 +60,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ram_test) { m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	enum
-	{
-		TIMER_COLD_BOOT
-	};
-
 	void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	void dice_palette(palette_device &palette) const;
-	u32 screen_update_dice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(update_boot_flag);
+
+	void palette_init(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void dice_mem(address_map &map);
 	void dice_io(address_map &map);
@@ -122,16 +118,9 @@ static INPUT_PORTS_START(dice)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE3) PORT_NAME("RAM Test") PORT_CHANGED_MEMBER(DEVICE_SELF, dinaris_state, ram_test, 0)
 INPUT_PORTS_END
 
-void dinaris_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dinaris_state::update_boot_flag)
 {
-	switch (id)
-	{
-	case TIMER_COLD_BOOT:
-		m_cold_boot = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in dinaris_state::device_timer");
-	}
+	m_cold_boot = 1;
 }
 
 void dinaris_state::machine_start()
@@ -146,7 +135,8 @@ void dinaris_state::machine_start()
 	save_item(NAME(m_sram_en));
 	save_item(NAME(m_cold_boot));
 
-	timer_set(attotime::from_msec(100), TIMER_COLD_BOOT);
+	emu_timer *cold_boot_timer = timer_alloc(FUNC(dinaris_state::update_boot_flag), this);
+	cold_boot_timer->adjust(attotime::from_msec(100));
 }
 
 void dinaris_state::dice_mem(address_map &map)
@@ -185,12 +175,12 @@ static constexpr rgb_t specimx_pens[16] = {
 	{ 0xff, 0xff, 0xff }  // F
 };
 
-void dinaris_state::dice_palette(palette_device &palette) const
+void dinaris_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_colors(0, specimx_pens);
 }
 
-u32 dinaris_state::screen_update_dice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dinaris_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// note: attribute area bytes set colors for 4x2 pix screen elements, not 8x1 like Specialist MX.
 	for (int x = 0; x < 48; x++)
@@ -253,10 +243,10 @@ void dinaris_state::dice(machine_config &config)
 	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(8'000'000), 512, 0, 384, 312, 0, 256);
-	screen.set_screen_update(FUNC(dinaris_state::screen_update_dice));
+	screen.set_screen_update(FUNC(dinaris_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(dinaris_state::dice_palette), 16);
+	PALETTE(config, m_palette, FUNC(dinaris_state::palette_init), 16);
 
 	// Sound
 	SPEAKER(config, "speaker").front_center();

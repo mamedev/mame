@@ -64,7 +64,7 @@ void newbrain_state::tvtl_w(uint8_t data)
 void newbrain_state::video_start()
 {
 	// set timer
-	m_clkint_timer = timer_alloc(TIMER_ID_CLKINT);
+	m_clkint_timer = timer_alloc(FUNC(newbrain_state::clear_clkint), this);
 	m_clkint_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 
 	// state saving

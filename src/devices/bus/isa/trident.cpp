@@ -179,7 +179,7 @@ void trident_vga_device::device_start()
 	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
 	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 	vga.svga_intf.seq_regcount = 0x0f;
 	vga.svga_intf.crtc_regcount = 0x60;
 	memset(&tri, 0, sizeof(tri));

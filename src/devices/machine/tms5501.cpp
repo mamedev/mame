@@ -88,11 +88,11 @@ void tms5501_device::device_start()
 	m_write_xo.resolve_safe();
 
 	// create timers
-	m_timer[TIMER_1] = timer_alloc(TIMER_1);
-	m_timer[TIMER_2] = timer_alloc(TIMER_2);
-	m_timer[TIMER_3] = timer_alloc(TIMER_3);
-	m_timer[TIMER_4] = timer_alloc(TIMER_4);
-	m_timer[TIMER_5] = timer_alloc(TIMER_5);
+	m_timer[TIMER_1] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_2] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_3] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_4] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_5] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
 
 	// state saving
 	save_item(NAME(m_rb));
@@ -122,38 +122,22 @@ void tms5501_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer_expired -
 //-------------------------------------------------
 
-void tms5501_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms5501_device::timer_expired)
 {
-	switch (id)
+	if (param == TIMER_5)
 	{
-	case TIMER_1:
-		set_interrupt(IRQ_TMR1);
-		break;
-
-	case TIMER_2:
-		set_interrupt(IRQ_TMR2);
-		break;
-
-	case TIMER_3:
-		set_interrupt(IRQ_TMR3);
-		break;
-
-	case TIMER_4:
-		set_interrupt(IRQ_TMR4);
-		break;
-
-	case TIMER_5:
 		if (!(m_cmd & CMD_XI7))
 		{
 			set_interrupt(IRQ_TMR5);
 		}
-		break;
-
-	default:
-		break;
+	}
+	else
+	{
+		static uint8_t const s_irq_ids[4] = { IRQ_TMR1, IRQ_TMR2, IRQ_TMR3, IRQ_TMR4 };
+		set_interrupt(s_irq_ids[param]);
 	}
 }
 
@@ -406,7 +390,7 @@ void tms5501_device::tmr_w(offs_t offset, uint8_t data)
 {
 	if (LOG) logerror("TMS5501 '%s' Timer %u %02x\n", tag(), offset, data);
 
-	m_timer[offset]->adjust(attotime::from_double((double) data / (clock() / 128.0)));
+	m_timer[offset]->adjust(attotime::from_double((double) data / (clock() / 128.0)), (int)offset);
 }
 
 

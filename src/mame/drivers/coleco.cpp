@@ -511,9 +511,9 @@ void coleco_state::machine_start()
 	// init paddles
 	for (int port = 0; port < 2; port++)
 	{
-		m_joy_pulse_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_pulse_callback),this));
-		m_joy_d7_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_d7reset_callback),this));
-		m_joy_irq_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_irqreset_callback),this));
+		m_joy_pulse_timer[port] = timer_alloc(FUNC(coleco_state::paddle_pulse_callback), this);
+		m_joy_d7_timer[port] = timer_alloc(FUNC(coleco_state::paddle_d7reset_callback), this);
+		m_joy_irq_timer[port] = timer_alloc(FUNC(coleco_state::paddle_irqreset_callback), this);
 
 		m_joy_irq_state[port] = 0;
 		m_joy_d7_state[port] = 0;

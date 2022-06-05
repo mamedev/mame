@@ -122,7 +122,7 @@ void es1373_device::device_start()
 	// create the stream
 	m_stream = stream_alloc(0, 2, 44100/2);
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(es1373_device::delayed_stream_update), this);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
 
 	// Save states
@@ -222,9 +222,9 @@ void es1373_device::map_extra(uint64_t memory_window_start, uint64_t memory_wind
 }
 
 //-------------------------------------------------
-//  device_timer - called when our device timer expires
+//  delayed_stream_update -
 //-------------------------------------------------
-void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(es1373_device::delayed_stream_update)
 {
 	m_stream->update();
 }

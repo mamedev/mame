@@ -843,7 +843,7 @@ bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 }
 
 
-void mc6845_device::handle_line_timer()
+TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 {
 	bool new_vsync = m_vsync;
 
@@ -932,7 +932,7 @@ void mc6845_device::handle_line_timer()
 			m_cursor_x = m_cursor_addr - m_line_address;
 
 			/* Schedule CURSOR ON signal */
-			m_cur_on_timer->adjust(cclks_to_attotime(m_cursor_x));
+			m_cursor_on_timer->adjust(cclks_to_attotime(m_cursor_x));
 		}
 	}
 
@@ -948,99 +948,82 @@ void mc6845_device::handle_line_timer()
 }
 
 
-void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mc6845_device::de_off_tick)
 {
-	switch (id)
+	set_de( false );
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::cursor_on)
+{
+	set_cur(true);
+
+	/* Schedule CURSOR off signal */
+	m_cursor_off_timer->adjust(cclks_to_attotime(1));
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::cursor_off)
+{
+	set_cur(false);
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::hsync_on)
+{
+	uint8_t hsync_width = ( m_sync_width & 0x0f ) ? ( m_sync_width & 0x0f ) : 0x10;
+
+	m_hsync_width_counter = 0;
+	set_hsync( true );
+
+	/* Schedule HSYNC off signal */
+	m_hsync_off_timer->adjust(cclks_to_attotime(hsync_width));
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::hsync_off)
+{
+	set_hsync( false );
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::latch_light_pen)
+{
+	m_light_pen_addr = get_ma();
+	m_light_pen_latched = true;
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::adr_update_tick)
+{
+	/* fire a update address strobe */
+	call_on_update_address(MODE_UPDATE_STROBE);
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::transparent_update_tick)
+{
+	int addr = (param >> 8);
+	int strobe = (param & 0xff);
+
+	/* call the callback function -- we know it exists */
+	m_on_update_addr_changed_cb(addr, strobe);
+
+	if(!m_update_ready_bit && MODE_TRANSPARENT_BLANK)
 	{
-	case TIMER_LINE:
-		handle_line_timer();
-		break;
-
-	case TIMER_DE_OFF:
-		set_de( false );
-		break;
-
-	case TIMER_CUR_ON:
-		set_cur( true );
-
-		/* Schedule CURSOR off signal */
-		m_cur_off_timer->adjust(cclks_to_attotime(1));
-		break;
-
-	case TIMER_CUR_OFF:
-		set_cur( false );
-		break;
-
-	case TIMER_HSYNC_ON:
-		{
-			uint8_t hsync_width = ( m_sync_width & 0x0f ) ? ( m_sync_width & 0x0f ) : 0x10;
-
-			m_hsync_width_counter = 0;
-			set_hsync( true );
-
-			/* Schedule HSYNC off signal */
-			m_hsync_off_timer->adjust(cclks_to_attotime(hsync_width));
-		}
-		break;
-
-	case TIMER_HSYNC_OFF:
-		set_hsync( false );
-		break;
-
-	case TIMER_LIGHT_PEN_LATCH:
-		m_light_pen_addr = get_ma();
-		m_light_pen_latched = true;
-		break;
-
-	case TIMER_UPD_ADR:
-		/* fire a update address strobe */
-		call_on_update_address(MODE_UPDATE_STROBE);
-		break;
-
-	case TIMER_UPD_TRANS:
-		{
-			int addr = (param >> 8);
-			int strobe = (param & 0xff);
-
-			/* call the callback function -- we know it exists */
-			m_on_update_addr_changed_cb(addr, strobe);
-
-			if(!m_update_ready_bit && MODE_TRANSPARENT_BLANK)
-			{
-				m_update_addr++;
-				m_update_addr &= 0x3fff;
-				m_update_ready_bit = true;
-			}
-		}
-		break;
-
+		m_update_addr++;
+		m_update_addr &= 0x3fff;
+		m_update_ready_bit = true;
 	}
 }
 
 
-void mos8563_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mos8563_device::block_copy_tick)
 {
-	switch (id)
-	{
-	case TIMER_BLOCK_COPY:
-	{
-		uint8_t data = VSS_COPY ? read_videoram(m_block_addr++) : m_data;
+	uint8_t data = VSS_COPY ? read_videoram(m_block_addr++) : m_data;
 
-		write_videoram(m_update_addr++, data);
+	write_videoram(m_update_addr++, data);
 
-		if (--m_word_count)
-		{
-			m_block_copy_timer->adjust(cclks_to_attotime(1));
-		}
-		else
-		{
-			m_update_ready_bit = 1;
-		}
-		break;
+	if (--m_word_count)
+	{
+		m_block_copy_timer->adjust(cclks_to_attotime(1));
 	}
-	default:
-		mc6845_device::device_timer(timer, id, param);
-		break;
+	else
+	{
+		m_update_ready_bit = 1;
 	}
 }
 
@@ -1237,15 +1220,15 @@ void mc6845_device::device_start()
 	m_out_vsync_cb.resolve_safe();
 
 	/* create the timers */
-	m_line_timer = timer_alloc(TIMER_LINE);
-	m_de_off_timer = timer_alloc(TIMER_DE_OFF);
-	m_cur_on_timer = timer_alloc(TIMER_CUR_ON);
-	m_cur_off_timer = timer_alloc(TIMER_CUR_OFF);
-	m_hsync_on_timer = timer_alloc(TIMER_HSYNC_ON);
-	m_hsync_off_timer = timer_alloc(TIMER_HSYNC_OFF);
-	m_light_pen_latch_timer = timer_alloc(TIMER_LIGHT_PEN_LATCH);
-	m_upd_adr_timer = timer_alloc(TIMER_UPD_ADR);
-	m_upd_trans_timer = timer_alloc(TIMER_UPD_TRANS);
+	m_line_timer = timer_alloc(FUNC(mc6845_device::handle_line_timer), this);
+	m_de_off_timer = timer_alloc(FUNC(mc6845_device::de_off_tick), this);
+	m_cursor_on_timer = timer_alloc(FUNC(mc6845_device::cursor_on), this);
+	m_cursor_off_timer = timer_alloc(FUNC(mc6845_device::cursor_off), this);
+	m_hsync_on_timer = timer_alloc(FUNC(mc6845_device::hsync_on), this);
+	m_hsync_off_timer = timer_alloc(FUNC(mc6845_device::hsync_off), this);
+	m_light_pen_latch_timer = timer_alloc(FUNC(mc6845_device::latch_light_pen), this);
+	m_upd_adr_timer = timer_alloc(FUNC(mc6845_device::adr_update_tick), this);
+	m_upd_trans_timer = timer_alloc(FUNC(mc6845_device::transparent_update_tick), this);
 
 	/* Use some large startup values */
 	m_horiz_char_total = 0xff;
@@ -1475,7 +1458,7 @@ void mos8563_device::device_start()
 	mc6845_device::device_start();
 
 	/* create the timers */
-	m_block_copy_timer = timer_alloc(TIMER_BLOCK_COPY);
+	m_block_copy_timer = timer_alloc(FUNC(mos8563_device::block_copy_tick), this);
 
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;

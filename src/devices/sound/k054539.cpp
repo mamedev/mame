@@ -307,7 +307,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 }
 
 
-void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(k054539_device::call_timer_handler)
 {
 	if (regs[0x22f] & 0x20)
 		m_timer_handler(m_timer_state ^= 1);
@@ -507,7 +507,7 @@ u8 k054539_device::read(offs_t offset)
 
 void k054539_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(k054539_device::call_timer_handler), this);
 
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();

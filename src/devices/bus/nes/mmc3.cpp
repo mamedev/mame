@@ -204,7 +204,7 @@ void nes_zz_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Here, IRQ counter decrements every scanline. */
-void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

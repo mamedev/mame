@@ -31,10 +31,13 @@ public:
 	void rollerg(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_NMI
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(sound_nmi);
 
 	/* misc */
 	int        m_readzoomroms = 0;
@@ -46,23 +49,17 @@ private:
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 	required_device<k053252_device> m_k053252;
-	void rollerg_0010_w(uint8_t data);
-	uint8_t rollerg_k051316_r(offs_t offset);
+
+	void ext_enable_w(uint8_t data);
+	uint8_t k051316_r(offs_t offset);
 	void soundirq_w(uint8_t data);
 	void sound_arm_nmi_w(uint8_t data);
 	uint8_t pip_r();
 	DECLARE_WRITE_LINE_MEMBER(rollerg_irq_ack_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_rollerg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K05324X_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
 	void banking_callback(uint8_t data);
-
-	void rollerg_map(address_map &map);
-	void rollerg_sound_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_ROLLERG_H

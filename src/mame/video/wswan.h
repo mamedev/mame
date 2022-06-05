@@ -52,7 +52,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void setup_palettes();
 	void draw_background();
@@ -61,7 +60,7 @@ protected:
 	void draw_foreground_3();
 	void handle_sprites(int mask);
 	void refresh_scanline();
-	void scanline_interrupt();
+	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	void common_save();
 	u16 swap_bytes(u16 word);
 
@@ -120,9 +119,6 @@ protected:
 	int m_vdp_type;
 
 	devcb_write8 m_icons_cb;
-
-	// timer IDs
-	static constexpr device_timer_id TIMER_SCANLINE = 0;
 
 	// interrupt flags
 	// these are the same as the wswan.h ones

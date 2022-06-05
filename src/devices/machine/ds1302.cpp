@@ -101,7 +101,7 @@ ds1202_device::ds1202_device(const machine_config &mconfig, const char *tag, dev
 void ds1302_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(ds1302_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	m_clk = 0;
@@ -129,10 +129,10 @@ void ds1302_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the clock if enabled
 //-------------------------------------------------
 
-void ds1302_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ds1302_device::clock_tick)
 {
 	if (!CLOCK_HALT)
 	{

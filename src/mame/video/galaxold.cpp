@@ -1231,8 +1231,8 @@ void galaxold_state::galaxold_init_stars(int colors_offset)
 
 	m_stars_on = 0;
 	m_stars_blink_state = 0;
-	m_stars_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_blink_callback),this));
-	m_stars_scroll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_scroll_callback),this));
+	m_stars_blink_timer = timer_alloc(FUNC(galaxold_state::stars_blink_callback), this);
+	m_stars_scroll_timer = timer_alloc(FUNC(galaxold_state::stars_scroll_callback), this);
 	m_timer_adjusted = 0;
 	m_stars_colors_start = colors_offset;
 

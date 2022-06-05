@@ -86,13 +86,15 @@ void midway_cheap_squeak_deluxe_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
+
+	m_pia_sync_timer = timer_alloc(FUNC(midway_cheap_squeak_deluxe_device::sync_pia), this);
 }
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  sync_pia
 //-------------------------------------------------
 
-void midway_cheap_squeak_deluxe_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midway_cheap_squeak_deluxe_device::sync_pia)
 {
 	m_pia->ca1_w(param);
 
@@ -134,7 +136,7 @@ void midway_cheap_squeak_deluxe_device::sr_w(u8 data)
 
 WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::sirq_w )
 {
-	synchronize(0, !state);
+	m_pia_sync_timer->adjust(attotime::zero, !state);
 }
 
 //-------------------------------------------------

@@ -152,9 +152,9 @@ void mct_adr_device::device_start()
 	m_ioc_physical_tag = 0;
 	m_ioc_logical_tag = 0;
 
-	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::irq_check), this));
-	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::dma_check), this));
-	m_interval_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::interval_timer), this));
+	m_irq_check = timer_alloc(FUNC(mct_adr_device::irq_check), this);
+	m_dma_check = timer_alloc(FUNC(mct_adr_device::dma_check), this);
+	m_interval_timer = timer_alloc(FUNC(mct_adr_device::interval_timer), this);
 
 	m_out_int_timer_asserted = false;
 	m_out_int_device_asserted = false;

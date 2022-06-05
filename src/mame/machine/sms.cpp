@@ -1041,7 +1041,7 @@ void sms_state::machine_start()
 		}
 	}
 
-	m_lphaser_th_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_th_generate),this));
+	m_lphaser_th_timer = timer_alloc(FUNC(sms_state::lphaser_th_generate), this);
 
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));

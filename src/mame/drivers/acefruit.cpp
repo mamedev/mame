@@ -48,29 +48,25 @@ public:
 	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_payout_r);
 
 protected:
-	enum
-	{
-		TIMER_ACEFRUIT_REFRESH
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(refresh_tick);
 
 private:
-	void acefruit_colorram_w(offs_t offset, uint8_t data);
-	void acefruit_coin_w(uint8_t data);
-	void acefruit_sound_w(uint8_t data);
-	void acefruit_lamp_w(offs_t offset, uint8_t data);
-	void acefruit_solenoid_w(uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void coin_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void lamp_w(offs_t offset, uint8_t data);
+	void solenoid_w(uint8_t data);
 
-	void acefruit_palette(palette_device &palette) const;
-	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(acefruit_vblank);
-	void acefruit_update_irq(int vpos);
+	void palette_init(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank);
+	void update_irq(int vpos);
 
-	void acefruit_io(address_map &map);
-	void acefruit_map(address_map &map);
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -88,7 +84,7 @@ private:
 
 
 
-void acefruit_state::acefruit_update_irq(int vpos)
+void acefruit_state::update_irq(int vpos)
 {
 	int row = vpos / 8;
 
@@ -106,25 +102,16 @@ void acefruit_state::acefruit_update_irq(int vpos)
 	}
 }
 
-
-void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 {
 	int vpos = m_screen->vpos();
 
-	switch(id)
-	{
-	case TIMER_ACEFRUIT_REFRESH:
+	m_screen->update_partial(vpos);
+	update_irq(vpos);
 
-		m_screen->update_partial(vpos);
-		acefruit_update_irq(vpos);
+	vpos = ((vpos / 8) + 1) * 8;
 
-		vpos = ((vpos / 8) + 1) * 8;
-
-		m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in acefruit_state::device_timer");
-	}
+	m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
 }
 
 void acefruit_state::machine_start()
@@ -135,16 +122,16 @@ void acefruit_state::machine_start()
 
 void acefruit_state::video_start()
 {
-	m_refresh_timer = timer_alloc(TIMER_ACEFRUIT_REFRESH);
+	m_refresh_timer = timer_alloc(FUNC(acefruit_state::refresh_tick), this);
 }
 
-INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
+INTERRUPT_GEN_MEMBER(acefruit_state::vblank)
 {
 	device.execute().set_input_line(0, HOLD_LINE );
 	m_refresh_timer->adjust( attotime::zero );
 }
 
-uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
@@ -212,7 +199,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 				}
 				else if( color == 0xc )
 				{
-					/* irq generated in acefruit_update_irq() */
+					/* irq generated in update_irq() */
 				}
 			}
 		}
@@ -251,34 +238,34 @@ int acefruit_state::starspnr_payout_r()
 	return 0;
 }
 
-void acefruit_state::acefruit_colorram_w(offs_t offset, uint8_t data)
+void acefruit_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-void acefruit_state::acefruit_coin_w(uint8_t data)
+void acefruit_state::coin_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-void acefruit_state::acefruit_sound_w(uint8_t data)
+void acefruit_state::sound_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-void acefruit_state::acefruit_lamp_w(offs_t offset, uint8_t data)
+void acefruit_state::lamp_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
-void acefruit_state::acefruit_solenoid_w(uint8_t data)
+void acefruit_state::solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_solenoids[i] = BIT(data, i);
 }
 
-void acefruit_state::acefruit_palette(palette_device &palette) const
+void acefruit_state::palette_init(palette_device &palette) const
 {
 	/* sprites */
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
@@ -301,12 +288,12 @@ void acefruit_state::acefruit_palette(palette_device &palette) const
 	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
 }
 
-void acefruit_state::acefruit_map(address_map &map)
+void acefruit_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x20ff).ram().share("nvram");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4400, 0x47ff).ram().w(FUNC(acefruit_state::acefruit_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).ram().w(FUNC(acefruit_state::colorram_w)).share("colorram");
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8001, 0x8001).portr("IN1");
 	map(0x8002, 0x8002).portr("IN2");
@@ -316,15 +303,15 @@ void acefruit_state::acefruit_map(address_map &map)
 	map(0x8006, 0x8006).portr("IN6");
 	map(0x8007, 0x8007).portr("IN7");
 	map(0x6000, 0x6005).ram().share("spriteram");
-	map(0xa000, 0xa001).w(FUNC(acefruit_state::acefruit_lamp_w));
-	map(0xa002, 0xa003).w(FUNC(acefruit_state::acefruit_coin_w));
-	map(0xa004, 0xa004).w(FUNC(acefruit_state::acefruit_solenoid_w));
-	map(0xa005, 0xa006).w(FUNC(acefruit_state::acefruit_sound_w));
+	map(0xa000, 0xa001).w(FUNC(acefruit_state::lamp_w));
+	map(0xa002, 0xa003).w(FUNC(acefruit_state::coin_w));
+	map(0xa004, 0xa004).w(FUNC(acefruit_state::solenoid_w));
+	map(0xa005, 0xa006).w(FUNC(acefruit_state::sound_w));
 	map(0xc000, 0xc000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe000, 0xffff).rom();
 }
 
-void acefruit_state::acefruit_io(address_map &map)
+void acefruit_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).noprw(); /* ? */
@@ -598,9 +585,9 @@ void acefruit_state::acefruit(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2500000); /* 2.5MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &acefruit_state::acefruit_map);
-	m_maincpu->set_addrmap(AS_IO, &acefruit_state::acefruit_io);
-	m_maincpu->set_vblank_int("screen", FUNC(acefruit_state::acefruit_vblank));
+	m_maincpu->set_addrmap(AS_PROGRAM, &acefruit_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &acefruit_state::main_io);
+	m_maincpu->set_vblank_int("screen", FUNC(acefruit_state::vblank));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -612,10 +599,10 @@ void acefruit_state::acefruit(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea_full();
-	m_screen->set_screen_update(FUNC(acefruit_state::screen_update_acefruit));
+	m_screen->set_screen_update(FUNC(acefruit_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(acefruit_state::acefruit_palette), 16);
+	PALETTE(config, m_palette, FUNC(acefruit_state::palette_init), 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

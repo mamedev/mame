@@ -784,12 +784,12 @@ void xavix_state::machine_start()
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
 	std::fill_n(&m_mainram[0], 0x4000 - nvram_size, 0xff);
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
-	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
+	m_interrupt_timer = timer_alloc(FUNC(xavix_state::interrupt_gen), this);
+	m_freq_timer = timer_alloc(FUNC(xavix_state::freq_timer_done), this);
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
+		m_sound_timer[i] = timer_alloc(FUNC(xavix_state::sound_timer_done), this);
 	}
 
 	if (m_nvram)

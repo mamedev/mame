@@ -102,6 +102,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 private:
+	virtual void machine_reset() override;
+
 	uint8_t video_vdp_r(offs_t offset);
 	void video_vdp_w(offs_t offset, uint8_t data);
 	uint8_t video_joy_r();
@@ -138,11 +140,9 @@ private:
 
 	void xmit_callback(uint8_t data);
 	DECLARE_MACHINE_START(tm990_189);
-	DECLARE_MACHINE_RESET(tm990_189);
 	DECLARE_MACHINE_START(tm990_189_v);
-	DECLARE_MACHINE_RESET(tm990_189_v);
 
-	emu_timer *m_rs232_input_timer = 0;
+	emu_timer *m_load_timer = nullptr;
 
 	void tm990_189_cru_map(address_map &map);
 	void tm990_189_memmap(address_map &map);
@@ -188,13 +188,6 @@ private:
 
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
-{
-	m_tms9980a->set_ready(ASSERT_LINE);
-	m_tms9980a->set_hold(CLEAR_LINE);
-	hold_load();
-}
-
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
 	m_digits.resolve();
@@ -203,24 +196,21 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 
 	m_digitsel = 0;
 	m_LED_state = 0;
+
+	m_load_timer = timer_alloc(FUNC(tm990189_state::clear_load), this);
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
-	m_digits.resolve();
-	m_leds.resolve();
-	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	MACHINE_START_CALL_MEMBER(tm990_189);
 
 	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-
-	m_digitsel = 0;
-	m_LED_state = 0;
 }
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_state::machine_reset()
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
@@ -241,7 +231,7 @@ void tm990189_state::hold_load()
 {
 	m_load_state = true;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
+	m_load_timer->adjust(attotime::from_msec(100));
 }
 
 /*
@@ -496,9 +486,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(rs232_input_tick);
 
 	required_device<tms9902_device> m_tms9902;
+	emu_timer *m_rs232_input_timer = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs232_image", "TM990/189 RS232 port")
@@ -512,9 +504,10 @@ tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config 
 
 void tm990_189_rs232_image_device::device_start()
 {
+	m_rs232_input_timer = timer_alloc(FUNC(tm990_189_rs232_image_device::rs232_input_tick), this);
 }
 
-void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)
 {
 	uint8_t buf;
 	if (/*m_rs232_rts &&*/ /*(mame_ftell(m_rs232_fp) < mame_fsize(m_rs232_fp))*/1)
@@ -526,20 +519,16 @@ void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_i
 
 image_init_result tm990_189_rs232_image_device::call_load()
 {
-	tm990189_state *state = machine().driver_data<tm990189_state>();
 	m_tms9902->rcv_dsr(ASSERT_LINE);
-	state->m_rs232_input_timer = timer_alloc();
-	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
+	m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 	return image_init_result::PASS;
 }
 
 
 void tm990_189_rs232_image_device::call_unload()
 {
-	tm990189_state *state = machine().driver_data<tm990189_state>();
 	m_tms9902->rcv_dsr(CLEAR_LINE);
-
-	state->m_rs232_input_timer->reset();    /* FIXME - timers should only be allocated once */
+	m_rs232_input_timer->adjust(attotime::never);
 }
 
 
@@ -850,7 +839,6 @@ void tm990189_state::tm990_189(machine_config &config)
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
-	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
 
 	/* Video hardware */
 	config.set_default_layout(layout_tm990189);
@@ -909,7 +897,6 @@ void tm990189_state::tm990_189_v(machine_config &config)
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
-	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
 	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));

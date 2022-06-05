@@ -69,8 +69,6 @@ TODO:
 - The board has, instead of a watchdog, a timed reset that has to be disabled
   on startup. The disable line is tied to CA2 of VIA2, but I don't see writes
   to that pin in the log. Missing support in machine/6522via.cpp?
-- Kaos needs a kludge to avoid a deadlock (see the via_irq() function below).
-  I don't know if this is a shortcoming of the driver or of 6522via.cpp.
 - Investigate and document the 8910 dip switches
 - Fix the input ports of Kaos
 
@@ -982,7 +980,7 @@ void gameplan_state::gameplan(machine_config &config)
 	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
 	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
 	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
-	m_via_0->irq_handler().set(FUNC(gameplan_state::via_irq));
+	m_via_0->irq_handler().set_inputline(m_maincpu, 0);
 
 	MOS6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_1->readpa_handler().set(FUNC(gameplan_state::io_port_r));

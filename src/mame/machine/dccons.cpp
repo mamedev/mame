@@ -104,9 +104,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 void dc_cons_state::dreamcast_atapi_init()
 {
-	atapi_timer = machine().scheduler().timer_alloc(
-		timer_expired_delegate(FUNC(dc_cons_state::atapi_xfer_end), this)
-	);
+	atapi_timer = timer_alloc(FUNC(dc_cons_state::atapi_xfer_end), this);
 	atapi_timer->adjust(attotime::never);
 	save_item(NAME(atapi_xferlen));
 	save_item(NAME(atapi_xferbase));

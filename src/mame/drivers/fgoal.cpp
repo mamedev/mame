@@ -64,19 +64,6 @@ void fgoal_state::fgoal_palette(palette_device &palette) const
 }
 
 
-void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_INTERRUPT:
-		interrupt_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in fgoal_state::device_timer");
-	}
-}
-
-
 TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 {
 	int scanline;
@@ -335,7 +322,7 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_interrupt_timer = timer_alloc(FUNC(fgoal_state::interrupt_callback), this);
 
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));

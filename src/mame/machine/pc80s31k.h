@@ -38,9 +38,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void fdc_io(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(tc_zero_tick);
 
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

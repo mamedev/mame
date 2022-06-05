@@ -240,8 +240,8 @@ void segas32_state::device_start()
 	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vblank_end_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int), this));
-	m_update_sprites_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::update_sprites), this));
+	m_vblank_end_int_timer = timer_alloc(FUNC(segas32_state::end_of_vblank_int), this);
+	m_update_sprites_timer = timer_alloc(FUNC(segas32_state::update_sprites), this);
 
 	/* allocate a copy of spriteram in 32-bit format */
 	m_spriteram_32bit = std::make_unique<uint32_t[]>(0x20000/4);

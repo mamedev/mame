@@ -36,9 +36,13 @@ void wpc_out_device::gi_update()
 	attotime now = machine().time();
 	attotime delta = now - previous_gi_update;
 	uint32_t delta_us = delta.as_ticks(1e6);
-	for(int i=0; i<gi_count; i++)
-		if(gi & (1 <<i))
+	for (int i = 0; i < gi_count; i++)
+	{
+		if (BIT(gi, i))
+		{
 			gi_time[i] += delta_us;
+		}
+	}
 	previous_gi_update = now;
 }
 
@@ -49,15 +53,18 @@ void wpc_out_device::send_output(int sid, int state)
 
 	char buffer[32];
 	const char *name;
-	if(names && names[sid-1] && strcmp(names[sid-1], "s:"))
-		name = names[sid-1];
-	else {
+	if (names && names[sid - 1] && strcmp(names[sid - 1], "s:"))
+	{
+		name = names[sid - 1];
+	}
+	else
+	{
 		sprintf(buffer, "u:output %02d", sid);
 		name = buffer;
 	}
 	machine().output().set_value(name, state);
 
-	if(sid == 41)
+	if (sid == 41)
 		machine().bookkeeping().coin_counter_w(0, state);
 }
 
@@ -66,28 +73,33 @@ void wpc_out_device::out_w(offs_t offset, uint8_t data)
 	first_after_led = false;
 	uint8_t diff = state[offset] ^ data;
 	state[offset] = data;
-	if(diff)
-		for(int i=0; i<8; i++)
-			if(diff & (1 << i)) {
+	if (diff)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (BIT(diff, i))
+			{
 				int id = (offset << 3) | i;
 				int sid;
-				if(id <= 3)
+				if (id <= 3)
 					sid = id + 25;
-				else if(id <= 7)
+				else if (id <= 7)
 					sid = id + 33;
-				else if(id <= 15)
-					sid = id-7;
-				else if(id <= 23)
-					sid = id+1;
-				else if(id <= 31)
-					sid = id-15;
-				else if(id <= 39)
-					sid = id-3;
+				else if (id <= 15)
+					sid = id - 7;
+				else if (id <= 23)
+					sid = id + 1;
+				else if (id <= 31)
+					sid = id - 15;
+				else if (id <= 39)
+					sid = id - 3;
 				else
-					sid = id+2;
+					sid = id + 2;
 
-				send_output(sid, (data & (1<<i)) != 0);
+				send_output(sid, BIT(data, i));
 			}
+		}
+	}
 }
 
 void wpc_out_device::out4_w(uint8_t data)
@@ -119,7 +131,7 @@ void wpc_out_device::device_start()
 	save_item(NAME(previous_gi_update));
 	save_item(NAME(gi_time));
 
-	timer = timer_alloc(0);
+	timer = timer_alloc(FUNC(wpc_out_device::update_outputs), this);
 }
 
 void wpc_out_device::device_reset()
@@ -132,10 +144,11 @@ void wpc_out_device::device_reset()
 	timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 }
 
-void wpc_out_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wpc_out_device::update_outputs)
 {
 	gi_update();
-	for(int i=0; i<gi_count; i++) {
+	for (int i = 0; i < gi_count; i++)
+	{
 		//      fprintf(stderr, "gi[%d] = %d\n", i, gi_time[i]);
 		gi_time[i] = 0;
 	}

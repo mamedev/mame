@@ -1324,27 +1324,27 @@ void gba_state::machine_reset()
 void gba_state::machine_start()
 {
 	/* and one for each DMA channel */
-	m_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
-	m_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
-	m_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
-	m_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
+	m_dma_timer[0] = timer_alloc(FUNC(gba_state::dma_complete), this);
+	m_dma_timer[1] = timer_alloc(FUNC(gba_state::dma_complete), this);
+	m_dma_timer[2] = timer_alloc(FUNC(gba_state::dma_complete), this);
+	m_dma_timer[3] = timer_alloc(FUNC(gba_state::dma_complete), this);
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
 	m_dma_timer[2]->adjust(attotime::never, 2);
 	m_dma_timer[3]->adjust(attotime::never, 3);
 
 	/* also one for each timer (heh) */
-	m_tmr_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
-	m_tmr_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
-	m_tmr_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
-	m_tmr_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
+	m_tmr_timer[0] = timer_alloc(FUNC(gba_state::timer_expire), this);
+	m_tmr_timer[1] = timer_alloc(FUNC(gba_state::timer_expire), this);
+	m_tmr_timer[2] = timer_alloc(FUNC(gba_state::timer_expire), this);
+	m_tmr_timer[3] = timer_alloc(FUNC(gba_state::timer_expire), this);
 	m_tmr_timer[0]->adjust(attotime::never);
 	m_tmr_timer[1]->adjust(attotime::never, 1);
 	m_tmr_timer[2]->adjust(attotime::never, 2);
 	m_tmr_timer[3]->adjust(attotime::never, 3);
 
 	/* and an IRQ handling timer */
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::handle_irq),this));
+	m_irq_timer = timer_alloc(FUNC(gba_state::handle_irq), this);
 	m_irq_timer->adjust(attotime::never);
 
 	save_item(NAME(m_regs));

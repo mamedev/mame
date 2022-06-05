@@ -132,7 +132,7 @@ void st2xxx_device::init_base_timer(u16 ireq)
 		if (st2xxx_bt_divider(n) != 0)
 		{
 			m_bt_mask |= 1 << n;
-			m_base_timer[n] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2xxx_device::bt_interrupt), this));
+			m_base_timer[n] = timer_alloc(FUNC(st2xxx_device::bt_interrupt), this);
 		}
 	}
 
@@ -151,7 +151,7 @@ void st2xxx_device::init_lcd_timer(u16 ireq)
 	m_lcd_ireq = ireq;
 	assert(m_lcd_ireq != 0);
 
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2xxx_device::lcd_interrupt), this));
+	m_lcd_timer = timer_alloc(FUNC(st2xxx_device::lcd_interrupt), this);
 }
 
 void st2xxx_device::save_common_registers()

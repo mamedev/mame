@@ -130,10 +130,10 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 {
 	m_stream = stream_alloc(0, 4, 48000);
 
-	m_timer_12bit[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t0_interrupt), this));
-	m_timer_12bit[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t1_interrupt), this));
-	m_timer_12bit[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t2_interrupt), this));
-	m_timer_12bit[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t3_interrupt), this));
+	m_timer_12bit[0] = timer_alloc(FUNC(st2205u_device::t0_interrupt), this);
+	m_timer_12bit[1] = timer_alloc(FUNC(st2205u_device::t1_interrupt), this);
+	m_timer_12bit[2] = timer_alloc(FUNC(st2205u_device::t2_interrupt), this);
+	m_timer_12bit[3] = timer_alloc(FUNC(st2205u_device::t3_interrupt), this);
 
 	init_base_timer(0x0040);
 	init_lcd_timer(0x0080);

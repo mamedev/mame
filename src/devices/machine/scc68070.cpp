@@ -183,13 +183,13 @@ void scc68070_device::device_start()
 	save_item(STRUCT_MEMBER(m_mmu.desc, segment));
 	save_item(STRUCT_MEMBER(m_mmu.desc, base));
 
-	m_timers.timer0_timer = timer_alloc(TIMER_TMR0);
+	m_timers.timer0_timer = timer_alloc(FUNC(scc68070_device::timer0_callback), this);
 	m_timers.timer0_timer->adjust(attotime::never);
 
-	m_uart.rx_timer = timer_alloc(TIMER_UART_RX);
+	m_uart.rx_timer = timer_alloc(FUNC(scc68070_device::rx_callback), this);
 	m_uart.rx_timer->adjust(attotime::never);
 
-	m_uart.tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart.tx_timer = timer_alloc(FUNC(scc68070_device::tx_callback), this);
 	m_uart.tx_timer->adjust(attotime::never);
 }
 
@@ -261,20 +261,6 @@ void scc68070_device::device_reset()
 	m_uart.rx_timer->adjust(attotime::never);
 	m_uart.tx_timer->adjust(attotime::never);
 	m_timers.timer0_timer->adjust(attotime::never);
-}
-
-//-------------------------------------------------
-//  device_timer - device-specific timer callback
-//-------------------------------------------------
-
-void scc68070_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if (id == TIMER_TMR0)
-		timer0_callback();
-	else if (id == TIMER_UART_RX)
-		rx_callback();
-	else if (id == TIMER_UART_TX)
-		tx_callback();
 }
 
 void scc68070_device::m68k_reset_peripherals()
@@ -469,7 +455,7 @@ void scc68070_device::set_timer_callback(int channel)
 	}
 }
 
-void scc68070_device::timer0_callback()
+TIMER_CALLBACK_MEMBER(scc68070_device::timer0_callback)
 {
 	m_timers.timer0 = m_timers.reload_register;
 	m_timers.timer_status_register |= TSR_OV0;
@@ -500,7 +486,7 @@ void scc68070_device::uart_tx(uint8_t data)
 	m_uart.status_register &= ~USR_TXEMT;
 }
 
-void scc68070_device::rx_callback()
+TIMER_CALLBACK_MEMBER(scc68070_device::rx_callback)
 {
 	if ((m_uart.command_register & 3) == 1)
 	{
@@ -535,7 +521,7 @@ void scc68070_device::rx_callback()
 	}
 }
 
-void scc68070_device::tx_callback()
+TIMER_CALLBACK_MEMBER(scc68070_device::tx_callback)
 {
 	if (((m_uart.command_register >> 2) & 3) == 1)
 	{

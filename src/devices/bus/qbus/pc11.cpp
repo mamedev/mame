@@ -82,8 +82,8 @@ void pc11_device::device_start()
 	save_item(NAME(m_tbuf));
 
 	// about 300 cps
-	emu_timer *timer = timer_alloc();
-	timer->adjust(attotime::from_usec(333), 0, attotime::from_usec(333));
+	m_read_timer = timer_alloc(FUNC(pc11_device::read_tick), this);
+	m_read_timer->adjust(attotime::from_usec(333), 0, attotime::from_usec(333));
 }
 
 
@@ -214,14 +214,14 @@ void pc11_device::write(offs_t offset, uint16_t data)
 	}
 }
 
-void pc11_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc11_device::read_tick)
 {
 	uint8_t reply;
 
 	if (!(m_rcsr & CSR_BUSY))
 		return;
 
-	LOGDBG("Timer rcsr %06o id %d param %d m_fd %p\n", m_rcsr, id, param, m_fd);
+	LOGDBG("Timer rcsr %06o param %d m_fd %p\n", m_rcsr, param, m_fd);
 
 	m_rcsr = (m_rcsr | CSR_ERR) & ~CSR_BUSY;
 	if (m_fd && m_fd->exists() && (m_fd->fread(&reply, 1) == 1))
