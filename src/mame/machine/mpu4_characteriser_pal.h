@@ -1028,12 +1028,89 @@ public:
 	static constexpr uint8_t hittop_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x40, 0x40, 0x20, 0x00, 0x40 }; // good?
 
 
-	/***************************************************************
+	// games with sequence starting
+	// 00 24 24 a4 1c 44 a4 14 a8 d8 cc f8 e4 14
+	// Winner Takes All  "WN4 1.1"
+	//                   "WN5 3.0"
+	static constexpr uint8_t wtaalt_characteriser_prot[8] = { 0x00, 0x28, 0x20, 0x08, 0x00, 0x28, 0x20, 0x00 }; // good? matches unprotected set
 
-	 Lamp data below is definitely incorrect
 
-	***************************************************************/
+	// games with sequence starting
+	// 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
+	// Blue Flash  "TBF 0.3"
+	//             "BFL 0.3"
+	static constexpr uint8_t blueflash_characteriser_prot[8] = { 0x00, 0x78, 0x30, 0x58, 0x50, 0x38, 0x30, 0x10 }; // not much evidence
 
+
+	// games with sequence starting 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
+	// Dutch Triple Bank   "DTB 1.2"
+	static constexpr uint8_t tribank_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x28, 0x20, 0x68, 0x60, 0x20 }; // many effects bypass the scramble, mostly correct?
+
+
+	// games with sequence starting
+	// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
+	// Tutti Fruity   "TFT 0.4 / TF4 0.4"
+	//                "CTU 0.1"
+	//                "TF4 0.2"
+	// 10 X 10        "T20 0.2"
+	//                "N25 0.3"
+	//                "T25 0.4"
+	// Cosmic Casinos "CC__3.0"
+	//                "CC__7.0"
+	// Dutch Express  "DXP 2.0"
+	static constexpr uint8_t cosmiccasino_characteriser_prot[8] = { 0x00, 0x70, 0x30, 0x60, 0x20, 0x70, 0x30, 0x20 }; // good?
+
+
+	// games with sequence starting
+	// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0 d8 64 94 c8 28 b0 58 e4 9c 64 14 d0 08 a0 1c f4 c8 e8 e8 78 24 14 00 14 d0 c8 68 30 c0 9c f4 08 a0 dc 64 94 d8 a4 dc e4 1c 64 94 08 f0 00
+	// Black Jack        "B2J 2.2"
+	//                   "BLA 2.0"
+	// Prize High Roller "PR3 0.1"
+	// Dutch Andy Capp   "DAC 1.3" (doesn't use lamp scramble? doesn't boot)
+	// Dutch Step Timer  "DST 1.1" (doesn't use lamp scramble? doesn't boot)
+	// Dutch Broadway    "DBR 1.1" (doesn't use lamp scramble? doesn't boot)
+	static constexpr uint8_t phr_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x40, 0x00, 0x50, 0x10, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
+	// Pontoon Club          "PON 3.0"
+	//                       "PON 4.0"
+	// Dutch Twilight        "DTL 2.2"
+	static constexpr uint8_t pontoon_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x20, 0x20, 0x10, 0x10, 0x00 }; // maybe
+
+
+	// games with sequence starting
+	// 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
+	// Eighth Wonder     "BEW 0.3"
+	// Sunset Boulevard  "BSB 0.4"
+	//                   "BSB 0.3"
+	static constexpr uint8_t eighth_characteriser_prot[8] = { 0x00, 0x38, 0x10, 0x38, 0x30, 0x18, 0x10, 0x10 }; // good? matches other Eighth Wonder set
+
+
+	// games with sequence starting
+	// 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c
+	// Sunset Boulevard    "BS__ 1.1"
+	//                     "BS__ 1.0"
+	static constexpr uint8_t sunsetbalt_characteriser_prot[8] = { 0x00, 0x58, 0x40, 0x58, 0x50, 0x48, 0x40, 0x40 }; // good? matches other Sunset sets
+
+
+	// games with sequence starting
+	// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
+	// Sunset Boulevard "SB__ 1.1"
+	//                  "SB__ 1.0"
+	// The Hit          "DTH 1.7"
+	// Top Take         "TTK 1.1"
+	static constexpr uint8_t toptake_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x40, 0x40, 0x20, 0x00, 0x40 }; // good? matches other sunset sets
+
+
+	// games with sequence starting
+	// 40 50 40 54 64 50 64 50 64 54 60 74 40 70 40 54 64 74 64 50 44 54 60 50 44 74 44 50 40 54 40 54 60 50 64 50 44 50 44 50 40 50 64 54 64 50 64 50 64 50 64 74 40 54 64 50 44 74 40 50 64 50 64 00
+	// ** This is an unusual sequence, bit 0x40 always seems to be set, both here and in the lamp results
+	//    Check if it isn't just one of the other ones but with an output line tied high?
+	// Hit The Top    "HI4 0.3"
+	//                "CHU 0.1"
+	static constexpr uint8_t hittopalt2_characteriser_prot[8] = { 0x40, 0x70, 0x50, 0x50, 0x50, 0x70, 0x50, 0x50 }; // good?
 
 
 	// games with sequence starting
@@ -1042,7 +1119,17 @@ public:
 	// Cloud 999    "CLN 4.0"
 	// Boulder Dash "BO_ 2.0"
 	// Boulder Dash "BO_ 2.1"
-	static constexpr uint8_t tictak_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+	static constexpr uint8_t tictak_characteriser_prot[8] = { 0x00, 0x58, 0x18, 0x50, 0x10, 0x58, 0x18, 0x10 }; // good?
+
+	/***************************************************************
+
+	 Lamp data below is definitely incorrect
+
+	***************************************************************/
+
+
+
+
 
 	// games with sequence starting
 	// 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 6c 10 4c 5c 7c 38 74 00 20 24 2c 5c 78 34 00 60 24 64 24 2c 1c 78 78 34 08 14 00 24 6c 54 4c 14 4c 54 4c 58 78 78 34 44 64 20 64 6c 54 04 64 24 6c 00
@@ -1066,30 +1153,6 @@ public:
 	// Oriental Diamonds (German) "RAB 0.1"
 	static constexpr uint8_t actclba_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0 d8 64 94 c8 28 b0 58 e4 9c 64 14 d0 08 a0 1c f4 c8 e8 e8 78 24 14 00 14 d0 c8 68 30 c0 9c f4 08 a0 dc 64 94 d8 a4 dc e4 1c 64 94 08 f0 00
-	// Black Jack        "B2J 2.2"
-	//                   "BLA 2.0"
-	// Prize High Roller "PR3 0.1"
-	// Dutch Andy Capp   "DAC 1.3" (doesn't use lamp scramble? doesn't boot)
-	// Dutch Step Timer  "DST 1.1" (doesn't use lamp scramble? doesn't boot)
-	// Dutch Broadway    "DBR 1.1" (doesn't use lamp scramble? doesn't boot)
-	static constexpr uint8_t phr_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-
-	// games with sequence starting
-	// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
-	// Tutti Fruity   "TFT 0.4 / TF4 0.4"
-	//                "CTU 0.1"
-	//                "TF4 0.2"
-	// 10 X 10        "T20 0.2"
-	//                "N25 0.3"
-	//                "T25 0.4"
-	// Cosmic Casinos "CC__3.0"
-	//                "CC__7.0"
-	// Dutch Express  "DXP 2.0"
-	static constexpr uint8_t cosmiccasino_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04
@@ -1106,9 +1169,6 @@ public:
 	static constexpr uint8_t turboplay_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
-
-
-
 	// games with sequence starting
 	// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
 	// Bank Roller Club         "CBR 0.5"
@@ -1119,6 +1179,7 @@ public:
 	// Adders and Ladders (Vid) "v2.1"    (MPU4 Video quiz, using 4k table implementation instead)
 	//                          "v2.0"    (MPU4 Video quiz, using 4k table implementation instead)
 	static constexpr uint8_t bankrollerclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting
 	// 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00 68 ac bc c8 9c cc b0 30 28 ac 9c c8 b0 1c c0 5c ec b0 1c cc 9c c8 94 14 00 60 6c a4 58 e4 74 20 6c 84 74 0c 80 74 2c 88 9c cc bc c8 94 10 2c 00
@@ -1136,16 +1197,19 @@ public:
 	//                           "CO  4.0"
 	static constexpr uint8_t copycat_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+
 	// games with sequence starting
 	// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
 	// Action Club      "ABV 1.9"
 	// Kings & Queens   "EE2 1.0 / EE2 1.0"
 	static constexpr uint8_t kqee2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+
 	// games with sequence starting
 	// 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
 	// Kings & Queens  "EE' 2.0 / EE_ 2.0"
 	static constexpr uint8_t kqee_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting
 	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
@@ -1188,13 +1252,6 @@ public:
 	// Hit The Top  "HTT 0.5"
 	static constexpr uint8_t hittopalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 40 50 40 54 64 50 64 50 64 54 60 74 40 70 (unusual sequence)
-	// Hit The Top    "HI4 0.3"
-	//                "CHU 0.1"
-	static constexpr uint8_t hittopalt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
 
 
 
@@ -1204,49 +1261,8 @@ public:
 	//               "AE10 2.0"
 	static constexpr uint8_t acechasealt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
-	// Sunset Boulevard "SB__ 1.1"
-	//                  "SB__ 1.0"
-	// The Hit          "DTH 1.7"
-	// Top Take         "TTK 1.1"
-	static constexpr uint8_t toptake_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c
-	// Sunset Boulevard    "BS__ 1.1"
-	//                     "BS__ 1.0"
-	static constexpr uint8_t sunsetbalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting
-	// 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
-	// Eighth Wonder     "BEW 0.3"
-	// Sunset Boulevard  "BSB 0.4"
-	//                   "BSB 0.3"
-	static constexpr uint8_t eighth_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
-	// Pontoon Club          "PON 3.0"
-	//                       "PON 4.0"
-	// Dutch Twilight        "DTL 2.2"
-	static constexpr uint8_t pontoon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
-	// Blue Flash  "TBF 0.3"
-	//             "BFL 0.3"
-	static constexpr uint8_t blueflash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 24 24 a4 1c 44 a4 14 a8 d8 cc f8 e4 14
-	// Winner Takes All  "WN4 1.1"
-	//                   "WN5 3.0"
-	static constexpr uint8_t wtaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
-	// Dutch Triple Bank   "DTB 1.2"
-	static constexpr uint8_t tribank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	/***************************************************************
