@@ -96,10 +96,8 @@ void at28c64b_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	printf("checking for default\n");
 	if (m_default_data.found())
 	{
-		printf("Got default data\n");
 		for( offs_t offs = 0; offs < AT28C64B_DATA_BYTES; offs++ )
 			space(AS_PROGRAM).write_byte(offs, m_default_data[offs]);
 	}
