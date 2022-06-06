@@ -184,7 +184,7 @@ void rc2014_ext_bus_device::device_start()
 //-------------------------------------------------
 
 device_rc2014_ext_card_interface::device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device)
-	: device_rc2014_card_interface(mconfig,device)
+	: device_rc2014_card_interface(mconfig, device)
 	, m_bus(nullptr)
 {
 }
@@ -250,7 +250,7 @@ void rc2014_rc80_bus_device::device_start()
 //-------------------------------------------------
 
 device_rc2014_rc80_card_interface::device_rc2014_rc80_card_interface(const machine_config &mconfig, device_t &device)
-	: device_rc2014_ext_card_interface(mconfig,device)
+	: device_rc2014_ext_card_interface(mconfig, device)
 	, m_bus(nullptr)
 {
 }

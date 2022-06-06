@@ -44637,3 +44637,9 @@ rc2014zed                       // RC2014 Zed
 rc2014zedp                      // RC2014 Zed Pro
 rc2014mini                      // RC2014 Mini
 rc2014minicpm                   // RC2014 Mini with CP/M upgrade
+rc2014micro                     // RC2014 Micro
+sc105                           // SC105 - Modular Backplane (RC2014)
+sc112                           // SC112 - Modular Backplane (RC2014)
+sc116                           // SC116 - Modular Backplane (RC2014)
+sc133                           // SC133 - Modular Backplane (RC2014)
+sc203                           // SC203 - Modular Z180 Computer
