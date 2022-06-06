@@ -2642,6 +2642,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc01.h",
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc02.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/corvfdc02.h",
+		MAME_DIR .. "src/devices/bus/a2bus/excel9.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/excel9.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
 		MAME_DIR .. "src/devices/bus/a2bus/grafex.cpp",
