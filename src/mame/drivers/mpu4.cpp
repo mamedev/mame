@@ -2100,6 +2100,13 @@ void mpu4_state::init_m4altreels()
 	init_m4default_banks();
 }
 
+void mpu4_state::init_m4altreels_big()
+{
+	init_m4default_big();
+	m_reel_mux = SIX_REEL_1TO8;
+	m_reels = 6;
+}
+
 void mpu4_state::init_m4default_reels()
 {
 	m_reel_mux = STANDARD_REEL;

@@ -7207,7 +7207,7 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BNKROL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4altreels_big, ROT0, company, title, GAME_FLAGS )
 
 // wants chr sequence starting 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 (bankrollerclub) (same as v4adders?)
 // "(C)1996 BARCREST" and "CBR 0.5"

@@ -1670,10 +1670,9 @@ GAME(199?, m4crkpot,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crk
 GAME(199?, m4crkpota, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (CP 3.8)",GAME_FLAGS )
 GAME(199?, m4crkpotb, m4crkpot,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Crackpot 100 Club (Barcrest) (MPU4) (CP 3.1)",GAME_FLAGS )
 
-// not English
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c 14 60 (crkpot)
-GAME(199?, m4hiroll,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","High Roller (Barcrest) (MPU4) (HR 3.0)",GAME_FLAGS )
+GAME(199?, m4hiroll,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::crkpot_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","High Roller (Barcrest) (Dutch) (MPU4) (HR 3.0)",GAME_FLAGS )
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 (m400)
