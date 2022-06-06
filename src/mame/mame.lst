@@ -38048,7 +38048,6 @@ hwchamp                         // (c) 1987 (Unprotected)
 hwchampa                        // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
-isgsm                           //
 lockonph                        //
 mvp                             // (c) 1989 (FD1094)
 mvpd                            //
@@ -38071,7 +38070,6 @@ sdibl3                          // bootleg
 sdibl4                          // bootleg
 sdibl5                          // bootleg
 sdibl6                          // bootleg
-shinfz                          //
 shinobi2                        // (c) 1987 (FD1094)
 shinobi2d                       //
 shinobi3                        // (c) 1987 (MC-8123B)
@@ -38083,7 +38081,6 @@ snapper                         // (c) 1990 Philko - korean clone board
 sonicbom                        // (c) 1987 (FD1094)
 sonicbomd                       //
 suprleag                        // (c) 1987 (FD1094)
-tetrbx                          //
 tetris1                         // (c) 1988 (FD1094) S16B
 tetris1d                        //
 tetris2                         // (c) 1988 (FD1094) S16B
@@ -38105,6 +38102,11 @@ wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
+
+@source:segas16b_isgsm.cpp
+isgsm                           //
+shinfz                          //
+tetrbx                          //
 
 @source:segas18.cpp
 astorm                          // 1990.?? Alien Storm (World, FD1094, 2 Players)
