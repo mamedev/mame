@@ -23359,6 +23359,7 @@ mondl68k                        // 1988 Mephisto Mondial 68000XL
 @source:mephisto_montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
+montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
