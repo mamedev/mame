@@ -8,7 +8,7 @@ This is a 'multi-game' cart system (only the operator can select the game, via a
 
 The system is designed to look like a PGM system (the ISG logo and fonts are ripped straight from original IGS material,
 and the external casing of the unit is near identical)  The system does NOT however run PGM games, the cartridges won't
-fit, and the hardware is basically a bootleg of Sega System 16 instead of PGM!  So far only one cartridge has been seen.
+fit, and the hardware is basically a bootleg of Sega System 16 instead of PGM!  So far only 2 cartridges have been seen.
 
 There are various levels of 'protection' on the system
  - Address XOR + 16-bit bitswap on the BIOS ROM and Cartridge ROMs
@@ -159,17 +159,8 @@ void isgsm_state::data_w(uint16_t data)
 	if ((m_data_type & 0x10) == 0x00)
 	{
 		// 8-bit rotation - used by bloxeed
-		switch (m_data_type & 0xe0)
-		{
-			case 0x00: data = bitswap<8>(data,0,7,6,5,4,3,2,1); break;
-			case 0x20: data = bitswap<8>(data,7,6,5,4,3,2,1,0); break;
-			case 0x40: data = bitswap<8>(data,6,5,4,3,2,1,0,7); break;
-			case 0x60: data = bitswap<8>(data,5,4,3,2,1,0,7,6); break;
-			case 0x80: data = bitswap<8>(data,4,3,2,1,0,7,6,5); break;
-			case 0xa0: data = bitswap<8>(data,3,2,1,0,7,6,5,4); break;
-			case 0xc0: data = bitswap<8>(data,2,1,0,7,6,5,4,3); break;
-			case 0xe0: data = bitswap<8>(data,1,0,7,6,5,4,3,2); break;
-		}
+		uint8_t shift = ((m_data_type >> 5 & 7) - 1) & 7;
+		data = (data << shift & 0xff) | ((data & 0xff) >> (8 - shift));
 	}
 
 	if (dest)
@@ -241,17 +232,8 @@ void isgsm_state::data_w(uint16_t data)
 			if ((m_data_type & 0x10) == 0x10)
 			{
 				// 8-bit rotation - used by tetris
-				switch (m_data_type & 0xe0)
-				{
-					case 0x00: byte = bitswap<8>(byte,0,7,6,5,4,3,2,1); break;
-					case 0x20: byte = bitswap<8>(byte,7,6,5,4,3,2,1,0); break;
-					case 0x40: byte = bitswap<8>(byte,6,5,4,3,2,1,0,7); break;
-					case 0x60: byte = bitswap<8>(byte,5,4,3,2,1,0,7,6); break;
-					case 0x80: byte = bitswap<8>(byte,4,3,2,1,0,7,6,5); break;
-					case 0xa0: byte = bitswap<8>(byte,3,2,1,0,7,6,5,4); break;
-					case 0xc0: byte = bitswap<8>(byte,2,1,0,7,6,5,4,3); break;
-					case 0xe0: byte = bitswap<8>(byte,1,0,7,6,5,4,3,2); break;
-				}
+				uint8_t shift = ((m_data_type >> 5 & 7) - 1) & 7;
+				byte = (byte << shift & 0xff) | ((byte & 0xff) >> (8 - shift));
 			}
 
 			dest[m_data_addr] = byte;
@@ -583,7 +565,7 @@ void isgsm_state::init_tetrbx()
 	std::vector<uint16_t> temp(0x80000/2);
 	uint16_t *rom = (uint16_t *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x80000/2; addr++)
-		temp[addr ^ 0x2A6E6] = bitswap<16>(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
+		temp[addr ^ 0x2a6e6] = bitswap<16>(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
 	memcpy(rom, &temp[0], 0x80000);
 
 	m_read_xor = 0x73;
@@ -609,14 +591,14 @@ ROM_START( tetrbx )
 	ISGSM_BIOS
 
 	ROM_REGION16_BE( 0x400000, "gamecart_rgn", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP("tetr06.u13",0x00000,0x080000, CRC(884dd693) SHA1(33549613844be16f7903c9b0cf4e028f0bceaff2) )
+	ROM_LOAD16_WORD_SWAP("tetr06.u13", 0x00000, 0x080000, CRC(884dd693) SHA1(33549613844be16f7903c9b0cf4e028f0bceaff2) )
 ROM_END
 
 ROM_START( shinfz )
 	ISGSM_BIOS
 
 	ROM_REGION16_BE( 0x200000, "gamecart_rgn", 0 )
-	ROM_LOAD16_WORD_SWAP("shin06.u13",0x00000,0x200000, CRC(39d773e9) SHA1(5284f90cb5190128a17ebee8b539a39c8914c364) )
+	ROM_LOAD16_WORD_SWAP("shin06.u13", 0x00000, 0x200000, CRC(39d773e9) SHA1(5284f90cb5190128a17ebee8b539a39c8914c364) )
 ROM_END
 
 } // anonymous namespace
