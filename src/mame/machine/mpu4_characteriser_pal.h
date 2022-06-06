@@ -1188,6 +1188,48 @@ public:
 	static constexpr uint8_t bagtel_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x40, 0x00, 0x60, 0x20, 0x00 }; // good?
 
 
+	// games with sequence starting
+	// 00 50 40 30 68 44 70 60 78 3c 34 28 64 10
+	// Berserk        "BE3 0.1"
+	// Flashlite      "BFL 0.5"
+	static constexpr uint8_t berseralt_characteriser_prot[8] = { 0x00, 0x78, 0x50, 0x38, 0x30, 0x58, 0x50, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 a0 e0 c4 c8 58 9c 94 6c 1c 9c 9c bc 94 6c 10
+	// Berserk  "BE4 1.1"
+	static constexpr uint8_t berseralt2_characteriser_prot[8] = { 0x00, 0x28, 0x20, 0x08, 0x00, 0x28, 0x20, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
+	// Magnificent 7s       "M7  2.0"
+    // Prize Fruit & Loot   "PFR 0.3"
+	static constexpr uint8_t pfloot_characteriser_prot[8] = { 0x00, 0x58, 0x10, 0x48, 0x40, 0x18, 0x10, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04
+	// Kings & Queens           "EE4 2.1/ EE  2.1"
+	//                          "EE8 2.2/ EE  2.2"
+	// Dutch Multiway           "DMU 1.7"
+	static constexpr uint8_t kingqn_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x20, 0x40, 0x00, 0x00 }; // good?
+
+
+	// games with sequence starting
+	// 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
+	// Kings & Queens  "EE' 2.0 / EE_ 2.0"
+	static constexpr uint8_t kqee_characteriser_prot[8] = { 0x00, 0x38, 0x18, 0x30, 0x10, 0x38, 0x18, 0x10 }; // good?
+
+
+	// games with sequence starting
+	// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
+	// Action Club      "ABV 1.9"
+	// Kings & Queens   "EE2 1.0 / EE2 1.0"
+	static constexpr uint8_t kqee2_characteriser_prot[8] = { 0x00, 0x30, 0x00, 0x30, 0x10, 0x20, 0x00, 0x00 }; // good?
+
+
+
 	/***************************************************************
 
 	 Unusual sequences (but correct?)
@@ -1204,7 +1246,8 @@ public:
 
 
 	// games with sequence starting
-	// 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 b4 bc f4 1c d0 98 70 14 b4 b8 f0 3c 50 b0 18 d0 3c 74 b4 18 f0 3c 70 94 18 70 b4 bc f0 98 f0 1c f4 18 f0 b8 74 94 bc 70 94 b8 d4 1c f4 18 f4 00	// ** This is an unusual sequence, bit 0x10 always seems to be set, both here and in the lamp results
+	// 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 b4 bc f4 1c d0 98 70 14 b4 b8 f0 3c 50 b0 18 d0 3c 74 b4 18 f0 3c 70 94 18 70 b4 bc f0 98 f0 1c f4 18 f0 b8 74 94 bc 70 94 b8 d4 1c f4 18 f4 00
+	// ** This is an unusual sequence, bit 0x10 always seems to be set, both here and in the lamp results
 	// ** Check if it isn't just one of the other ones but with an output line tied high? 
 	// Rocket Money      "ROK 0.6"
 	static constexpr uint8_t rockmn_characteriser_prot[8] = { 0x10, 0x34, 0x14, 0x34, 0x30, 0x30, 0x14, 0x30 };
@@ -1212,17 +1255,11 @@ public:
 
 	/***************************************************************
 
-	 Lamp data below is definitely incorrect
+	 Games below don't boot far enough to draw conclusions
+	 or ones that do boot aren't using lamp scramble
 
 	***************************************************************/
 
-
-	// games with sequence starting
-	// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04
-	// Kings & Queens           "EE4 2.1/ EE  2.1"
-	//                          "EE8 2.2/ EE  2.2"
-	// Dutch Multiway           "DMU 1.7"
-	static constexpr uint8_t kingqn_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting
 	// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
@@ -1244,43 +1281,9 @@ public:
 	static constexpr uint8_t bankrollerclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
-	// games with sequence starting
-	// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
-	// Action Club      "ABV 1.9"
-	// Kings & Queens   "EE2 1.0 / EE2 1.0"
-	static constexpr uint8_t kqee2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-	// games with sequence starting
-	// 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
-	// Kings & Queens  "EE' 2.0 / EE_ 2.0"
-	static constexpr uint8_t kqee_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-	// games with sequence starting
-	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
-	// Magnificent 7s       "M7  2.0"
-    // Prize Fruit & Loot   "PFR 0.3"
-	static constexpr uint8_t pfloot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 50 40 30 68 44 70 60 78 3c 34 28 64 10
-	// Berserk        "BE3 0.1"
-	// Flashlite      "BFL 0.5"
-	static constexpr uint8_t berseralt_characteriser_prot[8] = { 0x00, 0x60, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting
-	// 00 a0 e0 c4 c8 58 9c 94 6c 1c 9c 9c bc 94 6c 10
-	// Berserk  "BE4 1.1"
-	static constexpr uint8_t berseralt2_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-
-
-
 	/***************************************************************
 
-	 Types below have no games using lamp scramble, so data is unknown / blank
+	 Probably not using lamp scramble part of the protection, so data is left blank
 
 	***************************************************************/
 
@@ -1289,7 +1292,7 @@ public:
 	// German Viva Las Vegas   "GLV 1.2"
 	// Dutch Viva Las Vegas    "DLV 1.1"
 	// Dutch Premier           "DPM 1.4"
-	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting
 	// 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
