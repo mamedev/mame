@@ -13822,12 +13822,12 @@ license:CC0
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="ba3487fa" sha1="c3da81754a433793d255a0a193e5c222eed00d49"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="a764b534" sha1="d7ffd705dd597c2a018a9604a2a56e6ce970c1ca"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="47d0811e" sha1="5f507635ecef767095356cc0251f9d7585776ec7"/>
 			</dataarea>
@@ -13845,12 +13845,12 @@ license:CC0
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="bd4d0ce9" sha1="dd3a13d5ff85a200fa8ab564f522e3e213fa702d"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="04c5ed46" sha1="b77dd4395c2933a908748797aba662b273e4ebc8"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="14fa3e09" sha1="7b276418c6e6f78e74ea80a22137cc76cbd8576d"/>
 			</dataarea>
@@ -16407,7 +16407,7 @@ license:CC0
 				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="6e9bb9ed" sha1="f58f33d635c8177c170fa559c536effafa18e7b2"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e027bfe4" sha1="245cfab1538c06fd92732b95c9685c9b7e8f2f66"/>
 			</dataarea>
@@ -16438,7 +16438,7 @@ license:CC0
 				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="732c46b7" sha1="b0c7d2d2b4b54b32620c6b9fbe75036459c40987"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="154a3654" sha1="7d0892b35a845e6c26331f4de566cdfc30c1aac0"/>
 			</dataarea>
@@ -16455,7 +16455,7 @@ license:CC0
 				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="28a4bf38" sha1="24c8951ebf28a2511e14b68ede428f1cf965e32e"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c57a1fb2" sha1="274cb6dae354cb5494b210939372d712be990403"/>
 			</dataarea>
