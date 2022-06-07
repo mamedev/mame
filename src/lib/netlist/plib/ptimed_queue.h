@@ -169,6 +169,9 @@ namespace plib {
 	inline constexpr void timed_queue_linear<A, T>::push(T && e) noexcept
 	{
 #if 0
+		// The code is not as fast as the code path which is enabled.
+		// It is left here in case on a platform different to x64 it may
+		// be faster.
 		T * i(m_end-1);
 		for (; *i < e; --i)
 		{
