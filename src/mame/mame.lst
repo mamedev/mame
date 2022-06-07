@@ -123,6 +123,7 @@ unkpacg                         // (c) 19?? ???
 unkpacga                        //
 unkpacgb                        //
 unkpacgc                        //
+unkpacgd                        //
 unksig                          // 1998?
 unksiga                         // 1998?
 unksigb                         // 1998?
@@ -19743,6 +19744,7 @@ gs471
 crossmg2
 dobouchn
 fruitsmg
+ggoemon
 kattobas
 koropens
 kzaurus
@@ -23359,6 +23361,7 @@ mondl68k                        // 1988 Mephisto Mondial 68000XL
 @source:mephisto_montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
+montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
@@ -37551,6 +37554,9 @@ savia84                         //
 @source:savquest.cpp
 savquest                        //
 
+@source:sb180.cpp
+sb180                          //
+
 @source:sb8085.cpp
 sb8085                          //
 
@@ -38045,7 +38051,6 @@ hwchamp                         // (c) 1987 (Unprotected)
 hwchampa                        // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
-isgsm                           //
 lockonph                        //
 mvp                             // (c) 1989 (FD1094)
 mvpd                            //
@@ -38068,7 +38073,6 @@ sdibl3                          // bootleg
 sdibl4                          // bootleg
 sdibl5                          // bootleg
 sdibl6                          // bootleg
-shinfz                          //
 shinobi2                        // (c) 1987 (FD1094)
 shinobi2d                       //
 shinobi3                        // (c) 1987 (MC-8123B)
@@ -38080,7 +38084,6 @@ snapper                         // (c) 1990 Philko - korean clone board
 sonicbom                        // (c) 1987 (FD1094)
 sonicbomd                       //
 suprleag                        // (c) 1987 (FD1094)
-tetrbx                          //
 tetris1                         // (c) 1988 (FD1094) S16B
 tetris1d                        //
 tetris2                         // (c) 1988 (FD1094) S16B
@@ -38102,6 +38105,11 @@ wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
+
+@source:segas16b_isgsm.cpp
+isgsm                           //
+shinfz                          //
+tetrbx                          //
 
 @source:segas18.cpp
 astorm                          // 1990.?? Alien Storm (World, FD1094, 2 Players)
@@ -38251,7 +38259,7 @@ titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasm1.cpp
-tinkerbl						// (c) 1990 Sega
+tinkerbl                        // (c) 1990 Sega
 unkm1                           // (c) 1992 Sega
 bingpty                         // (c) 1994 Sega
 
@@ -43701,6 +43709,7 @@ nbaf_31a                        //
 ngg_10                          //
 ngg_13                          //
 ngg_p06                         //
+ph_04                           //
 sc_091                          //
 sc_10                           //
 sc_14                           //
@@ -43918,6 +43927,7 @@ ts_lm6                          //
 ts_lx4                          //
 ts_lx5                          //
 ts_pa1                          //
+wcs_l1                          //
 wcs_l2                          //
 wcs_la2                         //
 wcs_p2                          //
@@ -44634,3 +44644,9 @@ rc2014zed                       // RC2014 Zed
 rc2014zedp                      // RC2014 Zed Pro
 rc2014mini                      // RC2014 Mini
 rc2014minicpm                   // RC2014 Mini with CP/M upgrade
+rc2014micro                     // RC2014 Micro
+sc105                           // SC105 - Modular Backplane (RC2014)
+sc112                           // SC112 - Modular Backplane (RC2014)
+sc116                           // SC116 - Modular Backplane (RC2014)
+sc133                           // SC133 - Modular Backplane (RC2014)
+sc203                           // SC203 - Modular Z180 Computer

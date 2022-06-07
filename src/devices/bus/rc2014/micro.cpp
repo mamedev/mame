@@ -130,6 +130,7 @@ void rc2014_micro::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
 static INPUT_PORTS_START( rc2014_micro_jumpers )

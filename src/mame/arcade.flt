@@ -1149,6 +1149,7 @@ segald.cpp
 segaorun.cpp
 segas16a.cpp
 segas16b.cpp
+segas16b_isgsm.cpp
 segas18.cpp
 segas18_astormbl.cpp
 segas24.cpp

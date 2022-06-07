@@ -946,6 +946,7 @@ sapi1.cpp
 sartorius.cpp
 saturn.cpp
 savia84.cpp
+sb180.cpp
 sb8085.cpp
 sbc6510.cpp
 sbrain.cpp
@@ -1276,5 +1277,8 @@ zx.cpp
 +jaguarcd
 //neogeo.cpp
 +aes
+//sis630
+-gamecst2
+-gamecstl
 //vectrex.cpp
 -raaspec

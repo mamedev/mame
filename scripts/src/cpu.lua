@@ -2789,6 +2789,8 @@ if CPUS["Z180"] then
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.h",
 	}
 end
 
