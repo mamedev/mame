@@ -1277,5 +1277,8 @@ zx.cpp
 +jaguarcd
 //neogeo.cpp
 +aes
+//sis630
+-gamecst2
+-gamecstl
 //vectrex.cpp
 -raaspec

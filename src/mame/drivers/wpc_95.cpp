@@ -25,12 +25,13 @@ Cirqus Voltaire                50062  Hold QWER hit 1         QWER
 The Champion Pub               50063  Hold QWER hit 1         QWER
 Monster Bash                   50065  Hold QWER hit 1         QWER
 Cactus Canyon                  50066  Hold QWER hit 1         QWER
+Phantom Haus                   90001   (not a pinball, not working)
 Safe Cracker                   90003  Hold QWE hit 1          QWE (timed game)
 Ticket Tac Toe                 90005  Hold X hit 1            (n/a)
-Phantom Haus                   unknown   (not emulated)
 
 ToDo:
 - Mechanical sounds
+- Phantom Haus: This is a "payout machine" - it gives tokens as prizes - not a pinball.
 
 *********************************************************************************************/
 
