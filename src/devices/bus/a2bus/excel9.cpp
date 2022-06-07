@@ -3,9 +3,7 @@
 /*********************************************************************
 
     excel9.cpp
-
     Implementation of the Seikou Excel-9 6809 card
-
 
     Address mapping as follows:
     6809 0x0000-0x0fff -> 6502 0x9000-0x9fff
@@ -21,13 +19,11 @@
     Todo:
     Add timer support, board has a CD4536B timer onboard that can generate interrupts
 
-
 *********************************************************************/
 
 #include "emu.h"
 #include "excel9.h"
 #include "cpu/m6809/m6809.h"
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -84,7 +80,6 @@ a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, device_t
 	, m_interrupttype_firq(false)
 	, m_powerup(false)
 	, m_status(0)
-
 {
 }
 
@@ -111,9 +106,9 @@ void a2bus_excel9_device::device_reset()
 {
 	m_bEnabled = true;
 	m_romenable = true;
-	m_enable_flipflop=false;
+	m_enable_flipflop = false;
 	m_status = 0;
-	m_interrupttype_firq=false;
+	m_interrupttype_firq = false;
 	m_powerup = true;
 	raise_slot_dma();
 	m_6809->reset();
@@ -128,26 +123,22 @@ uint8_t a2bus_excel9_device::read_c0nx(uint8_t offset)
 	// Bit3 BS
 	// Bit2 rom enable 0=enable 1=disable
 	// Bit1 expansion connector pin34
-	// Bit0 interrupttype 0=6502 IRQ & 6809 IRQ, 1=6809 firq
+	// Bit0 interrupttype 0=6502 IRQ & 6809 IRQ, 1=6809 FIRQ
 
 	//Todo: add timer output, ba and bs
-
-	//printf("Excel-9: read  %02x from c0n%x\n", m_status, offset);
-
 	return m_status;
 }
 
 void a2bus_excel9_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	//printf("Excel-9: write %02x to c0n%x\n", data, offset);
 	switch (offset)
 	{
 		case 0:
-			m_enable_flipflop=false;
+			m_enable_flipflop = false;
 			break;
 
 		case 1:
-			m_enable_flipflop=true;
+			m_enable_flipflop = true;
 			break;
 
 		case 2: // enable 6809
@@ -177,9 +168,9 @@ void a2bus_excel9_device::write_c0nx(uint8_t offset, uint8_t data)
 			{
 				m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				lower_slot_dma();
-				if (m_powerup) //hack for initial 6502 RESET taking priority over the NMI
+				if (m_powerup) // hack for initial 6502 RESET taking priority over the NMI
 				{
-					m_powerup=false;
+					m_powerup = false;
 				}
 				else
 				{
@@ -227,11 +218,10 @@ void a2bus_excel9_device::write_c0nx(uint8_t offset, uint8_t data)
 				m_interrupttype_firq=false;
 				m_status &= ~0x01;
 			}
-
 			break;
 
 		default:
-			printf("Excel-9: %02x to unhandled c0n%x\n", data, offset);
+			logerror("Excel-9: %02x to unhandled c0n%x\n", data, offset);
 			break;
 	}
 }
@@ -267,7 +257,9 @@ uint8_t a2bus_excel9_device::dma_r(offs_t offset)
 				return m_rom[offset & 0x1fff];
 			}
 			else
+			{
 				return slot_dma_read(offset);
+			}
 		}
 	}
 	return 0xff;
@@ -305,7 +297,9 @@ void a2bus_excel9_device::dma_w(offs_t offset, uint8_t data)
 		else
 		{
 			if (!m_romenable)
+			{
 				slot_dma_write(offset, data);
+			}
 		}
 	}
 }
