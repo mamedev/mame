@@ -154,7 +154,6 @@ TODO:
      lives - $6155
 
      TODO:
-
        - COINB DSW is missing
        - few issues in cocktail mode
 
@@ -952,7 +951,7 @@ static INPUT_PORTS_START( yamato )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) /* set 1 only */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* set 1 only */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1013,7 +1012,7 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
 
@@ -2806,4 +2805,4 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_i
 GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )
