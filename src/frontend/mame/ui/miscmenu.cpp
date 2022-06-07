@@ -51,13 +51,13 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 {
 }
 
-int menu_bios_selection::current_bios(device_t *device)
+int menu_bios_selection::current_bios(const device_t &device)
 {
 	const char *val;
 	std::string bios;
-	if (device->owner())
+	if (device.owner())
 	{
-		const char *slot_option_name = device->owner()->tag() + 1;
+		const char *slot_option_name = device.owner()->tag() + 1;
 		bios = machine().options().slot_option(slot_option_name).bios();
 		val = bios.empty() ?  nullptr : bios.c_str();
 	}
@@ -67,17 +67,17 @@ int menu_bios_selection::current_bios(device_t *device)
 	}
 	if (val)
 	{
-		for (romload::system_bios const &bios : romload::entries(device->rom_region()).get_system_bioses())
+		for (romload::system_bios const &entry : romload::entries(device.rom_region()).get_system_bioses())
 		{
-			uint32_t const bios_flags(bios.get_value());
+			uint32_t const bios_flags(entry.get_value());
 			std::string bios_number = std::to_string(bios_flags - 1);
-			if (!core_stricmp(bios_number.c_str(), val) || !core_stricmp(bios.get_name(), val))
+			if (!core_stricmp(bios_number.c_str(), val) || !core_stricmp(entry.get_name(), val))
 			{
 				return bios_flags;
 			}
 		}
 	}
-	return device->system_bios();
+	return device.system_bios();
 }
 
 void menu_bios_selection::populate(float &customtop, float &custombottom)
@@ -89,7 +89,7 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 		device_slot_interface const *const slot(dynamic_cast<device_slot_interface const *>(parent));
 		if (!parent || (slot && (slot->get_card_device() == &device)))
 		{
-			int bios_val = current_bios(&device);
+			int bios_val = current_bios(device);
 			tiny_rom_entry const *rom(device.rom_region());
 			if (rom && !ROMENTRY_ISEND(rom))
 			{
@@ -140,7 +140,7 @@ void menu_bios_selection::handle(event const *ev)
 				case IPT_UI_LEFT: case IPT_UI_RIGHT:
 				{
 					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-					bios_val = current_bios(dev) + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
+					bios_val = current_bios(*dev) + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
 
 					// wrap
 					if (bios_val < 1)
