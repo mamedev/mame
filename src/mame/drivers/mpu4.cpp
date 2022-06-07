@@ -2292,7 +2292,7 @@ void mpu4_state::mpu4_memmap(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0810).rw(FUNC(mpu4_state::characteriser_r), FUNC(mpu4_state::characteriser_w));
 	map(0x0850, 0x0850).rw(FUNC(mpu4_state::bankswitch_r), FUNC(mpu4_state::bankswitch_w));    /* write bank (rom page select) */
-/*  map(0x08e0, 0x08e7).rw(FUNC(mpu4_state::68681_duart_r), FUNC(mpu4_state::68681_duart_w)); */ //Runs hoppers
+	map(0x08e0, 0x08ef).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)); //Runs hoppers
 	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 	map(0x0a00, 0x0a03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC3 */
 	map(0x0b00, 0x0b03).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC4 */
@@ -2439,6 +2439,8 @@ void mpu4_state::mpu4base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	MC68681(config, m_duart68681, MPU4_MASTER_CLOCK); // ?
 
 	config.set_default_layout(layout_mpu4);
 }

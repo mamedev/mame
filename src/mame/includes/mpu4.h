@@ -3,6 +3,7 @@
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
@@ -117,6 +118,7 @@ public:
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
 		, m_characteriser(*this, "characteriser")
+		, m_duart68681(*this, "duart68681")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
@@ -410,6 +412,7 @@ protected:
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;
+	optional_device<mc68681_device> m_duart68681;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 
