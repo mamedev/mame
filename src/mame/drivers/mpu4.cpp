@@ -382,10 +382,12 @@ void mpu4_state::update_meters()
 	}
 
 	m_meters->update(7, (data & 0x80));
+
 	for (meter = 0; meter < 4; meter ++)
 	{
 		m_meters->update(meter, (data & (1 << meter)));
 	}
+
 	if (m_reel_mux == STANDARD_REEL)
 	{
 		for (meter = 4; meter < 7; meter ++)
@@ -686,10 +688,12 @@ void mpu4_state::pia_ic4_portb_w(uint8_t data)
 		to be supported instead of 4. */
 		if (m_reel_mux == SEVEN_REEL)
 		{
-			m_active_reel= reel_mux_table7[(data >> 4) & 0x07];
+			m_active_reel = reel_mux_table7[(data >> 4) & 0x07];
 		}
 		else
-		m_active_reel= reel_mux_table[(data >> 4) & 0x07];
+		{
+			m_active_reel = reel_mux_table[(data >> 4) & 0x07];
+		}
 	}
 }
 
@@ -791,15 +795,9 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
-	uint8_t tempinput = m_aux1_port->read()|m_aux1_input;
-	if (m_aux1_invert)
-	{
-		return ~tempinput;
-	}
-	else
-	{
-		return tempinput;
-	}
+
+	uint8_t tempinput = m_aux1_port->read() | m_aux1_input;
+	return tempinput;
 }
 
 void mpu4_state::pia_ic5_porta_w(uint8_t data)
@@ -1011,15 +1009,8 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
 	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
 
-	uint8_t tempinput = m_aux2_port->read()|m_aux2_input;
-	if (m_aux2_invert)
-	{
-		return ~tempinput;
-	}
-	else
-	{
-		return tempinput;
-	}
+	uint8_t tempinput = m_aux2_port->read() | m_aux2_input;
+	return tempinput;
 }
 
 
@@ -1237,18 +1228,12 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic7_cb2_w)
 uint8_t mpu4_state::pia_ic8_porta_r()
 {
 	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", machine().describe_context()));
-/* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
-   This is achieved via connecting every input line to an AND gate, thus allowing two strobes
-   to represent each orange input bank (strobes are active low). */
+	/* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
+	   This is achieved via connecting every input line to an AND gate, thus allowing two strobes
+	   to represent each orange input bank (strobes are active low). */
 	m_pia5->cb1_w(m_aux2_port->read() & 0x80);
-	if ( (m_input_strobe == 2) && (m_door_invert ==1) )
-	{
-		return ((m_port_mux[m_input_strobe])->read() ^ 0x01);
-	}
-	else
-	{
-		return (m_port_mux[m_input_strobe])->read();
-	}
+
+	return (m_port_mux[m_input_strobe])->read();
 }
 
 
@@ -1556,12 +1541,21 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4_invcoin )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("AUX2")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
+INPUT_PORTS_END
 
 INPUT_PORTS_START( mpu4_cw )
 //Inputs for CoinWorld games
@@ -2009,21 +2003,6 @@ void mpu4_state::init_m4_low_volt_alt()
 	m_low_volt_detect_disable = 1;
 }
 
-void mpu4_state::init_m4_aux1_invert()
-{
-	m_aux1_invert = 1;
-}
-
-void mpu4_state::init_m4_aux2_invert()
-{
-	m_aux2_invert = 1;
-}
-
-void mpu4_state::init_m4_door_invert()
-{
-	m_aux2_invert = 1;
-}
-
 void mpu4_state::init_m4_small_extender()
 {
 	m_lamp_extender = SMALL_CARD;
@@ -2209,9 +2188,6 @@ void mpu4_state::init_m4default()
 {
 	init_m4default_reels();
 	m_bwb_bank = 0;
-	m_aux1_invert = 0;
-	m_aux2_invert = 0;
-	m_door_invert = 0;
 	init_m4default_banks();
 }
 
@@ -2219,9 +2195,6 @@ void mpu4_state::init_m4default()
 void mpu4_state::init_m4default_big()
 {
 	init_m4default_reels();
-	m_aux1_invert = 0;
-	m_aux2_invert = 0;
-	m_door_invert = 0;
 
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
@@ -2247,10 +2220,6 @@ void mpu4_state::init_m4default_big()
 	m_bank1->set_entry(m_numbanks);
 
 }
-
-
-
-
 
 uint8_t mpu4_state::crystal_sound_r()
 {
@@ -2459,7 +2428,7 @@ void mpu4_state::mpu4_common2(machine_config &config)
 
 void mpu4_state::mpu4base(machine_config &config)
 {
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2)
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)
 	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK); // MC68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap);

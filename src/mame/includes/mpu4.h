@@ -127,6 +127,10 @@ public:
 	void init_m4default();
 	void init_m4default_big();
 
+
+	void init_m4default_big_aux2inv();
+
+
 	void init_m4default_812prot_fixed();
 	void init_m4default_812prot();
 	void init_m4default_814prot();
@@ -142,9 +146,8 @@ public:
 	void init_m4default_banks();
 	void init_m4default_reels();
 	void init_m4_low_volt_alt();
-	void init_m4_aux1_invert();
-	void init_m4_aux2_invert();
-	void init_m4_door_invert();
+
+
 	void init_m4_five_reel_std();
 	void init_m4_five_reel_rev();
 	void init_m4_five_reel_alt();
@@ -312,21 +315,19 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
+
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4oki_alt);
-	DECLARE_MACHINE_START(mod4oki_5r);
-	DECLARE_MACHINE_START(mod2_alt);
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-		uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-	{
-		return 0;
-	}
+
+
 
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
@@ -453,9 +454,6 @@ protected:
 	int m_led_lamp = 0;
 	int m_link7a_connected = 0;
 	int m_low_volt_detect_disable = 0;
-	int m_aux1_invert = 0;
-	int m_aux2_invert = 0;
-	int m_door_invert = 0;
 	emu_timer *m_ic24_timer = nullptr;
 	int m_expansion_latch = 0;
 	int m_global_volume = 0;

@@ -20,11 +20,13 @@
 
 // in mpu4.cpp
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_invcoin );
 INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( grtecp );
+
 
 namespace {
 
@@ -2216,39 +2218,43 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4magrep,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
 
 // 00 24 24 64 2c 14 4c 14 4c 58 (actclba)
-GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 (m683)
 // yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
-GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c (bankrollerclub) (same as v4adders?)
-GAME(199?, m4drac,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4drac,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
 
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
-GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 2)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 3)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 1.1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 3)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 1.1)",GAME_FLAGS ) // DM1 SW ALM
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 (lv)
-GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 // not standard protection
-GAME(199?, m4crzjwl,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwla, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlb, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwld, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 5)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwl,  0,          mod4oki,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwla, m4crzjwl,   mod4oki,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlb, m4crzjwl,   mod4oki,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwld, m4crzjwl,   mod4oki,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 5)",GAME_FLAGS ) // DM1 SW ALM
 
-GAME(199?, m4vegastg, m4vegast,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c f4 28 70 00 c0 ac 3c d4 68 30 00 c0 a8
+GAME(199?, m4vegastg, m4vegast,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
-GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
+GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
+
 // 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90 ac (salsa)
 GAME(199?, m4luckdvd, m4luckdv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
 
-// not standard protection
+// expects the following response sequence, but check code is standard
+// was the CHR replaced with something else that just happens to give this seuqence, or is this valid somehow?
+// fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
 GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // '1,2' error
 
 // gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
@@ -2346,20 +2352,22 @@ GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sun
 GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54 (tri98)
-GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4bigban,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 (mag7s)
-GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (German) (MPU4) (CRZ 0.3)",GAME_FLAGS )
+GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (German) (MPU4) (CRZ 0.3)",GAME_FLAGS )
 
+// only runs with door open or gets stuck on initializing?
 // 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34 (bdash)
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4) (GCV 0.5)",GAME_FLAGS )
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98 (m683)
-GAME(199?, m4dragon,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4) (DGL 0.1)",GAME_FLAGS )
+GAME(199?, m4dragon,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4) (DGL 0.1)",GAME_FLAGS )
 
 // 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54 (bagtel)
-GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
+GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
 
+// only runs with door open or gets stuck on initializing?
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68 (fruitfall scramble)
 GAME(199?, m4octo,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fruitfall_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (German) (MPU4) (OCT 0.3)",GAME_FLAGS )
 
