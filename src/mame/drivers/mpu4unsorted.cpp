@@ -2088,9 +2088,9 @@ GAME(199?, m4chaseic, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4chaseid, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 3)",GAME_FLAGS )
 GAME(199?, m4chaseie, m4chasei,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 4)",GAME_FLAGS )
 // different protection, not original
-GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 1)",GAME_FLAGS )
-GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 2)",GAME_FLAGS )
-GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4_showstring_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 3)",GAME_FLAGS ) // copyright removed
+GAME(199?, m4chaseia, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4default_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 1)",GAME_FLAGS )
+GAME(199?, m4chaseib, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4default_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 2)",GAME_FLAGS )
+GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_m4default_814prot, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 3)",GAME_FLAGS ) // copyright removed
 
 // 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44  (bluediamond)
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
@@ -2142,8 +2142,8 @@ GAME(199?, m4bucks,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal:
 GAME(199?, m4supbf,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 1)",GAME_FLAGS )
 GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 2)",GAME_FLAGS )
 
-// 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 (m450)
-GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
+// 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 (m450) 
+GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
 
 // 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 (hirise)
 GAME(199?, m4hirise,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HII 0.3)",GAME_FLAGS )
@@ -2242,9 +2242,9 @@ GAME(199?, m4crzjwla, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 GAME(199?, m4crzjwlb, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4crzjwld, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 5)",GAME_FLAGS ) // DM1 SW ALM
 
-GAME(199?, m4vegastg, m4vegast,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) [German] (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
+GAME(199?, m4vegastg, m4vegast,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
-GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) [Czech] (MPU4)",GAME_FLAGS ) // AUX2 locked
+GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
 // 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90 ac (salsa)
 GAME(199?, m4luckdvd, m4luckdv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
 

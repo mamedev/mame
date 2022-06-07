@@ -1303,7 +1303,7 @@ public:
 
 	// games with sequence starting
 	// 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
-	// Dutch Liberty        "DLI 1.0" (doesn't boot)
+	// Dutch Liberty        "DLI 1.0" (doesn't boot) (Tubes)
 	// Crackpot 100 Club    "C1P 1.2" (no lamp scramble)
 	//                      " CP 3.8" (no lamp scramble)
 	//                      " CP 3.1" (no lamp scramble)
@@ -1312,72 +1312,72 @@ public:
 
 
 	// games with sequence starting 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44
-	// Dutch Blue Diamond  "DBD 1.0" (doesn't boot)
+	// Dutch Blue Diamond  "DBD 1.0" (doesn't boot) (Reel E)
 	static constexpr uint8_t bluediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
-	// Dutch Wild Timer "DWT 1.3" (doesn't boot)
+	// Dutch Wild Timer "DWT 1.3" (doesn't boot) (Tubes)
 	static constexpr uint8_t wildtime_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c
-	// Dutch Happy Joker   "DHJ 1.2" (doesn't boot)
-	// Dutch Red Heat      "DRH 1.2" (doesn't boot)
+	// Dutch Happy Joker   "DHJ 1.2" (doesn't boot) (Tubes)
+	// Dutch Red Heat      "DRH 1.2" (doesn't boot) (Reel B)
 	static constexpr uint8_t redheat_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90
-	// Dutch Lucky Devil     "DLD 1.3" (doesn't boot)
+	// Dutch Lucky Devil     "DLD 1.3" (doesn't boot) (Tubes)
 	// Hungarian Jolly Joker "HJJ 1.4" (no lamp scramble)
-	// Dutch Ceptor          "DCE 1.0" (doesn't boot)
-	// Dutch Salsa           "DSA 1.5" (doesn't boot)
+	// Dutch Ceptor          "DCE 1.0" (doesn't boot) (Tubes)
+	// Dutch Salsa           "DSA 1.5" (doesn't boot) (Reel E)
 	static constexpr uint8_t salsa_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28
-	// Dutch 21 Club          "DTW 2.7" (doesn't boot)
-	// Dutch Black & White    "DBW 1.1" (doesn't boot)
+	// Dutch 21 Club          "DTW 2.7" (doesn't boot) (Reel D)
+	// Dutch Black & White    "DBW 1.1" (doesn't boot) (Reel A)
 	static constexpr uint8_t blackwhite_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8
-	// Magic Turbo        "XST 0.4" (doesn't boot)
-	// Dutch Tricolor     "DTC 2.5" (doesn't boot)
+	// Magic Turbo        "XST 0.4" (doesn't boot) (Reel A)
+	// Dutch Tricolor     "DTC 2.5" (doesn't boot) (Tubes)
 	static constexpr uint8_t tricolor_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting 00 84 8c 3c f4 4c 34 14 54 14 40 d4 4c 70 04 d0 58 f4
-	// Dutch Turbo Reel   "DTR 3.1" (doesn't boot)
+	// Dutch Turbo Reel   "DTR 3.1" (doesn't boot) (Tubes)
 	// Grandstand Club    "G2D 4.0" (no lamp scramble)
 	// Grandstand Club    " GD 1.1" (no lamp scramble)
 	static constexpr uint8_t grandclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 30 10 0c 98 a8 c4 60 3c ac c4 7c b4
-	// Dutch Taj Mahal   "DTM 1.0" (doesn't boot)
+	// Dutch Taj Mahal   "DTM 1.0" (doesn't boot) (Tubes)
 	static constexpr uint8_t tajmahal_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 64 a4 ac 78 74 e0 6c 50 c0 ac 58 74 00 a4 ec f8 94 c8
-	// Dutch Giant   "DGI 2.1" (doesn't boot)
+	// Dutch Giant   "DGI 2.1" (doesn't boot) (Tubes)
 	static constexpr uint8_t giant_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 30 10 84 e0 f0 c4 60 b4 54 80 f4 50 80 f4 40 b0 d4
-	// Dutch Random Roulette   "DRR 2.2" (doesn't boot)
+	// Dutch Random Roulette   "DRR 2.2" (doesn't boot) (Tubes)
 	static constexpr uint8_t randroul_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting 00 c0 c8 38 f4 8c b8 70 a4 e8 38 74 80 4c b0 0c 94
-	// Dutch Red White & Blue  "DRW 1.4" (doesn't boot)
+	// Dutch Red White & Blue  "DRW 1.4" (doesn't boot) (REEL E)
 	static constexpr uint8_t redwhite_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 50 10 a0 c4 c4 74 30 b0 34 00 f0 14 80 f4 04
-	// Dutch Techno Reel  "DTE 1.3" (doesn't boot)
+	// Dutch Techno Reel  "DTE 1.3" (doesn't boot) (REEL F)
 	static constexpr uint8_t techno_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
-	// Bucks Fizz Club        "BUF 1.2" (doesn't boot)
+	// Bucks Fizz Club        "BUF 1.2" (doesn't boot) (REEL E)
 	// Super Bucks Fizz Club  "SBF 2.0" (doesn't boot)
 	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
-	// High Rise  "HII 0.3" (doesn't boot)
+	// High Rise  "HII 0.3" (doesn't boot) (REEL E)
 	//            "HIR 3.1" (doesn't boot)
 	//            "HIR 3.0" (doesn't boot)
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };

@@ -1858,28 +1858,28 @@ GAME(199?, m4solsila, m4solsil,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::luc
 GAME(199?, m4starbr,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::starsbars_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stars And Bars (Barcrest) (Dutch) (MPU4) (DSB 2.8)",GAME_FLAGS )
 
 // 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec (eighth)
-GAME(199?, m4sunset,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
+GAME(199?, m4sunset,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
 GAME(199?, m4sb5,     m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",GAME_FLAGS )
 // 00 60 60 c0 58 44 e0 50 a8 9c cc bc e4 50 a0 58 ec bc (sunsetb)
-GAME(199?, m4sunsetd, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
+GAME(199?, m4sunsetd, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
 // 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c (sunsetbalt)
-GAME(199?, m4sunsete, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetf, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetg, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunseth, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
-GAME(199?, m4sunseti, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetj, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4sunsete, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetf, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetg, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunseth, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
+GAME(199?, m4sunseti, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetj, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::sunsetbalt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
 // 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4 (toptake)
-GAME(199?, m4sunsetk, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetl, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetm, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsetn, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
-GAME(199?, m4sunseto, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetp, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4sunsetq, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
-GAME(199?, m4sunsetr, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
-GAME(199?, m4sunsets, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
-GAME(199?, m4sunsett, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
+GAME(199?, m4sunsetk, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetl, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetm, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsetn, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4sunseto, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetp, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4sunsetq, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4sunsetr, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
+GAME(199?, m4sunsets, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
+GAME(199?, m4sunsett, m4sunset,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
 
 // 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88 6c (rr6)
 GAME(199?, m4supslt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4) (S4S 1.0)",GAME_FLAGS )
@@ -1939,23 +1939,23 @@ GAME(198?, m4supsl,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::nif
 /* Bwb */
 
 // 00 c4 e8 58 b4 4c 30 40 e4 a8 18 94 48 34 64 c4 c8 7c f4  (graff)
-GAME(199?, m4flshlt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 3)",GAME_FLAGS )
-GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 6)",GAME_FLAGS )
-GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 7)",GAME_FLAGS )
+GAME(199?, m4flshlt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 7)",GAME_FLAGS )
 // 00 50 40 30 68 44 70 60 78 3c 34 28 64 10 68 04 58 7c (berseralt)
-GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (BFL 0.5)",GAME_FLAGS )
+GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (BFL 0.5)",GAME_FLAGS )
 
 // 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c (blueflash)
-GAME(199?, m4blflsh,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (TBF 0.3)",GAME_FLAGS )
-GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 2)",GAME_FLAGS )
-GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 3)",GAME_FLAGS )
-GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 4)",GAME_FLAGS )
-GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 5)",GAME_FLAGS )
+GAME(199?, m4blflsh,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (TBF 0.3)",GAME_FLAGS )
+GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 3)",GAME_FLAGS )
+GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 4)",GAME_FLAGS )
+GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 5)",GAME_FLAGS )
 
 // 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50 34 34 34 04 50 10 20 (clbveg)
 GAME(199?, m4ttak,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tac Take (Barcrest) (MPU4) (TIC 2.0)",GAME_FLAGS )
@@ -2002,14 +2002,14 @@ GAME(199?, m4clbcls,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m53
 
 // V isn't usually a valid code.
 // expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (tictak) (same as m4bdash__ax ?)
-GAME(199?, m4c999,   0,           mod2_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 4.0 V)",GAME_FLAGS )
+GAME(199?, m4c999,   0,           mod2_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 4.0 V)",GAME_FLAGS )
 // these are bootlegs with non-standard protection
-GAME(199?, m4c999a,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.6)",GAME_FLAGS )
-GAME(199?, m4c999b,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.0)",GAME_FLAGS )
+GAME(199?, m4c999a,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.6)",GAME_FLAGS )
+GAME(199?, m4c999b,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.0)",GAME_FLAGS )
 // protection has been modified, lamps are still scrambled somehow?
 // OC9 (on cloud 9?)
-GAME(199?, m4c999c,   m4c999,    mod2_bootleg_fixedret<0x80>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4c999c,   m4c999,    mod2_bootleg_fixedret<0x80>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -2017,7 +2017,7 @@ GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            m
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4 (hittop)
  // "(C)1993  B.W.B." and "SC9 5.0"
@@ -2207,7 +2207,7 @@ GAME(199?, m4brktak,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // sequence 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 (tentendia) (Same as Ten Ten Do It Again)
 // "(C)1991 BARCREST" and "NN3 0.1"
@@ -2229,7 +2229,7 @@ GAME_CUSTOM( 199?, m4nnww2__j,    m4nnww2, "nn3xy.p1",     0x0000, 0x010000, CRC
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::cashmx_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2_cheatchr_xxxx<mpu4_characteriser_pal::cashmx_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 // sequence 00 14 10 c0 8c a8 68 30 d0 58 e4 dc f4 08 f0 08 b0  (cashmx)
@@ -2248,7 +2248,7 @@ GAME_CUSTOM( 199?, m4nnww2__o,    m4nnww2, "nnu40x.bin",   0x0000, 0x010000, CRC
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME( year, setname, parent, mod2_bootleg_fixedret<0x06>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME( year, setname, parent, mod2_bootleg_fixedret<0x06>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // These don't boot fully (different protection?)  These were in 'adders + ladders' sets but are clearly not
 // no copyright string and "NNU 5.0"
@@ -2261,7 +2261,7 @@ GAME_CUSTOM( 199?, m4nnww2__hx4,   m4nnww2, "classic adders + ladders_alt2",    
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME( year, setname, parent, mod4yam, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS)
+	GAME( year, setname, parent, mod4yam, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS)
 
 // fails to boot even without touching protection address, maybe bad?    These were in 'adders + ladders' sets but are clearly not
 GAME_CUSTOM( 199?, m4nnww2__hx5,   m4nnww2, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 3)")
@@ -2272,7 +2272,7 @@ GAME_CUSTOM( 199?, m4nnww2__hx5,   m4nnww2, "nik56c",                           
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME( year, setname, parent, mod2_bootleg_fixedret<0x0e>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS)
+	GAME( year, setname, parent, mod2_bootleg_fixedret<0x0e>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS)
 
 // different protection
 // no copyright string and "NNU 3.4"
@@ -2291,7 +2291,7 @@ GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2_bootleg_fixedret<0x13>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2_bootleg_fixedret<0x13>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 // no copyright string in header, although 1988 BARCREST string exists elsewhere

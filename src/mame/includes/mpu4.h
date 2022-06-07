@@ -124,25 +124,21 @@ public:
 	 { }
 
 	void init_m4default_alt();
-	void init_m4debug();
-	void init_m4_showstring();
-	void init_m4_showstring_big();
+	void init_m4default();
+	void init_m4default_big();
 
-	void init_m4_showstring_812prot_fixed();
-	void init_m4_showstring_812prot();
-	void init_m4_showstring_814prot();
-	void init_m4_showstring_812altprot();
-	void init_m4_showstring_814altprot();
-	void init_m4_showstring_812alt2prot();
-	void init_m4_showstring_806prot();
-
+	void init_m4default_812prot_fixed();
+	void init_m4default_812prot();
+	void init_m4default_814prot();
+	void init_m4default_812altprot();
+	void init_m4default_814altprot();
+	void init_m4default_812alt2prot();
+	void init_m4default_806prot();
 
 	void init_crystali();
 	void init_m4tst2();
 	void init_crystal();
 	void init_m_frkstn();
-	void init_m4default_big();
-	void init_m4default();
 	void init_m4default_banks();
 	void init_m4default_reels();
 	void init_m4_low_volt_alt();
@@ -185,6 +181,11 @@ public:
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
+	template<const uint8_t ReelNo, uint8_t Type>
+	void mpu4_add_reel(machine_config& config);
+
+	template<uint8_t Type, uint8_t NumberOfReels>
+	void mpu4_reels(machine_config &config);
 
 	template<const uint8_t* Table> void mod2_cheatchr_xxxx(machine_config &config)
 	{
@@ -293,31 +294,6 @@ public:
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
 	void mpu4crys(machine_config &config);
-	void mpu4_std_3reel(machine_config &config);
-	void mpu4_type2_3reel(machine_config &config);
-	void mpu4_type3_3reel(machine_config &config);
-	void mpu4_type4_3reel(machine_config &config);
-	void mpu4_bwb_3reel(machine_config &config);
-	void mpu4_std_4reel(machine_config &config);
-	void mpu4_type2_4reel(machine_config &config);
-	void mpu4_type3_4reel(machine_config &config);
-	void mpu4_type4_4reel(machine_config &config);
-	void mpu4_bwb_4reel(machine_config &config);
-	void mpu4_std_5reel(machine_config &config);
-	void mpu4_type2_5reel(machine_config &config);
-	void mpu4_type3_5reel(machine_config &config);
-	void mpu4_type4_5reel(machine_config &config);
-	void mpu4_bwb_5reel(machine_config &config);
-	void mpu4_std_6reel(machine_config &config);
-	void mpu4_type2_6reel(machine_config &config);
-	void mpu4_type3_6reel(machine_config &config);
-	void mpu4_type4_6reel(machine_config &config);
-	void mpu4_bwb_6reel(machine_config &config);
-	void mpu4_std_7reel(machine_config &config);
-	void mpu4_type2_7reel(machine_config &config);
-	void mpu4_type3_7reel(machine_config &config);
-	void mpu4_type4_7reel(machine_config &config);
-	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
 
 protected:

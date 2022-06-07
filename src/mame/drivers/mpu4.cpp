@@ -810,6 +810,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		//opto line
 		//hopper1_drive_sensor(data&0x10);
 	}
+
 	switch (m_lamp_extender)
 	{
 	case NO_EXTENDER:
@@ -854,6 +855,8 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		lamp_extend_large(data,m_input_strobe,m_ic23_active);
 		break;
 	}
+
+
 	if (m_reel_mux == SIX_REEL_5TO8)
 	{
 		m_reel[4]->update( data      &0x0F);
@@ -861,8 +864,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		awp_draw_reel(machine(),"reel5", *m_reel[4]);
 		awp_draw_reel(machine(),"reel6", *m_reel[5]);
 	}
-	else
-	if (m_reel_mux == SEVEN_REEL)
+	else if (m_reel_mux == SEVEN_REEL)
 	{
 		m_reel[1]->update( data      &0x0F);
 		m_reel[2]->update((data >> 4)&0x0F);
@@ -2332,365 +2334,34 @@ void mpu4_state::mpu4_memmap(address_map &map)
 	map(0x1000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
 }
 
-void mpu4_state::mpu4_std_3reel(machine_config &config)
+template<const uint8_t ReelNo, uint8_t Type>
+void mpu4_state::mpu4_add_reel(machine_config &config)
 {
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
+	switch (Type)
+	{
+	default:
+	case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
+	case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
+	case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
+	case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
+	case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
+	}
+
+	if (m_reel[ReelNo])
+		m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
 }
 
-void mpu4_state::mpu4_type2_3reel(machine_config &config)
+template<uint8_t Type, uint8_t NumberOfReels>
+void mpu4_state::mpu4_reels(machine_config &config)
 {
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-}
-
-void mpu4_state::mpu4_type3_3reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-}
-
-void mpu4_state::mpu4_type4_3reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-}
-
-void mpu4_state::mpu4_bwb_3reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-}
-
-void mpu4_state::mpu4_std_4reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-}
-
-void mpu4_state::mpu4_type2_4reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-}
-
-void mpu4_state::mpu4_type3_4reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-}
-
-void mpu4_state::mpu4_type4_4reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-}
-
-void mpu4_state::mpu4_bwb_4reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-}
-
-void mpu4_state::mpu4_std_5reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-}
-
-void mpu4_state::mpu4_type2_5reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-}
-
-void mpu4_state::mpu4_type3_5reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-}
-
-void mpu4_state::mpu4_type4_5reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-}
-
-void mpu4_state::mpu4_bwb_5reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-}
-
-void mpu4_state::mpu4_std_6reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-}
-
-void mpu4_state::mpu4_type2_6reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-}
-
-void mpu4_state::mpu4_type3_6reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-}
-
-void mpu4_state::mpu4_type4_6reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-}
-
-void mpu4_state::mpu4_bwb_6reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-}
-
-
-void mpu4_state::mpu4_std_7reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-	REEL(config, m_reel[6], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[6]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<6>));
-	REEL(config, m_reel[7], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
-}
-
-void mpu4_state::mpu4_type2_7reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-	REEL(config, m_reel[6], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[6]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<6>));
-	REEL(config, m_reel[7], BARCREST_48STEP_REEL, 4, 12, 0x00, 2);
-	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
-}
-
-void mpu4_state::mpu4_type3_7reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-	REEL(config, m_reel[6], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[6]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<6>));
-	REEL(config, m_reel[7], BARCREST_48STEP_REEL, 92, 3, 0x00, 2);
-	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
-}
-
-void mpu4_state::mpu4_type4_7reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-	REEL(config, m_reel[6], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[6]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<6>));
-	REEL(config, m_reel[7], BARCREST_48STEP_REEL, 93, 2, 0x00, 2);
-	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
-}
-
-void mpu4_state::mpu4_bwb_7reel(machine_config &config)
-{
-	REEL(config, m_reel[0], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[0]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[1]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[2]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[3]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
-	REEL(config, m_reel[6], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[6]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<6>));
-	REEL(config, m_reel[7], BARCREST_48STEP_REEL, 96, 3, 0x00, 2);
-	m_reel[7]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<7>));
+	if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
+	if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
+	if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
+	if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
+	if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
+	if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
+	if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
+	if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
 }
 
 void mpu4_state::mpu4_common(machine_config &config)
@@ -2819,7 +2490,7 @@ void mpu4_state::mod2(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_std_6reel(config);
+	mpu4_reels<0, 6>(config);
 }
 
 void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
@@ -2869,7 +2540,7 @@ void mpu4_state::mod2_alt(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_type2_6reel(config);
+	mpu4_reels<1, 6>(config);
 }
 
 void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
@@ -2899,7 +2570,7 @@ void mpu4_state::mod4yam(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
-	mpu4_std_6reel(config);
+	mpu4_reels<0, 6>(config);
 
 	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2944,7 +2615,7 @@ void mpu4_state::mod4oki(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_std_6reel(config);
+	mpu4_reels<0, 6>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2983,7 +2654,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_type2_6reel(config);
+	mpu4_reels<1, 6>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -3014,7 +2685,7 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_std_5reel(config);
+	mpu4_reels<0, 5>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -3052,7 +2723,7 @@ void mpu4_state::bwboki(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
 	mpu4_common2(config);
-	mpu4_bwb_5reel(config);
+	mpu4_reels<4, 5>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -3075,73 +2746,7 @@ void mpu4_state::mpu4crys(machine_config &config)
 
 ***********************************************************************************************/
 
-void mpu4_state::init_m4debug()
-{
-	// many original barcrest / bwb sets have identification info around here
-	// this helps with sorting
-	uint8_t *src = memregion( "maincpu" )->base();
-	int size = memregion( "maincpu" )->bytes();
 
-	// m4richfm__e only has 0x004000
-	if (size < 0x10000)
-		return;
-
-	for (int j=0;j<size;j+=0x10000)
-	{
-		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
-		printf("\ncopyright string:\n");
-		for (int i = 0xffe0; i<0xfff0; i++)
-		{
-			printf("%c", src[j+i]);
-		}
-		printf("\n\nidentification string:\n");
-		for (int i = 0xff28; i<0xff30; i++)
-		{
-			printf("%c", src[j+i]);
-		}
-		printf("\n");
-
-		printf("flags ENABLED\n");
-		for (int i = 0xff30; i<0xff9f; i+=2)
-		{
-			uint8_t enable = src[j+i+0];
-			uint8_t letter = src[j+i+1];
-
-			if (enable == 0x00)
-			{
-				printf("%c", letter);
-			}
-		}
-		printf("\n");
-		printf("flags DISABLED\n");
-		for (int i = 0xff30; i<0xff9f; i+=2)
-		{
-			uint8_t enable = src[j+i+0];
-			uint8_t letter = src[j+i+1];
-
-			if (enable == 0xff)
-			{
-				if (letter != 0xff)
-					printf("%c", letter);
-			}
-		}
-		printf("\n");
-
-
-	}
-}
-
-void mpu4_state::init_m4_showstring()
-{
-	init_m4default();
-	init_m4debug();
-}
-
-void mpu4_state::init_m4_showstring_big()
-{
-	init_m4default_big();
-	init_m4debug();
-}
 
 
 
@@ -3171,33 +2776,33 @@ uint8_t mpu4_state::bootleg814alt2_r(address_space &space, offs_t offset)
 	return m_maincpu->space(AS_PROGRAM).read_byte(addr+3);
 }
 
-void mpu4_state::init_m4_showstring_812prot()
+void mpu4_state::init_m4default_812prot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
 }
 
-void mpu4_state::init_m4_showstring_814prot()
+void mpu4_state::init_m4default_814prot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
 }
 
-void mpu4_state::init_m4_showstring_812altprot()
+void mpu4_state::init_m4default_812altprot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
 }
 
-void mpu4_state::init_m4_showstring_812alt2prot()
+void mpu4_state::init_m4default_812alt2prot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt2_r)));
 }
 
-void mpu4_state::init_m4_showstring_814altprot()
+void mpu4_state::init_m4default_814altprot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
 }
 
@@ -3208,9 +2813,9 @@ uint8_t mpu4_state::bootleg814_2d_r(address_space &space, offs_t offset)
 }
 
 
-void mpu4_state::init_m4_showstring_812prot_fixed()
+void mpu4_state::init_m4default_812prot_fixed()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::characteriser_r)));
 }
 
@@ -3219,8 +2824,8 @@ uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
 	return 0x6a;
 }
 
-void mpu4_state::init_m4_showstring_806prot()
+void mpu4_state::init_m4default_806prot()
 {
-	init_m4_showstring();
+	init_m4default();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0806, 0x0806, read8m_delegate(*this, FUNC(mpu4_state::bootleg806_r)));
 }
