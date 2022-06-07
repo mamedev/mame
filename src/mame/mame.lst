@@ -38257,7 +38257,7 @@ titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasm1.cpp
-tinkerbl						// (c) 1990 Sega
+tinkerbl                        // (c) 1990 Sega
 unkm1                           // (c) 1992 Sega
 bingpty                         // (c) 1994 Sega
 
@@ -43902,6 +43902,7 @@ nf_22                           //
 nf_23                           //
 nf_23f                          //
 nf_23x                          //
+ph_04                           //
 rs_l6                           //
 rs_la4                          //
 rs_la5                          //
@@ -43924,6 +43925,7 @@ ts_lm6                          //
 ts_lx4                          //
 ts_lx5                          //
 ts_pa1                          //
+wcs_l1                          //
 wcs_l2                          //
 wcs_la2                         //
 wcs_p2                          //
