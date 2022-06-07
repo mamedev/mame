@@ -17,6 +17,8 @@
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
+#include <algorithm>
+
 namespace netlist
 {
 	namespace detail {
@@ -109,12 +111,10 @@ namespace netlist
 			// net management
 			// -----------------------------------------------------------------------------
 
-			const std::vector<detail::core_terminal_t *> core_terms_copy()  noexcept
+			const std::vector<detail::core_terminal_t *> core_terms_copy()
 			{
-				std::vector<detail::core_terminal_t *> ret;
-				ret.reserve(core_terms_ref().size());
-				for (auto *p : core_terms_ref())
-					ret.push_back(p);
+				std::vector<detail::core_terminal_t *> ret(core_terms_ref().size());
+				std::copy(core_terms_ref().begin(), core_terms_ref().end(), ret.begin());
 				return ret;
 			}
 
@@ -149,7 +149,7 @@ namespace netlist
 				return m_core_terms;
 			}
 #else
-			std::vector<detail::core_terminal_t *> &core_terms_ref() noexcept
+			std::vector<detail::core_terminal_t *> &core_terms_ref()
 			{
 				return state().core_terms(*this);
 			}

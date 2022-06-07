@@ -236,7 +236,7 @@ namespace netlist
 		///
 		void free_setup_resources();
 #if !(NL_USE_INPLACE_CORE_TERMS)
-		std::vector<detail::core_terminal_t *> &core_terms(const detail::net_t &net) noexcept
+		std::vector<detail::core_terminal_t *> &core_terms(const detail::net_t &net)
 		{
 			return m_core_terms[&net];
 		}

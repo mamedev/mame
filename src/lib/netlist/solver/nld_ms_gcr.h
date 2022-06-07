@@ -161,7 +161,7 @@ namespace netlist::solver
 
 			//# auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
 			//# *tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
-			std::size_t pd =std::size_t(this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0]);
+			std::size_t pd = std::size_t(this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0]);
 
 #if COMPRESSED
 			//pstring terms = plib::pfmt("m_A{1} = gt[{2}]")(pd, this->m_gtn.didx(k,0));
