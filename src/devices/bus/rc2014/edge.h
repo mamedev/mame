@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /**********************************************************************
 
-    RC2014 Modulare Backplane Extensions
+    RC2014 Modular Backplane Extensions
 
 **********************************************************************/
 
