@@ -2666,7 +2666,7 @@ ROM_START( toprollr )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "16.j4", 0x0000, 0x2000, CRC(ce3afe26) SHA1(7de00720f091537c64cc0fec687c061de3a8b1a3) )
-	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(1d9e3325) SHA1(e7f6863aa2ba2aeec40cfcc5cf6c69e947c185b5) )
+	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(b6fe97f2) SHA1(00c58f693dda0aa3ea4893dcaae90b1b63054789) )
 
 	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "14.c4", 0x0000, 0x2000, CRC(7a945733) SHA1(14187ba303aecf0a812c425c34d8edda3deaa2b5) )
@@ -2697,7 +2697,6 @@ ROM_START( toprollr )
 	ROM_LOAD( "prom.p9",  0x0060, 0x0020, CRC(eb399c02) SHA1(bf3d6c6dd982cb54446cf8a010b7adb949514bdb) ) //18-1f bg
 	ROM_LOAD( "prom.n9",  0x0080, 0x0020, CRC(fb03ea99) SHA1(4dcef86106cef713dfcbd965072bfa8fe4b68e15) ) //20-27 bg
 	ROM_LOAD( "prom.s9",  0x00a0, 0x0100, CRC(abf4c5fb) SHA1(a953f14642d4b72328293b36bc3c65b13491ffff) ) //unknown prom (filled with 2 bit vals)
-
 ROM_END
 
 
