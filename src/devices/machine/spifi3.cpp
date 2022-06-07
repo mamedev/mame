@@ -330,7 +330,7 @@ void spifi3_device::device_start()
 	m_drq_handler.resolve_safe();
 
 	bus_id = 0;
-	tm = timer_alloc(0);
+	tm = timer_alloc(FUNC(spifi3_device::tick), this);
 }
 
 void spifi3_device::map(address_map &map)
@@ -831,7 +831,7 @@ void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
 	}
 }
 
-void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spifi3_device::tick)
 {
 	step(true);
 }

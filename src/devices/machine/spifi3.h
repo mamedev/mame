@@ -47,7 +47,6 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void scsi_ctrl_changed() override;
 
 private:
@@ -216,6 +215,7 @@ private:
 	devcb_write_line m_drq_handler;
 
 	// State-related methods
+	TIMER_CALLBACK_MEMBER(tick);
 	void step(bool timeout);
 	void check_irq();
 	void check_drq();
