@@ -17,12 +17,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-
-
-INPUT_PORTS_EXTERN( mpu4 );
-INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
-
-
 namespace {
 
 class mpu4mod2_machines_state : public mpu4_state

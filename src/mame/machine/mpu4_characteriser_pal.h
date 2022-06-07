@@ -290,7 +290,7 @@ public:
 	// Reel 2 Reel                "RR  3.0"
 	// Road Hog                   "RO_ 3.0"
 	// Jackpot Gems               "JG3 0.1"
-	static constexpr uint8_t rhm_characteriser_prot[8] = { 0x00, 0x70, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00 }; // incomplete? doesn't seem correct for the lower rows of the roadhog set using it
+	static constexpr uint8_t rhm_characteriser_prot[8] = { 0x00, 0x70, 0x30, 0x50, 0x10, 0x70, 0x30, 0x10 };
 
 
 	// games with sequence starting

@@ -5,8 +5,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
-
 namespace {
 
 class mpu4union_machines_state : public mpu4_state

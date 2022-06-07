@@ -139,15 +139,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
-INPUT_PORTS_EXTERN( grtecp );
-INPUT_PORTS_EXTERN( mpu420p );
-INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
-INPUT_PORTS_EXTERN( mpu4jackpot8per );
-INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
-INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
-
-
 namespace {
 
 class mpu4mod4oki_machines_state : public mpu4_state

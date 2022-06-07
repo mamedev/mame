@@ -800,6 +800,7 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 	return tempinput;
 }
 
+
 void mpu4_state::pia_ic5_porta_w(uint8_t data)
 {
 	int i;
@@ -869,100 +870,8 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		awp_draw_reel(machine(),"reel2", *m_reel[1]);
 		awp_draw_reel(machine(),"reel3", *m_reel[2]);
 	}
-
-	if (strcmp(machine().system().name, "m4gambal") == 0)
-	{
-		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
-		provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
-		a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
-		holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
-		hole it's currently in, to land in another. Landing in the same hole causes the machine to
-		refire the ball. The ball detection is done by the high 4 bytes of AUX1.
-		Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
-		then trigger the switches corresponding to the correct number. This appears to be the best way
-		of making the game fair, short of simulating the physics of a bouncing ball ;)*/
-		if (data & 0x0f)
-		{
-			switch ((machine().rand()>>5) % 0x3)
-			{
-			case 0x00: //Top row
-				switch (machine().rand() & 0x3)
-				{
-				case 0x00: //7
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0xa0;
-					break;
-
-				case 0x01://4
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0xb0;
-					break;
-
-				case 0x02://9
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0xc0;
-					break;
-
-				case 0x03://8
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0xd0;
-					break;
-				}
-				break;
-
-			case 0x01: //Middle row - note switches don't match pattern
-				switch (machine().rand() & 0x3)
-				{
-				case 0x00://12
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x40;
-					break;
-
-				case 0x01://1
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x50;
-					break;
-
-				case 0x02://11
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x80;
-					break;
-
-				case 0x03://2
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x90;
-					break;
-				}
-				break;
-
-			case 0x02: //Bottom row
-				switch (machine().rand() & 0x3)
-				{
-				case 0x00://5
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x00;
-					break;
-
-				case 0x01://10
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x10;
-					break;
-
-				case 0x02://3
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x20;
-					break;
-
-				case 0x03://6
-					m_aux1_input = (m_aux1_input & 0x0f);
-					m_aux1_input|= 0x30;
-					break;
-				}
-				break;
-			}
-		}
-	}
 }
+
 
 void mpu4_state::pia_ic5_portb_w(uint8_t data)
 {

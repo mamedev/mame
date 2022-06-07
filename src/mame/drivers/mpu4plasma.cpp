@@ -11,9 +11,6 @@
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 
-
-INPUT_PORTS_EXTERN( mpu4 );
-
 namespace {
 
 	class mpu4plasma_state : public mpu4_state

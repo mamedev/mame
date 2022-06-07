@@ -50,13 +50,6 @@
 #define LOG_SS(x)   do { if (MPU4VERBOSE) logerror x; } while (0)
 
 
-
-
-
-static const uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
-static const uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
-
-
 //reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
 #define FIVE_REEL_5TO8 1    // Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
@@ -89,6 +82,17 @@ static const uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 #define HOPPER_NONDUART_A   4
 #define HOPPER_NONDUART_B   5
 
+INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_invcoin );
+INPUT_PORTS_EXTERN( mpu4_cw );
+INPUT_PORTS_EXTERN( mpu420p );
+INPUT_PORTS_EXTERN( mpu4jackpot8per );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
+
+// currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
+INPUT_PORTS_EXTERN( grtecp );
 
 class mpu4_state : public driver_device
 {
@@ -329,8 +333,6 @@ protected:
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-
-
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
@@ -380,6 +382,7 @@ protected:
 	uint8_t pia_gb_portb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
@@ -494,6 +497,9 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
+
+	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
+	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
 
 INPUT_PORTS_EXTERN( mpu4 );

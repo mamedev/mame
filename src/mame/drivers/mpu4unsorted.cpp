@@ -18,16 +18,6 @@
 #include "includes/mpu4.h"
 
 
-// in mpu4.cpp
-INPUT_PORTS_EXTERN( mpu4 );
-INPUT_PORTS_EXTERN( mpu4_invcoin );
-INPUT_PORTS_EXTERN( mpu420p );
-INPUT_PORTS_EXTERN( mpu4_cw );
-INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
-INPUT_PORTS_EXTERN( mpu4jackpot8per );
-INPUT_PORTS_EXTERN( grtecp );
-
-
 namespace {
 
 class mpu4unsorted_state : public mpu4_state

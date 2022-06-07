@@ -5,8 +5,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
-
 namespace {
 
 class mpu4mod4yam_machines_state : public mpu4_state
@@ -20,6 +18,11 @@ public:
 
 	void init_m4addr();
 	void init_m4addr814();
+
+	void mod4yam_cheatchr_gambal(machine_config &config);
+
+private:
+	void pia_ic5_porta_gambal_w(uint8_t data);
 };
 
 #include "gamball.lh"
@@ -388,6 +391,109 @@ INPUT_PORTS_START( m4gambal )
 INPUT_PORTS_END
 
 
+void mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w(uint8_t data)
+{
+	pia_ic5_porta_w(data);
+
+	/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
+	provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
+	a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
+	holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
+	hole it's currently in, to land in another. Landing in the same hole causes the machine to
+	refire the ball. The ball detection is done by the high 4 bytes of AUX1.
+	Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
+	then trigger the switches corresponding to the correct number. This appears to be the best way
+	of making the game fair, short of simulating the physics of a bouncing ball ;)*/
+	if (data & 0x0f)
+	{
+		switch ((machine().rand()>>5) % 0x3)
+		{
+		case 0x00: //Top row
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00: //7
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xa0;
+				break;
+
+			case 0x01://4
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xb0;
+				break;
+
+			case 0x02://9
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xc0;
+				break;
+
+			case 0x03://8
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xd0;
+				break;
+			}
+			break;
+
+		case 0x01: //Middle row - note switches don't match pattern
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00://12
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x40;
+				break;
+
+			case 0x01://1
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x50;
+				break;
+
+			case 0x02://11
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x80;
+				break;
+
+			case 0x03://2
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x90;
+				break;
+			}
+			break;
+
+		case 0x02: //Bottom row
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00://5
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x00;
+				break;
+
+			case 0x01://10
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x10;
+				break;
+
+			case 0x02://3
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x20;
+				break;
+
+			case 0x03://6
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x30;
+				break;
+			}
+			break;
+		}
+	}
+}
+
+
+void mpu4mod4yam_machines_state::mod4yam_cheatchr_gambal(machine_config &config)
+{
+	mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::gambal_characteriser_prot>(config);
+
+	// custom hookup for gambal feature
+	m_pia5->writepa_handler().set(FUNC(mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w));
+}
 
 
 #undef GAME_CUSTOM
@@ -396,7 +502,7 @@ INPUT_PORTS_END
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::gambal_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
+	GAMEL( year, setname, parent, mod4yam_cheatchr_gambal, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
 
 // 00 0c 50 90 b0 38 d4 a0 (gambal)
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (GBB 2.0)" )
