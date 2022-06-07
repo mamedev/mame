@@ -391,8 +391,8 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
 {
 	int code, attr, color;
 
-	attr = tile_index & 0x10 ? m_colorram[tile_index & ~0x20] : m_colorram[tile_index];
-	code = ((attr & 0x30) << 4) | m_videoram[tile_index];
+	attr = m_colorram[tile_index];
+	code = ((attr & 0x10) << 5) | ((attr & 0x20) << 3) | m_videoram[tile_index];
 	color = attr & 0x0f;
 
 	tileinfo.set(0, code, color, 0);

@@ -157,7 +157,6 @@ TODO:
 
        - COINB DSW is missing
        - few issues in cocktail mode
-       - wrong colors (fg text layer) - game sometimes ("round" text , lives) updates only even columns of cell attribs...
 
 -------------------------------------------------------------------
 
@@ -291,13 +290,6 @@ void cclimber_state::toprollr_rombank_w(int state)
 	}
 }
 
-MACHINE_RESET_MEMBER(cclimber_state,cclimber)
-{
-	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
-	m_nmi_mask = 0;
-
-	m_toprollr_rombank = 0;
-}
 
 void cclimber_state::nmi_mask_w(int state)
 {
@@ -443,7 +435,7 @@ void cclimber_state::toprollr_map(address_map &map)
 	map(0x9800, 0x987f).ram(); /* unused ? */
 	map(0x9880, 0x995f).ram().share("spriteram");
 	map(0x99dc, 0x99df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
