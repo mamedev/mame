@@ -383,6 +383,11 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
+	uint8_t hack_duart_r()
+	{
+		return machine().rand() & 0x10;
+	}
+
 	uint8_t bootleg814_r(address_space &space, offs_t offset);
 	uint8_t bootleg814alt_r(address_space &space, offs_t offset);
 	uint8_t bootleg814alt2_r(address_space &space, offs_t offset);
