@@ -249,7 +249,7 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 			}
 
 			u16 cmd_to_run = data & regmask[offset];
-			if((m_reg[CR] & CR_TXP))
+			if (m_reg[CR] & CR_TXP)
 			{
 				// Per section 3.5.4 in the datasheet, TDAs can be dynamically added.
 				// The TXP command will be re-sent by the host, but doesn't do anything
@@ -585,14 +585,15 @@ void dp83932c_device::dump_bytes(u8 *buf, int length)
 	}
 }
 
-u32 dp83932c_device::read_bus_word(offs_t address)
+u16 dp83932c_device::read_bus_word(offs_t address)
 {
-	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
-	return width == 2 ? m_bus->read_word(address) : m_bus->read_dword(address);
+	return (m_reg[DCR] & DCR_DW) ? m_bus->read_dword(address) : m_bus->read_word(address);
 }
 
-void dp83932c_device::write_bus_word(offs_t address, u32 data)
+void dp83932c_device::write_bus_word(offs_t address, u16 data)
 {
-	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
-	width == 2 ? m_bus->write_word(address, data) : m_bus->write_dword(address, data);
+	if (m_reg[DCR] & DCR_DW)
+		m_bus->write_dword(address, data);
+	else
+		m_bus->write_word(address, data);
 }
