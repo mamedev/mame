@@ -78,22 +78,22 @@
 #include "tilemap.h"
 
 
-#define LOG_DSP_AB0			(1U << 1)
-#define LOG_DSP_A6			(1U << 2)
-#define LOG_DSP_A7			(1U << 3)
-#define LOG_DSP_A8			(1U << 4)
-#define LOG_DSP_AC			(1U << 5)
-#define LOG_DSP_AE			(1U << 6)
-#define LOG_DSP_B6			(1U << 7)
-#define LOG_DSP_B7			(1U << 8)
-#define LOG_DSP_B8			(1U << 9)
-#define LOG_68K_SHARED		(1U << 10)
-#define LOG_DSP_HOST_INTF	(1U << 11)
+#define LOG_DSP_AB0         (1U << 1)
+#define LOG_DSP_A6          (1U << 2)
+#define LOG_DSP_A7          (1U << 3)
+#define LOG_DSP_A8          (1U << 4)
+#define LOG_DSP_AC          (1U << 5)
+#define LOG_DSP_AE          (1U << 6)
+#define LOG_DSP_B6          (1U << 7)
+#define LOG_DSP_B7          (1U << 8)
+#define LOG_DSP_B8          (1U << 9)
+#define LOG_68K_SHARED      (1U << 10)
+#define LOG_DSP_HOST_INTF   (1U << 11)
 #define LOG_DSP_CTRL        (1U << 12)
 #define LOG_DSP_PORTC       (1U << 13)
 
 #define LOG_ALL_DSP_A       (LOG_DSP_AB0 | LOG_DSP_A7 | LOG_DSP_A6 | LOG_DSP_A8 | LOG_DSP_AC | LOG_DSP_AE)
-#define LOG_ALL_DSP_B		(LOG_DSP_AB0 | LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8)
+#define LOG_ALL_DSP_B       (LOG_DSP_AB0 | LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8)
 
 //#define VERBOSE (LOG_ALL_DSP_A | LOG_ALL_DSP_B | LOG_68K_SHARED | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
 #define VERBOSE (0)
@@ -257,11 +257,11 @@ void polygonet_state::machine_start()
 	m_sound_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	// Initialize DSP banking
-    m_dsp_bank_a_8->configure_entries(0, 8, m_dsp_ram_a_8.target(), 0x4000 * 2);
-    m_dsp_bank_b_6->configure_entries(0, 4, m_dsp_ram_b_6.target(), 0x1000 * 2);
-    m_dsp_bank_b_7->configure_entries(0, 4, m_dsp_ram_b_7.target(), 0x1000 * 2);
-    m_dsp_bank_b_8->configure_entries(0, 8, m_dsp_ram_b_8.target(), 0x8000 * 2);
-    m_dsp_data_view.select(0);
+	m_dsp_bank_a_8->configure_entries(0, 8, m_dsp_ram_a_8.target(), 0x4000 * 2);
+	m_dsp_bank_b_6->configure_entries(0, 4, m_dsp_ram_b_6.target(), 0x1000 * 2);
+	m_dsp_bank_b_7->configure_entries(0, 4, m_dsp_ram_b_7.target(), 0x1000 * 2);
+	m_dsp_bank_b_8->configure_entries(0, 8, m_dsp_ram_b_8.target(), 0x8000 * 2);
+	m_dsp_data_view.select(0);
 
 	// Register save states
 	save_item(NAME(m_sys1));
@@ -367,23 +367,23 @@ void polygonet_state::sys_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-		    // D28 = /FIXKILL     - Disable 'FIX' layer?
-		    // D27 = MUTE
-		    // D26 = EEPROM CLK
-		    // D25 = EEPROM CS
-		    // D24 = EEPROM DATA
+			// D28 = /FIXKILL     - Disable 'FIX' layer?
+			// D27 = MUTE
+			// D26 = EEPROM CLK
+			// D25 = EEPROM CS
+			// D24 = EEPROM DATA
 			m_eepromout->write(data, 0xffff);
 			break;
 
 		case 1:
-		    // D23 = BRMAS        - 68k bus error mask
-		    // D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
-		    // D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
-		    // D20 = L3MAS        - L3 interrupt mask (056230)
-		    // D19 = VFLIP        - Flip video vertically
-		    // D18 = HFLIP        - Flip video horizontally
-		    // D17 = COIN2        - Coin counter 2
-		    // D16 = COIN1        - Coin counter 1
+			// D23 = BRMAS        - 68k bus error mask
+			// D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
+			// D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
+			// D20 = L3MAS        - L3 interrupt mask (056230)
+			// D19 = VFLIP        - Flip video vertically
+			// D18 = HFLIP        - Flip video horizontally
+			// D17 = COIN2        - Coin counter 2
+			// D16 = COIN1        - Coin counter 1
 			machine().bookkeeping().coin_counter_w(0, data & 1);
 			machine().bookkeeping().coin_counter_w(1, data & 2);
 			if (~data & 0x20)
@@ -814,19 +814,19 @@ void polygonet_state::dsp_program_map(address_map &map)
 
 void polygonet_state::dsp_data_map(address_map &map)
 {
-    map(0x0800, 0xffff).view(m_dsp_data_view);
+	map(0x0800, 0xffff).view(m_dsp_data_view);
 
-    m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-    m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
-    m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
-    m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
-    m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
-    m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+	m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+	m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
+	m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+	m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
+	m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
+	m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
 
 	m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-    m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
-    m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
-    m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
+	m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
+	m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
+	m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
 }
 
 
