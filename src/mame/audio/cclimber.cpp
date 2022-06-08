@@ -41,6 +41,8 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 
 void cclimber_audio_device::device_start()
 {
+	assert(m_rom.bytes() == 0x2000);
+
 	m_address = 0;
 	m_start_address = 0;
 	m_loop_address = 0;
@@ -106,8 +108,7 @@ void cclimber_audio_device::sample_trigger_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(cclimber_audio_device::sample_tick)
 {
-	u16 mask = ((m_rom.bytes() << 1) - 1) & 0x3fff;
-	u8 data = m_rom[m_address >> 1 & mask];
+	u8 data = m_rom[m_address >> 1 & 0x1fff];
 
 	// sample end marker, continue from loop point
 	if (data == 0x70)
