@@ -206,7 +206,6 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
-	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/includes/mw8080bw.h",
 	MAME_DIR .. "src/mame/audio/mw8080bw.h",
@@ -276,7 +275,7 @@ files{
 	MAME_DIR .. "src/mame/audio/cclimber.h",
 
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
-	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+	MAME_DIR .. "src/mame/audio/nl_zac1b11142.h",
 	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
 	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/zaccaria.cpp",
@@ -305,13 +304,9 @@ files{
 	MAME_DIR .. "src/mame/video/vicdual-97269pb.cpp",
 	MAME_DIR .. "src/mame/video/vicdual-97269pb.h",
 	MAME_DIR .. "src/mame/audio/carnival.cpp",
-	MAME_DIR .. "src/mame/audio/carnival.h",
 	MAME_DIR .. "src/mame/audio/depthch.cpp",
-	MAME_DIR .. "src/mame/audio/depthch.h",
 	MAME_DIR .. "src/mame/audio/invinco.cpp",
-	MAME_DIR .. "src/mame/audio/invinco.h",
 	MAME_DIR .. "src/mame/audio/pulsar.cpp",
-	MAME_DIR .. "src/mame/audio/pulsar.h",
 
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",

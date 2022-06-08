@@ -132,7 +132,6 @@ files{
 	MAME_DIR .. "src/mame/drivers/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy.h",
-	MAME_DIR .. "src/mame/video/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy440.cpp",
 	MAME_DIR .. "src/mame/audio/exidy440.h",
 	MAME_DIR .. "src/mame/drivers/starfire.cpp",
