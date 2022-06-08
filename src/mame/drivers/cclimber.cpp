@@ -146,14 +146,15 @@ TODO:
       - bg gradient color decode & table selection
 
 
- Top Roller:
- ----------
+    Top Roller:
+    ----------
      It's made by the same developers as Yamato and use
      probably the same encrypted SEGA cpu as Yamato.
 
      lives - $6155
 
      TODO:
+       - some of the samples should loop (truck, helicopter, motorcycle)
        - COINB DSW is missing
        - few issues in cocktail mode
 
@@ -1165,7 +1166,7 @@ void cclimber_state::cclimber(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	CCLIMBER_AUDIO(config, "cclimber_audio", 0);
+	CCLIMBER_AUDIO(config, "cclimber_audio", XTAL(18'432'000)/3/2/2);
 }
 
 void cclimber_state::rpatrol(machine_config &config)
@@ -1272,6 +1273,8 @@ void cclimber_state::toprollr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
+
+	subdevice<cclimber_audio_device>("cclimber_audio")->set_sample_clockdiv(4);
 }
 
 
@@ -2805,4 +2808,4 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_i
 GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

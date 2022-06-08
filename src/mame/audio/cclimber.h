@@ -24,6 +24,8 @@ public:
 	// construction/destruction
 	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto &set_sample_clockdiv(uint8_t div) { m_sample_clockdiv = div; return *this; } // determines base sound pitch (default 2)
+
 	void sample_trigger(int state);
 	void sample_trigger_w(uint8_t data);
 	void sample_rate_w(uint8_t data);
@@ -41,6 +43,7 @@ private:
 	uint8_t m_sample_num;
 	uint32_t m_sample_freq;
 	uint8_t m_sample_volume;
+	uint8_t m_sample_clockdiv;
 	required_device<samples_device> m_samples;
 	required_region_ptr<uint8_t> m_samples_region;
 

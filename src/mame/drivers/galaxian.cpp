@@ -7859,7 +7859,7 @@ void mshuttle_state::mshuttle(machine_config &config)
 	set_irq_line(0);
 
 	// sound hardware
-	CCLIMBER_AUDIO(config, "cclimber_audio", 0);
+	CCLIMBER_AUDIO(config, "cclimber_audio", GALAXIAN_PIXEL_CLOCK/3/2/2);
 }
 
 
