@@ -48220,4 +48220,85 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ultima2">
+		<description>Ultima II (Revision 3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 3, which adds a feature to make a copy of the player master disk before you create a character. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 1 - program master.dsk" size="143360" crc="29b8c634" sha1="a8408eec3a37f99a1c1e91603c3f9676032a3cce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima2r2">
+		<description>Ultima II (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 1 - program master.dsk" size="143360" crc="3fa83c21" sha1="af3b5b1300cf972d501946edc205f261b0690adb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima2r1">
+		<description>Ultima II (Revision 1) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 1 - program master.dsk" size="143360" crc="3d83a419" sha1="ad0f3e7515bb439c61d98e45b980ca786f44cc10"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
