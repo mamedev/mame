@@ -1041,6 +1041,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+		SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
 		m_initialized_joystick = !SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 		if (!m_initialized_joystick)
