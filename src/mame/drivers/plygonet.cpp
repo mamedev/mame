@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Andrew Gardner
+// copyright-holders:R. Belmont, Andrew Gardner, Ryan Holtz
 /*
     Polygonet Commanders (Konami, 1993)
     Poly-Net Warriors (Konami, 1993)
@@ -54,9 +54,9 @@
     DSP
     ===
 
-    500000-503fff = HCOM     - 16kB common RAM
+    500000-503fff = HCOM     - 16kB shared RAM
     504000-504fff = CONTROL  - DSP/Host Control
-                    D10? = COMBNK - Switch between 68k and DSP access to common RAM
+                    D10? = COMBNK - Switch between 68k and DSP access to shared RAM
                     D08? = RESN   - Reset DSP
     506000-506fff = HEN      - DSP/Host interface
 
@@ -74,27 +74,28 @@
 #include "speaker.h"
 
 
-#define LOG_DSP_BANK00		(1 << 1U)
-#define LOG_DSP_BANK01		(1 << 2U)
-#define LOG_DSP_BANK02		(1 << 3U)
-#define LOG_DSP_BANK04		(1 << 4U)
-#define LOG_DSP_SHARED		(1 << 5U)
-#define LOG_68K_SHARED		(1 << 6U)
-#define LOG_DSP_HOST_INTF	(1 << 7U)
-#define LOG_DSP_CTRL        (1 << 8U)
-#define LOG_DSP_PORTC       (1 << 9U)
+#define LOG_DSP_AB0			(1U << 1)
+#define LOG_DSP_A6			(1U << 2)
+#define LOG_DSP_A7			(1U << 3)
+#define LOG_DSP_A8			(1U << 4)
+#define LOG_DSP_AC			(1U << 5)
+#define LOG_DSP_AE			(1U << 6)
+#define LOG_DSP_B6			(1U << 7)
+#define LOG_DSP_B7			(1U << 8)
+#define LOG_DSP_B8			(1U << 9)
+#define LOG_68K_SHARED		(1U << 10)
+#define LOG_DSP_HOST_INTF	(1U << 11)
+#define LOG_DSP_CTRL        (1U << 12)
+#define LOG_DSP_PORTC       (1U << 13)
 
-//#define VERBOSE (LOG_DSP_BANK00 | LOG_DSP_BANK01 | LOG_DSP_BANK02 | LOG_DSP_SHARED | LOG_68K_SHARED | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
+#define LOG_ALL_DSP_A       (LOG_DSP_AB0 | LOG_DSP_A7 | LOG_DSP_A6 | LOG_DSP_A8 | LOG_DSP_AC | LOG_DSP_AE)
+#define LOG_ALL_DSP_B		(LOG_DSP_AB0 | LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8)
+
+//#define VERBOSE (LOG_ALL_DSP_A | LOG_ALL_DSP_B | LOG_68K_SHARED | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
 #define VERBOSE (0)
 #include "logmacro.h"
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
-
-const uint16_t polygonet_state::dsp_bank00_size = 0x1000;
-const uint16_t polygonet_state::dsp_bank01_size = 0x1000;
-const uint16_t polygonet_state::dsp_bank02_size = 0x4000;
-const uint16_t polygonet_state::dsp_shared_ram_16_size = 0x2000;
-const uint16_t polygonet_state::dsp_bank04_size = 0x1fc0;
 
 uint8_t polygonet_state::inputs_r(offs_t offset)
 {
@@ -182,16 +183,13 @@ uint32_t polygonet_state::dsp_host_interface_r(offs_t offset, uint32_t mem_mask)
 
 uint32_t polygonet_state::shared_ram_read(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t data = m_shared_ram[offset];
-	LOGMASKED(LOG_68K_SHARED, "%s: 68k Reading from shared DSP RAM[%04x]: %08x (DSP values %04x%04x) & %08x \n", machine().describe_context(),
-		0xc000 + (offset << 1), data, m_dsp_shared_ram_16[offset << 1], m_dsp_shared_ram_16[(offset << 1) + 1], mem_mask);
+	uint32_t data = (m_dsp_share[offset << 1] << 16) | m_dsp_share[(offset << 1) + 1];
+	LOGMASKED(LOG_68K_SHARED, "%s: 68k Reading from shared DSP RAM[%04x]: %08x & %08x \n", machine().describe_context(), 0xc000 + (offset << 1), data, mem_mask);
 	return data;
 }
 
 void polygonet_state::shared_ram_write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_shared_ram[offset]);
-
 	if (mem_mask == 0xffff0000)
 	{
 		LOGMASKED(LOG_68K_SHARED, "%s: 68k Writing to shared DSP RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + (offset << 1), (uint16_t)(data >> 16));
@@ -208,13 +206,13 @@ void polygonet_state::shared_ram_write(offs_t offset, uint32_t data, uint32_t me
 	/* write to the current DSP word */
 	if (ACCESSING_BITS_16_31)
 	{
-		m_dsp_shared_ram_16[offset << 1] = (uint16_t)(m_shared_ram[offset] >> 16);
+		m_dsp_share[offset << 1] = (uint16_t)(data >> 16);
 	}
 
 	/* write to the next DSP word */
 	if (ACCESSING_BITS_0_15)
 	{
-		m_dsp_shared_ram_16[(offset << 1) + 1] = (uint16_t)m_shared_ram[offset];
+		m_dsp_share[(offset << 1) + 1] = (uint16_t)data;
 	}
 }
 
@@ -273,153 +271,164 @@ uint16_t polygonet_state::dsp_bootload_r()
 
    XXXX ---- ---- ----  . Reserved bits
    ---- ???- -?-- ----  . unknown
-   ---- ---- --x- ----  . [Bank Group A] Enable bit for "001c banking"?
-   ---- ---- ---x xx--  . [Group A bank control] Believed to bank memory from 0x8000-0xbfff
-   ---- ---- ---- --x-  . [Bank Group B] Enable bit for "0181 banking"?
-   ---- ---x x--- ---x  . [Group B bank control] Believed to bank various other memory regions
-
-   001c banking is fairly easy - it happens in a loop and writes from 8000 to bfff
-   0181 banking is very weird  - it happens in a nested loop and writes from 6000-6fff, 7000-7fff, and 8000-ffbf
-                                 bit 0002 turns on *just* before this happens.
+   ---- ---- --x- ----  . [Bank Group A] Enable bit
+   ---- ---- ---x xx--  . [Group A bank control] Banks memory from 0x8000-0xbfff
+   ---- ---- ---- --x-  . [Bank Group B] Enable bit
+   ---- ---x x--- ---x  . [Group B bank control] Banks memory at 0x6000-0x6fff and 0x7000-0x7fff (bits 7,8 only), and 0x8000-0xffbf (bits 7,8,0)
 */
-
-uint8_t polygonet_state::dsp_bank_group()
-{
-	/* If bank group B is on, it overrides bank group A */
-	if (m_dsp_portc & 0x0002)
-		return BANK_GROUP_B;
-	else if (m_dsp_portc & 0x0020)
-		return BANK_GROUP_A;
-
-	return INVALID_BANK_GROUP;
-}
-
-uint8_t polygonet_state::dsp_bank_num(uint8_t bank_group)
-{
-	if (bank_group == BANK_GROUP_A)
-	{
-		const uint16_t bit3   = (m_dsp_portc & 0x0010) >> 2;
-		const uint16_t bits21 = (m_dsp_portc & 0x000c) >> 2;
-		return (bit3 | bits21);
-	}
-	else if (bank_group == BANK_GROUP_B)
-	{
-		const uint16_t bits32 = (m_dsp_portc & 0x0180) >> 6;
-		const uint16_t bit1   = (m_dsp_portc & 0x0001) >> 0;
-		return (bits32 | bit1);
-	}
-	else if (bank_group == INVALID_BANK_GROUP)
-	{
-		fatalerror("Plygonet: dsp bank num invalid.\n");
-	}
-
-	return 0;
-}
 
 void polygonet_state::dsp_portc_write(uint16_t data)
 {
 	LOGMASKED(LOG_DSP_PORTC, "%s: DSP Port C write: %04x\n", machine().describe_context(), data);
 	m_dsp_portc = data;
 
-	m_dsp_bank_group = dsp_bank_group();
-	m_dsp_bank_num = dsp_bank_num(m_dsp_bank_group);
+	uint8_t bank_a_8_num = bitswap<3>(m_dsp_portc, 4, 3, 2);
+	m_dsp_bank_a_8->set_entry(bank_a_8_num);
 
-	m_dsp_bank_offsets[0] = (m_dsp_bank_group * dsp_bank00_size * 8) + (m_dsp_bank_num * dsp_bank00_size);
-	m_dsp_bank_offsets[1] = (m_dsp_bank_group * dsp_bank01_size * 8) + (m_dsp_bank_num * dsp_bank01_size);
-	m_dsp_bank_offsets[2] = (m_dsp_bank_group * dsp_bank02_size * 8) + (m_dsp_bank_num * dsp_bank02_size);
-	m_dsp_bank_offsets[3] = (m_dsp_bank_group * dsp_shared_ram_16_size * 8) + (m_dsp_bank_num * dsp_shared_ram_16_size);
-	m_dsp_bank_offsets[4] = (m_dsp_bank_group * dsp_bank04_size * 8) + (m_dsp_bank_num * dsp_bank04_size);
+	uint8_t bank_b_67_num = bitswap<2>(m_dsp_portc, 7, 8);
+	m_dsp_bank_b_6->set_entry(bank_b_67_num);
+	m_dsp_bank_b_7->set_entry(bank_b_67_num);
+
+	uint8_t bank_b_8_num = bitswap<3>(m_dsp_portc, 7, 8, 0);
+	m_dsp_bank_b_8->set_entry(bank_b_8_num);
+
+	m_dsp_data_view.select(BIT(m_dsp_portc, 1));
 }
 
 
-/* BANK HANDLERS */
-uint16_t polygonet_state::dsp_ram_bank00_read(offs_t offset)
+/* DSP RAM HANDLERS */
+uint16_t polygonet_state::dsp_ram_ab_0_read(offs_t offset)
 {
-	uint16_t data = m_dsp_bank00_ram[m_dsp_bank_offsets[0] + offset];
-	LOGMASKED(LOG_DSP_BANK00, "%s: DSP Reading from Bank0 RAM[%04x]: %04x (banked offset %05x)\n", machine().describe_context(),
-		0x6000 + offset, data, m_dsp_bank_offsets[0] + offset);
+	uint16_t data = m_dsp_ab_0[offset];
+	LOGMASKED(LOG_DSP_AB0, "%s: DSP Reading from Mapping A/B, 0xxx RAM[%04x]: %04x\n", machine().describe_context(), offset, data);
 	return data;
 }
 
-void polygonet_state::dsp_ram_bank00_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void polygonet_state::dsp_ram_ab_0_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DSP_BANK00, "%s: DSP Writing to Bank0 RAM[%04x] = %04x (banked offset %05x)\n", machine().describe_context(),
-		0x6000 + offset, data, m_dsp_bank_offsets[0] + offset);
-	COMBINE_DATA(&m_dsp_bank00_ram[m_dsp_bank_offsets[0] + offset]);
+	LOGMASKED(LOG_DSP_AB0, "%s: DSP Writing to Mapping A/B, 0xxx RAM[%04x] = %04x\n", machine().describe_context(), offset, data);
+	COMBINE_DATA(&m_dsp_ab_0[offset]);
 }
 
 
-uint16_t polygonet_state::dsp_ram_bank01_read(offs_t offset)
+uint16_t polygonet_state::dsp_ram_a_6_read(offs_t offset)
 {
-	uint16_t data = m_dsp_bank01_ram[m_dsp_bank_offsets[1] + offset];
-	LOGMASKED(LOG_DSP_BANK01, "%s: DSP Reading from Bank1 RAM[%04x]: %04x (banked offset %05x)\n", machine().describe_context(),
-		0x7000 + offset, data, m_dsp_bank_offsets[1] + offset);
+	uint16_t data = m_dsp_a_6[offset];
+	LOGMASKED(LOG_DSP_A6, "%s: DSP Reading from Mapping A, 6xxx RAM[%04x]: %04x\n", machine().describe_context(), 0x6000 + offset, data);
 	return data;
 }
 
-void polygonet_state::dsp_ram_bank01_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void polygonet_state::dsp_ram_a_6_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DSP_BANK01, "%s: DSP Writing to Bank1 RAM[%04x] = %04x (banked offset %05x)\n", machine().describe_context(),
-		0x7000 + offset, data, m_dsp_bank_offsets[1] + offset);
-	COMBINE_DATA(&m_dsp_bank01_ram[m_dsp_bank_offsets[1] + offset]);
-
-	/* For now, *always* combine P:0x7000-0x7fff with bank01 with no regard to the banking hardware. */
-	m_dsp_p_mirror[offset] = data;
+	LOGMASKED(LOG_DSP_A6, "%s: DSP Writing to Mapping A, 6xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data);
+	COMBINE_DATA(&m_dsp_a_6[offset]);
 }
 
 
-uint16_t polygonet_state::dsp_ram_bank02_read(offs_t offset)
+uint16_t polygonet_state::dsp_ram_b_6_read(offs_t offset)
 {
-	LOGMASKED(LOG_DSP_BANK02, "%s: DSP Reading from Bank2 RAM[%04x] (bank offset %05x)\n", machine().describe_context(),
-		0x8000 + offset, m_dsp_bank_offsets[2]);
-	return m_dsp_bank02_ram[m_dsp_bank_offsets[2] + offset];
-}
-
-void polygonet_state::dsp_ram_bank02_write(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_DSP_BANK02, "%s: DSP Writing to Bank2 RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(),
-		0x8000 + offset, data, m_dsp_bank_offsets[2]);
-	COMBINE_DATA(&m_dsp_bank02_ram[m_dsp_bank_offsets[2] + offset]);
-}
-
-
-uint16_t polygonet_state::dsp_shared_ram_read(offs_t offset)
-{
-	uint16_t data = m_dsp_shared_ram_16[m_dsp_bank_offsets[3] + offset];
-	LOGMASKED(LOG_DSP_SHARED, "%s: DSP Reading from Shared RAM[%04x]: %04x (banked offset %05x)\n", machine().describe_context(),
-		0xc000 + offset, data, m_dsp_bank_offsets[3] + offset);
+	offs_t bank_b_6_offset = bitswap<2>(m_dsp_portc, 7, 8) * 0x1000;
+	uint16_t data = ((uint16_t *)m_dsp_bank_b_6->base())[offset];
+	LOGMASKED(LOG_DSP_B6, "%s: DSP Reading from Mapping B, 6xxx RAM[%04x]: %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data, bank_b_6_offset + offset);
 	return data;
 }
 
-void polygonet_state::dsp_shared_ram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void polygonet_state::dsp_ram_b_6_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DSP_SHARED, "%s: DSP Writing to Shared RAM[%04x] = %04x (banked offset %05x)\n", machine().describe_context(),
-		0xc000 + offset, data, m_dsp_bank_offsets[3] + offset);
-	COMBINE_DATA(&m_dsp_shared_ram_16[m_dsp_bank_offsets[3] + offset]);
-
-	/* Bank group A with offset 0 is believed to be the shared region */
-	if (m_dsp_bank_group == BANK_GROUP_A && m_dsp_bank_num == 0)
-	{
-		if (offset % 2)
-			m_shared_ram[offset >> 1] = ((m_dsp_shared_ram_16[offset-1]) << 16) | m_dsp_shared_ram_16[offset];
-		else
-			m_shared_ram[offset >> 1] = ((m_dsp_shared_ram_16[offset])   << 16) | m_dsp_shared_ram_16[offset+1];
-	}
+	offs_t bank_b_6_offset = bitswap<2>(m_dsp_portc, 7, 8) * 0x1000;
+	LOGMASKED(LOG_DSP_B6, "%s: DSP Writing to Mapping B, 6xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data, bank_b_6_offset + offset);
+	COMBINE_DATA(((uint16_t *)m_dsp_bank_b_6->base()) + offset);
 }
 
 
-uint16_t polygonet_state::dsp_ram_bank04_read(offs_t offset)
+uint16_t polygonet_state::dsp_ram_a_7_read(offs_t offset)
 {
-	LOGMASKED(LOG_DSP_BANK04, "%s: DSP Reading from Bank4 RAM[%04x] (bank offset %05x)\n", machine().describe_context(),
-		0xe000 + offset, m_dsp_bank_offsets[4]);
-	return m_dsp_bank04_ram[m_dsp_bank_offsets[4] + offset];
+	uint16_t data = m_dsp_a_7[offset];
+	LOGMASKED(LOG_DSP_A7, "%s: DSP Reading from Mapping A, 7xxx RAM[%04x]: %04x\n", machine().describe_context(), 0x7000 + offset, data);
+	return data;
 }
 
-void polygonet_state::dsp_ram_bank04_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void polygonet_state::dsp_ram_a_7_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DSP_BANK04, "%s: DSP Writing to Bank4 RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(),
-		0xe000 + offset, data, m_dsp_bank_offsets[4]);
-	COMBINE_DATA(&m_dsp_bank04_ram[m_dsp_bank_offsets[4] + offset]);
+	LOGMASKED(LOG_DSP_A7, "%s: DSP Writing to Mapping A, 7xxx RAM[%04x] = %04x\n", machine().describe_context(), 0x7000 + offset, data);
+	COMBINE_DATA(&m_dsp_a_7[offset]);
+	COMBINE_DATA(&m_dsp_common[offset]);
+}
+
+
+uint16_t polygonet_state::dsp_ram_b_7_read(offs_t offset)
+{
+	offs_t bank_b_7_offset = bitswap<2>(m_dsp_portc, 7, 8) * 0x1000;
+	uint16_t data = ((uint16_t *)m_dsp_bank_b_7->base())[offset];
+	LOGMASKED(LOG_DSP_B7, "%s: DSP Reading from Mapping B, 7xxx RAM[%04x]: %04x (bank offset %05x)\n", machine().describe_context(), 0x7000 + offset, data, bank_b_7_offset + offset);
+	return data;
+}
+
+void polygonet_state::dsp_ram_b_7_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	offs_t bank_b_7_offset = bitswap<2>(m_dsp_portc, 7, 8) * 0x1000;
+	LOGMASKED(LOG_DSP_B7, "%s: DSP Writing to Mapping B, 7xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x7000 + offset, data, bank_b_7_offset + offset);
+	COMBINE_DATA(((uint16_t *)m_dsp_bank_b_7->base()) + offset);
+}
+
+
+uint16_t polygonet_state::dsp_ram_a_8_read(offs_t offset)
+{
+	offs_t bank_a_8_offset = bitswap<3>(m_dsp_portc, 4, 3, 2) * 0x4000;
+	uint16_t data = ((uint16_t *)m_dsp_bank_a_8->base())[offset];
+	LOGMASKED(LOG_DSP_A8, "%s: DSP Reading from Mapping A, 8xxx RAM[%04x]: %04x (bank offset %05x)\n", machine().describe_context(), 0x8000 + offset, data, bank_a_8_offset + offset);
+	return data;
+}
+
+void polygonet_state::dsp_ram_a_8_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	offs_t bank_a_8_offset = bitswap<3>(m_dsp_portc, 4, 3, 2) * 0x4000;
+	LOGMASKED(LOG_DSP_A8, "%s: DSP Writing to Mapping A, 8xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x8000 + offset, data, bank_a_8_offset + offset);
+	COMBINE_DATA(((uint16_t *)m_dsp_bank_a_8->base()) + offset);
+}
+
+
+uint16_t polygonet_state::dsp_ram_b_8_read(offs_t offset)
+{
+	offs_t bank_b_8_offset = bitswap<3>(m_dsp_portc, 7, 8, 0) * 0x8000;
+	uint16_t data = ((uint16_t *)m_dsp_bank_b_8->base())[offset];
+	LOGMASKED(LOG_DSP_B8, "%s: DSP Reading from Mapping B, 8xxx RAM[%04x]: %04x (bank offset %05x)\n", machine().describe_context(), 0x8000 + offset, data, bank_b_8_offset + offset);
+	return data;
+}
+
+void polygonet_state::dsp_ram_b_8_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	offs_t bank_b_8_offset = bitswap<3>(m_dsp_portc, 4, 3, 2) * 0x4000;
+	LOGMASKED(LOG_DSP_B8, "%s: DSP Writing to Mapping B, 8xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x8000 + offset, data, bank_b_8_offset + offset);
+	COMBINE_DATA(((uint16_t *)m_dsp_bank_b_8->base()) + offset);
+}
+
+
+uint16_t polygonet_state::dsp_ram_a_c_read(offs_t offset)
+{
+	uint16_t data = m_dsp_share[offset];
+	LOGMASKED(LOG_DSP_AC, "%s: DSP Reading from Mapping A, Cxxx RAM[%04x]: %04x\n", machine().describe_context(), 0xc000 + offset, data);
+	return data;
+}
+
+void polygonet_state::dsp_ram_a_c_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_DSP_AC, "%s: DSP Writing to Mapping A, Cxxx RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + offset, data);
+	COMBINE_DATA(&m_dsp_share[offset]);
+}
+
+
+uint16_t polygonet_state::dsp_ram_a_e_read(offs_t offset)
+{
+	uint16_t data = m_dsp_a_e[offset];
+	LOGMASKED(LOG_DSP_AE, "%s: DSP Reading from Mapping A, Exxx RAM[%04x]: %04x\n", machine().describe_context(), 0xe000 + offset, data);
+	return data;
+}
+
+void polygonet_state::dsp_ram_a_e_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_DSP_AE, "%s: DSP Writing to Mapping A, Exxx RAM[%04x] = %04x\n", machine().describe_context(), 0xe000 + offset, data);
+	COMBINE_DATA(&m_dsp_a_e[offset]);
 }
 
 
@@ -430,13 +439,13 @@ void polygonet_state::main_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x400000, 0x40001f).rw(m_k053936, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
-	map(0x440000, 0x440fff).rw(FUNC(polygonet_state::roz_ram_r), FUNC(polygonet_state::roz_ram_w));
+	map(0x440000, 0x440fff).ram().share(m_roz_vram).w(FUNC(polygonet_state::roz_vram_w));
 	map(0x480000, 0x480003).r(FUNC(polygonet_state::inputs_r));
 	map(0x4c0000, 0x4c0003).w(FUNC(polygonet_state::sys_w));
-	map(0x500000, 0x503fff).ram().rw(FUNC(polygonet_state::shared_ram_read), FUNC(polygonet_state::shared_ram_write)).share("shared_ram");
+	map(0x500000, 0x503fff).ram().rw(FUNC(polygonet_state::shared_ram_read), FUNC(polygonet_state::shared_ram_write));
 	map(0x504000, 0x504003).w(FUNC(polygonet_state::dsp_w_lines));
 	map(0x506000, 0x50600f).rw(FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
-	map(0x540000, 0x540fff).rw(FUNC(polygonet_state::ttl_ram_r), FUNC(polygonet_state::ttl_ram_w));
+	map(0x540000, 0x540fff).ram().share(m_ttl_vram).w(FUNC(polygonet_state::ttl_vram_w));
 	map(0x541000, 0x54101f).ram();
 	map(0x580000, 0x5807ff).ram();
 	map(0x580800, 0x580803).r(FUNC(polygonet_state::network_r)).nopw(); /* network RAM | registers? */
@@ -452,19 +461,26 @@ void polygonet_state::main_map(address_map &map)
 
 void polygonet_state::dsp_program_map(address_map &map)
 {
-	map(0x7000, 0x7fff).ram().share("dsp_p_mirror"); /* Unsure of size, but 0x1000 matches bank01 */
-	map(0x8000, 0x87ff).ram().share("dsp_p_8000");
+	map(0x7000, 0x7fff).ram().share(m_dsp_common);
+	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc000).r(FUNC(polygonet_state::dsp_bootload_r));
 }
 
 void polygonet_state::dsp_data_map(address_map &map)
 {
-	map(0x0800, 0x5fff).ram();      /* Appears to not be affected by banking? */
-	map(0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_bank00_read), FUNC(polygonet_state::dsp_ram_bank00_write));
-	map(0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_bank01_read), FUNC(polygonet_state::dsp_ram_bank01_write));  /* Mirrored in program space @ 0x7000 */
-	map(0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_bank02_read), FUNC(polygonet_state::dsp_ram_bank02_write));
-	map(0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_shared_ram_read), FUNC(polygonet_state::dsp_shared_ram_write));
-	map(0xe000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_bank04_read), FUNC(polygonet_state::dsp_ram_bank04_write));
+    map(0x0800, 0xffff).view(m_dsp_data_view);
+
+    m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+    m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
+    m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+    m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
+    m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
+    m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+
+	m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+    m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
+    m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
+    m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
 }
 
 /**********************************************************************************/
@@ -531,9 +547,6 @@ void polygonet_state::machine_reset()
 	m_sound_ctrl = 0;
 
 	m_dsp_portc = 0;
-	m_dsp_bank_group = 0;
-	m_dsp_bank_num = 0;
-	memset(m_dsp_bank_offsets, 0, sizeof(m_dsp_bank_offsets));
 
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	m_dsp->set_input_line(DSP56156_IRQ_RESET, ASSERT_LINE);
@@ -545,32 +558,19 @@ void polygonet_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	/* Initialize space for DSP banking */
-	m_dsp_bank00_ram = std::make_unique<uint16_t[]>(2 * 8 * dsp_bank00_size); /* 2 bank sets, 8 potential banks each */
-	m_dsp_bank01_ram = std::make_unique<uint16_t[]>(2 * 8 * dsp_bank01_size);
-	m_dsp_bank02_ram = std::make_unique<uint16_t[]>(2 * 8 * dsp_bank02_size);
-	m_dsp_shared_ram_16 = std::make_unique<uint16_t[]>(2 * 8 * dsp_shared_ram_16_size);
-	m_dsp_bank04_ram = std::make_unique<uint16_t[]>(2 * 8 * dsp_bank04_size);
-	memset(&m_dsp_bank00_ram[0], 0, 2 * 8 * dsp_bank00_size * sizeof(uint16_t));
-	memset(&m_dsp_bank01_ram[0], 0, 2 * 8 * dsp_bank01_size * sizeof(uint16_t));
-	memset(&m_dsp_bank02_ram[0], 0, 2 * 8 * dsp_bank02_size * sizeof(uint16_t));
-	memset(&m_dsp_shared_ram_16[0], 0, 2 * 8 * dsp_shared_ram_16_size * sizeof(uint16_t));
-	memset(&m_dsp_bank04_ram[0], 0, 2 * 8 * dsp_bank04_size * sizeof(uint16_t));
+	/* Initialize DSP banking */
+    m_dsp_bank_a_8->configure_entries(0, 8, m_dsp_ram_a_8.target(), 0x4000 * 2);
+    m_dsp_bank_b_6->configure_entries(0, 4, m_dsp_ram_b_6.target(), 0x1000 * 2);
+    m_dsp_bank_b_7->configure_entries(0, 4, m_dsp_ram_b_7.target(), 0x1000 * 2);
+    m_dsp_bank_b_8->configure_entries(0, 8, m_dsp_ram_b_8.target(), 0x8000 * 2);
+    m_dsp_data_view.select(0);
 
 	/* save states */
-	save_pointer(NAME(m_dsp_bank00_ram), 2 * 8 * dsp_bank00_size);
-	save_pointer(NAME(m_dsp_bank01_ram), 2 * 8 * dsp_bank01_size);
-	save_pointer(NAME(m_dsp_bank02_ram), 2 * 8 * dsp_bank02_size);
-	save_pointer(NAME(m_dsp_shared_ram_16), 2 * 8 * dsp_shared_ram_16_size);
-	save_pointer(NAME(m_dsp_bank04_ram), 2 * 8 * dsp_bank04_size);
 	save_item(NAME(m_sys0));
 	save_item(NAME(m_sys1));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 	save_item(NAME(m_dsp_portc));
-	save_item(NAME(m_dsp_bank_group));
-	save_item(NAME(m_dsp_bank_num));
-	save_item(NAME(m_dsp_bank_offsets));
 }
 
 WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)

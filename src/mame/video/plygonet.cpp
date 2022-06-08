@@ -18,67 +18,44 @@
 
 TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 {
-	int attr, code;
-
-	code = m_ttl_vram[tile_index]&0xfff;
-
-	attr = m_ttl_vram[tile_index]>>12;  /* palette in all 4 bits? */
+	uint16_t *ttl_vram = (uint16_t *)&m_ttl_vram[0];
+	int code = ttl_vram[tile_index] & 0xfff;
+	int attr = ttl_vram[tile_index] >> 12;  /* palette in all 4 bits? */
 
 	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
-	int attr, code;
-
-	attr = (m_roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
-	code = m_roz_vram[tile_index] & 0x3ff;
+	uint16_t *roz_vram = (uint16_t *)&m_roz_vram[0];
+	int code = roz_vram[tile_index] & 0x3ff;
+	int attr = (roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
 
 	tileinfo.set(0, code, attr, 0);
 }
 
-uint32_t polygonet_state::ttl_ram_r(offs_t offset)
+void polygonet_state::ttl_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t *vram = (uint32_t *)m_ttl_vram;
-
-	return vram[offset];
+	COMBINE_DATA(&m_ttl_vram[offset]);
+	m_ttl_tilemap->mark_tile_dirty(offset << 1);
+	m_ttl_tilemap->mark_tile_dirty((offset << 1) + 1);
 }
 
-void polygonet_state::ttl_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void polygonet_state::roz_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t *vram = (uint32_t *)m_ttl_vram;
-
-	COMBINE_DATA(&vram[offset]);
-
-	m_ttl_tilemap->mark_tile_dirty(offset*2);
-	m_ttl_tilemap->mark_tile_dirty(offset*2+1);
-}
-
-uint32_t polygonet_state::roz_ram_r(offs_t offset)
-{
-	uint32_t *vram = (uint32_t *)m_roz_vram;
-
-	return vram[offset];
-}
-
-void polygonet_state::roz_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	uint32_t *vram = (uint32_t *)m_roz_vram;
-
-	COMBINE_DATA(&vram[offset]);
-
-	m_roz_tilemap->mark_tile_dirty(offset*2);
-	m_roz_tilemap->mark_tile_dirty(offset*2+1);
+	COMBINE_DATA(&m_roz_vram[offset]);
+	m_roz_tilemap->mark_tile_dirty(offset << 1);
+	m_roz_tilemap->mark_tile_dirty((offset << 1) + 1);
 }
 
 TILEMAP_MAPPER_MEMBER(polygonet_state::scan_rows)
 {
-	return row * num_cols + (col^1);
+	return row * num_cols + (col ^ 1);
 }
 
 TILEMAP_MAPPER_MEMBER(polygonet_state::scan_cols)
 {
-	return col * num_rows + (row^1);
+	return col * num_rows + (row ^ 1);
 }
 
 void polygonet_state::video_start()
@@ -115,8 +92,6 @@ void polygonet_state::video_start()
 
 	/* save states */
 	save_item(NAME(m_ttl_gfx_index));
-	save_item(NAME(m_ttl_vram));
-	save_item(NAME(m_roz_vram));
 }
 
 uint32_t polygonet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
