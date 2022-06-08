@@ -9938,6 +9938,34 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The files inside the floppy disks are the same of the other French release, but the files' date are newer -->
+	<software name="aitdfr1" cloneof="aitd">
+		<description>Alone in the Dark (France, newer)</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="940a3e1f" sha1="a4d9e129fded8abf91d695a608dea5019002b8c0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="441abc41" sha1="c3ec05f8cee5c278a10aeda75d4bc955f1cf95a6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="912ffe59" sha1="12d186a5ba22d956ff44227b5f79707326535f71"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="1e0c9e72" sha1="8441b44b82d404424c67873b9c639b15ae6254ae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitdes" cloneof="aitd">
 		<description>Alone in the Dark (Spain, Top Games/Altaya release)</description>
 		<year>1993</year>
@@ -10587,6 +10615,29 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The floppy disks are strangely labelled "Eternam" - necessary to validate if it's a good dmup -->
+	<software name="hillbill">
+		<description>The Beverly Hillbillies</description>
+		<year>1993</year>
+		<publisher>Capstone</publisher>
+		<info name="developer" value="Synergistic Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Beverly Hillbillies [Capstone] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3841379e" sha1="b676272a73f653500ab1545ecd64f2709377e445"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Beverly Hillbillies [Capstone] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="c97609cd" sha1="6e0e1d8d24af45fc083d8605fb6cb176f36342a3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Beverly Hillbillies [Capstone] [1993]  [3.5HD] [Disk 3 of 3].img" size="1474560" crc="034bc286" sha1="64c713beaa747360c09129400369feca14ff034f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -11047,6 +11098,19 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen4sw">
+		<description>Commander Keen in Secret of the Oracle (shareware)</description>
+		<year>1993</year>
+		<publisher>CrystalVision Brand Software</publisher>
+		<info name="developer" value="id Software" />
+		<info name="version" value="v1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen IV (shareware) [Crystalvision Software] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b3139974" sha1="d8c1354ff1f8c1307d11266a3eb4efefd66643b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12254,6 +12318,17 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Duke Nukem II (USA) (Disk 2).img" size="1474560" crc="07a5265f" sha1="2b7e949dd818263153dcd2874e772d89e95b092f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duke2sw" cloneof="duke2">
+		<description>Duke Nukem II (shareware, $5 Computer Store - Wiz Technology release)</description>
+		<year>1994</year>
+		<publisher>Wiz Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Duke Nukem II (shareware) [Wiz Technology] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="d19d39ab" sha1="68502716d0e4e3fec2f7875346f0b651f8c17994"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13663,7 +13738,25 @@ license:CC0
 	</software>
 
 	<software name="gs2000">
-		<description>Gunship 2000</description>
+		<description>Gunship 2000 (3.5" HD, v469.0605)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="469.0605" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gunship 2000 [MicroProse] [1993] [3.5HD] [Disk 1 of 2] [Disk A].img" size="1474560" crc="edea41c9" sha1="b53b12313cd2ce2b4bc0271b827faed8ed16ab68"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gunship 2000 [MicroProse] [1993] [3.5HD] [Disk 2 of 2] [Disk B].img" size="1474560" crc="093b5a1f" sha1="07fc8ae6d0e75cb374e37c6e9464e45a0e9fcddb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs2000a" cloneof="gs2000">
+		<description>Gunship 2000 (3.5" DD, v469.02)</description>
 		<year>1991</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MicroProse" />
@@ -13686,6 +13779,80 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Gunship 2000 [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="3dd3f5a6" sha1="d981a909fa08cf21d0cd975fd80b5b39ec9dcbe2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs2000b" cloneof="gs2000">
+		<description>Gunship 2000 (3.5" DD, v469.03)</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="469.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk A].img" size="737280" crc="ee9da48a" sha1="9e212a805d73776fb5aeaea44786d12c5ec93b86"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk B].img" size="737280" crc="1811c2ee" sha1="269425fb84c3239e822c36c6c90e352ad4477caf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk C].img" size="737280" crc="eb1404e7" sha1="996ccde0b6a0bc5229cc097ef7d198814df2abb6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [3.5DD] [Disk D].img" size="737280" crc="d48db926" sha1="d19d8c7fd222cdda239d88df28287776fe2f9a9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs2000_525" cloneof="gs2000">
+		<description>Gunship 2000 (5.25" HD, v469.03)</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="469.03" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="ba3487fa" sha1="c3da81754a433793d255a0a193e5c222eed00d49"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="a764b534" sha1="d7ffd705dd597c2a018a9604a2a56e6ce970c1ca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.03) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="47d0811e" sha1="5f507635ecef767095356cc0251f9d7585776ec7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs2000_525a" cloneof="gs2000">
+		<description>Gunship 2000 (5.25" HD, v469.02)</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="469.02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk A].img" size="1228800" crc="bd4d0ce9" sha1="dd3a13d5ff85a200fa8ab564f522e3e213fa702d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk B].img" size="1228800" crc="04c5ed46" sha1="b77dd4395c2933a908748797aba662b273e4ebc8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Gunship 2000 (469.02) [MicroProse] [1991] [5.25HD] [Disk C].img" size="1228800" crc="14fa3e09" sha1="7b276418c6e6f78e74ea80a22137cc76cbd8576d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13945,41 +14112,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hyperspd">
-		<description>Hyperspeed (3.5" DD)</description>
-		<year>1991</year>
-		<publisher>MicroProse</publisher>
-		<info name="developer" value="MPS Labs" />
+	<software name="hiredgun">
+		<description>Hired Guns</description>
+		<year>1993</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design Limited" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="8c8f9a94" sha1="433dbddc7ca7ba2609aa02531e0e8437eefb5608"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Hired Guns [Psygnosis] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="2d9f55cf" sha1="d9957d6626ad573af69998ac98c11fac60ae3f48"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 2 of 3].img" size="737280" crc="6c1bc667" sha1="bd973ce3922ea28622a4d55fa91bed15fd41b2ce"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="398f7753" sha1="a1a5af101c842f6e603a5bb279e29ad477745e02"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hyperspd525" cloneof="hyperspd">
-		<description>Hyperspeed (5.25" HD)</description>
-		<year>1991</year>
-		<publisher>MicroProse</publisher>
-		<info name="developer" value="MPS Labs" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "1228800">
-				<rom name="Hyperspeed [Microprose] [1991] [5.25HD] [Disk A].img" size="1228800" crc="a0c6ba05" sha1="5be8302936b76394b29b767ef95dd339b7e19d22"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "1228800">
-				<rom name="Hyperspeed [Microprose] [1991] [5.25HD] [Disk B].img" size="1228800" crc="1974ae9d" sha1="a7b79de112e19e427d041637e9eb7ba206356523"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Hired Guns [Psygnosis] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="9c8cc081" sha1="17f9a5272a5f412452d583c8b88c82b36f0f6974"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14063,6 +14208,45 @@ license:CC0
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="1e0e73ed" sha1="e0fcd8422b91c8d3ea00e5706be871e9a4cf408c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspd">
+		<description>Hyperspeed (3.5" DD)</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="8c8f9a94" sha1="433dbddc7ca7ba2609aa02531e0e8437eefb5608"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 2 of 3].img" size="737280" crc="6c1bc667" sha1="bd973ce3922ea28622a4d55fa91bed15fd41b2ce"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="398f7753" sha1="a1a5af101c842f6e603a5bb279e29ad477745e02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspd525" cloneof="hyperspd">
+		<description>Hyperspeed (5.25" HD)</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Hyperspeed [Microprose] [1991] [5.25HD] [Disk A].img" size="1228800" crc="a0c6ba05" sha1="5be8302936b76394b29b767ef95dd339b7e19d22"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Hyperspeed [Microprose] [1991] [5.25HD] [Disk B].img" size="1228800" crc="1974ae9d" sha1="a7b79de112e19e427d041637e9eb7ba206356523"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16186,6 +16370,114 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Includes: Asteroids, Battlezone, Centipede, Missile Command, Tempest -->
+	<software name="msarcade">
+		<description>Microsoft Arcade</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Arcade [Microsoft] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="c67a3e7c" sha1="57977ba651e20b3a731d756a19be60d121537ef9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This pack includes: Tetris, Minesweeper, Cruel, Golf, TicTactics, Taipei, Pegged, IdleWild -->
+	<software name="msentp1">
+		<description>Microsoft Entertainment Pack</description>
+		<year>1990</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack [Microsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7cbdfa34" sha1="aafedd723426a34d367f1c30e9d5748c5691b0a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This pack includes: FreeCell, JigSawed, Pipe Dream, Rodent's Revenge, RattlerRace, Stones, Tut's Tomb, IdleWild -->
+	<software name="msentp2">
+		<description>Microsoft Entertainment Pack 2</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="6e9bb9ed" sha1="f58f33d635c8177c170fa559c536effafa18e7b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e027bfe4" sha1="245cfab1538c06fd92732b95c9685c9b7e8f2f66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This pack includes: Fuji Golf, Klotski, LifeGenesis, SkieFree, TetraVex, TriPeaks, WordZap, IdleWild -->
+	<software name="msentp3">
+		<description>Microsoft Entertainment Pack 3</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 3 [Microsoft] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ea49d42a" sha1="843c3ccc003b8a83d205bf07084eea0528622a9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This pack includes: JezzBall, Maxwell's Maniac, Chip's Challenge, Dr. Black Jack, Tic Tac Drop, Go Figure!, Chess -->
+	<software name="msentp4">
+		<description>Microsoft Entertainment Pack 4</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="732c46b7" sha1="b0c7d2d2b4b54b32620c6b9fbe75036459c40987"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="154a3654" sha1="7d0892b35a845e6c26331f4de566cdfc30c1aac0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp4a" cloneof="msentp4">
+		<description>Microsoft Entertainment Pack 4 (alt)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="28a4bf38" sha1="24c8951ebf28a2511e14b68ede428f1cf965e32e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c57a1fb2" sha1="274cb6dae354cb5494b210939372d712be990403"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim50">
+		<description>Microsoft Flight Simulator 5.0</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Flight Simulator 5.0 [Microsoft] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="27ac12e9" sha1="7b90626a7a4762e7c775d7d862cb8a0b19067c41"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Flight Simulator 5.0 [Microsoft] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="0176da38" sha1="0888d6d01a9db15fa4c6c3b14b40fc0ce539b1ae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msroa">
 		<description>Microsoft Return of Arcade</description>
 		<year>1996</year>
@@ -16359,6 +16651,18 @@ license:CC0
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="b4bf3f18" sha1="645ff70bda55a7d39da285916ebfac487160d32a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikditka">
+		<description>Mike Ditka Ultimate Football</description>
+		<year>1991</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Mike Ditka Ultimate Football [Accolade] [1991] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="f2094e3a" sha1="abb345fd0cd9257cc82f92e9e7da425e912c47d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17694,6 +17998,20 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Modified RootDir but it's a factory setting. -->
+	<software name="retrocty">
+		<description>Retro City Rampage: 486</description>
+		<year>2015</year>
+		<publisher>Vblank Entertainment</publisher>
+		<info name="developer" value="Vblank Entertainment" />
+		<info name="version" value="version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Retro City Rampage [Vblank] [2015] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="208239c0" sha1="24eac71b9ac831a2975d444551aa286bd8d3de74"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rphantom">
 		<description>Return of the Phantom</description>
 		<year>1993</year>
@@ -18411,6 +18729,7 @@ license:CC0
 		<description>SimAnt (Windows 3.x release)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="5ec6bb7d" sha1="7666d4e9b3d78ca109481c5225ebc51e286b51f8"/>
@@ -18427,6 +18746,7 @@ license:CC0
 		<description>SimCity Classic (Windows 3.x release) (3.5")</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -18444,6 +18764,7 @@ license:CC0
 		<description>SimCity Classic (Windows 3.x release) (5.25")</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
