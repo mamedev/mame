@@ -15,6 +15,7 @@
 
 #include "machine/bacta_datalogger.h"
 #include "machine/meters.h"
+#include "machine/mpu4_characteriser_bootleg.h"
 #include "machine/mpu4_characteriser_pal.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
@@ -122,6 +123,9 @@ public:
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
 		, m_characteriser(*this, "characteriser")
+		, m_characteriser_bl(*this, "characteriser_bl")
+		, m_characteriser_blastbank(*this, "characteriser_blastbank")
+		, m_characteriser_copcash(*this, "characteriser_copcash")
 		, m_duart68681(*this, "duart68681")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
@@ -135,14 +139,6 @@ public:
 
 
 	void init_m4default_big_aux2inv();
-
-
-	void init_m4default_812prot_fixed();
-	void init_m4default_812prot();
-	void init_m4default_814prot();
-	void init_m4default_812altprot();
-	void init_m4default_814altprot();
-	void init_m4default_812alt2prot();
 	void init_m4default_806prot();
 
 	void init_crystali();
@@ -199,6 +195,9 @@ public:
 	template<const uint8_t* Table> void mod2_cheatchr_xxxx(machine_config &config)
 	{
 		mod2(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
@@ -208,6 +207,9 @@ public:
 	template<const uint8_t* Table> void mod2_alt_cheatchr_xxxx(machine_config &config)
 	{
 		mod2_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
@@ -217,6 +219,9 @@ public:
 	template<const uint8_t* Table> void mod4oki_cheatchr_xxxx(machine_config &config)
 	{
 		mod4oki(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
@@ -226,6 +231,9 @@ public:
 	template<const uint8_t* Table> void mod4oki_alt_cheatchr_xxxx(machine_config &config)
 	{
 		mod4oki_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
@@ -235,6 +243,9 @@ public:
 	template<const uint8_t* Table> void mod4yam_cheatchr_xxxx(machine_config &config)
 	{
 		mod4yam(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
@@ -244,10 +255,23 @@ public:
 	template<const uint8_t* Table> void mod4oki_5r_cheatchr_xxxx(machine_config &config)
 	{
 		mod4oki_5r(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 		m_characteriser->set_cpu_tag("maincpu");
 		m_characteriser->set_allow_6809_cheat(true);
 		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki_5r(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
 	}
 
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
@@ -256,23 +280,43 @@ public:
 	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
 	{
 		mod2(config);
-		MPU4_CHARACTERISER_BOOTLEG_PAL(config, m_characteriser, 0);
-		m_characteriser->set_bootleg_fixed_return(Fixed);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
 	}
 
 	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config)
 	{
 		mod4yam(config);
-		MPU4_CHARACTERISER_BOOTLEG_PAL(config, m_characteriser, 0);
-		m_characteriser->set_bootleg_fixed_return(Fixed);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
 	}
 
 	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config)
 	{
 		mod4oki(config);
-		MPU4_CHARACTERISER_BOOTLEG_PAL(config, m_characteriser, 0);
-		m_characteriser->set_bootleg_fixed_return(Fixed);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
 	}
+
+	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
 
 	void mod2_chr_blastbnk(machine_config &config);
 	void mod2_chr_copcash(machine_config &config);
@@ -309,6 +353,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(update_ic24);
 	
 	void mpu4_memmap(address_map &map);
+	void mpu4_memmap_characteriser(address_map &map);
+	void mpu4_memmap_bootleg_characteriser(address_map &map);
+
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
 	void led_write_extender(int latch, int data, int column);
@@ -336,10 +383,10 @@ protected:
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
-	void characteriser_w(offs_t offset, uint8_t data);
-	uint8_t characteriser_r(address_space &space, offs_t offset);
+
 	void bwb_characteriser_w(offs_t offset, uint8_t data);
 	uint8_t bwb_characteriser_r(offs_t offset);
+
 	void mpu4_ym2413_w(offs_t offset, uint8_t data);
 	uint8_t mpu4_ym2413_r(offs_t offset);
 	uint8_t crystal_sound_r();
@@ -391,10 +438,7 @@ protected:
 		return machine().rand() & 0x10;
 	}
 
-	uint8_t bootleg814_r(address_space &space, offs_t offset);
-	uint8_t bootleg814alt_r(address_space &space, offs_t offset);
-	uint8_t bootleg814alt2_r(address_space &space, offs_t offset);
-	uint8_t bootleg814_2d_r(address_space &space, offs_t offset);
+
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
@@ -420,6 +464,11 @@ protected:
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;
+	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
+	optional_device<mpu4_characteriser_bl_blastbank> m_characteriser_blastbank;
+	optional_device<mpu4_characteriser_bl_copcash> m_characteriser_copcash;
+
+
 	optional_device<mc68681_device> m_duart68681;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
@@ -502,4 +551,3 @@ protected:
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
 
-INPUT_PORTS_EXTERN( mpu4 );

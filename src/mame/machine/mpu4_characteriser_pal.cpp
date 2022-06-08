@@ -38,8 +38,6 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal, "mpu4chrpal", "Barcrest MPU4 Characteriser PAL")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4chrpalbwb", "Barcrest MPU4 Characteriser PAL (BWB type)")
 
-DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL, mpu4_characteriser_bootleg, "mpu4chrpalboot19", "Barcrest MPU4 Characteriser PAL (bootleg type)")
-
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank, "mpu4chrpalboot_blast", "Barcrest MPU4 Characteriser PAL (Bank A Blast)")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash, "mpu4chrpalboot_copcash", "Barcrest MPU4 Characteriser PAL (Coppa Cash)")
 

@@ -1792,25 +1792,6 @@ void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
 	//  bwb_characteriser_w(offset, data);
 }
 
-
-uint8_t mpu4_state::characteriser_r(address_space &space, offs_t offset)
-{
-	if (m_characteriser)
-		return m_characteriser->read(offset);
-	else
-		logerror("%s: characteriser_r with no characteriser device %02x\n", machine().describe_context(), offset);
-
-	return 0x00;
-}
-
-void mpu4_state::characteriser_w(offs_t offset, uint8_t data)
-{
-	if (m_characteriser)
-		m_characteriser->write(offset, data);
-	else
-		logerror("%s: characteriser_w with no characteriser device %02x %02x\n", machine().describe_context(), offset, data);
-}
-
 /* Common configurations */
 
 void mpu4_state::mpu4_ym2413_w(offs_t offset, uint8_t data)
@@ -2200,7 +2181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 void mpu4_state::mpu4_memmap(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x0800, 0x0810).rw(FUNC(mpu4_state::characteriser_r), FUNC(mpu4_state::characteriser_w));
+//	map(0x0800, 0x081f) // optional protection device lives here, see other maps
 	map(0x0850, 0x0850).rw(FUNC(mpu4_state::bankswitch_r), FUNC(mpu4_state::bankswitch_w));    /* write bank (rom page select) */
 	map(0x08e0, 0x08ef).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)); //Runs hoppers
 	map(0x08ed, 0x08ed).r(FUNC(mpu4_state::hack_duart_r)); // hack until the hopper is hooked up to the duart in games wanting that setup (eg m4ready)
@@ -2212,6 +2193,18 @@ void mpu4_state::mpu4_memmap(address_map &map)
 	map(0x0e00, 0x0e03).rw(m_pia7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC7 */
 	map(0x0f00, 0x0f03).rw(m_pia8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC8 */
 	map(0x1000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
+}
+
+void mpu4_state::mpu4_memmap_characteriser(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0800, 0x0810).rw(m_characteriser, FUNC(mpu4_characteriser_pal::read), FUNC(mpu4_characteriser_pal::write));
+}
+
+void mpu4_state::mpu4_memmap_bootleg_characteriser(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0800, 0x081f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
 }
 
 template<const uint8_t ReelNo, uint8_t Type>
@@ -2378,6 +2371,9 @@ void mpu4_state::mod2(machine_config &config)
 void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2390,6 +2386,9 @@ void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* tabl
 void mpu4_state::mod2_chr(machine_config &config)
 {
 	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 }
 
@@ -2402,6 +2401,8 @@ void mpu4_state::mod2_cheatchr(machine_config &config)
 void mpu4_state::mod2_chr_blastbnk(machine_config &config)
 {
 	mod2(config);
+
+
 	MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK(config, m_characteriser, 0);
 }
 
@@ -2428,6 +2429,9 @@ void mpu4_state::mod2_alt(machine_config &config)
 void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2462,12 +2466,18 @@ void mpu4_state::mod4yam(machine_config &config)
 void mpu4_state::mod4yam_chr(machine_config &config)
 {
 	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 }
 
 void mpu4_state::mod4yam_cheatchr_table(machine_config& config, const uint8_t* table)
 {
 	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2507,6 +2517,9 @@ void mpu4_state::mod4oki(machine_config &config)
 void mpu4_state::mod4oki_chr(machine_config &config)
 {
 	mod4oki(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 }
 
@@ -2514,6 +2527,9 @@ void mpu4_state::mod4oki_chr(machine_config &config)
 void mpu4_state::mod4oki_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod4oki(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2547,6 +2563,9 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 void mpu4_state::mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table)
 {
 	mod4oki_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2577,12 +2596,18 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 void mpu4_state::mod4oki_5r_chr(machine_config &config)
 {
 	mod4oki_5r(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 }
 
 void mpu4_state::mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod4oki_5r(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
@@ -2627,79 +2652,6 @@ void mpu4_state::mpu4crys(machine_config &config)
   Inits
 
 ***********************************************************************************************/
-
-
-
-
-
-// many bootlegs have an initial protection check reading 0x814 or 0x812
-// if it passes, other checks are skipped.
-//
-// this could be a trap, maybe this one is meant to fail and the others are meant to pass
-
-uint8_t mpu4_state::bootleg814_r(address_space &space, offs_t offset)
-{
-	int addr = m_maincpu->state_int(M6809_PC);
-	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
-	return m_maincpu->space(AS_PROGRAM).read_byte(addr+8);
-}
-
-uint8_t mpu4_state::bootleg814alt_r(address_space &space, offs_t offset)
-{
-	int addr = m_maincpu->state_int(M6809_PC);
-	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
-	return m_maincpu->space(AS_PROGRAM).read_byte(addr+6);
-}
-
-uint8_t mpu4_state::bootleg814alt2_r(address_space &space, offs_t offset)
-{
-	int addr = m_maincpu->state_int(M6809_PC);
-	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
-	return m_maincpu->space(AS_PROGRAM).read_byte(addr+3);
-}
-
-void mpu4_state::init_m4default_812prot()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
-}
-
-void mpu4_state::init_m4default_814prot()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
-}
-
-void mpu4_state::init_m4default_812altprot()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
-}
-
-void mpu4_state::init_m4default_812alt2prot()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt2_r)));
-}
-
-void mpu4_state::init_m4default_814altprot()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
-}
-
-uint8_t mpu4_state::bootleg814_2d_r(address_space &space, offs_t offset)
-{
-	logerror("%s: bootleg814_2d_r offset %02x\n", machine().describe_context(), offset);
-	return 0x2d;
-}
-
-
-void mpu4_state::init_m4default_812prot_fixed()
-{
-	init_m4default();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::characteriser_r)));
-}
 
 uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
 {

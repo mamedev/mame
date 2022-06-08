@@ -13,7 +13,7 @@
 
 namespace {
 
-	class mpu4plasma_state : public mpu4_state
+class mpu4plasma_state : public mpu4_state
 {
 public:
 	mpu4plasma_state(const machine_config &mconfig, device_type type, const char *tag)
