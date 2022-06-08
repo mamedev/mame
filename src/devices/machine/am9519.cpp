@@ -126,7 +126,6 @@ void am9519_device::set_irq_line(int irq, int state)
 		LOG("am9519_device::set_irq_line(): UIC cleared IRQ line #%d\n", irq);
 
 		m_irq_lines &= ~mask;
-		m_irr &= ~mask;
 	}
 	m_irq_check_timer->adjust(attotime::zero);
 }

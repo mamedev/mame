@@ -39,6 +39,13 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+enum map_mux_mask : u8
+{
+	MM_ENB = 0x01, // mapper enabled
+	MM_INT = 0x02, // interrupt map mode selected (mapnum=0)
+	MM_PND = 0x04, // map mode change pending next non-instruction memory read
+};
+
 enum mapwr1_mask : u8
 {
 	MAPWR1_MA19 = 0x10, // multibus address bit 19
@@ -70,6 +77,7 @@ labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char c
 	, m_fdc(*this, "fdc")
 	, m_dma(*this, "dma%u", 0U)
 	, m_sio(*this, "sio")
+	, m_int(*this, "int")
 	, m_fdd(*this, "fdd%u", 0U)
 	, m_eprom(*this, "eprom%u", 0U)
 	, m_e15(*this, "E15%c", 'A')
@@ -230,7 +238,7 @@ void labtam_z80sbc_device::device_start()
 	save_pointer(NAME(m_map_lo), 256);
 	save_pointer(NAME(m_map_hi), 256);
 
-	save_item(NAME(m_map_enabled));
+	save_item(NAME(m_map_mux));
 	save_item(NAME(m_map_num));
 }
 
@@ -254,8 +262,9 @@ void labtam_z80sbc_device::device_reset()
 		m_installed = true;
 	}
 
-	m_map_enabled = false;
+	m_map_mux = 0;
 	m_map_num = 0;
+	m_fdcstatus = 0x3c;
 
 	m_dma[0]->iei_w(1);
 }
@@ -268,21 +277,36 @@ static void z80sbc_floppies(device_slot_interface &device)
 	device.option_add("dsdd8", FLOPPY_8_DSDD);
 }
 
+static const z80_daisy_config daisy_chain[] = { { "dma0" }, { "dma1" }, { "sio" }, { nullptr } };
+
 void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_cpu, 20_MHz_XTAL / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &labtam_z80sbc_device::cpu_mem);
+	m_cpu->set_addrmap(AS_OPCODES, &labtam_z80sbc_device::cpu_mem);
 	m_cpu->set_addrmap(AS_IO, &labtam_z80sbc_device::cpu_pio);
+	m_cpu->irqack_cb().set([this](int state) { m_map_mux |= MM_PND; });
+	m_cpu->set_daisy_config(daisy_chain);
 	m_cpu->set_irq_acknowledge_callback(m_uic, FUNC(am9519_device::iack_cb));
 
+	INPUT_MERGER_ANY_HIGH(config, m_int);
+	m_int->output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+
 	/*
-	 * While not a full Z80 daisy chain, the Z80DMAs, Z80SIO and Am9519 have
-	 * their EI/EO lines connected such that only one will assert the Z80
-	 * /INT line at once.
+	 * The Z80DMAs, Z80SIO and Am9519 are all connected to the Z80 /INT line,
+	 * with EI/EO lines used to control request priority. The Am9519 does not
+	 * support the full Z80 IM2 interrupt protocol and the RETI instruction is
+	 * not used by the system firmware.
+	 *
+	 * This logic is emulated using an input merger for the interrupt line, a
+	 * Z80 daisy-chain for the DMA and SIO devices and a regular interrupt
+	 * acknowledge callback handler for the UIC. This has the side-effect of
+	 * making the UIC the lowest-priority device despite not emulating and
+	 * connecting its EI/EO lines.
 	 */
 
 	Z80DMA(config, m_dma[0], 20_MHz_XTAL / 4);
-	m_dma[0]->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_dma[0]->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<0>));
 	m_dma[0]->out_ieo_callback().set(m_dma[1], FUNC(z80dma_device::iei_w));
 	m_dma[0]->out_busreq_callback().set(m_dma[0], FUNC(z80dma_device::bai_w));
 	m_dma[0]->in_mreq_callback().set(FUNC(labtam_z80sbc_device::map_r<7>));
@@ -291,7 +315,7 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 	m_dma[0]->out_iorq_callback().set(m_fdc, FUNC(wd2793_device::data_w));
 
 	Z80DMA(config, m_dma[1], 20_MHz_XTAL / 4);
-	m_dma[1]->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_dma[1]->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<1>));
 	//m_dma[1]->out_ieo_callback().set(m_sio, FUNC(z80sio_device::iei_w));
 	m_dma[1]->out_busreq_callback().set(m_dma[1], FUNC(z80dma_device::bai_w));
 	m_dma[1]->in_mreq_callback().set(FUNC(labtam_z80sbc_device::map_r<7>));
@@ -299,16 +323,15 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 
 	// TODO: implement iei/ieo on z80sio
 	Z80SIO(config, m_sio, 20_MHz_XTAL / 4);
-	//m_sio->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_sio->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<2>));
 	//m_sio->out_ieo_callback().set(m_uic, FUNC(am9519_device::iei_w));
 
 	// TODO: implement iei/ieo on am9519
 	AM9519(config, m_uic);
-	m_uic->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_uic->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<3>));
 
 	WD2793(config, m_fdc, 2'000'000);
-	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w));
-	m_fdc->intrq_wr_callback().append(FUNC(labtam_z80sbc_device::int_w<3>));
+	m_fdc->intrq_wr_callback().set(FUNC(labtam_z80sbc_device::fdcint_w));
 	m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
 
 	// WD1002 irq -> Am9519 ireq3
@@ -338,13 +361,13 @@ void labtam_z80sbc_device::cpu_mem(address_map &map)
 
 void labtam_z80sbc_device::cpu_pio(address_map &map)
 {
-	//map(0x0000, 0x0000); // TODO: fdcset: set fdc interrupt
+	map(0x0000, 0x0000).lw8([this](u8 data) { LOG("fdcset 0x%02x (%s)\n", data, machine().describe_context()); }, "fdcset");
 	//map(0x0008, 0x0008); // TODO: serset: set sio interrupt
 
 	map(0x0010, 0x0010).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_lo[offset >> 8] = data; }, "mapwr0");
 	map(0x0018, 0x0018).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_hi[offset >> 8] = data & 0xf0; }, "mapwr1");
-	map(0x0020, 0x0020).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; LOG("intswt 0x%02x mapnum 0x%02x (%s)\n", data, m_map_num, machine().describe_context()); }, "intswt");
-	map(0x0028, 0x0028).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; m_map_num = data & 0x0f; LOG("mapnum 0x%02x (%s)\n", data, machine().describe_context()); }, "mapnum");
+	map(0x0020, 0x0020).mirror(0xff00).w(FUNC(labtam_z80sbc_device::intswt_w));
+	map(0x0028, 0x0028).mirror(0xff00).w(FUNC(labtam_z80sbc_device::mapnum_w));
 
 	map(0x0030, 0x0037).mirror(0xff00).w(FUNC(labtam_z80sbc_device::drive_w));
 	map(0x0038, 0x0038).mirror(0xff00).lw8([this](u8 data) { LOG("reset drive fault\n"); }, "fltrest");
@@ -366,10 +389,22 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 	map(0x00e0, 0x00ff).mirror(0xff00).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 }
 
-u8 labtam_z80sbc_device::mem_r(offs_t offset)
+u8 labtam_z80sbc_device::mem_r(address_space &space, offs_t offset)
 {
-	if (m_map_enabled)
-		return map_r(m_map_num, offset);
+	// check for and complete pending map number change
+	if ((m_map_mux & MM_PND) && (space.spacenum() == AS_PROGRAM) && !machine().side_effects_disabled())
+	{
+		m_map_mux &= ~MM_PND;
+		m_map_mux ^= MM_INT;
+	}
+
+	if (m_map_mux & MM_ENB)
+	{
+		if (m_map_mux & MM_INT)
+			return map_r(0, offset);
+		else
+			return map_r(m_map_num, offset);
+	}
 	else
 		// Theory: when mapper is deactivated, its outputs are all forced high, resulting
 		// in set RESB|MEM|WP flags and resident bus address |= 0xf800.
@@ -378,8 +413,13 @@ u8 labtam_z80sbc_device::mem_r(offs_t offset)
 
 void labtam_z80sbc_device::mem_w(offs_t offset, u8 data)
 {
-	if (m_map_enabled)
-		map_w(m_map_num, offset, data);
+	if (m_map_mux & MM_ENB)
+	{
+		if (m_map_mux & MM_INT)
+			map_w(0, offset, data);
+		else
+			map_w(m_map_num, offset, data);
+	}
 	else
 		LOG("mem_w unmapped offset 0x%04x data 0x%02x (%s)\n", offset, data, machine().describe_context());
 }
@@ -422,23 +462,71 @@ void labtam_z80sbc_device::map_w(unsigned map_num, offs_t offset, u8 data)
 
 	u32 const address = u32(hi & MAPWR1_MA19) << 15 | u32(lo) << 11 | (offset & 0x7ff);
 
-	// TODO: suppress write-protected accesses
-
-	if (hi & MAPWR1_RESB)
+	if (!(hi & MAPWR1_WP))
 	{
-		// TODO: use address space to decode resident bus
-		switch (address & 0xf000)
+		if (hi & MAPWR1_RESB)
 		{
-		case 0x2000:
-			m_sram[address & 0x7ff] = data;
-			break;
-		default:
-			LOG("map_w hi 0x%02x lo 0x%02x address 0x%05x data 0x%02x (%s)\n", hi, lo, address, data, machine().describe_context());
-			break;
+			// TODO: use address space to decode resident bus
+			switch (address & 0xf000)
+			{
+			case 0x2000:
+				m_sram[address & 0x7ff] = data;
+				break;
+			default:
+				LOG("map_w hi 0x%02x lo 0x%02x address 0x%05x data 0x%02x (%s)\n", hi, lo, address, data, machine().describe_context());
+				break;
+			}
 		}
+		else
+			m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).write_byte(address, data);
 	}
+}
+
+void labtam_z80sbc_device::intswt_w(u8 data)
+{
+	/*
+	 * Writing to this port toggles between interrupt (map number forced to 0) and
+	 * user (map number from mapnum latch) mode. The mapping mode can be applied
+	 * immediately, or only upon the next non-instruction memory read. The delay
+	 * mechanism is used to support interrupts:
+	 *
+	 *  - When an interrupt is taken, the delayed map change allows the Z80 to
+	 *    store the return address on the currently mapped stack, before switching
+	 *    to map 0 to fetch the interrupt vector address.
+	 *
+	 *  - When returning from an interrupt handler, the delayed map change allows
+	 *    further instructions (including RET) to be fetched from the interrupt
+	 *    service routine using map 0, while the return address will be fetched
+	 *    from the user mapped stack.
+	 */
+
+	LOG("intswt_w 0x%02x mapnum 0x%02x (%s)\n", data, m_map_num, machine().describe_context());
+
+	if (BIT(data, 0))
+		m_map_mux ^= MM_INT;
 	else
-		m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).write_byte(address, data);
+		m_map_mux |= MM_PND;
+}
+
+void labtam_z80sbc_device::mapnum_w(u8 data)
+{
+	LOG("mapnum 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_map_mux |= MM_ENB;
+
+	// TODO: what are bits 3, 4 and 5 used for?
+	m_map_num = data & 0x3f;
+}
+
+void labtam_z80sbc_device::fdcint_w(int state)
+{
+	if (state)
+		m_fdcstatus |= 1U << 0;
+	else
+		m_fdcstatus &= ~(1U << 0);
+
+	m_uic->ireq2_w(state);
+	int_w<3>(state);
 }
 
 void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
@@ -484,7 +572,7 @@ void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 
 void labtam_z80sbc_device::fdcclr_w(u8 data)
 {
-	LOG("fdcclr_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_uic->ireq4_w(0);
 }
 
 void labtam_z80sbc_device::netclr_w(u8 data)
@@ -501,7 +589,7 @@ void labtam_z80sbc_device::fdcattn_w(u8 data)
 u8 labtam_z80sbc_device::fdcstatus_r()
 {
 	LOG("fdcstatus_r (%s)\n", machine().describe_context());
-	return 0x3c;
+	return m_fdcstatus;
 }
 
 u8 labtam_z80sbc_device::drvstatus_r()

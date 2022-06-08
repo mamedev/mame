@@ -59,7 +59,8 @@ void rc2014_bus_device::device_start()
 
 void rc2014_bus_device::device_reset()
 {
-	installer(AS_IO)->unmap_readwrite(0, (1 << installer(AS_IO)->space_config().addr_width()) - 1);
+	if (m_installer[AS_IO])
+		installer(AS_IO)->unmap_readwrite(0, (1 << installer(AS_IO)->space_config().addr_width()) - 1);
 }
 
 void rc2014_bus_device::set_bus_clock(u32 clock)

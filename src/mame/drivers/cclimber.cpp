@@ -146,18 +146,17 @@ TODO:
       - bg gradient color decode & table selection
 
 
- Top Roller:
- ----------
+    Top Roller:
+    ----------
      It's made by the same developers as Yamato and use
      probably the same encrypted SEGA cpu as Yamato.
 
      lives - $6155
 
      TODO:
-
+       - some of the samples should loop (truck, helicopter, motorcycle)
        - COINB DSW is missing
        - few issues in cocktail mode
-       - wrong colors (fg text layer) - game sometimes ("round" text , lives) updates only even columns of cell attribs...
 
 -------------------------------------------------------------------
 
@@ -291,13 +290,6 @@ void cclimber_state::toprollr_rombank_w(int state)
 	}
 }
 
-MACHINE_RESET_MEMBER(cclimber_state,cclimber)
-{
-	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
-	m_nmi_mask = 0;
-
-	m_toprollr_rombank = 0;
-}
 
 void cclimber_state::nmi_mask_w(int state)
 {
@@ -443,7 +435,7 @@ void cclimber_state::toprollr_map(address_map &map)
 	map(0x9800, 0x987f).ram(); /* unused ? */
 	map(0x9880, 0x995f).ram().share("spriteram");
 	map(0x99dc, 0x99df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -960,7 +952,7 @@ static INPUT_PORTS_START( yamato )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) /* set 1 only */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* set 1 only */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1021,7 +1013,7 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
 
@@ -1174,7 +1166,7 @@ void cclimber_state::cclimber(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	CCLIMBER_AUDIO(config, "cclimber_audio", 0);
+	CCLIMBER_AUDIO(config, "cclimber_audio", XTAL(18'432'000)/3/2/2);
 }
 
 void cclimber_state::rpatrol(machine_config &config)
@@ -1281,6 +1273,8 @@ void cclimber_state::toprollr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
+
+	subdevice<cclimber_audio_device>("cclimber_audio")->set_sample_clockdiv(4);
 }
 
 
@@ -2674,7 +2668,7 @@ ROM_START( toprollr )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "16.j4", 0x0000, 0x2000, CRC(ce3afe26) SHA1(7de00720f091537c64cc0fec687c061de3a8b1a3) )
-	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(1d9e3325) SHA1(e7f6863aa2ba2aeec40cfcc5cf6c69e947c185b5) )
+	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(b6fe97f2) SHA1(00c58f693dda0aa3ea4893dcaae90b1b63054789) )
 
 	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "14.c4", 0x0000, 0x2000, CRC(7a945733) SHA1(14187ba303aecf0a812c425c34d8edda3deaa2b5) )
@@ -2705,7 +2699,6 @@ ROM_START( toprollr )
 	ROM_LOAD( "prom.p9",  0x0060, 0x0020, CRC(eb399c02) SHA1(bf3d6c6dd982cb54446cf8a010b7adb949514bdb) ) //18-1f bg
 	ROM_LOAD( "prom.n9",  0x0080, 0x0020, CRC(fb03ea99) SHA1(4dcef86106cef713dfcbd965072bfa8fe4b68e15) ) //20-27 bg
 	ROM_LOAD( "prom.s9",  0x00a0, 0x0100, CRC(abf4c5fb) SHA1(a953f14642d4b72328293b36bc3c65b13491ffff) ) //unknown prom (filled with 2 bit vals)
-
 ROM_END
 
 
@@ -2815,4 +2808,4 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_i
 GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
