@@ -193,13 +193,13 @@ u32 igs022_device::pop_stack()
 
 std::string igs022_device::stack_as_string() const
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 	stream << "stack:";
 
 	for (int i = 0; i <= m_stack_ptr; ++i)
 		util::stream_format(stream, " %08x", m_stack[i]);
 
-	return stream.str();
+	return std::move(stream).str();
 }
 
 u32 igs022_device::read_reg(u16 offset)

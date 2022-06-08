@@ -39,9 +39,9 @@ To Do:
 Notes:
 
 - Test mode is usually accessed by keeping test (F2) pressed during boot.
-- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for book-keeping / setup [pass: press Play (2)].
-- iqblockf/genius6: press service1 (9) then press play (2) eight times to switch to gambling. Then test (F2) enters book-keeping / setup.
-- lhzb2, mgcs, slqz2, tjsb: press service (F2) + stats (9) during inputs test for sound test.
+- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for book-keeping / setup [pass: press deal (2)].
+- iqblockf/genius6: press service1 (9) then press deal (2) eight times to switch to gambling. Then test (F2) enters book-keeping / setup.
+- lhzb2, mgcs, slqz2, tjsb: press test (F2) + book (0) during inputs test for sound test.
 - mgdh, sdmg2: press keys A + B during test mode for sound test (B1 + B2 + B3 when using a joystick in mgdh).
 - spkrform: to switch from poker to Formosa press service1 (9). To switch back, press in sequence:
             service3 (right of 0) then Bet (M) then press "Hold 1".."Hold 5" (Z, X, C, V, B)
@@ -147,7 +147,7 @@ public:
 
 	u8 result_r();                                  // 0x05:        result_r
 	void do_bitswap_w(offs_t offset, u8 data);      // 0x20-0x27:   do_bitswap_w
-	u8 advance_string_offs_r();                     // 0x40:        advance_string_offs_r
+	u8 advance_string_offs_r(address_space &space); // 0x40:        advance_string_offs_r
 
 	// Call after decryption, e.g. at the end of init_<gamename>
 	void dump(const char *filename, u32 string_addr, u32 xor_addr, bool is_16bits) const;
@@ -167,7 +167,7 @@ DEFINE_DEVICE_TYPE(IGS_STRING, igs_string_device, "igs_string", "IGS String Prot
 
 igs_string_device::igs_string_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, IGS_STRING, tag, owner, clock)
-	, m_region_key(*this, "key")
+	, m_region_key(*this, DEVICE_SELF)
 { }
 
 void igs_string_device::dump(const char *filename, u32 string_addr, u32 xor_addr, bool is_16bits) const
@@ -244,10 +244,9 @@ void igs_string_device::do_bitswap_w(offs_t offset, u8 data)
 	m_word |= bit0 ^ xor0;
 
 	logerror("%s: exec bitswap on port %02x = %02x - bit0 %x, xor0 %x, word %04x -> %04x\n", machine().describe_context(), offset, data, bit0, xor0, x, m_word);
-	return;
 }
 
-u8 igs_string_device::advance_string_offs_r()
+u8 igs_string_device::advance_string_offs_r(address_space &space)
 {
 	const u8 next_string_offs   =   ((m_string_offs + 1) < 0xec ? (m_string_offs + 1) : 0);
 
@@ -263,7 +262,7 @@ u8 igs_string_device::advance_string_offs_r()
 	m_string_offs = next_string_offs;
 	m_string_word = next_string_word;
 
-	return 0x00;
+	return space.unmap();
 }
 
 // Similar protection to that found in igs011.cpp:
@@ -375,7 +374,7 @@ void igs_bitswap_device::device_reset()
 
 u8 igs_bitswap_device::result_r()
 {
-	u8 res = bitswap<16>(m_val, 0,0,0,0,0,0,0,0, 5,2,9,7,10,13,12,15) & 0xff;
+	u8 res = bitswap<8>(m_val, 5, 2, 9, 7, 10, 13, 12, 15);
 	logerror("%s: read bitswap - val %04x -> %02x\n", machine().describe_context(), m_val, res);
 	return res;
 }
@@ -2456,6 +2455,13 @@ void igs017_state::mgcs_mux_map(address_map &map)
 void igs017_state::sdmg2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
+
+	// incdec protection
+	map(0x002001, 0x002001).w(m_igs_incdec, FUNC(igs_incdec_device::reset_w));
+	map(0x002003, 0x002003).w(m_igs_incdec, FUNC(igs_incdec_device::dec_w));
+	map(0x002007, 0x002007).w(m_igs_incdec, FUNC(igs_incdec_device::inc_w));
+	map(0x00200b, 0x00200b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
+
 	map(0x1f0000, 0x1fffff).ram();
 
 	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
@@ -2917,18 +2923,18 @@ static INPUT_PORTS_START( iqblocka )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_NAME("%p Down / Collect Win")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_NAME("Hold 1 / Big / Help") // help = next tile becomes a wildcard (in videogame mode)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_NAME("Hold 2 / Double Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1    ) PORT_NAME("Hold 1 / Big / Help") // (1P A in test mode) help = next tile becomes a wildcard (in videogame mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2    ) PORT_NAME("Hold 2 / Double Up")  // (1P B in test mode)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("PLAYER2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2         ) PORT_NAME("Play / Last Bet") // play current bet or, if null, the last bet (2P C in test mode)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL    ) PORT_NAME("Deal / Last Bet") // play current bet or, if null, the last bet (START2 in test mode)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) // unused? shown in test mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) // ""
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) // ""
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // ""
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_NAME("Hold 4 / Half Double")        // (2P A in test mode)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_NAME("Hold 5 / Tile in Double Up?") // (2P B in test mode)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4    ) PORT_NAME("Hold 4 / Half Double")        // (2P A in test mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5    ) PORT_NAME("Hold 5 / Tile in Double Up?") // (2P B in test mode)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("COINS")
@@ -2942,12 +2948,12 @@ static INPUT_PORTS_START( iqblocka )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Toggle Gambling") // this toggles between videogame and gambling
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_NAME("Hold 3 / Small")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5)  // no coin. Hopper sensor? impulse prevents coin error in gambling mode (1P D in test mode)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6        )                  // unused?      (1P E in test mode)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3         ) PORT_NAME("Bet") // Bet 1 credit (2P C in test mode)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)   // unused?      (2P D in test mode)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_PLAYER(2)   // unused?      (2P E in test mode)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD3    ) PORT_NAME("Hold 3 / Small") //  (1P C in test mode)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5) // no coin. Hopper sensor? impulse prevents coin error in gambling mode (1P D in test mode)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        )                 // unused?      (1P E in test mode)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET     )                 // Bet 1 credit (2P C in test mode)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)  // unused?      (2P D in test mode)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_PLAYER(2)  // unused?      (2P E in test mode)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 INPUT_PORTS_END
@@ -3014,7 +3020,7 @@ static INPUT_PORTS_START( iqblockf )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 
 	PORT_MODIFY("PLAYER2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2         ) PORT_NAME("Play / Last Bet / Toggle Gambling (8 Times)") // play current bet or, if null, bet as last time (2P C in test mode)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL    ) PORT_NAME("Deal / Last Bet / Toggle Gambling (8 Times)") // play current bet or, if null, bet as last time (START2 in test mode)
 
 	PORT_MODIFY("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // impulse prevents coin error in gambling mode
@@ -3024,9 +3030,10 @@ static INPUT_PORTS_START( iqblockf )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW       ) // book-keeping after switching to gambling (TEST in test mode)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Start Gambling Toggle (Then Play x 8)") // this starts toggling between videogame and gambling
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Start Gambling Toggle (Then Deal x 8)") // this starts toggling between videogame and gambling
 
 	PORT_MODIFY("BUTTONS")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // (1P E in test mode)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT  ) // (2P E in test mode)
 INPUT_PORTS_END
 
@@ -3088,7 +3095,7 @@ static INPUT_PORTS_START( genius6 )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
 
 	PORT_MODIFY("PLAYER2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") // (2P B in test mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) // (2P B in test mode)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lhzb2 )
@@ -3136,19 +3143,19 @@ static INPUT_PORTS_START( lhzb2 )
 	PORT_DIPNAME( 0x40, 0x40, "Symbols" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // pigs, apples
-	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Hide Gambling" ) PORT_DIPLOCATION("SW2:8") // press "Hide Gambling" to hide credits and bets
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // test mode (keep pressed during boot too)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE3  ) PORT_NAME("Clear") // shown in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -3205,14 +3212,14 @@ static INPUT_PORTS_START( lhzb2a )
 	PORT_INCLUDE( lhzb2 )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  ) PORT_NAME("Clear") // shown in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW   ) // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgcs )
@@ -3260,9 +3267,9 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPNAME( 0x20, 0x20, "Number Type" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Number" )
 	PORT_DIPSETTING(    0x00, "Tile" )
-	PORT_DIPNAME( 0x40, 0x40, "Bet Number?" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hide Gambling" ) PORT_DIPLOCATION("SW2:7") // press "Hide Gambling" to hide credits and bets
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	// Joystick mode: the top 2 bits of COINS (i8255 port A) and JOY (i8255 port B) are read and combined with the bottom 4 bits read from port C (see code at $1c83a)
@@ -3278,18 +3285,18 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // test mode (keep pressed during boot too)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3  ) // Clear? must be high to display numbers (shown in test mode)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
 	// Keyboard mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x10,EQUALS,0x10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x10,EQUALS,0x10)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN      ) PORT_CONDITION("DSW2",0x10,EQUALS,0x10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN      ) PORT_CONDITION("DSW2",0x10,EQUALS,0x10)
 	// Joystick mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2          ) PORT_CONDITION("DSW2",0x10,EQUALS,0x00) // bet
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3          ) PORT_CONDITION("DSW2",0x10,EQUALS,0x00) // function
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2     ) PORT_CONDITION("DSW2",0x10,EQUALS,0x00) // bet
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3     ) PORT_CONDITION("DSW2",0x10,EQUALS,0x00) // function
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -3392,19 +3399,17 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_DIPSETTING(    0x00, "Tile" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE3  ) PORT_NAME("Clear") // shown in test mode
-	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1     )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
+	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW   ) // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
 	// Keyboard mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40) PORT_NAME("Clear") // shown in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40) // shown in test mode ('O' appears, or it might be a 0)
 	// Joystick mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3   ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
 
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3414,7 +3419,7 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to BUTTON3
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to joystick BUTTON3
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -3518,14 +3523,14 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPSETTING(    0x00, "10" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // test mode (keep pressed during boot too)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE3  ) PORT_NAME("Clear") // shown in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
 
 	PORT_START("KEY0")
 	// Keyboard mode:
@@ -3643,19 +3648,19 @@ static INPUT_PORTS_START( slqz2 )
 	PORT_DIPNAME( 0x40, 0x40, "Symbols" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // pigs, apples
-	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Hide Gambling" ) PORT_DIPLOCATION("SW2:8") // press "Hide Gambling" to hide credits and bets
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM    ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // test mode (keep pressed during boot too)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN   ) // needs to be high for "Clear" input below to work
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2   )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3   )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN     ) // needs to be 0 for "clear" input below to work
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3     )
 
 	PORT_START("PLAYER1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("Start / Don Den")
@@ -3668,14 +3673,14 @@ static INPUT_PORTS_START( slqz2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("PLAYER2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3       ) PORT_NAME("Clear") // shown in test mode
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tjsb )
@@ -3753,24 +3758,24 @@ static INPUT_PORTS_START( tjsb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics")
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN1     )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x02,  IP_ACTIVE_LOW   ) // keep pressed while booting
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1       )
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Clear") // shown in test mode
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3  )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spkrform )
@@ -3926,7 +3931,7 @@ static INPUT_PORTS_START( tarzan )
 	PORT_DIPNAME( 0x02, 0x00, "Back Color" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING( 0x02, "Black" )
 	PORT_DIPSETTING( 0x00, "Color" )
-	PORT_DIPNAME( 0x04, 0x00, "Button To Hide Gambling" ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x04, 0x04, "Hide Gambling" ) PORT_DIPLOCATION("SW3:3") // Press "Hide Gambling" to hide credits and bets
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Number Type" ) PORT_DIPLOCATION("SW3:4")
@@ -3947,7 +3952,7 @@ static INPUT_PORTS_START( tarzan )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   ) // Book
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(5) // Coin/Key in (coin error in coin mode)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // Coin/Key out
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3      ) PORT_NAME("Clear? (Hide Gambling)") // shown in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
 	// Keyboard mode:
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
@@ -4688,6 +4693,9 @@ void igs017_state::sdmg2(machine_config &config)
 	// DSW3 is read but unused (it's not populated on the PCB)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+
+	// protection
+	IGS_INCDEC(config, m_igs_incdec, 0);
 }
 
 
@@ -4983,7 +4991,7 @@ ROM_START( tjsb )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s0703.u15", 0x00000, 0x80000,  CRC(c6f94d29) SHA1(ec413580240711fc4977dd3c96c288501aa7ef6c) )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tjsb_string.key", 0x00, 0xec, CRC(412c83a0) SHA1(c09618aabecdde4c77d2b5695799fc89dfb325bc) )
 ROM_END
 
@@ -5044,7 +5052,7 @@ ROM_START( mgcs )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1502.u10", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) )
 ROM_END
 
@@ -5166,7 +5174,7 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
@@ -5185,7 +5193,7 @@ ROM_START( lhzb2a )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
@@ -5248,7 +5256,7 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Long Hu Zhengba 2
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "slqz2_string.key", 0x00, 0xec, CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) )
 ROM_END
 
@@ -5394,7 +5402,7 @@ ROM_START( tarzanc )
 	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
 	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
@@ -5418,7 +5426,7 @@ ROM_START( tarzan )
 	ROM_LOAD( "pal1", 0x000, 0x2dd, NO_DUMP )
 	ROM_LOAD( "pal2", 0x2dd, 0x2dd, NO_DUMP )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
@@ -5441,7 +5449,7 @@ ROM_START( tarzana )
 	ROM_LOAD( "pal1", 0x000, 0x2dd, NO_DUMP )
 	ROM_LOAD( "pal2", 0x2dd, 0x2dd, NO_DUMP )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
@@ -5512,7 +5520,7 @@ ROM_START( starzan )
 	ROM_LOAD( "palce22v10h_tar97_u10-1.u10", 0x000, 0x2dd, NO_DUMP ) // read protected
 	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP ) // ""
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "starzan_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
@@ -5609,7 +5617,7 @@ ROM_START( spkrform )
 	ROM_REGION( 0x2dd, "plds", ROMREGION_ERASE )
 	ROM_LOAD( "dn.u18", 0x000, 0x2dd, NO_DUMP )
 
-	ROM_REGION( 0xec, "igs_string:key", 0 )
+	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "spkrform_string.key", 0x00, 0xec, CRC(17a9021a) SHA1(41943e08f9c9be49fc3705e6f2702d504ec6d078) )
 ROM_END
 
