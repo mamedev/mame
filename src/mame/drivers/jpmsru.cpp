@@ -433,10 +433,10 @@ void jpmsru_state::out_disp_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0: m_disp_digit = (m_disp_digit & ~0x01) | (data ? 0x00 : 0x01); break;
-		case 1: m_disp_digit = (m_disp_digit & ~0x02) | (data ? 0x00 : 0x02); break;
-		case 2: m_disp_digit = (m_disp_digit & ~0x04) | (data ? 0x00 : 0x04); break;
-		case 3: m_disp_digit = (m_disp_digit & ~0x08) | (data ? 0x00 : 0x08); break;
+		case 0:
+		case 1:
+		case 2:
+		case 3: m_disp_digit = (m_disp_digit & ~(1 << offset)) | (data ? 0 : (1 << offset)); break;
 		case 4: m_disp_d1 = data; break;
 		case 5: m_disp_d2 = data; break;
 	}
@@ -499,12 +499,12 @@ void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
 		case 0: out_lamp_ext_w(m_logicext_addr, m_logicext_data); break; /* j_lc has solely lamps as outputs and is the only dumped
 																			game to use this, so keep things simple for now */
 		case 1: m_logicext_data = data; break;
-		case 2: m_logicext_addr = (m_logicext_addr & ~0x01) | (data ? 0x00 : 0x01); break;
-		case 3: m_logicext_addr = (m_logicext_addr & ~0x02) | (data ? 0x00 : 0x02); break;
-		case 4: m_logicext_addr = (m_logicext_addr & ~0x04) | (data ? 0x00 : 0x04); break;
-		case 5: m_logicext_addr = (m_logicext_addr & ~0x08) | (data ? 0x00 : 0x08); break;
-		case 6: m_logicext_addr = (m_logicext_addr & ~0x10) | (data ? 0x00 : 0x10); break;
-		case 7: m_logicext_addr = (m_logicext_addr & ~0x20) | (data ? 0x00 : 0x20); break;
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7: m_logicext_addr = (m_logicext_addr & ~(1 << (offset - 2))) | (data ? 0 : (1 << (offset - 2))); break;
 		case 8: m_logicext_addr = 0; break;
 	}
 }
