@@ -130,7 +130,6 @@ files{
 	MAME_DIR .. "src/mame/audio/circus.cpp",
 	MAME_DIR .. "src/mame/video/circus.cpp",
 	MAME_DIR .. "src/mame/drivers/exidy.cpp",
-	MAME_DIR .. "src/mame/includes/exidy.h",
 	MAME_DIR .. "src/mame/audio/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy.h",
 	MAME_DIR .. "src/mame/video/exidy.cpp",
