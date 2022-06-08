@@ -21,7 +21,7 @@
 #define NEOGEO_VSSTART                          (0x100)
 
 // todo, sort out what needs to be public and make the rest private/protected
-class neosprite_base_device : public device_t, public device_video_interface
+class neosprite_base_device : public device_t, public device_video_interface, public device_memory_interface
 {
 public:
 	virtual void optimize_sprite_data();
@@ -50,7 +50,6 @@ public:
 	void set_fixed_regions(uint8_t* fix_cart, uint32_t fix_cart_size, memory_region* fix_bios);
 	void set_pens(const pen_t* pens);
 
-	std::unique_ptr<uint16_t[]>     m_videoram;
 	uint16_t     *m_videoram_drawsource = nullptr;
 
 	uint16_t     m_vram_offset = 0;
@@ -92,6 +91,14 @@ protected:
 	const pen_t   *m_pens = nullptr;
 
 	required_region_ptr<uint8_t> m_region_zoomy;
+
+	const address_space_config      m_space_config;
+	
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	void memmap(address_map &map);
 };
 
 
