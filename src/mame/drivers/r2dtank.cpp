@@ -534,4 +534,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, empty_init, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)
+GAME( 1981, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, empty_init, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE )
