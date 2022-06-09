@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria, hap
+/***************************************************************************
+
+Crazy Climber sound hardware
+
+It has an AY-3-8910.
+And 8KB ROM for voice samples, done with TTL chips.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "audio/cclimber.h"
 
 #include "sound/ay8910.h"
 
-
-// macro to convert 4-bit unsigned samples to 16-bit signed samples
-#define SAMPLE_CONV4(a) (0x1111*((a&0x0f))-0x8000)
-
-SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
-{
-	m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
-	save_pointer(NAME(m_sample_buf), 2 * m_samples_region.bytes());
-}
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -26,17 +26,14 @@ DEFINE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device, "cclimber_audio", "Cra
 //  cclimber_audio_device: Constructor
 //-------------------------------------------------
 
-cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CCLIMBER_AUDIO, tag, owner, clock),
-	m_sample_buf(nullptr),
-	m_sample_num(0),
-	m_sample_freq(0),
-	m_sample_volume(0),
-	m_sample_clockdiv(2),
-	m_samples(*this, "samples"),
-	m_samples_region(*this, "samples")
-{
-}
+	m_dac(*this, "dac"),
+	m_volume(*this, "volume"),
+	m_rom(*this, "samples"),
+	m_sample_clockdiv(2)
+{ }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -44,10 +41,25 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 
 void cclimber_audio_device::device_start()
 {
-	save_item(NAME(m_sample_num));
-	save_item(NAME(m_sample_freq));
-	save_item(NAME(m_sample_volume));
+	assert(m_rom.bytes() == 0x2000);
+
+	m_address = 0;
+	m_start_address = 0;
+	m_loop_address = 0;
+	m_sample_rate = 0;
+	m_sample_trigger = 0;
+
+	m_sample_timer = timer_alloc(FUNC(cclimber_audio_device::sample_tick), this);
+	m_sample_timer->adjust(attotime::zero);
+
+	// register for savestates
+	save_item(NAME(m_address));
+	save_item(NAME(m_start_address));
+	save_item(NAME(m_loop_address));
+	save_item(NAME(m_sample_rate));
+	save_item(NAME(m_sample_trigger));
 }
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -56,64 +68,56 @@ void cclimber_audio_device::device_start()
 void cclimber_audio_device::device_add_mconfig(machine_config &config)
 {
 	ay8910_device &aysnd(AY8910(config, "aysnd", DERIVED_CLOCK(1, 1)));
-	aysnd.port_a_write_callback().set(FUNC(cclimber_audio_device::sample_select_w));
+	aysnd.port_a_write_callback().set(FUNC(cclimber_audio_device::start_address_w));
+	aysnd.port_b_write_callback().set(FUNC(cclimber_audio_device::loop_address_w));
 	aysnd.add_route(ALL_OUTPUTS, ":speaker", 0.5);
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(cclimber_audio_device::sh_start));
-	m_samples->add_route(ALL_OUTPUTS, ":speaker", 0.5);
+	DAC_4BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "volume", 0.5);
+
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, ":speaker", 1.0);
 }
 
 
-void cclimber_audio_device::sample_select_w(uint8_t data)
+//-------------------------------------------------
+//  handlers
+//-------------------------------------------------
+
+void cclimber_audio_device::sample_rate_w(u8 data)
 {
-	m_sample_num = data;
+	m_sample_rate = data;
 }
 
-void cclimber_audio_device::sample_rate_w(uint8_t data)
+void cclimber_audio_device::sample_volume_w(u8 data)
 {
-	// calculate the sampling frequency
-	m_sample_freq = clock() / m_sample_clockdiv / (256 - data);
-}
-
-void cclimber_audio_device::sample_volume_w(uint8_t data)
-{
-	m_sample_volume = data & 0x1f; // range 0-31
+	m_volume->flt_volume_set_volume(double(data & 0x1f) / 31.0); // range 0-31
 }
 
 void cclimber_audio_device::sample_trigger(int state)
 {
-	if (state == 0)
-		return;
+	// start playing on rising edge
+	if (state && !m_sample_trigger)
+		m_address = m_start_address * 64;
 
-	play_sample(32 * m_sample_num, m_sample_freq, m_sample_volume);
+	m_sample_trigger = state;
 }
 
-void cclimber_audio_device::sample_trigger_w(uint8_t data)
+void cclimber_audio_device::sample_trigger_w(u8 data)
 {
 	sample_trigger(data != 0);
 }
 
-
-void cclimber_audio_device::play_sample(int start,int freq,int volume)
+TIMER_CALLBACK_MEMBER(cclimber_audio_device::sample_tick)
 {
-	int romlen = m_samples_region.bytes();
+	u8 data = m_rom[m_address >> 1 & 0x1fff];
 
-	// decode the ROM samples
-	int len = 0;
-	while (start + len < romlen && m_samples_region[start+len] != 0x70)
-	{
-		int sample;
+	// sample end marker, continue from loop point
+	if (data == 0x70)
+		m_address = m_loop_address * 64;
 
-		sample = (m_samples_region[start + len] & 0xf0) >> 4;
-		m_sample_buf[2*len] = SAMPLE_CONV4(sample) * volume / 31;
+	m_dac->write((m_address & 1) ? (data & 0xf) : (data >> 4));
 
-		sample = m_samples_region[start + len] & 0x0f;
-		m_sample_buf[2*len + 1] = SAMPLE_CONV4(sample) * volume / 31;
+	if (m_sample_trigger)
+		m_address++;
 
-		len++;
-	}
-
-	m_samples->start_raw(0, m_sample_buf.get(), 2 * len, freq);
+	m_sample_timer->adjust(attotime::from_ticks(256 - m_sample_rate, clock() / m_sample_clockdiv));
 }

@@ -286,20 +286,29 @@ hazl1500                        // Hazeltine 1500 (c) 1977
 j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
+j_ewnc                          //
 j_ndu                           // Nudge Double Up (JPM)
 j_ndua                          //
+j_ndub                          //
 j_dud                           // Nudge Double Up Deluxe (JPM)
 j_duda                          //
+j_dudb                          //
 j_dt                            //
 j_lan                           // Lite A Nudge (JPM)
 j_lana                          //
-j_ews                           // Each Way Shifter
-j_ews8a                         //
-j_luck2                         // Lucky Twos
-j_luckac                        // Lucky Aces
-j_plus2                         // Plus 2
+j_lanb                          //
 j_super2                        // Super 2
-j_unk                           //
+j_ews                           // Each Way Shuffle (JPM)
+j_ewsa                          //
+j_ewsb                          //
+j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_lt                            // Lucky 2's (JPM)
+j_ts                            //
+j_plus2                         // Plus 2 (CTL)
+j_goldn2                        // Golden 2's (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
+j_la                            // Lucky Aces
 
 @source:m62.cpp                 // m62.cpp
 battroad                        // (c) 1984

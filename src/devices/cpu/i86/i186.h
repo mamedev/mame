@@ -21,6 +21,7 @@ public:
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 	auto irmx_irq_cb() { return m_irmx_irq_cb.bind(); }
+	auto irqa_cb() { return m_irqa_cb.bind(); }
 	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
@@ -157,6 +158,7 @@ private:
 	devcb_write_line m_out_tmrout0_func;
 	devcb_write_line m_out_tmrout1_func;
 	devcb_write_line m_irmx_irq_cb;
+	devcb_write_line m_irqa_cb;
 	device_irq_acknowledge_delegate m_irmx_irq_ack;
 };
 

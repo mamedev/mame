@@ -142,19 +142,26 @@ TODO:
      mapping of 8 or 16 (both roms) bits. Also table
      selection source is unknown.
 
+     At the title screen, it's a solid dark-cyan.
+     During gameplay, the sky is a cyan gradient, and
+     the sea is a dark blue gradient. When the player
+     ship explodes, the sky and sea briefly turn to a
+     lighter cyan gradient, followed by cyan-pink for
+     the sky, and purple-red for the sea.
+
      TODO:
       - bg gradient color decode & table selection
+      - music is too fast?
 
 
     Top Roller:
     ----------
-     It's made by the same developers as Yamato and use
-     probably the same encrypted SEGA cpu as Yamato.
+     It's made by the same developers as Yamato (apparently
+     Falcon) and probably uses the same encrypted SEGA cpu.
 
      lives - $6155
 
      TODO:
-       - some of the samples should loop (truck, helicopter, motorcycle)
        - COINB DSW is missing
        - few issues in cocktail mode
 
@@ -477,6 +484,7 @@ void cclimber_state::cclimber_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x09).w("cclimber_audio:aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("cclimber_audio:aysnd", FUNC(ay8910_device::data_r));
+	map(0x0d, 0x0d).nopw();
 }
 
 void cclimber_state::rpatrol_portmap(address_map &map)
@@ -2808,4 +2816,4 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_i
 GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )

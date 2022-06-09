@@ -36,6 +36,7 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 void cclimber_state::cclimber_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -499,12 +500,9 @@ VIDEO_START_MEMBER(cclimber_state,toprollr)
 
 void cclimber_state::draw_playfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	m_pf_tilemap->mark_all_dirty();
-	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
-									(m_flip_y ? TILEMAP_FLIPY : 0));
-	for (i = 0; i < 32; i++)
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+	for (int i = 0; i < 32; i++)
 		m_pf_tilemap->set_scrolly(i, m_column_scroll[i]);
 
 	m_pf_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -526,8 +524,7 @@ void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16
 
 	m_bs_tilemap->mark_all_dirty();
 
-	m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
-									(m_flip_y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
+	m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
 
 	m_bs_tilemap->set_scrollx(0, x);
 	m_bs_tilemap->set_scrolly(0, y);
@@ -543,7 +540,7 @@ void cclimber_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16
 
 	m_bs_tilemap->mark_all_dirty();
 
-	m_bs_tilemap->set_flip(m_flip_y ? TILEMAP_FLIPY : 0);
+	m_bs_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 
 	m_bs_tilemap->set_scrollx(0, x);
 	m_bs_tilemap->set_scrolly(0, y);
@@ -587,7 +584,7 @@ void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-			gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -624,7 +621,7 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-			gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -661,7 +658,7 @@ void cclimber_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-			gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -776,14 +773,13 @@ uint32_t cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind
 uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle scroll_area_clip = cliprect;
-	scroll_area_clip.min_x = 4*8;
-	scroll_area_clip.max_x = 29*8-1;
+	scroll_area_clip.min_x = (m_flip_x ? 3 : 5) * 8;
+	scroll_area_clip.max_x = (m_flip_x ? 27 : 29) * 8 - 1;
 
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 
 	m_toproller_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
-	m_toproller_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
-											(m_flip_y ? TILEMAP_FLIPY : 0));
+	m_toproller_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 	m_toproller_bg_tilemap->mark_all_dirty();
 	m_toproller_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
 
@@ -802,8 +798,7 @@ uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	}
 
 	m_pf_tilemap->mark_all_dirty();
-	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) |
-									(m_flip_y ? TILEMAP_FLIPY : 0));
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 	m_pf_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
