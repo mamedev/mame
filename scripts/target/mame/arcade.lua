@@ -1475,6 +1475,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mpu4vid.cpp",
 	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.cpp",
 	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.h",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.h",
 	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.cpp",
 	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.h",
 	MAME_DIR .. "src/mame/includes/mpu5.h",

@@ -17,6 +17,7 @@
 #include "machine/meters.h"
 #include "machine/mpu4_characteriser_bootleg.h"
 #include "machine/mpu4_characteriser_pal.h"
+#include "machine/mpu4_characteriser_pal_bwb.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
 
@@ -125,6 +126,7 @@ public:
 		, m_characteriser(*this, "characteriser")
 		, m_characteriser_bl(*this, "characteriser_bl")
 		, m_characteriser_blastbank(*this, "characteriser_blastbank")
+		, m_characteriser_bwb(*this, "characteriser_bwb")
 		, m_duart68681(*this, "duart68681")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
@@ -355,6 +357,7 @@ protected:
 	void mpu4_memmap_characteriser(address_map &map);
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
+	void mpu4_memmap_characteriser_bwb(address_map &map);
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -383,9 +386,6 @@ protected:
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
-
-	void bwb_characteriser_w(offs_t offset, uint8_t data);
-	uint8_t bwb_characteriser_r(offs_t offset);
 
 	void mpu4_ym2413_w(offs_t offset, uint8_t data);
 	uint8_t mpu4_ym2413_r(offs_t offset);
@@ -466,7 +466,7 @@ protected:
 	optional_device<mpu4_characteriser_pal> m_characteriser;
 	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
 	optional_device<mpu4_characteriser_bl_blastbank> m_characteriser_blastbank;
-
+	optional_device<mpu4_characteriser_pal_bwb> m_characteriser_bwb;
 
 	optional_device<mc68681_device> m_duart68681;
 

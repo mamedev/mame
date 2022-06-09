@@ -10,7 +10,6 @@
 #include "cpu/m68000/m68000.h"
 
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
 
 class mpu4_characteriser_pal : public device_t
 {
@@ -1428,44 +1427,6 @@ private:
 	static constexpr bool IDENTIFICATION_HELPER = true;
 	int m_temp_debug_write_count;
 	uint8_t m_temp_debug_table[64];
-};
-
-
-
-#if 0
-static const bwb_chr_table prizeinv_data1[5] = {
-//This is all wrong, but without BWB Vid booting,
-//I can't find the right values. These should be close though
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-#endif
-
-#if 0// TODOxx:
-static mpu4_chr_table prizeinv_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
-#endif
-
-class mpu4_characteriser_pal_bwb : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
-	constexpr static uint8_t bwb_chr_table_common[10] = {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
-
-	int m_chr_state = 0;
-	int m_chr_counter = 0;
-	int m_chr_value = 0;
-	int m_bwb_return = 0;
-	int m_init_col = 0;
-
-	uint8_t* m_bwb_chr_table1;
-
 };
 
 #endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H

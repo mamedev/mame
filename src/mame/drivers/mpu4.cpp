@@ -1778,19 +1778,6 @@ INPUT_PORTS_START( grtecp )
 INPUT_PORTS_END
 
 
-uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
-{
-	//if (bwb_characteriser_r)
-	//  bwb_characteriser_r(offset);
-
-	return 0x00;
-}
-
-void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
-{
-	//if (m_characteriser)
-	//  bwb_characteriser_w(offset, data);
-}
 
 /* Common configurations */
 
@@ -1823,7 +1810,7 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 
 void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
 {
-	space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
+//	space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2213,6 +2200,11 @@ void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
 }
 
+void mpu4_state::mpu4_memmap_characteriser_bwb(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0800, 0x0810).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
+}
 
 
 
@@ -2646,6 +2638,10 @@ void mpu4_state::bwboki(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
 	mpu4_common2(config);
 	mpu4_reels<4, 5>(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
+
+	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
