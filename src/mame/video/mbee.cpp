@@ -140,8 +140,8 @@ void mbee_state::oldkb_matrix_r(u16 offs)
 {
 	if (!BIT(m_features, 2))
 	{
-		u8 port = (offs >> 7) & 7;
-		u8 bit = (offs >> 4) & 7;
+		u8 port = BIT(offs, 7, 3);
+		u8 bit = BIT(offs, 4, 3);
 		u8 extra = 0;
 		u8 data = m_io_oldkb[port]->read();
 		bool keydown  = BIT(data, bit);
@@ -182,7 +182,7 @@ void mbee_state::oldkb_matrix_r(u16 offs)
 		}
 
 		if( keydown )
-			m_crtc->assert_light_pen_input(); //lpen_strobe
+			m_crtc->assert_light_pen_input(offs); //lpen_strobe
 	}
 }
 
