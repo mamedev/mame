@@ -106,7 +106,7 @@ void k054539_device::keyoff(int channel)
 
 void k054539_device::advance_filter(int channel, int val)
 {
-	float *hist = filter_hist[channel];
+	auto &hist = filter_hist[channel];
 	hist[0] = hist[1];
 	hist[1] = hist[2];
 	hist[2] = hist[3];
@@ -118,11 +118,11 @@ float k054539_device::calculate_filter(int channel, float t)
 	// Cubic hermite interpolation
 	// t is domain [0,1]
 
-	const float *hist = filter_hist[channel];
+	auto &hist = filter_hist[channel];
 	const float a = (-hist[0] / 2.0f) + (3.0f * hist[1] / 2.0f) - (3.0f * hist[2] / 2.0f) + (hist[3] / 2.0f);
 	const float b = hist[0] - (5.0f * hist[1] / 2.0f) + (2.0f * hist[2]) - (hist[3] / 2.0f);
 	const float c = (-hist[0] / 2.0f) + (hist[2] / 2.0f);
-	return (a * t * t * t) + (b * t * t) + (c * t) + hist[1];
+	return (t * t * t * a) + (t * t * b) + (t * c) + hist[1];
 }
 
 void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -344,8 +344,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				advance_filter(ch, 0);
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put_int(sample, lval * 32768.0f, 32768);
-		outputs[1].put_int(sample, rval * 32768.0f, 32768);
+		outputs[0].put(sample, lval);
+		outputs[1].put(sample, rval);
 	}
 }
 
@@ -383,6 +383,7 @@ void k054539_device::init_chip()
 	save_item(NAME(cur_ptr));
 	save_item(NAME(cur_limit));
 	save_item(NAME(rom_addr));
+	save_item(NAME(filter_hist));
 
 	save_item(NAME(m_timer_state));
 }
