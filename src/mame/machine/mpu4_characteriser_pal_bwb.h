@@ -63,9 +63,6 @@ private:
 	bool m_allow_68k_cheat;
 
 	const uint8_t* m_current_lamp_table;
-	int m_lamp_col;
-	int m_4krow;
-	bool m_is_4ksim;
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
