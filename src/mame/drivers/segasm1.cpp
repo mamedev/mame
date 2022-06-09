@@ -693,10 +693,26 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
+ROM_START( blicks )
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD16_BYTE("epr-14163.ic8", 0x000000, 0x040000, CRC(19bc94fa) SHA1(b81a61394a853dda6ed157cfcb3cb40ecd103c3d) )
+	ROM_LOAD16_BYTE("epr-14165.ic7", 0x000001, 0x040000, CRC(61b8d395) SHA1(452b718d7ce9cbec913eeb6f2758e8dbecced6b1) )
+	ROM_LOAD16_BYTE("epr.14164.ic10", 0x080000, 0x040000, CRC(5d3ccf3b) SHA1(31db63c87bf8417d58ae829759d2014ef140e891))
+	ROM_LOAD16_BYTE("epr-14166.ic9", 0x080001, 0x040000, CRC(5e63db91) SHA1(1d754675a2ca9d4e945c314ce2a42e7ed86a9ecf) )
+
+	ROM_REGION(0x20000, "soundcpu", 0)
+	ROM_LOAD( "epr-14167.ic104", 0x000000, 0x020000, CRC(305a9afe) SHA1(5b27d50797c6048e92b86f3748dfff3c873bbf13) )
+
+	ROM_REGION(0x40000, "gals", 0)
+	ROM_LOAD( "gal18v8a_315-5391.ic103", 0x000000, 0x040000, CRC(29480530) SHA1(d3d629fb4c2a4ae851f14b1d9e5b72b37b567f0b) )
+	ROM_LOAD( "315-5391.jed", 0x000000, 0x00038e, CRC(9918d5c8) SHA1(2d599573c716ec840b98dff44c167a15117ba824) )
+ROM_END
+
 } // anonymous namespace
 
 // Standalone M1 games
 GAME(1990, tinkerbl, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Tinker Bell", MACHINE_NOT_WORKING)
+GAME(1990, blicks, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Blicks", MACHINE_NOT_WORKING)
 
 // M1 comm multi-board games
 GAME(1994, bingpty, 0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING)
