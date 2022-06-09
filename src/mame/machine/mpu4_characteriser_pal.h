@@ -12,11 +12,6 @@
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
 
-// bootleg protections
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank)
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash)
-
-
 class mpu4_characteriser_pal : public device_t
 {
 public:
@@ -1472,28 +1467,5 @@ public:
 	uint8_t* m_bwb_chr_table1;
 
 };
-
-
-class mpu4_characteriser_bootleg_blastbank : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_bootleg_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-};
-
-class mpu4_characteriser_bootleg_copcash : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_bootleg_copcash(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-};
-
-
 
 #endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H

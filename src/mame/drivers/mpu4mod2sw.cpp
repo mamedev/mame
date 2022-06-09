@@ -1779,9 +1779,6 @@ GAME(199?, m4cashmxa, m4cashmx,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::cas
 GAME(199?, m4cashzn,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4) (CAZ 1.2)",GAME_FLAGS )
 GAME(199?, m4cashzna, m4cashzn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4) (CAZ 1.5)",GAME_FLAGS )
 
-// the protection has been replaced with a check against 6 possible values
-GAME(199?, m4copcsh,  0,          mod2_chr_copcash, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Coppa Cash (Barcrest) (bootleg) (MPU4) (FC 2.0)",GAME_FLAGS )
-
 // 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4 08 b0 ac (addr)
 GAME(199?, m4dblup,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::addr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Double Up (Barcrest) (MPU4) (DU 1.5)",GAME_FLAGS ) // token alarm
 
@@ -1922,8 +1919,6 @@ GAME(199?, m4bjsm,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::sun
 // RTC BAT FAIL, before any protection check
 GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM 1.6)",GAME_FLAGS ) // complains about battery, is this a different game?
 
-// the protection has been replaced with a check against 6 possible values
-GAME(199?, m4blstbk,  0,          mod2_chr_blastbnk, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Blast A Bank (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 c4 2c f8 (nifty)
 GAME(198?, m4supsl,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4) (SS2V 1.0)",GAME_FLAGS )
@@ -2291,6 +2286,24 @@ GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC
 // no copyright string in header, although 1988 BARCREST string exists elsewhere
 // RED 0.4, different protection?, hack, might be a different game, has touchscreen related strings?
 GAME_CUSTOM( 199?, m4redunk,    0,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8dec5) SHA1(74777ed7f78ef7cc615beadf097380569832a75a), "bootleg","unknown Barcrest MPU4 'RED 0.4' (MPU4) (bootleg)" )
+
+
+/*********************************************************************************************************
+
+    Sets below have different protection, are they bootlegs?
+
+	Some sources credit a game called Blast-a-Bank to Carfield, is this it?
+
+	Apart from the protection they do appear to be build off a Barcrest codebase
+
+*********************************************************************************************************/
+
+// different protection, call/response check with 6 possible values
+GAME(199?, m4blstbk,  0,          mod2_chr_blastbnk, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg?","Blast A Bank (MPU4) (BB 1.0)",GAME_FLAGS )
+
+// different protection, call/response check with 6 possible values
+GAME(199?, m4copcsh,  0,          mod2_chr_copcash, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Coppa Cash (MPU4) (FC 2.0)",GAME_FLAGS )
+
 
 
 /*********************************************************************************************************

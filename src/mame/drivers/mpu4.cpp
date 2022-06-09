@@ -2207,6 +2207,15 @@ void mpu4_state::mpu4_memmap_bootleg_characteriser(address_map &map)
 	map(0x0800, 0x081f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
 }
 
+void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
+}
+
+
+
+
 template<const uint8_t ReelNo, uint8_t Type>
 void mpu4_state::mpu4_add_reel(machine_config &config)
 {
@@ -2402,14 +2411,20 @@ void mpu4_state::mod2_chr_blastbnk(machine_config &config)
 {
 	mod2(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
 
-	MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
 }
 
 void mpu4_state::mod2_chr_copcash(machine_config &config)
 {
 	mod2(config);
-	MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH(config, m_characteriser, 0);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
+
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
+	m_characteriser_blastbank->set_retxor(0x03);
+
 }
 
 

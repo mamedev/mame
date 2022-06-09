@@ -125,7 +125,6 @@ public:
 		, m_characteriser(*this, "characteriser")
 		, m_characteriser_bl(*this, "characteriser_bl")
 		, m_characteriser_blastbank(*this, "characteriser_blastbank")
-		, m_characteriser_copcash(*this, "characteriser_copcash")
 		, m_duart68681(*this, "duart68681")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
@@ -355,6 +354,7 @@ protected:
 	void mpu4_memmap(address_map &map);
 	void mpu4_memmap_characteriser(address_map &map);
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
+	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -466,7 +466,6 @@ protected:
 	optional_device<mpu4_characteriser_pal> m_characteriser;
 	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
 	optional_device<mpu4_characteriser_bl_blastbank> m_characteriser_blastbank;
-	optional_device<mpu4_characteriser_bl_copcash> m_characteriser_copcash;
 
 
 	optional_device<mc68681_device> m_duart68681;
