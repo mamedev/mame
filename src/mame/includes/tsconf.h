@@ -189,7 +189,7 @@ private:
 
 	address_space *m_program = nullptr;
 	memory_view m_bank0_rom;
-	required_memory_bank_array<5> m_banks;
+	required_memory_bank_array<5> m_banks; // 0..3 - RAM, 4 - ROM
 
 	required_device<at_keyboard_device> m_keyboard;
 
