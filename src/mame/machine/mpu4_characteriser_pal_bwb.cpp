@@ -18,7 +18,14 @@ Said weaknesses (A Cheats Guide according to Project Amber)
 
 The common initialisation sequence is "00 04 04 0C 0C 1C 14 2C 5C 2C"
                                         0  1  2  3  4  5  6  7  8
+
+ - This is the start of a 0x40 long string containing the BWB- filename / code for the version
+
 Using debug search for the first read from said string (best to find it first).
+
+ - in m4blsbys this string is at 0x17383 in ROM, which is banked into memory at 0x7383
+ - this is first accessed by the code at 50c3, a CMPA $0138,X opcode, where X is 0x724B (0x724B + 0x138 = 0x7383)
+ 
 
 At this point, the X index on the CPU is at the magic number address.
 
@@ -61,8 +68,6 @@ mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mco
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
 	m_current_lamp_table(nullptr),
-	m_lamp_col(0),
-	m_4krow(0),
 	m_protregion(*this, "fakechr")
 {
 }
@@ -170,7 +175,7 @@ void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 
 uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 {
-	logerror("Characteriser read offset %02x \n", offset);
+	logerror("%s Characteriser read offset %02x\n", machine().describe_context(), offset);
 
 	if (!m_current_chr_table)
 	{
@@ -186,7 +191,7 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 		case 20:
 		case 27:
 		case 34:
-			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];
+			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];   // this is an init sequence, writes between are 0
 
 		default:
 			if (m_chr_counter > 34)

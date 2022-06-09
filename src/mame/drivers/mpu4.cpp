@@ -2203,7 +2203,7 @@ void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 void mpu4_state::mpu4_memmap_characteriser_bwb(address_map &map)
 {
 	mpu4_memmap(map);
-	map(0x0800, 0x0810).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
+	map(0x0800, 0x083f).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
 }
 
 
