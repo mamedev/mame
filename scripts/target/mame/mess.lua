@@ -1502,6 +1502,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	}
 
 	includedirs {
+		ext_includedir("flac"),
 		ext_includedir("zlib")
 	}
 end
