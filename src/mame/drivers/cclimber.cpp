@@ -142,14 +142,22 @@ TODO:
      mapping of 8 or 16 (both roms) bits. Also table
      selection source is unknown.
 
+     At the title screen, it's a solid dark-cyan.
+     During gameplay, the sky is a cyan gradient, and
+     the sea is a dark blue gradient. When the player
+     ship explodes, the sky and sea briefly turn to a
+     lighter cyan gradient, followed by cyan-pink for
+     the sky, and purple-red for the sea.
+
      TODO:
       - bg gradient color decode & table selection
+      - music is too fast?
 
 
     Top Roller:
     ----------
-     It's made by the same developers as Yamato and use
-     probably the same encrypted SEGA cpu as Yamato.
+     It's made by the same developers as Yamato (apparently
+     Falcon) and probably uses the same encrypted SEGA cpu.
 
      lives - $6155
 
