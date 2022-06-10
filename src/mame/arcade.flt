@@ -1141,6 +1141,7 @@ segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
+segafruit.cpp
 segag80r.cpp
 segag80v.cpp
 segahang.cpp
