@@ -79,27 +79,27 @@ namespace plib
 
 		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
-		void clear() noexcept
+		constexpr void clear() noexcept
 		{
 			nz_num = 0;
 			for (std::size_t i=0; i < size() + 1; i++)
 				row_idx[i] = 0;
 		}
 
-		void set_scalar(T scalar) noexcept
+		constexpr void set_scalar(T scalar) noexcept
 		{
 			for (std::size_t i=0, e=nz_num; i<e; i++)
 				A[i] = scalar;
 		}
 
-		void set_row_scalar(C r, T val) noexcept
+		constexpr void set_row_scalar(C r, T val) noexcept
 		{
 			C ri = row_idx[r];
 			while (ri < row_idx[r+1])
 				A[ri++] = val;
 		}
 
-		void set(C r, C c, T val) noexcept
+		constexpr void set(C r, C c, T val) noexcept
 		{
 			C ri = row_idx[r];
 			while (ri < row_idx[r+1] && col_idx[ri] < c)
@@ -233,8 +233,8 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
-		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
-		std::size_t nzbd_count(std::size_t row) { return m_nzbd.col_count(row) - 1; }
+		constexpr index_type * nzbd(std::size_t row) noexcept { return m_nzbd[row]; }
+		constexpr std::size_t nzbd_count(std::size_t row) noexcept { return m_nzbd.col_count(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
@@ -265,7 +265,7 @@ namespace plib
 		~pGEmatrix_cr() = default;
 
 		template <typename M>
-		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill)
+		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill) noexcept
 		{
 			std::size_t ops = 0;
 			std::size_t fill_max = 0;
@@ -298,7 +298,7 @@ namespace plib
 		}
 
 		template <typename V>
-		void gaussian_elimination(V & RHS)
+		void gaussian_elimination(V & RHS) noexcept
 		{
 			const std::size_t iN = base_type::size();
 
@@ -338,7 +338,7 @@ namespace plib
 			}
 		}
 
-		int get_parallel_level(std::size_t k) const
+		int get_parallel_level(std::size_t k) const noexcept
 		{
 			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
 				if (plib::container::contains( m_ge_par[i], k))
@@ -347,7 +347,7 @@ namespace plib
 		}
 
 		template <typename V>
-		void gaussian_elimination_parallel(V & RHS)
+		void gaussian_elimination_parallel(V & RHS) noexcept
 		{
 			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
 			for (auto l = 0UL; l < m_ge_par.size(); l++)
@@ -388,7 +388,7 @@ namespace plib
 		}
 
 		template <typename V1, typename V2>
-		void gaussian_back_substitution(V1 &V, const V2 &RHS)
+		void gaussian_back_substitution(V1 &V, const V2 &RHS) noexcept
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
@@ -406,7 +406,7 @@ namespace plib
 		}
 
 		template <typename V1>
-		void gaussian_back_substitution(V1 &V)
+		void gaussian_back_substitution(V1 &V) noexcept
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
@@ -425,7 +425,7 @@ namespace plib
 
 	private:
 		template <typename M>
-		void build_parallel_gaussian_execution_scheme(const M &fill)
+		void build_parallel_gaussian_execution_scheme(const M &fill) noexcept
 		{
 			// calculate parallel scheme for gaussian elimination
 			std::vector<std::vector<std::size_t>> rt(base_type::size());
@@ -505,7 +505,7 @@ namespace plib
 		~pLUmatrix_cr() = default;
 
 		template <typename M>
-		void build(M &fill, std::size_t ilup)
+		void build(M &fill, std::size_t ilup) noexcept
 		{
 			std::size_t p(0);
 			// build ilu_rows
@@ -552,7 +552,7 @@ namespace plib
 		///      k=k+1
 		///    i=i+1
 		///
-		void incomplete_LU_factorization(const base_type &mat)
+		void incomplete_LU_factorization(const base_type &mat) noexcept
 		{
 			if (m_ILUp < 1)
 				this->raw_copy_from(mat);
@@ -615,7 +615,7 @@ namespace plib
 		/// This can be solved for x using backwards elimination in U.
 		///
 		template <typename R>
-		void solveLU (R &r)
+		void solveLU (R &r) noexcept
 		{
 			for (std::size_t i = 1; i < base_type::size(); ++i )
 			{

@@ -123,13 +123,13 @@ namespace plib {
 
 		~parray() noexcept = default;
 
-		base_type &as_base() noexcept { return m_a; }
+		constexpr base_type &as_base() noexcept { return m_a; }
 
 		constexpr size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
 
 		constexpr size_type max_size() const noexcept { return base_type::max_size(); }
 
-		bool empty() const noexcept { return size() == 0; }
+		constexpr bool empty() const noexcept { return size() == 0; }
 
 		constexpr reference operator[](size_type i) noexcept
 		{
@@ -140,8 +140,8 @@ namespace plib {
 			return m_a[i];
 		}
 
-		pointer data() noexcept { return m_a.data(); }
-		const_pointer data() const noexcept { return m_a.data(); }
+		constexpr pointer data() noexcept { return m_a.data(); }
+		constexpr const_pointer data() const noexcept { return m_a.data(); }
 
 	private:
 		PALIGNAS_VECTOROPT()

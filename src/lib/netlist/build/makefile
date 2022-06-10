@@ -49,6 +49,7 @@ TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
 TIDY_FLAGSX += -modernize-use-nodiscard,
+TIDY_FLAGSX += -modernize-use-auto,
 #TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 #TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
 #TIDY_FLAGSX += -modernize-use-transparent-functors,
@@ -103,6 +104,7 @@ MD = @mkdir
 RM = @rm
 endif
 
+CSPELL=cspell
 PYTHON=@python
 
 TIDY_DB = $(OBJ)/compile_commands.json
@@ -289,10 +291,6 @@ native:
 gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
-emsdk:
-	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pong.cpp@nl_pong.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
-	# LDFLAGS  -s ASSERTIONS=1
-	
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
@@ -343,6 +341,14 @@ mingw-cross:
 		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" OBJ=obj/mingw-cross \
 		EXESUFFIX=.exe LIBS=
 
+#
+# run with emrun  --browser chrome nltool.html -c run  -t 10 -n kidniki nl_kidniki.cpp
+#
+emsdk:
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pongf.cpp@nl_pongf.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
+	# LDFLAGS  -s ASSERTIONS=1
+
+
 #-------------------------------------------------
 # regression tests
 #-------------------------------------------------
@@ -365,8 +371,8 @@ doc:
 	$(DOXYGEN) doxygen.conf
 
 cspell:
-	cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) ) | sed -e "s/ - Unknown/: error: Unknown/g"
-	#cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
+	#cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) ) | sed -e "s/ - Unknown/: error: Unknown/g"
+	cd .. && $(CSPELL) -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
 
 #-------------------------------------------------
 # depends
@@ -420,7 +426,7 @@ fix_permissions:
 srcclean: $(ALLSOURCES) $(ALLHEADERS)
 	@../../../../srcclean -u $(ALLSOURCES) $(ALLHEADERS)
 
-precommit: fix_permissions srcclean
+precommit: fix_permissions srcclean all runtests
 
 #-------------------------------------------------
 # clang tidy
