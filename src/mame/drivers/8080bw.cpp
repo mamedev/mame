@@ -1129,6 +1129,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( galxwars )
 	PORT_INCLUDE( sicv_base )
 
+	// Probably crude protection/anti-tampering:
+	// * Compared to 0x40 on start, jumps to 0x0000 (reset) on any other value.
+	// * Compared to byte in ROM at 0x091b (immediate from an ani $40), gets
+	//   into a state where it won't coin up on any other value.
+	// * Not read again during gameplay.
+	// It would be enough to stop someone just swapping the ROMs onto a Space
+	// Invaders C.V. board, but any competent hacker could bypass it easily.
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, 0x40, IPT_CUSTOM )
+
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1140,8 +1150,8 @@ static INPUT_PORTS_START( galxwars )
 	PORT_DIPSETTING(    0x00, "3000" )
 	PORT_DIPSETTING(    0x08, "5000" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
 void _8080bw_state::starw1_io_map(address_map &map)

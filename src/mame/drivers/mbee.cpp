@@ -1188,7 +1188,7 @@ COMP( 1985, mbeepc85,  mbee,   0,      mbeepc85, mbee,    mbee_state, init_mbeei
 COMP( 1985, mbeepc85s, mbee,   0,      mbeepc85, mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)",     MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mbeepc85b, mbee,   0,      mbeepc85, mbee,    mbee_state, init_mbeeic,   "Microbee Systems",   "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Microbee Systems",   "Microbee Premium PC85",       MACHINE_SUPPORTS_SAVE )
-COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Microbee Systems",   "Microbee Teleterm",           MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Microbee Systems",   "Microbee Teleterm",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Microbee Systems",   "Microbee 128k Premium",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Microbee Systems",   "Microbee 256TC",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2012, mbeepp,    mbee,   0,      mbeepp,   mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus+",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

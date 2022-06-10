@@ -18,6 +18,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
+#include "emupal.h"
 
 class labtam_vducom_device
 	: public device_t
@@ -47,9 +48,10 @@ private:
 	u8 nvram_r(address_space &space, offs_t offset) { return m_nvram[1]->read(space, offset) << 4 | m_nvram[0]->read(space, offset); }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[0]->write(offset, data & 0x0f); m_nvram[1]->write(offset, data >> 4); }
 
-	u8 u7_r(offs_t offset) { return BIT(m_u7, offset); }
+	u8 u15_r(offs_t offset) { return BIT(m_e4->read(), offset); }
 	void u7_w(offs_t offset, u8 data);
 
+	void palette_init(palette_device &palette);
 	MC6845_UPDATE_ROW(update_row);
 
 	required_device<i8086_cpu_device> m_cpu;
@@ -58,6 +60,7 @@ private:
 	required_device_array<z80sio_device, 2> m_com;
 	required_device_array<x2212_device, 2> m_nvram;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	required_shared_ptr_array<u16, 2> m_ram;

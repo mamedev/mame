@@ -11,6 +11,7 @@
 
 #include "bus/rc2014/cf.h"
 #include "bus/rc2014/clock.h"
+#include "bus/rc2014/edge.h"
 #include "bus/rc2014/fdc.h"
 #include "bus/rc2014/ide.h"
 #include "bus/rc2014/micro.h"
@@ -20,6 +21,7 @@
 #include "bus/rc2014/rtc.h"
 #include "bus/rc2014/serial.h"
 #include "bus/rc2014/sound.h"
+#include "bus/rc2014/z180cpu.h"
 #include "bus/rc2014/z80cpu.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
@@ -54,6 +56,12 @@ void rc2014_mini_bus_modules(device_slot_interface &device)
 	device.option_add("mini_cpm", RC2014_MINI_CPM);
 }
 
+void rc2014_bus_edge_modules(device_slot_interface &device)
+{
+	device.option_add("sc141", RC2014_SC141);
+	device.option_add("sc147", RC2014_SC147);
+	rc2014_bus_modules(device);
+}
 void rc2014_ext_bus_modules(device_slot_interface &device)
 {
 	rc2014_bus_modules(device);
@@ -67,4 +75,14 @@ void rc2014_ext_bus_modules(device_slot_interface &device)
 void rc2014_rc80_bus_modules(device_slot_interface &device)
 {
 	rc2014_ext_bus_modules(device);
+	device.option_add("sc111", RC2014_SC111);
+	device.option_add("sc119", RC2014_SC119);
+}
+
+void rc2014_rc80_bus_edge_modules(device_slot_interface &device)
+{
+	device.option_add("sc106", RC2014_SC106);
+	device.option_add("sc107", RC2014_SC107);
+	device.option_add("sc113", RC2014_SC113);
+	rc2014_rc80_bus_modules(device);
 }

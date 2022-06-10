@@ -413,7 +413,9 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
 	m_rs232->rxd_handler().set(m_maincpu, FUNC(z180_device::rxa0_w));
+	m_rs232->cts_handler().set(m_maincpu, FUNC(z180_device::cts0_w));
 
 	EEPROM_93C46_8BIT(config, m_eeprom);
 
@@ -449,6 +451,7 @@ void _25pacman_state::_25pacman(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &_25pacman_state::_25pacman_io_map);
 
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem_57600));
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(null_modem_57600));
 
 	AMD_29LV200T(config, "flash");
 }

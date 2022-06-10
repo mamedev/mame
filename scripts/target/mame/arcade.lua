@@ -1050,6 +1050,10 @@ files {
 	MAME_DIR .. "src/mame/audio/rax.h",
 	MAME_DIR .. "src/mame/audio/segam1audio.cpp",
 	MAME_DIR .. "src/mame/audio/segam1audio.h",
+	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
+	MAME_DIR .. "src/mame/video/snk68_spr.h",
+	MAME_DIR .. "src/mame/video/alpha68k_palette.cpp",
+	MAME_DIR .. "src/mame/video/alpha68k_palette.h",
 }
 
 --------------------------------------------------
@@ -1104,14 +1108,11 @@ files {
 	MAME_DIR .. "src/mame/audio/ad_sound.h",
 	MAME_DIR .. "src/mame/machine/alpha8201.cpp",
 	MAME_DIR .. "src/mame/machine/alpha8201.h",
-	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
-	MAME_DIR .. "src/mame/video/snk68_spr.h",
-	MAME_DIR .. "src/mame/video/alpha68k_palette.cpp",
-	MAME_DIR .. "src/mame/video/alpha68k_palette.h",
 }
 
 createMAMEProjects(_target, _subtarget, "amiga")
 files {
+	MAME_DIR .. "src/mame/includes/amiga.h",
 	MAME_DIR .. "src/mame/drivers/alg.cpp",
 	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
@@ -1318,8 +1319,8 @@ files {
 	MAME_DIR .. "src/mame/audio/orbit.cpp",
 	MAME_DIR .. "src/mame/video/orbit.cpp",
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.h",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
@@ -1901,6 +1902,10 @@ files {
 createMAMEProjects(_target, _subtarget, "efo")
 files {
 	MAME_DIR .. "src/mame/drivers/cedar_magnet.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_plane.h",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_sprite.h",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_board.h",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_flop.h",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_plane.cpp",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_sprite.cpp",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_board.cpp",
@@ -2564,8 +2569,6 @@ files {
 	MAME_DIR .. "src/mame/video/pingpong.cpp",
 	MAME_DIR .. "src/mame/drivers/piratesh.cpp",
 	MAME_DIR .. "src/mame/drivers/plygonet.cpp",
-	MAME_DIR .. "src/mame/includes/plygonet.h",
-	MAME_DIR .. "src/mame/video/plygonet.cpp",
 	MAME_DIR .. "src/mame/drivers/pooyan.cpp",
 	MAME_DIR .. "src/mame/includes/pooyan.h",
 	MAME_DIR .. "src/mame/video/pooyan.cpp",
@@ -2819,6 +2822,9 @@ files {
 	MAME_DIR .. "src/mame/includes/midtunit.h",
 	MAME_DIR .. "src/mame/machine/midtunit.cpp",
 	MAME_DIR .. "src/mame/video/midtunit.cpp",
+	MAME_DIR .. "src/mame/video/midtunit.ipp",
+	MAME_DIR .. "src/mame/video/midtunit.h",
+	MAME_DIR .. "src/mame/video/midtview.ipp",
 	MAME_DIR .. "src/mame/drivers/midvunit.cpp",
 	MAME_DIR .. "src/mame/includes/midvunit.h",
 	MAME_DIR .. "src/mame/video/midvunit.cpp",
@@ -3557,6 +3563,7 @@ files {
 	MAME_DIR .. "src/mame/includes/segas16a.h",
 	MAME_DIR .. "src/mame/video/segas16a.cpp",
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
+	MAME_DIR .. "src/mame/drivers/segas16b_isgsm.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
@@ -3865,10 +3872,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/snk68.cpp",
 	MAME_DIR .. "src/mame/includes/snk68.h",
 	MAME_DIR .. "src/mame/video/snk68.cpp",
-	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
-	MAME_DIR .. "src/mame/video/snk68_spr.h",
-	MAME_DIR .. "src/mame/video/alpha68k_palette.cpp",
-	MAME_DIR .. "src/mame/video/alpha68k_palette.h",
 }
 
 createMAMEProjects(_target, _subtarget, "sony")
@@ -4631,6 +4634,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sam.cpp",
 	MAME_DIR .. "src/mame/drivers/sleic.cpp",
 	MAME_DIR .. "src/mame/drivers/spectra.cpp",
+	MAME_DIR .. "src/mame/drivers/spike.cpp",
 	MAME_DIR .. "src/mame/drivers/spinb.cpp",
 	MAME_DIR .. "src/mame/drivers/spirit76.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
@@ -4653,6 +4657,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/wpc_s.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.h",
+	MAME_DIR .. "src/mame/audio/bally.h",
 	MAME_DIR .. "src/mame/audio/bally.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.h",
@@ -4828,6 +4833,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",
 	MAME_DIR .. "src/mame/drivers/flower.cpp",
+	MAME_DIR .. "src/mame/audio/flower.h",
 	MAME_DIR .. "src/mame/audio/flower.cpp",
 	MAME_DIR .. "src/mame/drivers/fortecar.cpp",
 	MAME_DIR .. "src/mame/drivers/fresh.cpp",
