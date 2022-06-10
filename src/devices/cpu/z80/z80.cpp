@@ -339,6 +339,8 @@ static const uint8_t cc_ex[0x100] = {
 	m_icount_executing -= icount; \
 } while (0)
 
+#define CP(prefix, opcode) case 0x##opcode:prefix##_##opcode();break;
+
 // T Memory Address
 #define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
 
@@ -347,70 +349,38 @@ static const uint8_t cc_ex[0x100] = {
 	CC(prefix,op); \
 	switch(op) \
 	{  \
-	case 0x00:prefix##_##00();break; case 0x01:prefix##_##01();break; case 0x02:prefix##_##02();break; case 0x03:prefix##_##03();break; \
-	case 0x04:prefix##_##04();break; case 0x05:prefix##_##05();break; case 0x06:prefix##_##06();break; case 0x07:prefix##_##07();break; \
-	case 0x08:prefix##_##08();break; case 0x09:prefix##_##09();break; case 0x0a:prefix##_##0a();break; case 0x0b:prefix##_##0b();break; \
-	case 0x0c:prefix##_##0c();break; case 0x0d:prefix##_##0d();break; case 0x0e:prefix##_##0e();break; case 0x0f:prefix##_##0f();break; \
-	case 0x10:prefix##_##10();break; case 0x11:prefix##_##11();break; case 0x12:prefix##_##12();break; case 0x13:prefix##_##13();break; \
-	case 0x14:prefix##_##14();break; case 0x15:prefix##_##15();break; case 0x16:prefix##_##16();break; case 0x17:prefix##_##17();break; \
-	case 0x18:prefix##_##18();break; case 0x19:prefix##_##19();break; case 0x1a:prefix##_##1a();break; case 0x1b:prefix##_##1b();break; \
-	case 0x1c:prefix##_##1c();break; case 0x1d:prefix##_##1d();break; case 0x1e:prefix##_##1e();break; case 0x1f:prefix##_##1f();break; \
-	case 0x20:prefix##_##20();break; case 0x21:prefix##_##21();break; case 0x22:prefix##_##22();break; case 0x23:prefix##_##23();break; \
-	case 0x24:prefix##_##24();break; case 0x25:prefix##_##25();break; case 0x26:prefix##_##26();break; case 0x27:prefix##_##27();break; \
-	case 0x28:prefix##_##28();break; case 0x29:prefix##_##29();break; case 0x2a:prefix##_##2a();break; case 0x2b:prefix##_##2b();break; \
-	case 0x2c:prefix##_##2c();break; case 0x2d:prefix##_##2d();break; case 0x2e:prefix##_##2e();break; case 0x2f:prefix##_##2f();break; \
-	case 0x30:prefix##_##30();break; case 0x31:prefix##_##31();break; case 0x32:prefix##_##32();break; case 0x33:prefix##_##33();break; \
-	case 0x34:prefix##_##34();break; case 0x35:prefix##_##35();break; case 0x36:prefix##_##36();break; case 0x37:prefix##_##37();break; \
-	case 0x38:prefix##_##38();break; case 0x39:prefix##_##39();break; case 0x3a:prefix##_##3a();break; case 0x3b:prefix##_##3b();break; \
-	case 0x3c:prefix##_##3c();break; case 0x3d:prefix##_##3d();break; case 0x3e:prefix##_##3e();break; case 0x3f:prefix##_##3f();break; \
-	case 0x40:prefix##_##40();break; case 0x41:prefix##_##41();break; case 0x42:prefix##_##42();break; case 0x43:prefix##_##43();break; \
-	case 0x44:prefix##_##44();break; case 0x45:prefix##_##45();break; case 0x46:prefix##_##46();break; case 0x47:prefix##_##47();break; \
-	case 0x48:prefix##_##48();break; case 0x49:prefix##_##49();break; case 0x4a:prefix##_##4a();break; case 0x4b:prefix##_##4b();break; \
-	case 0x4c:prefix##_##4c();break; case 0x4d:prefix##_##4d();break; case 0x4e:prefix##_##4e();break; case 0x4f:prefix##_##4f();break; \
-	case 0x50:prefix##_##50();break; case 0x51:prefix##_##51();break; case 0x52:prefix##_##52();break; case 0x53:prefix##_##53();break; \
-	case 0x54:prefix##_##54();break; case 0x55:prefix##_##55();break; case 0x56:prefix##_##56();break; case 0x57:prefix##_##57();break; \
-	case 0x58:prefix##_##58();break; case 0x59:prefix##_##59();break; case 0x5a:prefix##_##5a();break; case 0x5b:prefix##_##5b();break; \
-	case 0x5c:prefix##_##5c();break; case 0x5d:prefix##_##5d();break; case 0x5e:prefix##_##5e();break; case 0x5f:prefix##_##5f();break; \
-	case 0x60:prefix##_##60();break; case 0x61:prefix##_##61();break; case 0x62:prefix##_##62();break; case 0x63:prefix##_##63();break; \
-	case 0x64:prefix##_##64();break; case 0x65:prefix##_##65();break; case 0x66:prefix##_##66();break; case 0x67:prefix##_##67();break; \
-	case 0x68:prefix##_##68();break; case 0x69:prefix##_##69();break; case 0x6a:prefix##_##6a();break; case 0x6b:prefix##_##6b();break; \
-	case 0x6c:prefix##_##6c();break; case 0x6d:prefix##_##6d();break; case 0x6e:prefix##_##6e();break; case 0x6f:prefix##_##6f();break; \
-	case 0x70:prefix##_##70();break; case 0x71:prefix##_##71();break; case 0x72:prefix##_##72();break; case 0x73:prefix##_##73();break; \
-	case 0x74:prefix##_##74();break; case 0x75:prefix##_##75();break; case 0x76:prefix##_##76();break; case 0x77:prefix##_##77();break; \
-	case 0x78:prefix##_##78();break; case 0x79:prefix##_##79();break; case 0x7a:prefix##_##7a();break; case 0x7b:prefix##_##7b();break; \
-	case 0x7c:prefix##_##7c();break; case 0x7d:prefix##_##7d();break; case 0x7e:prefix##_##7e();break; case 0x7f:prefix##_##7f();break; \
-	case 0x80:prefix##_##80();break; case 0x81:prefix##_##81();break; case 0x82:prefix##_##82();break; case 0x83:prefix##_##83();break; \
-	case 0x84:prefix##_##84();break; case 0x85:prefix##_##85();break; case 0x86:prefix##_##86();break; case 0x87:prefix##_##87();break; \
-	case 0x88:prefix##_##88();break; case 0x89:prefix##_##89();break; case 0x8a:prefix##_##8a();break; case 0x8b:prefix##_##8b();break; \
-	case 0x8c:prefix##_##8c();break; case 0x8d:prefix##_##8d();break; case 0x8e:prefix##_##8e();break; case 0x8f:prefix##_##8f();break; \
-	case 0x90:prefix##_##90();break; case 0x91:prefix##_##91();break; case 0x92:prefix##_##92();break; case 0x93:prefix##_##93();break; \
-	case 0x94:prefix##_##94();break; case 0x95:prefix##_##95();break; case 0x96:prefix##_##96();break; case 0x97:prefix##_##97();break; \
-	case 0x98:prefix##_##98();break; case 0x99:prefix##_##99();break; case 0x9a:prefix##_##9a();break; case 0x9b:prefix##_##9b();break; \
-	case 0x9c:prefix##_##9c();break; case 0x9d:prefix##_##9d();break; case 0x9e:prefix##_##9e();break; case 0x9f:prefix##_##9f();break; \
-	case 0xa0:prefix##_##a0();break; case 0xa1:prefix##_##a1();break; case 0xa2:prefix##_##a2();break; case 0xa3:prefix##_##a3();break; \
-	case 0xa4:prefix##_##a4();break; case 0xa5:prefix##_##a5();break; case 0xa6:prefix##_##a6();break; case 0xa7:prefix##_##a7();break; \
-	case 0xa8:prefix##_##a8();break; case 0xa9:prefix##_##a9();break; case 0xaa:prefix##_##aa();break; case 0xab:prefix##_##ab();break; \
-	case 0xac:prefix##_##ac();break; case 0xad:prefix##_##ad();break; case 0xae:prefix##_##ae();break; case 0xaf:prefix##_##af();break; \
-	case 0xb0:prefix##_##b0();break; case 0xb1:prefix##_##b1();break; case 0xb2:prefix##_##b2();break; case 0xb3:prefix##_##b3();break; \
-	case 0xb4:prefix##_##b4();break; case 0xb5:prefix##_##b5();break; case 0xb6:prefix##_##b6();break; case 0xb7:prefix##_##b7();break; \
-	case 0xb8:prefix##_##b8();break; case 0xb9:prefix##_##b9();break; case 0xba:prefix##_##ba();break; case 0xbb:prefix##_##bb();break; \
-	case 0xbc:prefix##_##bc();break; case 0xbd:prefix##_##bd();break; case 0xbe:prefix##_##be();break; case 0xbf:prefix##_##bf();break; \
-	case 0xc0:prefix##_##c0();break; case 0xc1:prefix##_##c1();break; case 0xc2:prefix##_##c2();break; case 0xc3:prefix##_##c3();break; \
-	case 0xc4:prefix##_##c4();break; case 0xc5:prefix##_##c5();break; case 0xc6:prefix##_##c6();break; case 0xc7:prefix##_##c7();break; \
-	case 0xc8:prefix##_##c8();break; case 0xc9:prefix##_##c9();break; case 0xca:prefix##_##ca();break; case 0xcb:prefix##_##cb();break; \
-	case 0xcc:prefix##_##cc();break; case 0xcd:prefix##_##cd();break; case 0xce:prefix##_##ce();break; case 0xcf:prefix##_##cf();break; \
-	case 0xd0:prefix##_##d0();break; case 0xd1:prefix##_##d1();break; case 0xd2:prefix##_##d2();break; case 0xd3:prefix##_##d3();break; \
-	case 0xd4:prefix##_##d4();break; case 0xd5:prefix##_##d5();break; case 0xd6:prefix##_##d6();break; case 0xd7:prefix##_##d7();break; \
-	case 0xd8:prefix##_##d8();break; case 0xd9:prefix##_##d9();break; case 0xda:prefix##_##da();break; case 0xdb:prefix##_##db();break; \
-	case 0xdc:prefix##_##dc();break; case 0xdd:prefix##_##dd();break; case 0xde:prefix##_##de();break; case 0xdf:prefix##_##df();break; \
-	case 0xe0:prefix##_##e0();break; case 0xe1:prefix##_##e1();break; case 0xe2:prefix##_##e2();break; case 0xe3:prefix##_##e3();break; \
-	case 0xe4:prefix##_##e4();break; case 0xe5:prefix##_##e5();break; case 0xe6:prefix##_##e6();break; case 0xe7:prefix##_##e7();break; \
-	case 0xe8:prefix##_##e8();break; case 0xe9:prefix##_##e9();break; case 0xea:prefix##_##ea();break; case 0xeb:prefix##_##eb();break; \
-	case 0xec:prefix##_##ec();break; case 0xed:prefix##_##ed();break; case 0xee:prefix##_##ee();break; case 0xef:prefix##_##ef();break; \
-	case 0xf0:prefix##_##f0();break; case 0xf1:prefix##_##f1();break; case 0xf2:prefix##_##f2();break; case 0xf3:prefix##_##f3();break; \
-	case 0xf4:prefix##_##f4();break; case 0xf5:prefix##_##f5();break; case 0xf6:prefix##_##f6();break; case 0xf7:prefix##_##f7();break; \
-	case 0xf8:prefix##_##f8();break; case 0xf9:prefix##_##f9();break; case 0xfa:prefix##_##fa();break; case 0xfb:prefix##_##fb();break; \
-	case 0xfc:prefix##_##fc();break; case 0xfd:prefix##_##fd();break; case 0xfe:prefix##_##fe();break; case 0xff:prefix##_##ff();break; \
+	CP(prefix, 00) CP(prefix, 01) CP(prefix, 02) CP(prefix, 03) CP(prefix, 04) CP(prefix, 05) CP(prefix, 06) CP(prefix, 07) \
+	CP(prefix, 08) CP(prefix, 09) CP(prefix, 0a) CP(prefix, 0b) CP(prefix, 0c) CP(prefix, 0d) CP(prefix, 0e) CP(prefix, 0f) \
+	CP(prefix, 10) CP(prefix, 11) CP(prefix, 12) CP(prefix, 13) CP(prefix, 14) CP(prefix, 15) CP(prefix, 16) CP(prefix, 17) \
+	CP(prefix, 18) CP(prefix, 19) CP(prefix, 1a) CP(prefix, 1b) CP(prefix, 1c) CP(prefix, 1d) CP(prefix, 1e) CP(prefix, 1f) \
+	CP(prefix, 20) CP(prefix, 21) CP(prefix, 22) CP(prefix, 23) CP(prefix, 24) CP(prefix, 25) CP(prefix, 26) CP(prefix, 27) \
+	CP(prefix, 28) CP(prefix, 29) CP(prefix, 2a) CP(prefix, 2b) CP(prefix, 2c) CP(prefix, 2d) CP(prefix, 2e) CP(prefix, 2f) \
+	CP(prefix, 30) CP(prefix, 31) CP(prefix, 32) CP(prefix, 33) CP(prefix, 34) CP(prefix, 35) CP(prefix, 36) CP(prefix, 37) \
+	CP(prefix, 38) CP(prefix, 39) CP(prefix, 3a) CP(prefix, 3b) CP(prefix, 3c) CP(prefix, 3d) CP(prefix, 3e) CP(prefix, 3f) \
+	CP(prefix, 40) CP(prefix, 41) CP(prefix, 42) CP(prefix, 43) CP(prefix, 44) CP(prefix, 45) CP(prefix, 46) CP(prefix, 47) \
+	CP(prefix, 48) CP(prefix, 49) CP(prefix, 4a) CP(prefix, 4b) CP(prefix, 4c) CP(prefix, 4d) CP(prefix, 4e) CP(prefix, 4f) \
+	CP(prefix, 50) CP(prefix, 51) CP(prefix, 52) CP(prefix, 53) CP(prefix, 54) CP(prefix, 55) CP(prefix, 56) CP(prefix, 57) \
+	CP(prefix, 58) CP(prefix, 59) CP(prefix, 5a) CP(prefix, 5b) CP(prefix, 5c) CP(prefix, 5d) CP(prefix, 5e) CP(prefix, 5f) \
+	CP(prefix, 60) CP(prefix, 61) CP(prefix, 62) CP(prefix, 63) CP(prefix, 64) CP(prefix, 65) CP(prefix, 66) CP(prefix, 67) \
+	CP(prefix, 68) CP(prefix, 69) CP(prefix, 6a) CP(prefix, 6b) CP(prefix, 6c) CP(prefix, 6d) CP(prefix, 6e) CP(prefix, 6f) \
+	CP(prefix, 70) CP(prefix, 71) CP(prefix, 72) CP(prefix, 73) CP(prefix, 74) CP(prefix, 75) CP(prefix, 76) CP(prefix, 77) \
+	CP(prefix, 78) CP(prefix, 79) CP(prefix, 7a) CP(prefix, 7b) CP(prefix, 7c) CP(prefix, 7d) CP(prefix, 7e) CP(prefix, 7f) \
+	CP(prefix, 80) CP(prefix, 81) CP(prefix, 82) CP(prefix, 83) CP(prefix, 84) CP(prefix, 85) CP(prefix, 86) CP(prefix, 87) \
+	CP(prefix, 88) CP(prefix, 89) CP(prefix, 8a) CP(prefix, 8b) CP(prefix, 8c) CP(prefix, 8d) CP(prefix, 8e) CP(prefix, 8f) \
+	CP(prefix, 90) CP(prefix, 91) CP(prefix, 92) CP(prefix, 93) CP(prefix, 94) CP(prefix, 95) CP(prefix, 96) CP(prefix, 97) \
+	CP(prefix, 98) CP(prefix, 99) CP(prefix, 9a) CP(prefix, 9b) CP(prefix, 9c) CP(prefix, 9d) CP(prefix, 9e) CP(prefix, 9f) \
+	CP(prefix, a0) CP(prefix, a1) CP(prefix, a2) CP(prefix, a3) CP(prefix, a4) CP(prefix, a5) CP(prefix, a6) CP(prefix, a7) \
+	CP(prefix, a8) CP(prefix, a9) CP(prefix, aa) CP(prefix, ab) CP(prefix, ac) CP(prefix, ad) CP(prefix, ae) CP(prefix, af) \
+	CP(prefix, b0) CP(prefix, b1) CP(prefix, b2) CP(prefix, b3) CP(prefix, b4) CP(prefix, b5) CP(prefix, b6) CP(prefix, b7) \
+	CP(prefix, b8) CP(prefix, b9) CP(prefix, ba) CP(prefix, bb) CP(prefix, bc) CP(prefix, bd) CP(prefix, be) CP(prefix, bf) \
+	CP(prefix, c0) CP(prefix, c1) CP(prefix, c2) CP(prefix, c3) CP(prefix, c4) CP(prefix, c5) CP(prefix, c6) CP(prefix, c7) \
+	CP(prefix, c8) CP(prefix, c9) CP(prefix, ca) CP(prefix, cb) CP(prefix, cc) CP(prefix, cd) CP(prefix, ce) CP(prefix, cf) \
+	CP(prefix, d0) CP(prefix, d1) CP(prefix, d2) CP(prefix, d3) CP(prefix, d4) CP(prefix, d5) CP(prefix, d6) CP(prefix, d7) \
+	CP(prefix, d8) CP(prefix, d9) CP(prefix, da) CP(prefix, db) CP(prefix, dc) CP(prefix, dd) CP(prefix, de) CP(prefix, df) \
+	CP(prefix, e0) CP(prefix, e1) CP(prefix, e2) CP(prefix, e3) CP(prefix, e4) CP(prefix, e5) CP(prefix, e6) CP(prefix, e7) \
+	CP(prefix, e8) CP(prefix, e9) CP(prefix, ea) CP(prefix, eb) CP(prefix, ec) CP(prefix, ed) CP(prefix, ee) CP(prefix, ef) \
+	CP(prefix, f0) CP(prefix, f1) CP(prefix, f2) CP(prefix, f3) CP(prefix, f4) CP(prefix, f5) CP(prefix, f6) CP(prefix, f7) \
+	CP(prefix, f8) CP(prefix, f9) CP(prefix, fa) CP(prefix, fb) CP(prefix, fc) CP(prefix, fd) CP(prefix, fe) CP(prefix, ff) \
 	} \
 	if(m_icount_executing > 0) T(m_icount_executing); else m_icount_executing = 0; \
 } while (0)
@@ -2282,7 +2252,7 @@ OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD       
 OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { eax(); u8 a = arg(); nomreq_addr(PCD-1, 2); EXEC(xycb, a);  } /* **   DD CB xx    */
+OP(dd,cb) { eax(); m_prefix = XY_CB;                         } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
 OP(dd,ce) { illegal_1(); op_ce();                            } /* DB   DD          */
@@ -2573,7 +2543,7 @@ OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD       
 OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
 OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
 OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { eay(); u8 a = arg(); nomreq_addr(PCD-1, 2); EXEC(xycb, a);  } /* **   FD CB xx    */
+OP(fd,cb) { eay(); m_prefix = XY_CB;                         } /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
 OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
 OP(fd,ce) { illegal_1(); op_ce();                            } /* DB   FD          */
@@ -2944,7 +2914,7 @@ OP(op,06) { B = arg();                                                          
 OP(op,07) { rlca();                                                               } /* RLCA             */
 
 OP(op,08) { ex_af();                                                              } /* EX   AF,AF'      */
-OP(op,09) { add16(m_hl, m_bc);                                      } /* ADD  HL,BC       */
+OP(op,09) { add16(m_hl, m_bc);                                                    } /* ADD  HL,BC       */
 OP(op,0a) { A = rm(BC);  WZ=BC+1;                                                 } /* LD   A,(BC)      */
 OP(op,0b) { nomreq_ir(2); BC--;                                                   } /* DEC  BC          */
 OP(op,0c) { C = inc(C);                                                           } /* INC  C           */
@@ -2962,7 +2932,7 @@ OP(op,16) { D = arg();                                                          
 OP(op,17) { rla();                                                                } /* RLA              */
 
 OP(op,18) { jr();                                                                 } /* JR   o           */
-OP(op,19) { add16(m_hl, m_de);                                      } /* ADD  HL,DE       */
+OP(op,19) { add16(m_hl, m_de);                                                    } /* ADD  HL,DE       */
 OP(op,1a) { A = rm(DE); WZ = DE + 1;                                              } /* LD   A,(DE)      */
 OP(op,1b) { nomreq_ir(2); DE--;                                                   } /* DEC  DE          */
 OP(op,1c) { E = inc(E);                                                           } /* INC  E           */
@@ -2980,7 +2950,7 @@ OP(op,26) { H = arg();                                                          
 OP(op,27) { daa();                                                                } /* DAA              */
 
 OP(op,28) { jr_cond(F & ZF, 0x28);                                                } /* JR   Z,o         */
-OP(op,29) { add16(m_hl, m_hl);                                      } /* ADD  HL,HL       */
+OP(op,29) { add16(m_hl, m_hl);                                                    } /* ADD  HL,HL       */
 OP(op,2a) { m_ea = arg16(); rm16(m_ea, m_hl); WZ = m_ea + 1;                      } /* LD   HL,(w)      */
 OP(op,2b) { nomreq_ir(2); HL--;                                                   } /* DEC  HL          */
 OP(op,2c) { L = inc(L);                                                           } /* INC  L           */
@@ -3162,7 +3132,7 @@ OP(op,c7) { rst(0x00);                                                          
 OP(op,c8) { ret_cond(F & ZF, 0xc8);                                               } /* RET  Z           */
 OP(op,c9) { pop(m_pc); WZ = PCD;                                                  } /* RET              */
 OP(op,ca) { jp_cond(F & ZF);                                                      } /* JP   Z,a         */
-OP(op,cb) { EXEC(cb, rop());                                                      } /* **** CB xx       */
+OP(op,cb) { m_prefix = CB;                                                        } /* **** CB xx       */
 OP(op,cc) { call_cond(F & ZF, 0xcc);                                              } /* CALL Z,a         */
 OP(op,cd) { call();                                                               } /* CALL a           */
 OP(op,ce) { adc_a(arg());                                                         } /* ADC  A,n         */
@@ -3182,7 +3152,7 @@ OP(op,d9) { exx();                                                              
 OP(op,da) { jp_cond(F & CF);                                                      } /* JP   C,a         */
 OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)       */
 OP(op,dc) { call_cond(F & CF, 0xdc);                                              } /* CALL C,a         */
-OP(op,dd) { EXEC(dd, rop());                                                      } /* **** DD xx       */
+OP(op,dd) { m_prefix = DD;                                                        } /* **** DD xx       */
 OP(op,de) { sbc_a(arg());                                                         } /* SBC  A,n         */
 OP(op,df) { rst(0x18);                                                            } /* RST  3           */
 
@@ -3200,7 +3170,7 @@ OP(op,e9) { PC = HL;                                                            
 OP(op,ea) { jp_cond(F & PF);                                                      } /* JP   PE,a        */
 OP(op,eb) { ex_de_hl();                                                           } /* EX   DE,HL       */
 OP(op,ec) { call_cond(F & PF, 0xec);                                              } /* CALL PE,a        */
-OP(op,ed) { EXEC(ed, rop());                                                      } /* **** ED xx       */
+OP(op,ed) { m_prefix = ED;                                                        } /* **** ED xx       */
 OP(op,ee) { xor_a(arg());                                                         } /* XOR  n           */
 OP(op,ef) { rst(0x28);                                                            } /* RST  5           */
 
@@ -3218,7 +3188,7 @@ OP(op,f9) { nomreq_ir(2); SP = HL;                                              
 OP(op,fa) { jp_cond(F & SF);                                                      } /* JP   M,a         */
 OP(op,fb) { ei();                                                                 } /* EI               */
 OP(op,fc) { call_cond(F & SF, 0xfc);                                              } /* CALL M,a         */
-OP(op,fd) { EXEC(fd, rop());                                                      } /* **** FD xx       */
+OP(op,fd) { m_prefix = FD;                                                        } /* **** FD xx       */
 OP(op,fe) { cp(arg());                                                            } /* CP   n           */
 OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
 
@@ -3393,6 +3363,7 @@ void nsc800_device::take_interrupt_nsc800()
 /****************************************************************************
  * Processor initialization
  ****************************************************************************/
+ALLOW_SAVE_TYPE(z80_device::op_prefix);
 void z80_device::device_start()
 {
 	if( !tables_initialised )
@@ -3469,6 +3440,10 @@ void z80_device::device_start()
 
 		tables_initialised = true;
 	}
+
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_prefix));
+	save_item(NAME(m_opcode));
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(PC));
@@ -3599,6 +3574,9 @@ void z80_device::device_reset()
 {
 	leave_halt();
 
+	m_cycle = 0;
+	m_prefix = NONE;
+
 	PC = 0x0000;
 	m_i = 0;
 	m_r = 0;
@@ -3618,41 +3596,74 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
+
+void z80_device::exec(op_prefix prefix, u8 opcode) {
+	switch (prefix)
+	{
+	case NONE:  EXEC(op,   opcode); break;
+	case CB:    EXEC(cb,   opcode); break;
+	case DD:    EXEC(dd,   opcode); break;
+	case ED:    EXEC(ed,   opcode); break;
+	case FD:    EXEC(fd,   opcode); break;
+	case XY_CB: EXEC(xycb, opcode); break;
+	default: break;
+	}
+}
+
 /****************************************************************************
  * Execute 'cycles' T-states.
  ****************************************************************************/
-
 void z80_device::execute_run()
 {
-	do
+	while (m_icount > 0)
 	{
 		if (m_wait_state)
 		{
-			// stalled
-			m_icount = 0;
+			m_icount = 0; // stalled
 			return;
 		}
 
-		// check for interrupts before each instruction
-		check_interrupts();
-		m_icount_executing = 0;
-
-		m_after_ei = false;
-		m_after_ldair = false;
-
-		PRVPC = PCD;
-		debugger_instruction_hook(PCD);
-
-		uint8_t opcode = rop();
-
-		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
-		if (m_halt)
+		if (m_cycle == 0)
 		{
-			PC--;
-			opcode = 0;
+			// check for interrupts before each instruction
+			if (m_prefix == NONE) check_interrupts();
+			if (m_icount > 0)
+			{
+				if (m_prefix == NONE)
+				{
+					m_icount_executing = 0;
+					m_after_ei = false;
+					m_after_ldair = false;
+
+					PRVPC = PCD;
+					debugger_instruction_hook(PCD);
+				}
+
+				if (m_prefix == XY_CB)
+				{
+					m_opcode = arg();
+					nomreq_addr(PCD-1, 2);
+				}
+				else
+					m_opcode = rop();
+
+				// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
+				if (m_halt)
+				{
+					PC--;
+					m_opcode = 0;
+				}
+				m_cycle = 1;
+			}
 		}
-		EXEC(op,opcode);
-	} while (m_icount > 0);
+		else
+		{
+			op_prefix prefix = m_prefix;
+			m_prefix = NONE;
+			exec(prefix, m_opcode);
+			m_cycle = 0;
+		}
+	};
 }
 
 void z80_device::check_interrupts()

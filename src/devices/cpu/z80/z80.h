@@ -42,6 +42,11 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
+	enum op_prefix : u8
+	{
+		NONE, CB, DD, ED, FD, XY_CB
+	};
+
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -232,6 +237,7 @@ protected:
 	void otdr();
 	void ei();
 
+	void exec(op_prefix prefix, u8 opcode);
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
@@ -282,6 +288,9 @@ protected:
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
+	int               m_cycle;
+	op_prefix         m_prefix;
+	u8                m_opcode;
 	int               m_icount;
 	int               m_icount_executing;
 	uint8_t           m_rtemp;
