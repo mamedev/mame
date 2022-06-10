@@ -2138,6 +2138,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fs_cbmdos.h,FORMATS["FS_CBMDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_CBMDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fs_coco_rsdos.h,FORMATS["FS_COCO_RSDOS"] = true
 --------------------------------------------------
 
