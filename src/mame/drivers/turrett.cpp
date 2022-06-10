@@ -61,7 +61,7 @@ void turrett_state::machine_start()
 	save_item(NAME(m_frame));
 	save_item(NAME(m_adc));
 
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(turrett_state::dma_complete), this));
+	m_dma_timer = timer_alloc(FUNC(turrett_state::dma_complete), this);
 }
 
 

@@ -39,15 +39,6 @@
 class pc88va_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PC8801FD_UPD765_TC_TO_ZERO,
-		TIMER_T3_MOUSE_CALLBACK,
-		TIMER_PC88VA_FDC_TIMER,
-		TIMER_PC88VA_FDC_MOTOR_START_0,
-		TIMER_PC88VA_FDC_MOTOR_START_1
-	};
-
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -87,9 +78,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
@@ -102,6 +93,7 @@ private:
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
 	std::unique_ptr<uint8_t[]> m_kanjiram;
+
 	uint16_t m_bank_reg = 0;
 	uint16_t m_screen_ctrl_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
@@ -115,6 +107,11 @@ private:
 	uint8_t m_buf_ram[16]{};
 	uint8_t m_portc_test = 0;
 	uint8_t m_fdc_motor_status[2]{};
+
+	/* timers */
+	emu_timer *m_tc_clear_timer = nullptr;
+	emu_timer *m_fdc_timer = nullptr;
+	emu_timer *m_motor_start_timer[2]{};
 
 	/* floppy state */
 	uint8_t m_i8255_0_pc = 0;

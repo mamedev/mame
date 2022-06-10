@@ -71,6 +71,7 @@ public:
 	void pipibibs(machine_config &config);
 	void pipibibsbl(machine_config &config);
 	void batsugun(machine_config &config);
+	void batsugunbl(machine_config &config);
 	void enmadaio(machine_config &config);
 	void truxton2(machine_config &config);
 	void vfive(machine_config &config);
@@ -186,6 +187,7 @@ private:
 	DECLARE_VIDEO_START(bgaregga);
 	DECLARE_VIDEO_START(bgareggabl);
 	DECLARE_VIDEO_START(batrider);
+	DECLARE_VIDEO_START(batsugunbl);
 
 	// Teki Paki sound
 	u8 tekipaki_cmdavailable_r();
@@ -211,6 +213,7 @@ private:
 	void batrider_sound_z80_mem(address_map &map);
 	void batrider_sound_z80_port(address_map &map);
 	void batsugun_68k_mem(address_map &map);
+	void batsugunbl_68k_mem(address_map &map);
 	void bbakraid_68k_mem(address_map &map);
 	void bbakraid_sound_z80_mem(address_map &map);
 	void bbakraid_sound_z80_port(address_map &map);

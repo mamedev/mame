@@ -708,8 +708,8 @@ ROM_END
 void ssfindo_state::init_common()
 {
 	m_speedup = nullptr;
-	//m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
-	//m_PS7500timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer1_callback),this));
+	//m_PS7500timer0 = timer_alloc(FUNC(ssfindo_state::PS7500_Timer0_callback), this);
+	//m_PS7500timer1 = timer_alloc(FUNC(ssfindo_state::PS7500_Timer1_callback), this);
 
 	//save_item(NAME(m_PS7500_IO));
 	//save_item(NAME(m_PS7500_FIFO));

@@ -235,7 +235,6 @@ spacbatt                        // bootleg
 spacempr                        // bootleg
 spactrai                        //
 spcdrag                         // bootleg
-spcdraga                        // bootleg
 spctbird                        // (c) Fortrek
 spdcoin                         // (c) 1984 Stern
 sstarcrs                        // Taito (Brazil)
@@ -282,6 +281,34 @@ gamemach                        //
 
 @source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
+
+@source:jpmsru.cpp
+j_ewn                           // Each Way Nudger (JPM)
+j_ewna                          //
+j_ewnb                          //
+j_ewnc                          //
+j_ndu                           // Nudge Double Up (JPM)
+j_ndua                          //
+j_ndub                          //
+j_dud                           // Nudge Double Up Deluxe (JPM)
+j_duda                          //
+j_dudb                          //
+j_dt                            //
+j_lan                           // Lite A Nudge (JPM)
+j_lana                          //
+j_lanb                          //
+j_super2                        // Super 2
+j_ews                           // Each Way Shuffle (JPM)
+j_ewsa                          //
+j_ewsb                          //
+j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_lt                            // Lucky 2's (JPM)
+j_ts                            //
+j_plus2                         // Plus 2 (CTL)
+j_goldn2                        // Golden 2's (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
+j_la                            // Lucky Aces
 
 @source:m62.cpp                 // m62.cpp
 battroad                        // (c) 1984
@@ -472,7 +499,6 @@ goldnaxeud                      //
 hwchamp                         // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
-isgsm                           //
 lockonph                        //
 mvp                             // (c) 1989 (FD1094)
 mvpd                            //
@@ -495,7 +521,6 @@ ryukyud                         //
 //sdibl4                          // bootleg
 //sdibl5                          // bootleg
 //sdibl6                          // bootleg
-shinfz                          //
 //shinobi2                        // (c) 1987 (FD1094)
 //shinobi2d                       //
 //shinobi3                        // (c) 1987 (MC-8123B)
@@ -507,7 +532,6 @@ snapper                         // (c) 1990 Philko - korean clone board
 sonicbom                        // (c) 1987 (FD1094)
 sonicbomd                       //
 suprleag                        // (c) 1987 (FD1094)
-tetrbx                          //
 //tetris1                         // (c) 1988 (FD1094) S16B
 //tetris1d                        //
 //tetris2                         // (c) 1988 (FD1094) S16B
@@ -529,6 +553,11 @@ wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
+
+@source:segas16b_isgsm.cpp
+isgsm                           //
+shinfz                          //
+tetrbx                          //
 
 @source:sspeedr.cpp
 sspeedr                         // Midway

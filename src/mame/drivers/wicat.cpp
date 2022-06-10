@@ -66,6 +66,23 @@ public:
 	void wicat(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void driver_start() override;
+
+	void main_mem(address_map &map);
+	void video_io(address_map &map);
+	void video_mem(address_map &map);
+	void wd1000_io(address_map &map);
+	void wd1000_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(poll_kb);
+	TIMER_CALLBACK_MEMBER(kb_serial_tick);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
+
+	void send_key(uint8_t val);
+
 	uint16_t invalid_r(offs_t offset);
 	void invalid_w(offs_t offset, uint16_t data);
 	uint16_t memmap_r();
@@ -109,26 +126,8 @@ private:
 	required_memory_region m_chargen;
 	required_device<fd1795_device> m_fdc;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	void main_mem(address_map &map);
-	void video_io(address_map &map);
-	void video_mem(address_map &map);
-	void wd1000_io(address_map &map);
-	void wd1000_mem(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void driver_start() override;
-
-	void poll_kb();
-	void send_key(uint8_t val);
-
 	emu_timer* m_kb_timer;
 	emu_timer* m_kb_serial_timer;
-	static const device_timer_id KB_TIMER = 1;
-	static const device_timer_id KB_SERIAL_TIMER = 2;
 
 	uint8_t m_portA;
 	uint8_t m_portB;
@@ -276,8 +275,8 @@ static void wicat_floppies(device_slot_interface &device)
 
 void wicat_state::driver_start()
 {
-	m_kb_timer = timer_alloc(KB_TIMER);
-	m_kb_serial_timer = timer_alloc(KB_SERIAL_TIMER);
+	m_kb_timer = timer_alloc(FUNC(wicat_state::poll_kb), this);
+	m_kb_serial_timer = timer_alloc(FUNC(wicat_state::kb_serial_tick), this);
 }
 
 void wicat_state::machine_start()
@@ -305,25 +304,17 @@ void wicat_state::machine_reset()
 		elem = 0;
 }
 
-void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wicat_state::kb_serial_tick)
 {
-	switch (id)
+	m_videouart->write_rri((m_kb_data >> (m_kb_bit)) & 0x01);
+	m_kb_bit++;
+	if(m_kb_bit > 10)
 	{
-	case KB_TIMER:
-		poll_kb();
-		break;
-	case KB_SERIAL_TIMER:
-		m_videouart->write_rri((m_kb_data >> (m_kb_bit)) & 0x01);
-		m_kb_bit++;
-		if(m_kb_bit > 10)
-		{
-			m_kb_serial_timer->reset();
-		}
-		break;
+		m_kb_serial_timer->reset();
 	}
 }
 
-void wicat_state::poll_kb()
+TIMER_CALLBACK_MEMBER(wicat_state::poll_kb)
 {
 	uint8_t line;
 	uint8_t val = 0;

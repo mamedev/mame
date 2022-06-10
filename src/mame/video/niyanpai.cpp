@@ -162,16 +162,9 @@ void niyanpai_state::update_pixel(int vram, int x, int y)
 	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
-void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(niyanpai_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb19010_busyflag = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in niyanpai_state::device_timer");
-	}
+	m_nb19010_busyflag = 1;
 }
 
 void niyanpai_state::gfxdraw(int vram)
@@ -372,7 +365,7 @@ void niyanpai_state::video_start()
 	m_clut[1] = std::make_unique<uint8_t[]>(0x1000);
 	m_clut[2] = std::make_unique<uint8_t[]>(0x1000);
 	m_nb19010_busyflag = 1;
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(niyanpai_state::clear_busy_flag), this);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));

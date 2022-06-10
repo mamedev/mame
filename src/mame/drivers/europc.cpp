@@ -30,15 +30,15 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "cpu/m6805/m68705.h"
 #include "bus/isa/aga.h"
 #include "bus/isa/fdc.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "machine/europc_kbd.h"
 #include "machine/genpc.h"
 #include "machine/m3002.h"
-#include "machine/pckeybrd.h"
 #include "machine/ram.h"
 #include "softlist_dev.h"
-
 
 class europc_pc_state : public driver_device
 {
@@ -47,11 +47,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
-		m_keyboard(*this, "pc_keyboard"),
 		m_ram(*this, RAM_TAG),
 		m_rtc(*this, "rtc"),
-		m_jim_state(0),
-		m_port61(0)
+		m_jim_state(0)
 	{ }
 
 	void europc(machine_config &config);
@@ -63,12 +61,11 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
-	required_device<pc_keyboard_device> m_keyboard;
 	required_device<ram_device> m_ram;
 	required_device<m3002_device> m_rtc;
 
-	void europc_pio_w(offs_t offset, uint8_t data);
-	uint8_t europc_pio_r(offs_t offset);
+	uint8_t europc_portc_r();
+	DECLARE_WRITE_LINE_MEMBER(reset_in_w);
 
 	void europc_jim_w(offs_t offset, uint8_t data);
 	uint8_t europc_jim_r(offs_t offset);
@@ -77,7 +74,6 @@ private:
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
 	isa8_aga_device::mode_t m_jim_mode{};
-	int m_port61; // bit 0,1 must be 0 for startup; reset?
 
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
@@ -275,41 +271,20 @@ void europc_pc_state::init_europc()
 	}
 }
 
-void europc_pc_state::europc_pio_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 1:
-		m_port61=data;
-		m_mb->m_pit8253->write_gate2(BIT(data, 0));
-		m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-		m_keyboard->enable(BIT(data, 6));
-		if(data & 0x80)
-			m_mb->m_pic8259->ir1_w(0);
-		break;
-	}
-
-	logerror("europc pio write %.2x %.2x\n", offset, data);
-}
-
-
-uint8_t europc_pc_state::europc_pio_r(offs_t offset)
+uint8_t europc_pc_state::europc_portc_r()
 {
 	int data = 0;
-	switch (offset)
-	{
-	case 0:
-		data = m_keyboard->read();
-		break;
-	case 1:
-		data = m_port61;
-		break;
-	case 2:
-		if (m_mb->pit_out2())
-			data |= 0x20;
-		break;
-	}
+	if (m_mb->pit_out2())
+		data |= 0x20;
+
 	return data;
+}
+
+WRITE_LINE_MEMBER(europc_pc_state::reset_in_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	if (!state)
+		m_mb->reset();
 }
 
 /*
@@ -367,45 +342,6 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( europc_keyboard )
-	PORT_INCLUDE(pc_keyboard)
-	PORT_MODIFY("pc_keyboard_2") /* IN6 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_BACKSLASH) /* `                           29  A9 */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_TILDE) /* \                           2B  AB */
-
-	PORT_MODIFY("pc_keyboard_5") /* IN9 */
-	PORT_BIT ( 0x0070, 0x0000, IPT_UNUSED )
-	/* 0x40 non us backslash 2 not available */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11)      /* F11                         57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12)      /* F12                         58  D8 */
-
-	PORT_START("pc_keyboard_6") /* IN10 */\
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP Enter") PORT_CODE(KEYCODE_ENTER_PAD)       /* PAD Enter                   60  e0 */
-	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
-INPUT_PORTS_END
-
-class europc_keyboard_device : public pc_keyboard_device
-{
-public:
-	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
-DEFINE_DEVICE_TYPE(EUROPC_KEYB, europc_keyboard_device, "europc_keyb", "EURO PC Keyboard")
-
-europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_keyboard_device(mconfig, EUROPC_KEYB, tag, owner, clock)
-{
-	m_type = KEYBOARD_TYPE::PC;
-}
-
-ioport_constructor europc_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(europc_keyboard);
-}
-
 void europc_pc_state::europc_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -416,7 +352,7 @@ void europc_pc_state::europc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
+	map(0x0062, 0x0062).r(FUNC(europc_pc_state::europc_portc_r));
 	map(0x0250, 0x025f).rw(FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
 	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
@@ -487,15 +423,18 @@ void europc_pc_state::europc(machine_config &config)
 	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_mb->kbddata_callback().set("kbd", FUNC(europc_keyboard_device::kbdata_w));
+	m_mb->kbdclk_callback().set("kbd", FUNC(europc_keyboard_device::kbclk_w));
 
-	M6805U2(config, "kbdctrl", 16_MHz_XTAL / 4);
+	europc_keyboard_device &kbd(EUROPC_KEYBOARD(config, "kbd", 16_MHz_XTAL / 4));
+	kbd.kbdata_callback().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_data_w));
+	kbd.kbclk_callback().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));
+	kbd.reset_callback().set(FUNC(europc_pc_state::reset_in_w));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
-	EUROPC_KEYB(config, m_keyboard);
-	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -520,10 +459,12 @@ void europc_pc_state::euroxt(machine_config &config)
 {
 	europc(config);
 
-	config.device_remove("kbdctrl");
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config.replace(), "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_data_w));
 
-	PC_KEYB(config.replace(), m_keyboard);
-	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+	m_mb->kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	m_ram->set_default_size("768K");
 
@@ -551,18 +492,12 @@ ROM_START( europc )
 	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
 	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(7)) // v2.04 and v2.05 don't work yet, , see comment section
-
-	ROM_REGION(0x1000, "kbdctrl", 0)
-	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
 ROM_END
 
 ROM_START( europc2 )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
 	ROM_LOAD("europcii_bios_v3.01_500145.bin", 0x8000, 0x8000, CRC(ecca89c8) SHA1(802b89babdf0ab0a0a9c21d1234e529c8386d6fb))
-
-	ROM_REGION(0x1000, "kbdctrl", 0)
-	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
 ROM_END
 
 ROM_START( euroxt )
@@ -580,7 +515,7 @@ ROM_START( euroxt )
 	// BIOS ROM versions 1.02, 1.04 and 1.05 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1988, europc,  ibm5150, 0,      europc,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC",    MACHINE_NOT_WORKING)
-COMP( 198?, europc2, ibm5150, 0,      europc2, europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
-COMP( 198?, euroxt,  ibm5150, 0,      euroxt,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO XT",    MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
+COMP( 1988, europc,  0,      ibm5150, europc,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC",    MACHINE_NOT_WORKING)
+COMP( 198?, europc2, 0,      ibm5150, europc2, europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
+COMP( 198?, euroxt,  0,      ibm5150, euroxt,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO XT",    MACHINE_NOT_WORKING)

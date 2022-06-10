@@ -433,7 +433,7 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	// IO8 at 0xe080 is used internally by the MPID board PIA.
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(swtpc09_state::pia0_a_r));
-	m_pia->readca1_handler().set(FUNC(swtpc09_state::pia0_ca1_r));
+	m_pia->ca1_w(0);
 	m_pia->irqa_handler().set(FUNC(swtpc09_state::pia0_irq_a));
 
 	// IO9 at 0xe090 is used internally by the MPID board 6840 timer.

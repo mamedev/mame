@@ -12,10 +12,16 @@ Execution Debugger Commands
     (Shift-F11)
 :ref:`debugger-command-go`
     resume execution (F5)
+:ref:`debugger-command-gbt`
+    resume execution until next true branch is executed
+:ref:`debugger-command-gbf`
+    resume execution until next false branch is executed
 :ref:`debugger-command-gex`
     resume execution until exception is raised
 :ref:`debugger-command-gint`
     resume execution until interrupt is taken (F7)
+:ref:`debugger-command-gni`
+    resume execution until next further instruction
 :ref:`debugger-command-gtime`
     resume execution until the given delay has elapsed
 :ref:`debugger-command-gvblank`
@@ -137,6 +143,64 @@ Examples:
 Back to :ref:`debugger-execution-list`
 
 
+.. _debugger-command-gbf:
+
+gbf
+---
+
+**gbf [<condition>]**
+
+Resumes execution.  Control will not be returned to the debugger until
+a breakpoint or watchpoint is triggered, or until a conditional branch
+or skip instruction is not taken, following any delay slots.
+
+The optional **<condition>** parameter lets you specify an expression
+that will be evaluated each time a conditional branch is encountered.
+If the result of the expression is true (non-zero), execution will be
+halted after the branch if it is not taken; otherwise, execution will
+continue with no notification.
+
+Examples:
+
+``gbf``
+    Resume execution until a breakpoint/watchpoint is triggered, or
+    until the next false branch.
+``gbf {pc != 1234}``
+    Resume execution until the next false branch, disregarding the
+    instruction at address 1234.
+
+Back to :ref:`debugger-execution-list`
+
+
+.. _debugger-command-gbt:
+
+gbt
+---
+
+**gbt [<condition>]**
+
+Resumes execution.  Control will not be returned to the debugger until
+a breakpoint or watchpoint is triggered, or until a conditional branch
+or skip instruction is taken, following any delay slots.
+
+The optional **<condition>** parameter lets you specify an expression
+that will be evaluated each time a conditional branch is encountered.
+If the result of the expression is true (non-zero), execution will be
+haltedafter the branch if it is taken; otherwise, execution will
+continue with no notification.
+
+Examples:
+
+``gbt``
+    Resume execution until a breakpoint/watchpoint is triggered, or
+    until the next true branch.
+``gbt {pc != 1234}``
+    Resume execution until the next true branch, disregarding the
+    instruction at address 1234.
+
+Back to :ref:`debugger-execution-list`
+
+
 .. _debugger-command-gex:
 
 gex
@@ -192,6 +256,34 @@ Examples:
     Resume execution until a breakpoint/watchpoint is triggered, or
     interrupt request line 4 is asserted and acknowledged on the current
     CPU.
+
+Back to :ref:`debugger-execution-list`
+
+
+.. _debugger-command-gni:
+
+gni
+---
+
+**gni [<count>]**
+
+Resumes execution.  Control will not be returned to the debugger until a
+breakpoint or watchpoint is triggered.  A temporary unconditional breakpoint
+is set at the prorgam address **<count>** instructions sequentially past the
+current one.  When this breakpoint is hit, it is automatically removed.
+
+The **<count>** parameter is optional and defaults to 1 if omitted.  If
+**<count>** is specified as zero, the command does nothing.  **<count>** is
+not permitted to exceed 512 decimal.
+
+Examples:
+
+``gni``
+    Resume execution until a breakpoint/watchpoint is triggered, including
+    the temporary breakpoint set at the address of the following instruction.
+``gni 2``
+    Resume execution until a breakpoint/watchpoint is triggered.  A temporary
+    breakpoint is set two instructions past the current one.
 
 Back to :ref:`debugger-execution-list`
 

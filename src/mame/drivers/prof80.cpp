@@ -401,22 +401,18 @@ static void prof80_floppies(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  motor_off - disable the floppy motor after
+//  a delay
 //-------------------------------------------------
 
-void prof80_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(prof80_state::motor_off)
 {
-	switch (id)
-	{
-	case TIMER_ID_MOTOR:
-		motor(1);
-		break;
-	}
+	motor(1);
 }
 
 
 //-------------------------------------------------
-//  MACHINE_START( prof80 )
+//  machine_start
 //-------------------------------------------------
 
 void prof80_state::machine_start()
@@ -426,7 +422,7 @@ void prof80_state::machine_start()
 	m_rtc->oe_w(1);
 
 	// create timer
-	m_floppy_motor_off_timer = timer_alloc(TIMER_ID_MOTOR);
+	m_floppy_motor_off_timer = timer_alloc(FUNC(prof80_state::motor_off), this);
 
 	// register for state saving
 	save_item(NAME(m_motor));
@@ -441,7 +437,7 @@ void prof80_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( prof80 )
+//  machine_config
 //-------------------------------------------------
 
 void prof80_state::prof80(machine_config &config)

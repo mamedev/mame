@@ -55,13 +55,9 @@ To Do:
 #include "speaker.h"
 
 
-/***************************************************************************
-
-
-                            Memory Maps - Main CPU
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  memory - main CPU
+//-------------------------------------------------
 
 void fuuki16_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -107,7 +103,7 @@ void fuuki16_state::vram_buffered_w(offs_t offset, u16 data, u16 mem_mask)
 		m_tilemap[2]->mark_tile_dirty(offset / 2);
 }
 
-void fuuki16_state::fuuki16_map(address_map &map)
+void fuuki16_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                     // ROM
 	map(0x400000, 0x40ffff).ram();                                                                     // RAM
@@ -127,13 +123,9 @@ void fuuki16_state::fuuki16_map(address_map &map)
 }
 
 
-/***************************************************************************
-
-
-                            Memory Maps - Sound CPU
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  memory - sound CPU
+//-------------------------------------------------
 
 void fuuki16_state::sound_rombank_w(u8 data)
 {
@@ -153,14 +145,14 @@ void fuuki16_state::oki_banking_w(u8 data)
 	m_oki->set_rom_bank((data & 6) >> 1);
 }
 
-void fuuki16_state::fuuki16_sound_map(address_map &map)
+void fuuki16_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();         // ROM
 	map(0x6000, 0x7fff).ram();         // RAM
 	map(0x8000, 0xffff).bankr("soundbank");    // Banked ROM
 }
 
-void fuuki16_state::fuuki16_sound_io_map(address_map &map)
+void fuuki16_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
@@ -174,13 +166,9 @@ void fuuki16_state::fuuki16_sound_io_map(address_map &map)
 }
 
 
-/***************************************************************************
-
-
-                                Input Ports
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  input ports
+//-------------------------------------------------
 
 static INPUT_PORTS_START( gogomile )
 	PORT_START("SYSTEM")    // $800000.w
@@ -345,13 +333,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-
-                            Graphics Layouts
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  graphics layouts
+//-------------------------------------------------
 
 /* 16x16x4 */
 static const gfx_layout layout_16x16x4 =
@@ -384,13 +368,9 @@ static GFXDECODE_START( gfx_fuuki16 )
 GFXDECODE_END
 
 
-/***************************************************************************
-
-
-                                Machine Drivers
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  driver functions
+//-------------------------------------------------
 
 /*
     - Interrupts (pbancho) -
@@ -404,26 +384,23 @@ GFXDECODE_END
             also used for water effects and titlescreen linescroll on gogomile
 */
 
-void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(fuuki16_state::level1_interrupt)
 {
-	switch (id)
-	{
-	case TIMER_LEVEL_1_INTERRUPT:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
-		break;
-	case TIMER_VBLANK_INTERRUPT:
-		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-		m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
-		break;
-	case TIMER_RASTER_INTERRUPT:
-		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
-		m_screen->update_partial(m_screen->vpos());
-		m_raster_interrupt_timer->adjust(m_screen->frame_period());
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in fuuki16_state::device_timer");
-	}
+	m_maincpu->set_input_line(1, HOLD_LINE);
+	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
+}
+
+TIMER_CALLBACK_MEMBER(fuuki16_state::vblank_interrupt)
+{
+	m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
+}
+
+TIMER_CALLBACK_MEMBER(fuuki16_state::raster_interrupt)
+{
+	m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
+	m_screen->update_partial(m_screen->vpos());
+	m_raster_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 
@@ -433,9 +410,9 @@ void fuuki16_state::machine_start()
 
 	m_soundbank->configure_entries(0, 3, &ROM[0x8000], 0x8000);
 
-	m_level_1_interrupt_timer = timer_alloc(TIMER_LEVEL_1_INTERRUPT);
-	m_vblank_interrupt_timer = timer_alloc(TIMER_VBLANK_INTERRUPT);
-	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
+	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki16_state::level1_interrupt), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki16_state::vblank_interrupt), this);
+	m_raster_interrupt_timer = timer_alloc(FUNC(fuuki16_state::raster_interrupt), this);
 }
 
 
@@ -453,11 +430,11 @@ void fuuki16_state::fuuki16(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(32'000'000) / 2);    /* 16 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::main_map);
 
 	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);      /* 6 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::fuuki16_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -493,11 +470,9 @@ void fuuki16_state::fuuki16(machine_config &config)
 }
 
 
-/***************************************************************************
-
-                                ROM Loading
-
-***************************************************************************/
+//-------------------------------------------------
+//  ROM loading
+//-------------------------------------------------
 
 /***************************************************************************
 
@@ -661,13 +636,9 @@ ROM_START( pbancho )
 ROM_END
 
 
-/***************************************************************************
-
-
-                                Game Drivers
-
-
-***************************************************************************/
+//-------------------------------------------------
+//  game drivers
+//-------------------------------------------------
 
 GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )

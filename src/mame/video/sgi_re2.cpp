@@ -78,7 +78,7 @@ void sgi_re2_device::device_start()
 	set_rdy(true);
 	set_drq(false);
 
-	m_step = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sgi_re2_device::step), this));
+	m_step = timer_alloc(FUNC(sgi_re2_device::step), this);
 }
 
 void sgi_re2_device::device_reset()

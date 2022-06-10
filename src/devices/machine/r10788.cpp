@@ -80,7 +80,7 @@ void r10788_device::device_start()
 	save_item(NAME(m_io_counter));
 	save_item(NAME(m_scan_counter));
 
-	m_timer = timer_alloc(TIMER_DISPLAY);
+	m_timer = timer_alloc(FUNC(r10788_device::display_update), this);
 	// recurring timer every 36 cycles
 	m_timer->adjust(clocks_to_attotime(36), 0, clocks_to_attotime(36));
 }
@@ -102,27 +102,11 @@ void r10788_device::device_reset()
 }
 
 
-/**
- * @brief r10788_device::device_timer timer event callback
- * @param timer emu_timer which fired
- * @param id timer identifier
- * @param param parameter
- * @param ptr pointer parameter
- */
-void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(r10788_device::display_update)
 {
-	uint8_t data;
-	switch (id)
-	{
-		case TIMER_DISPLAY:
-			data = (m_reg[0][m_scan_counter] & m_mask_a) +
-					16 * (m_reg[1][m_scan_counter] & m_mask_b);
-			LOG("%s: scan counter:%2d data:%02x\n", __FUNCTION__, m_scan_counter, data);
-			m_display(m_scan_counter, data, 0xff);
-			break;
-		default:
-			LOG("%s: invalid timer id:%d\n", __FUNCTION__, id);
-	}
+	uint8_t data = ((m_reg[1][m_scan_counter] & m_mask_b) << 4) | (m_reg[0][m_scan_counter] & m_mask_a);
+	LOG("display_update: scan counter:%2d data:%02x\n", m_scan_counter, data);
+	m_display(m_scan_counter, data, 0xff);
 	m_scan_counter = (m_scan_counter + 1) % 16;
 }
 

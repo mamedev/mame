@@ -296,7 +296,7 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 
 void cvs_state::start_393hz_timer()
 {
-	m_cvs_393hz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cvs_state::cvs_393hz_timer_cb),this));
+	m_cvs_393hz_timer = timer_alloc(FUNC(cvs_state::cvs_393hz_timer_cb), this);
 	m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 

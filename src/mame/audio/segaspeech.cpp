@@ -13,6 +13,8 @@
 
 #include "sound/sp0250.h"
 
+#include "netlist/nl_setup.h"
+
 #include "audio/nl_segaspeech.h"
 
 #define VERBOSE 0

@@ -356,7 +356,7 @@ struct OffsetFormat {
   //! Returns the size of the region/instruction where the offset is encoded.
   inline uint32_t regionSize() const noexcept { return _regionSize; }
 
-  //! Returns the the offset of the word relative to the start of the region where the offset is.
+  //! Returns the offset of the word relative to the start of the region where the offset is.
   inline uint32_t valueOffset() const noexcept { return _valueOffset; }
 
   //! Returns the size of the data-type (word) that contains the offset, in bytes.

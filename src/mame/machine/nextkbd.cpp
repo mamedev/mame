@@ -33,7 +33,7 @@ void nextkbd_device::device_start()
 	int_power_cb.resolve_safe();
 	int_nmi_cb.resolve_safe();
 
-	poll_timer = timer_alloc(0);
+	poll_timer = timer_alloc(FUNC(nextkbd_device::update_tick), this);
 
 	save_item(NAME(ctrl_snd));
 	save_item(NAME(ctrl_kms));
@@ -124,7 +124,7 @@ void nextkbd_device::update_mouse(bool force_update)
 	send();
 }
 
-void nextkbd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nextkbd_device::update_tick)
 {
 	if(!fifo_empty())
 		send();

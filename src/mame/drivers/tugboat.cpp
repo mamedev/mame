@@ -48,16 +48,11 @@ public:
 	void tugboat(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(trigger_int);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -91,7 +86,7 @@ private:
 
 void tugboat_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_interrupt_timer = timer_alloc(FUNC(tugboat_state::trigger_int), this);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_hd46505_0_reg));
@@ -212,17 +207,10 @@ void tugboat_state::ctrl_w(uint8_t data)
 	m_ctrl = data;
 }
 
-void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tugboat_state::trigger_int)
 {
-	switch (id)
-	{
-	case TIMER_INTERRUPT:
-		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_interrupt_timer->adjust(m_screen->frame_period());
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tugboat_state::device_timer");
-	}
+	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 void tugboat_state::machine_reset()

@@ -158,7 +158,7 @@ void news_68k_state::machine_start()
 
 	m_net_ram = std::make_unique<u16[]>(8192);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_68k_state::timer), this));
+	m_timer = timer_alloc(FUNC(news_68k_state::timer), this);
 
 	m_intst = 0;
 	for (bool &int_state : m_int_state)

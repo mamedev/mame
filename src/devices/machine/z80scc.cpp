@@ -1072,7 +1072,7 @@ void z80scc_channel::device_start()
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
 
-	m_baudtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80scc_channel::brg_tick), this));
+	m_baudtimer = timer_alloc(FUNC(z80scc_channel::brg_tick), this);
 
 	// state saving
 	save_item(NAME(m_rr0));
@@ -2287,7 +2287,7 @@ void z80scc_channel::do_sccreg_wr15(uint8_t data)
 	LOG("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled");
 	LOG("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled");
 
-	const bool old_reg = m_wr15;
+	const uint8_t old_reg = m_wr15;
 	m_wr15 = data;
 	if ((old_reg & WR15_ZEROCOUNT) != (m_wr15 & WR15_ZEROCOUNT))
 	{

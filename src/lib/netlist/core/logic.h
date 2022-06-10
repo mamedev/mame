@@ -30,7 +30,7 @@ namespace netlist
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname,
-				state_e terminal_state, nldelegate delegate);
+				state_e terminal_state, nl_delegate delegate);
 
 		logic_net_t & net() noexcept
 		{
@@ -50,7 +50,7 @@ namespace netlist
 	{
 	public:
 		logic_input_t(device_t &dev, const pstring &aname,
-				nldelegate delegate);
+				nl_delegate delegate);
 
 		const netlist_sig_t &operator()() const noexcept
 		{
@@ -140,10 +140,9 @@ namespace netlist
 		///
 		/// This function terminates if actually called.
 		///
-		[[noreturn]] static void set_tristate(netlist_sig_t v,
-			netlist_time ts_off_on, netlist_time ts_on_off)
+		[[noreturn]] static void set_tristate([[maybe_unused]] netlist_sig_t v,
+			[[maybe_unused]] netlist_time ts_off_on, [[maybe_unused]] netlist_time ts_on_off)
 		{
-			plib::unused_var(v, ts_off_on, ts_on_off);
 			plib::terminate("set_tristate on logic_output should never be called!");
 		}
 	private:

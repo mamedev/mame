@@ -124,7 +124,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(adc_ready);
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -628,7 +629,7 @@ void atlantis_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 
 	// Allocate adc timer
-	m_adc_ready_timer = timer_alloc(0);
+	m_adc_ready_timer = timer_alloc(FUNC(atlantis_state::adc_ready), this);
 
 	// Save states
 	save_item(NAME(m_cmos_write_enabled));
@@ -659,7 +660,7 @@ void atlantis_state::machine_reset()
 /*************************************
 *  Timer
 *************************************/
-void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(atlantis_state::adc_ready)
 {
 	// ADC Ready Timer
 	board_ctrl[STATUS] |= (1 << A2D_IRQ_SHIFT);

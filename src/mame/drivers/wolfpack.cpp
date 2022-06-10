@@ -14,19 +14,6 @@
 #include "speaker.h"
 
 
-void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PERIODIC:
-		periodic_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in wolfpack_state::device_timer");
-	}
-}
-
-
 TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
@@ -44,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 void wolfpack_state::machine_start()
 {
 	m_led.resolve();
-	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
+	m_periodic_timer = timer_alloc(FUNC(wolfpack_state::periodic_callback), this);
 }
 
 void wolfpack_state::machine_reset()

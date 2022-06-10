@@ -72,7 +72,7 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
   add **OSD=sdl** to the make options.  The main emulator binary will have an
   ``sdl`` prefix prepended (e.g. ``sdlmame.exe``).  You
-  will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
+  will need to install the MSYS2 packages for SDL 2 version 2.0.6 or later.
 * By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
   will need to install the MSYS2 packages for Qt 5.
@@ -224,7 +224,7 @@ Fedora Linux
 ------------
 
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.4 or later as earlier versions are buggy::
+SDL2 2.0.6 or later as earlier versions lack required functionality::
 
     sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
 
@@ -246,7 +246,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 -------------------------------------------------------------
 
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.4 or later as earlier versions are buggy::
+SDL2 2.0.6 or later as earlier versions lack required functionality::
 
     sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default
 
@@ -274,8 +274,10 @@ Apple macOS
 
 You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
 Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
-need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.  You’ll also
-need to install Python 3.
+need SDL2 2.0.6 or later for Intel or SDL2 2.0.14 on Apple Silicon.  You’ll also
+need to install Python 3 – it’s currently included with the Xcode command line
+tools, but you can also install a stand-alone version or get it via the Homebrew
+package manager.
 
 * Install **Xcode** from the Mac App Store or
   `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
@@ -298,12 +300,13 @@ Next you’ll need to get SDL2 installed.
   **SDL2.framework** folder from the SDL disk image into the **Frameworks**
   folder. You will have to authenticate with your user password.
 
-Now get Python 3 set up:
+If you don’t already have it, get Python 3 set up:
 
-* Go to the `official Python site <https://www.python.org/>`_ and click the link
-  to the download page for the current version (this was
-  `Python 3.10.0 <https://www.python.org/downloads/release/python-3100/>`_ at
-  the time of writing).
+* Go to the official Python site, navigate to the
+  `releases for macOS <https://www.python.org/downloads/macos/>`_, and click the
+  link to download the installer for the latest stable release (this was
+  `Python 3.10.4 <https://www.python.org/ftp/python/3.10.4/python-3.10.4-macos11.pkg>`_
+  at the time of writing).
 * Scroll down to the “Files” section, and download the macOS version (called
   “macOS 64-bit universal2 installer” or similar).
 * Once the package downloads, open it and follow the standard installation

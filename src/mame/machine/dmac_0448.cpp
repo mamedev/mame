@@ -54,8 +54,8 @@ void dmac_0448_device::device_start()
 	m_dma_r.resolve_all_safe(0);
 	m_dma_w.resolve_all_safe();
 
-	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac_0448_device::irq_check), this));
-	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac_0448_device::dma_check), this));
+	m_irq_check = timer_alloc(FUNC(dmac_0448_device::irq_check), this);
+	m_dma_check = timer_alloc(FUNC(dmac_0448_device::dma_check), this);
 
 	m_out_int_state = false;
 	m_gsel = 0;

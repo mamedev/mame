@@ -31,25 +31,26 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-private:
-	static constexpr device_timer_id TIMER_SEND_IRQ = 0;
+	TIMER_CALLBACK_MEMBER(send_irq);
 
+private:
 	address_space_config m_mmio_config;
 
 	devcb_write_line m_out_irq_func;
 
-	u8 m_cmd = 0, m_tx_data = 0;
+	emu_timer *m_irq_timer;
+	u8 m_cmd = 0;
+	u8 m_tx_data = 0;
 	u32 m_ctrl = 0;
 	u16 m_status = 0;
 };
 
 DECLARE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device)
 
-void iphone2g_spi_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(iphone2g_spi_device::send_irq)
 {
 	m_out_irq_func(1);
 }
@@ -61,7 +62,7 @@ void iphone2g_spi_device::map(address_map &map)
 		{
 			m_status |= 0xfff2;
 			m_cmd = m_tx_data;
-			timer_set(attotime::from_hz(1'000), TIMER_SEND_IRQ);
+			m_irq_timer->adjust(attotime::from_hz(1'000));
 		}
 		m_ctrl = data;
 	}));
@@ -99,6 +100,8 @@ void iphone2g_spi_device::device_start()
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_tx_data));
 	save_item(NAME(m_status));
+
+	m_irq_timer = timer_alloc(FUNC(iphone2g_spi_device::send_irq), this);
 }
 
 void iphone2g_spi_device::device_reset()
@@ -138,16 +141,17 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-private:
-	static constexpr device_timer_id TIMER_TICK = 0;
+	TIMER_CALLBACK_MEMBER(send_irq);
 
+private:
 	address_space_config m_mmio_config;
 
 	devcb_write_line m_out_irq_func;
+
+	emu_timer *m_irq_timer;
 
 	struct timer
 	{
@@ -161,7 +165,7 @@ private:
 
 DECLARE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device)
 
-void iphone2g_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(iphone2g_timer_device::send_irq)
 {
 	m_out_irq_func(1);
 }
@@ -185,6 +189,7 @@ void iphone2g_timer_device::device_resolve_objects()
 
 void iphone2g_timer_device::device_start()
 {
+	m_irq_timer = timer_alloc(FUNC(iphone2g_timer_device::send_irq), this);
 }
 
 void iphone2g_timer_device::device_reset()

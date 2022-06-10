@@ -73,8 +73,6 @@ enum cop400_cko_bond {
 class cop400_cpu_device : public cpu_device
 {
 public:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// L pins: 8-bit bi-directional
 	auto read_l() { return m_read_l.bind(); }
 	auto write_l() { return m_write_l.bind(); }
@@ -153,6 +151,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	TIMER_CALLBACK_MEMBER(advance_counter);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

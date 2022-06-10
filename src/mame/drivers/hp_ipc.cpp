@@ -413,7 +413,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(clear_bus_error);
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -478,7 +479,7 @@ private:
 };
 
 
-void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp_ipc_state::clear_bus_error)
 {
 	m_bus_error = false;
 }
@@ -735,7 +736,7 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 
 void hp_ipc_state::machine_start()
 {
-	m_bus_error_timer = timer_alloc(0);
+	m_bus_error_timer = timer_alloc(FUNC(hp_ipc_state::clear_bus_error), this);
 	m_bus_error = false;
 
 	m_bankdev->set_bank(1);

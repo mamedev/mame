@@ -83,7 +83,7 @@ public:
 
 	// Active low lines. We're using ASSERT=0 / CLEAR=1
 	line_state      ready_r() { return m_ready? ASSERT_LINE : CLEAR_LINE; }
-	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
+	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; }
 	line_state      trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; }
 
 	// Data output towards controller
@@ -118,7 +118,11 @@ protected:
 	virtual void        device_start() override;
 	virtual void        device_stop() override;
 	virtual void        device_reset() override;
-	virtual void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(index_timer);
+	TIMER_CALLBACK_MEMBER(recalibrate);
+	TIMER_CALLBACK_MEMBER(seek_update);
+	TIMER_CALLBACK_MEMBER(cache_update);
 
 	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer, *m_cache_timer;
 	index_pulse_cb      m_index_pulse_cb;
@@ -166,7 +170,6 @@ private:
 	mfmhd_image_format_t*   m_format;
 	chd_file   *m_chd;
 	void        head_move();
-	void        recalibrate();
 
 	// Common routine for read/write
 	bool            find_position(attotime &from_when, const attotime &limit, int &bytepos, int &bitpos);

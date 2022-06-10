@@ -81,6 +81,7 @@ const help_item f_static_help_list[] =
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
+		"  time -- prints current machine time to the console\n"
 		"  cls -- clears the console text buffer\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
@@ -581,6 +582,13 @@ const help_item f_static_help_list[] =
 		"  Reads in debugger commands from break_and_trace.cmd and executes them.\n"
 	},
 	{
+		"time",
+		"\n"
+		"  time\n"
+		"\n"
+		"The time command prints the current machine time to the console.\n"
+	},
+	{
 		"quit",
 		"\n"
 		"  quit\n"
@@ -970,7 +978,8 @@ const help_item f_static_help_list[] =
 		"debugger until a breakpoint or watchpoint is hit, or until you manually break in using the "
 		"assigned key. Before executing, the gni command sets a temporary unconditional breakpoint "
 		"<count> instructions sequentially past the current one, which is automatically removed when "
-		"hit. If <count> is omitted, its default value is 1."
+		"hit. If <count> is omitted, its default value is 1. If <count> is specified as zero, the "
+		"command does nothing. <count> is not permitted to exceed 512 decimal."
 		"\n"
 		"Examples:\n"
 		"\n"

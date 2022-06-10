@@ -21,6 +21,7 @@ public:
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 	auto irmx_irq_cb() { return m_irmx_irq_cb.bind(); }
+	auto irqa_cb() { return m_irqa_cb.bind(); }
 	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
@@ -65,7 +66,6 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
@@ -95,6 +95,8 @@ private:
 	void inc_timer(int which);
 	uint16_t internal_port_r(offs_t offset, uint16_t mem_mask = ~0);
 	void internal_port_w(offs_t offset, uint16_t data);
+
+	TIMER_CALLBACK_MEMBER(timer_elapsed);
 
 	struct mem_state
 	{
@@ -145,10 +147,6 @@ private:
 	mem_state       m_mem;
 	bool            m_last_dma;
 
-	static const device_timer_id TIMER_INT0 = 0;
-	static const device_timer_id TIMER_INT1 = 1;
-	static const device_timer_id TIMER_INT2 = 2;
-
 	uint16_t m_reloc;
 
 	address_space_config m_program_config;
@@ -160,6 +158,7 @@ private:
 	devcb_write_line m_out_tmrout0_func;
 	devcb_write_line m_out_tmrout1_func;
 	devcb_write_line m_irmx_irq_cb;
+	devcb_write_line m_irqa_cb;
 	device_irq_acknowledge_delegate m_irmx_irq_ack;
 };
 

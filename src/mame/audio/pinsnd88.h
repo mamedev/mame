@@ -52,10 +52,8 @@ protected:
 	required_device<ym2151_device> m_ym2151;
 	required_memory_bank m_cpubank;
 
-	static const device_timer_id TIMER_SYNC = 0;
 private:
-	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 	// members
 	devcb_write_line m_syncq_cb;

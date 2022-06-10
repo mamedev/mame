@@ -34,13 +34,14 @@ Year + Game               Board(s)               CPU      Company            Not
 88  Almond Pinky          D1401128L-0 + RM-1D    Z80      Dynax
 89  Mahjong Shinkirou     D210301BL2 + FRM-00?   TLCS-90  Dynax
 89  Mahjong Derringer     D2203018L              Z80      Dynax              Larger palette
-9?  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 90  Mahjong If..?         D2909278L              TLCS-90  Dynax              Larger palette
 91  Mahjong Vegas         D5011308L1 + FRM-00    TLCS-90  Dynax              Undumped internal rom (mjvegas set)
 92  Mahjong Cafe Time     D6310128L1-1           TLCS-90  Dynax              Larger palette, RTC
 93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
+93  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 95  Mahjong Tensinhai     D10010318L1            TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
+97  Pong Boo! 2           NEW PONG-BOO           Z80(?)   OCT                OKI M6295, no PROMs
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
 99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Undumped internal rom
 99  Mahjong Cafe Paradise ? + TSS001-0001        TLCS-90  Techno-Top         Undumped internal rom
@@ -107,6 +108,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
+#include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -170,6 +172,7 @@ public:
 	void mjsiyoub(machine_config &config);
 	void rkjanoh2(machine_config &config);
 	void ichiban(machine_config &config);
+	void pongboo2(machine_config &config);
 
 	void init_tahjong();
 	void init_dynax();
@@ -315,6 +318,9 @@ private:
 	void mjtensin_map(address_map &map);
 	void mjvegasa_map(address_map &map);
 	void mjyarou_iomap(address_map &map);
+	void pongboo2_map(address_map &map);
+	void pongboo2_iomap(address_map &map);
+	void pongboo2_opcodes_map(address_map &map);
 	void rkjanoh2_iomap(address_map &map);
 	void royalmah_iomap(address_map &map);
 	void royalmah_map(address_map &map);
@@ -328,7 +334,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<ay8910_device> m_ay;
+	optional_device<ay8910_device> m_ay;
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<msm6242_device> m_rtc;
@@ -758,6 +764,21 @@ void royalmah_state::ichiban_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
+void royalmah_state::pongboo2_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().region("maincpu", 0);
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000); // TODO: should be banked, as changing the offset shows other graphics
+	map(0x8000, 0xffff).writeonly().share(m_videoram);
+}
+
+void royalmah_state::pongboo2_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().region("maincpu", 0x10000);
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
+}
+
 void royalmah_state::royalmah_iomap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -881,6 +902,20 @@ void royalmah_state::ichiban_iomap(address_map &map) // TODO: writes to 0x12 and
 	map(0x13, 0x13).portr("DSW-C");
 	map(0x14, 0x14).portr("DSW-D").nopw();
 	map(0x16, 0x17).w("ymsnd", FUNC(ym2413_device::write));
+}
+
+void royalmah_state::pongboo2_iomap(address_map &map) // TODO: banking, inputs
+{
+	map.global_mask(0xff);
+	// map(0x50, 0x50) // reads P1 inputs from here, but active high / different from other games?
+	// map(0x51, 0x51) // reads P2 inputs from here, but active high / different from other games?
+	// map(0x80, 0x80).w // ??
+	map(0x81, 0x81).w(FUNC(royalmah_state::input_port_select_w)); // 0x01, 0x02, 0x04, 0x08, 0x10
+	// map(0x82, 0x82).w // ??
+	// map(0x84, 0x84).w // ??
+	// map(0x91, 0x91).r // ??
+	map(0x9a, 0x9a).w("oki", FUNC(okim6295_device::write));
+	// map(0xa0, 0xbf).w // something similar to jansou_colortable_w ?
 }
 
 void royalmah_state::dondenmj_iomap(address_map &map)
@@ -4048,6 +4083,33 @@ void royalmah_state::ichiban(machine_config &config)
 	YM2413(config, "ymsnd", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void royalmah_state::pongboo2(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, 48_MHz_XTAL / 12); // not a Z80, probably some derived core
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::pongboo2_map);
+	m_maincpu->set_addrmap(AS_IO, &royalmah_state::pongboo2_iomap);
+	m_maincpu->set_addrmap(AS_OPCODES, &royalmah_state::pongboo2_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(royalmah_state::irq0_line_hold));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 8, 247);
+	screen.set_refresh_hz(60.5686);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_screen_update(FUNC(royalmah_state::screen_update));
+
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 512); // wrong
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5); // frequency and pin 7 not verified
+}
+
 
 /***************************************************************************
 
@@ -5499,7 +5561,7 @@ ROM_END
 /***************************************************************************
 
 Ichi Ban Jyan
-Excel, 199?
+Excel, 1993
 
 PCB Layout
 ----------
@@ -5543,6 +5605,35 @@ ROM_START( ichiban )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
+
+/*
+Pong Boo! 2 by OCT
+
+PCB is etched
+NEW PONG-BOO MADE IN JAPAN
+OCT. Co,Ltd. All Rights Reserved
+
+Main components
+- 4x scratched chips. 1 is supposed to be the main CPU, possibly some kind of Z80 or Z180 based SoC?
+- 1x 48.000 XTAL
+- 1x OKI M6295 sound chip (there's also an unpopulated space marked for a YM2413)
+- 1x CY7C185-15PC 8k x8 SRAM
+- 1x CY7C199-15PC 32k x8 SRAM
+- 1x HM6264ALSP-12 with a battery nearby
+- 2x SN74LS174N
+- 4x bank of 8 dip-switches
+
+This game shares the same programmer / programming team as Ichi Ban Jian by Excel.
+It seems to use a similar split opcodes / data ROM arrangement.
+*/
+
+ROM_START( pongboo2 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "1a.1.u016", 0x00000, 0x80000, CRC(07a95a99) SHA1(10897f8f0d8799797a577dffc9ba36b8904bb6c4) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "2.u0513", 0x00000, 0x40000, CRC(97bafe5b) SHA1(bff4df17cdb2d3ee63cc88ff486a7f5964182a15) )
+ROM_END
 
 void royalmah_state::init_tahjong()
 {
@@ -5738,7 +5829,6 @@ GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, royalmah_state, init_mjifb,
 GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, royalmah_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_state, init_daisyari, ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
-GAME( 199?,  ichiban,  0,        ichiban,  ichiban,  royalmah_state, empty_init,    ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
 GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
 GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
@@ -5746,8 +5836,10 @@ GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_state, init_mjvega
 GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, royalmah_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             MACHINE_NOT_WORKING )
+GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_state, empty_init,    ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
+GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_state, empty_init,    ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs
 GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    MACHINE_NOT_WORKING )
 GAME( 1999,  cafepara, 0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise",                 MACHINE_NOT_WORKING )

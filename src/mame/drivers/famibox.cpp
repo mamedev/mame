@@ -508,8 +508,8 @@ void famibox_state::machine_start()
 	for (int i = 0; i < 4; i++)
 		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
-	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
-	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
+	m_attract_timer = timer_alloc(FUNC(famibox_state::famicombox_attract_timer_callback), this);
+	m_gameplay_timer = timer_alloc(FUNC(famibox_state::famicombox_gameplay_timer_callback), this);
 	m_exception_cause = 0xff;
 	m_exception_mask = 0;
 	m_attract_timer_period = 0;

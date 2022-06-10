@@ -616,9 +616,9 @@ void gt_device_base::device_start()
 	save_item(NAME(m_control));
 
 	// allocate timers
-	m_blit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt_device_base::blit), this));
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt_device_base::line), this));
-	m_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt_device_base::done), this));
+	m_blit_timer = timer_alloc(FUNC(gt_device_base::blit), this);
+	m_line_timer = timer_alloc(FUNC(gt_device_base::line), this);
+	m_done_timer = timer_alloc(FUNC(gt_device_base::done), this);
 }
 
 void gt_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)

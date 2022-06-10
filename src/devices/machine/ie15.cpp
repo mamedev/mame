@@ -166,7 +166,7 @@ void ie15_device::beep_w(uint8_t data)
 	{
 		LOG("beep (%s)\n", m_long_beep ? "short" : "long");
 	}
-	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(ie15_device::ie15_beepoff),this));
+	m_beepoff_timer->adjust(attotime::from_msec(length));
 	m_beeper->set_state(1);
 }
 
@@ -229,27 +229,22 @@ uint8_t ie15_device::kb_s_lin_r()
 	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_LIN ? IE_TRUE : 0;
 }
 
-/* serial port */
-
-void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ie15_device::hblank_onoff_tick)
 {
-	switch (id)
+	if (m_hblank) // Transitioning from in blanking to out of blanking
 	{
-	case TIMER_HBLANK:
-		if (m_hblank) // Transitioning from in blanking to out of blanking
-		{
-			m_hblank = 0;
-			m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % IE15_TOTAL_VERT, 0));
-			scanline_callback();
-		}
-		else // Transitioning from out of blanking to in blanking
-		{
-			m_hblank = 1;
-			m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, IE15_HORZ_START));
-		}
-		break;
+		m_hblank = 0;
+		m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % IE15_TOTAL_VERT, 0));
+		scanline_callback();
+	}
+	else // Transitioning from out of blanking to in blanking
+	{
+		m_hblank = 1;
+		m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, IE15_HORZ_START));
 	}
 }
+
+/* serial port */
 
 WRITE_LINE_MEMBER(ie15_device::rs232_conn_rxd_w)
 {
@@ -494,9 +489,10 @@ void ie15_device::device_start()
 	m_sdv_led.resolve();
 	m_prd_led.resolve();
 
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
+	m_hblank_timer = timer_alloc(FUNC(ie15_device::hblank_onoff_tick), this);
 	m_hblank_timer->adjust(attotime::never);
 
+	m_beepoff_timer = timer_alloc(FUNC(ie15_device::ie15_beepoff), this);
 	m_video.ptr1 = m_video.ptr2 = m_latch = 0;
 
 	m_tmpbmp = std::make_unique<uint32_t[]>(IE15_TOTAL_HORZ * IE15_TOTAL_VERT);

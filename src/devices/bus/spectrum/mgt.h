@@ -74,15 +74,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(inhibit_button) { if (!newval) m_romcs = 0; }
 
 protected:
-	enum
-	{
-		TIMER_RESET
-	};
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -96,6 +90,8 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
+	TIMER_CALLBACK_MEMBER(reset_tick);
+
 private:
 	required_device<spectrum_expansion_slot_device> m_exp;
 	required_ioport m_joy1;
@@ -105,6 +101,7 @@ private:
 	bool m_map;
 	u8 m_control;
 	bool m_reset_delay;
+	emu_timer *m_reset_timer;
 };
 
 

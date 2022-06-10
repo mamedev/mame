@@ -41,7 +41,7 @@ mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, de
 
 void mb3773_device::device_start()
 {
-	m_watchdog_timer = timer_alloc();
+	m_watchdog_timer = timer_alloc(FUNC(mb3773_device::watchdog_expired), this);
 
 	save_item( NAME(m_ck) );
 }
@@ -56,7 +56,7 @@ void mb3773_device::device_reset()
 	reset_timer();
 }
 
-void mb3773_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mb3773_device::watchdog_expired)
 {
 	logerror("Reset caused by watchdog\n");
 

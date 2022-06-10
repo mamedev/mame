@@ -48,7 +48,7 @@ namespace netlist
 		///
 		virtual ~netlist_state_t() noexcept = default;
 
-		template<class C>
+		template <class C>
 		static bool check_class(core_device_t *p) noexcept
 		{
 			return dynamic_cast<C *>(p) != nullptr;
@@ -63,7 +63,7 @@ namespace netlist
 		///
 		/// \return pointers to device
 
-		template<class C>
+		template <class C>
 		C *get_single_device(const pstring &name) const
 		{
 			return dynamic_cast<C *>(get_single_device(name, check_class<C>));
@@ -75,7 +75,7 @@ namespace netlist
 		///
 		/// \return vector with pointers to devices
 
-		template<class C>
+		template <class C>
 		std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
@@ -93,7 +93,7 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib_base &static_solver_lib() const noexcept { return *m_lib; }
+		plib::dynamic_library_base &static_solver_lib() const noexcept { return *m_lib; }
 
 		/// \brief provide library with static solver implementations.
 		///
@@ -101,7 +101,7 @@ namespace netlist
 		/// determined by the specific use case. You can pass such a collection
 		/// of symbols with this method.
 		///
-		void set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib);
+		void set_static_solver_lib(std::unique_ptr<plib::dynamic_library_base> &&lib);
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -109,13 +109,13 @@ namespace netlist
 		// state handling
 		plib::state_manager_t &run_state_manager() noexcept { return m_state; }
 
-		template<typename O, typename C>
+		template <typename O, typename C>
 		void save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
 			this->run_state_manager().save_item(plib::void_ptr_cast(&owner), state, module + "." + stname);
 		}
 
-		template<typename O, typename C>
+		template <typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
 			this->run_state_manager().save_state_ptr(plib::void_ptr_cast(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
@@ -193,7 +193,7 @@ namespace netlist
 		nlparse_t &parser();
 		const nlparse_t &parser() const;
 
-		// FIXME: make a postload member and include code there
+		// FIXME: make a post load member and include code there
 		void rebuild_lists(); // must be called after post_load !
 
 		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
@@ -208,7 +208,7 @@ namespace netlist
 
 		family_collection_type &family_cache() { return m_family_cache; }
 
-		template<typename T, typename... Args>
+		template <typename T, typename... Args>
 		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
 			return plib::make_unique<T>(m_pool, std::forward<Args>(args)...);
@@ -246,7 +246,7 @@ namespace netlist
 		device_arena                               m_pool; // must be deleted last!
 
 		device_arena::unique_ptr<netlist_t>        m_netlist;
-		std::unique_ptr<plib::dynlib_base>         m_lib;
+		std::unique_ptr<plib::dynamic_library_base>         m_lib;
 		plib::state_manager_t                      m_state;
 		log_type                                   m_log;
 

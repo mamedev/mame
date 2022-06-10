@@ -288,6 +288,7 @@ csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
 cubo.cpp
+cucaracha.cpp
 cultures.cpp
 cupidon.cpp
 cv1k.cpp
@@ -434,6 +435,7 @@ forte2.cpp
 fortecar.cpp
 freekick.cpp
 freeway.cpp
+frenzyxprss.cpp
 fresh.cpp
 fromanc2.cpp
 fromance.cpp
@@ -473,7 +475,6 @@ galpanic.cpp
 galpanic_ms.cpp
 galspnbl.cpp
 gambl186.cpp
-gamecstl.cpp
 gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
@@ -501,7 +502,6 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
-gokidetor.cpp
 goldart.cpp
 goldngam.cpp
 goldnpkr.cpp
@@ -564,6 +564,7 @@ homedata.cpp
 homerun.cpp
 hornet.cpp
 hotblock.cpp
+hotchili.cpp
 hotstuff.cpp
 houseball.cpp
 hshavoc.cpp
@@ -747,6 +748,7 @@ majorpkr.cpp
 malzak.cpp
 manohman.cpp
 mappy.cpp
+marblmd2.cpp
 marineb.cpp
 marinedt.cpp
 mario.cpp
@@ -795,6 +797,7 @@ mgames.cpp
 mgavegas.cpp
 mgolf.cpp
 mhavoc.cpp
+miconkit.cpp
 micro3d.cpp
 microdar.cpp
 micropin.cpp
@@ -1054,6 +1057,7 @@ radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
+rallypnt.cpp
 rallyx.cpp
 rampart.cpp
 ramtek.cpp
@@ -1142,14 +1146,15 @@ segag80v.cpp
 segahang.cpp
 segajw.cpp
 segald.cpp
-segam1.cpp
 segaorun.cpp
 segas16a.cpp
 segas16b.cpp
+segas16b_isgsm.cpp
 segas18.cpp
 segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
+segasm1.cpp
 segasp.cpp
 segattl.cpp
 segaufo.cpp
@@ -1191,6 +1196,7 @@ silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp
 simpsons.cpp
+sis630.cpp
 skeetsht.cpp
 skimaxx.cpp
 skopro.cpp
@@ -1379,6 +1385,7 @@ toaplan2.cpp
 toki.cpp
 toki_ms.cpp
 tomcat.cpp
+tomsadvs.cpp
 tonton.cpp
 toobin.cpp
 topspeed.cpp
@@ -1554,5 +1561,7 @@ zwackery.cpp
 -saturnjp
 -saturnkr
 -vsaturn
+//sis630.cpp
+-shutms11
 //vectrex.cpp
 -vectrex

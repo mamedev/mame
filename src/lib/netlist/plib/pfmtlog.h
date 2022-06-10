@@ -375,7 +375,7 @@ namespace plib {
 			if (build_enabled && enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				dynamic_cast<T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
+				dynamic_cast<T &>(*this).upstream_write(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -385,7 +385,7 @@ namespace plib {
 			if (build_enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<const T &>(*this).vdowrite(xlog(pf, std::forward<Args>(args)...));
+				static_cast<const T &>(*this).upstream_write(xlog(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -412,7 +412,7 @@ namespace plib {
 
 	};
 
-	using plog_delegate = plib::pmfp<void, plog_level, const pstring &>;
+	using plog_delegate = plib::pmfp<void (plog_level, const pstring &)>;
 
 	template <plog_level::E L, bool build_enabled = true>
 	class plog_channel : public pfmt_writer_t<plog_channel<L, build_enabled>, build_enabled>
@@ -428,7 +428,7 @@ namespace plib {
 		~plog_channel() noexcept = default;
 
 	protected:
-		void vdowrite(const pstring &ls) const noexcept
+		void upstream_write(const pstring &ls) const noexcept
 		{
 			m_logger(L, ls);
 		}

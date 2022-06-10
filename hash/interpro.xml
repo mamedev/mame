@@ -280,25 +280,25 @@ license:CC0
 
 		<!-- Emerald systems have a three-disk set of diagnostic floppies -->
 		<part name="emerald1" interface="floppy_3_5">
-			  <feature name="part_id" value="Emerald Diagnostic Floppy #1/3" />
-			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
-			  <dataarea name="flop" size="1474560">
-					<rom name="emerald1.img" size="1474560" crc="2130e140" sha1="4cfcd2683bb05d04d13909e98e5bd67128534077" />
-			  </dataarea>
+			<feature name="part_id" value="Emerald Diagnostic Floppy #1/3" />
+			<feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			<dataarea name="flop" size="1474560">
+				<rom name="emerald1.img" size="1474560" crc="2130e140" sha1="4cfcd2683bb05d04d13909e98e5bd67128534077" />
+			</dataarea>
 		</part>
 		<part name="emerald2" interface="floppy_3_5">
-			  <feature name="part_id" value="Emerald Diagnostic Floppy #2/3" />
-			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
-			  <dataarea name="flop" size="1474560">
-					<rom name="emerald2.img" size="1474560" crc="971c761c" sha1="7c9b1eea5daf919ecde02cf8a1f394e383058708" />
-			  </dataarea>
+			<feature name="part_id" value="Emerald Diagnostic Floppy #2/3" />
+			<feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			<dataarea name="flop" size="1474560">
+				<rom name="emerald2.img" size="1474560" crc="971c761c" sha1="7c9b1eea5daf919ecde02cf8a1f394e383058708" />
+			</dataarea>
 		</part>
 		<part name="emerald3" interface="floppy_3_5">
-			  <feature name="part_id" value="Emerald Diagnostic Floppy #3/3" />
-			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
-			  <dataarea name="flop" size="1474560">
-					<rom name="emerald3.img" size="1474560" crc="1951566a" sha1="2aa1c7aed43901627f35df8c87785385a5fba701" />
-			  </dataarea>
+			<feature name="part_id" value="Emerald Diagnostic Floppy #3/3" />
+			<feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			<dataarea name="flop" size="1474560">
+				<rom name="emerald3.img" size="1474560" crc="1951566a" sha1="2aa1c7aed43901627f35df8c87785385a5fba701" />
+			</dataarea>
 		</part>
 
 		<!-- Turquoise systems have a single diagnostic floppy -->

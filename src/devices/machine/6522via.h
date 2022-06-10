@@ -123,17 +123,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(shift_irq_tick);
+	TIMER_CALLBACK_MEMBER(shift_tick);
+	TIMER_CALLBACK_MEMBER(t1_tick);
+	TIMER_CALLBACK_MEMBER(t2_tick);
+	TIMER_CALLBACK_MEMBER(ca2_tick);
 
 private:
-	static constexpr device_timer_id TIMER_SHIFT = 0;
-	static constexpr device_timer_id TIMER_T1 = 1;
-	static constexpr device_timer_id TIMER_T2 = 2;
-	static constexpr device_timer_id TIMER_CA2 = 3;
-	static constexpr device_timer_id TIMER_SHIFT_IRQ = 4;
-	static constexpr device_timer_id TIMER_CB2 = 5;
-
-
 	uint16_t get_counter1_value();
 	void counter2_decrement();
 

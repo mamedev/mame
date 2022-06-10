@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:kmg, Fabio Priuli
+// copyright-holders:kmg
 /**********************************************************************
 
     Nintendo Family Computer - Konami Exciting Boxing Air Bag

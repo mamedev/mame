@@ -62,7 +62,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_write);
 
 private:
 	// devices
@@ -74,6 +75,7 @@ private:
 	required_memory_bank m_rombank;
 
 	// internal state
+	emu_timer *m_sync_write_timer;
 	u8 m_talkback;
 
 	void talkback_w(u8 data);
@@ -117,17 +119,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_master_command);
+	TIMER_CALLBACK_MEMBER(sync_slave_command);
+	TIMER_CALLBACK_MEMBER(sync_clear);
 
 private:
-	// timer IDs
-	enum
-	{
-		TID_MASTER_COMMAND,
-		TID_SLAVE_COMMAND,
-		TID_SYNC_CLEAR
-	};
-
 	// devices
 	required_device_array<mc6809e_device, 2> m_cpu;
 	required_device<hc55516_device> m_hc55516;
@@ -136,6 +133,9 @@ private:
 	required_memory_bank m_slavebank;
 
 	// internal state
+	emu_timer *m_sync_master_timer;
+	emu_timer *m_sync_slave_timer;
+	emu_timer *m_sync_clear_timer;
 	u8 m_latch;
 	u8 m_latch2;
 	u8 m_talkback;
@@ -170,18 +170,13 @@ public:
 	mc6809e_device *get_cpu() { return m_cpu; }
 
 protected:
-	// timer IDs
-	enum
-	{
-		TID_COMMAND,
-		TID_IRQ_CLEAR
-	};
-
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_command);
+	TIMER_CALLBACK_MEMBER(irq_clear);
 
 private:
 	// devices
@@ -191,6 +186,8 @@ private:
 	required_memory_bank m_okibank;
 
 	// internal state
+	emu_timer *m_sync_command_timer;
+	emu_timer *m_irq_clear_timer;
 	u8 m_latch;
 	u8 m_talkback;
 	u8 m_sound_int_state;

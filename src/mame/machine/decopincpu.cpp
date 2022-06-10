@@ -56,28 +56,23 @@ static INPUT_PORTS_START( decocpu1 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(decocpu_type1_device::irq_trigger)
 {
-	switch(id)
+	if (param == 1)
 	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_cpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-			m_irq_active = true;
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));
-		}
-		else
-		{
-			m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-			m_irq_active = false;
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
+		m_cpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(32, E_CLOCK), 0);
+		m_irq_active = true;
+		m_pia28->ca1_w(BIT(m_diags->read(), 2));
+		m_pia28->cb1_w(BIT(m_diags->read(), 3));
+	}
+	else
+	{
+		m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
+		m_irq_active = false;
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 }
 
@@ -90,10 +85,10 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 
 WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 {
-	if(state == CLEAR_LINE)
+	if (state == CLEAR_LINE)
 	{
 		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
+		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
 		m_irq_active = false;
 	}
 	else
@@ -105,93 +100,93 @@ WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 	}
 }
 
-void decocpu_type1_device::lamp0_w(uint8_t data)
+void decocpu_type1_device::lamp0_w(u8 data)
 {
 	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
 	m_lamp_data = data ^ 0xff;
-	m_write_lamp(0,data,0xff);
+	m_write_lamp(0, data, 0xff);
 }
 
-void decocpu_type1_device::lamp1_w(uint8_t data)
+void decocpu_type1_device::lamp1_w(u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			for (u8 j = 0; j < 8; j++)
-				m_io_outputs[22U+i*8U+j] = BIT(m_lamp_data, j);
+				m_io_outputs[22 + i * 8 + j] = BIT(m_lamp_data, j);
 
-	m_write_lamp(1,data,0xff);
+	m_write_lamp(1, data, 0xff);
 }
 
-uint8_t decocpu_type1_device::display_strobe_r()
+u8 decocpu_type1_device::display_strobe_r()
 {
-	uint8_t ret = 0x80;
+	u8 ret = 0x80;
 
-	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
+	if (BIT(m_diags->read(), 4))  // W7 Jumper
 		ret &= ~0x80;
 
 	return ret | (m_read_display(0) & 0x7f);
 }
 
-void decocpu_type1_device::display_strobe_w(uint8_t data)
+void decocpu_type1_device::display_strobe_w(u8 data)
 {
-	m_write_display(0,data,0xff);
+	m_write_display(0, data, 0xff);
 }
 
-void decocpu_type1_device::display_out1_w(uint8_t data)
+void decocpu_type1_device::display_out1_w(u8 data)
 {
-	m_write_display(1,data,0xff);
+	m_write_display(1, data, 0xff);
 }
 
-void decocpu_type1_device::display_out2_w(uint8_t data)
+void decocpu_type1_device::display_out2_w(u8 data)
 {
-	m_write_display(2,data,0xff);
+	m_write_display(2, data, 0xff);
 }
 
-void decocpu_type1_device::display_out3_w(uint8_t data)
+void decocpu_type1_device::display_out3_w(u8 data)
 {
-	m_write_display(3,data,0xff);
+	m_write_display(3, data, 0xff);
 }
 
-uint8_t decocpu_type1_device::display_in3_r()
+u8 decocpu_type1_device::display_in3_r()
 {
 	return m_read_display(3);
 }
 
-void decocpu_type1_device::switch_w(uint8_t data)
+void decocpu_type1_device::switch_w(u8 data)
 {
-	m_write_switch(0,data,0xff);
+	m_write_switch(0, data, 0xff);
 }
 
-uint8_t decocpu_type1_device::switch_r()
+u8 decocpu_type1_device::switch_r()
 {
 	return m_read_switch(0);
 }
 
-uint8_t decocpu_type1_device::dmdstatus_r()
+u8 decocpu_type1_device::dmdstatus_r()
 {
 	return m_read_dmdstatus(0);
 }
 
-void decocpu_type1_device::display_out4_w(uint8_t data)
+void decocpu_type1_device::display_out4_w(u8 data)
 {
-	m_write_display(4,data,0xff);
+	m_write_display(4, data, 0xff);
 }
 
-void decocpu_type1_device::sound_w(uint8_t data)
+void decocpu_type1_device::sound_w(u8 data)
 {
-	m_write_soundlatch(0,data,0xff);
+	m_write_soundlatch(0, data, 0xff);
 }
 
-void decocpu_type1_device::solenoid1_w(uint8_t data)
+void decocpu_type1_device::solenoid1_w(u8 data)
 {
-	m_write_solenoid(1,data,0xff);
+	m_write_solenoid(1, data, 0xff);
 	for (u8 i = 0; i < 8; i++)
-		m_io_outputs[i+8] = BIT(data, i);
+		m_io_outputs[i + 8] = BIT(data, i);
 }
 
-void decocpu_type1_device::solenoid0_w(uint8_t data)
+void decocpu_type1_device::solenoid0_w(u8 data)
 {
-	m_write_solenoid(0,data,0xff);
+	m_write_solenoid(0, data, 0xff);
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[i] = BIT(data, i);
 }
@@ -257,11 +252,12 @@ ioport_constructor decocpu_type1_device::device_input_ports() const
 	return INPUT_PORTS_NAME( decocpu1 );
 }
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type1_device(mconfig, DECOCPU1, tag, owner, clock)
-{}
+{
+}
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 		, m_cpu(*this,"maincpu")
 		, m_pia21(*this, "pia21")
@@ -271,6 +267,7 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 		, m_pia30(*this, "pia30")
 		, m_pia34(*this, "pia34")
 		, m_rom(*this, finder_base::DUMMY_TAG)
+		, m_diags(*this, "DIAGS")
 		, m_read_display(*this)
 		, m_write_display(*this)
 		, m_read_dmdstatus(*this)
@@ -280,7 +277,8 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 		, m_write_lamp(*this)
 		, m_write_solenoid(*this)
 		, m_io_outputs(*this, "out%d", 0U)
-{}
+{
+}
 
 void decocpu_type1_device::device_start()
 {
@@ -294,23 +292,25 @@ void decocpu_type1_device::device_start()
 	m_write_lamp.resolve_safe();
 	m_write_solenoid.resolve_safe();
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
+	m_irq_timer = timer_alloc(FUNC(decocpu_type1_device::irq_trigger), this);
+	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
 	m_irq_active = false;
 
-	m_cpu->space(AS_PROGRAM).install_rom(0x4000,0xffff,&m_rom[0x4000]);
+	m_cpu->space(AS_PROGRAM).install_rom(0x4000, 0xffff, &m_rom[0x4000]);
 
 	m_io_outputs.resolve();
 	save_item(NAME(m_lamp_data));
 }
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type2_device(mconfig, DECOCPU2, tag, owner, clock)
-{}
+{
+}
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type1_device(mconfig, type, tag, owner, clock)
-{}
+{
+}
 
 void decocpu_type2_device::device_add_mconfig(machine_config &config)
 {
@@ -325,22 +325,25 @@ void decocpu_type2_device::device_start()
 	decocpu_type1_device::device_start();
 }
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type3_device(mconfig, DECOCPU3, tag, owner, clock)
-{}
+{
+}
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type2_device(mconfig, type, tag, owner, clock)
-{}
+{
+}
 
 void decocpu_type3_device::device_start()
 {
 	decocpu_type1_device::device_start();
 }
 
-decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: decocpu_type3_device(mconfig, DECOCPU3B, tag, owner, clock)
-{}
+{
+}
 
 void decocpu_type3b_device::device_start()
 {

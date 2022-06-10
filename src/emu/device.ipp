@@ -75,6 +75,11 @@ inline void device_delegate_helper::set_tag(device_finder<DeviceClass, Required>
 
 } // namespace emu::detail
 
+template <typename... T>
+inline emu_timer *device_t::timer_alloc(T &&... args)
+{
+	return machine().scheduler().timer_alloc(timer_expired_delegate(std::forward<T>(args)...));
+}
 
 template <typename Format, typename... Params>
 inline void device_t::popmessage(Format &&fmt, Params &&... args) const

@@ -272,7 +272,7 @@ void playch10_state::pc10_set_mirroring(int mirroring)
  *  64         1 *
 \*****************/
 
-void playch10_state::pc10_set_videorom_bank( int first, int count, int bank, int size )
+void playch10_state::pc10_set_videorom_bank(int first, int count, int bank, int size)
 {
 	int i, len;
 	/* first = first bank to map */
@@ -301,7 +301,7 @@ void playch10_state::pc10_set_videorom_bank( int first, int count, int bank, int
 	}
 }
 
-void playch10_state::set_videoram_bank( int first, int count, int bank, int size )
+void playch10_state::set_videoram_bank(int first, int count, int bank, int size)
 {
 	int i;
 	/* first = first bank to map */
@@ -650,7 +650,7 @@ void playch10_state::init_pcfboard()
 //**********************************************************************************
 // G Board (MMC3) games (Super Mario Bros. 3, etc)
 
-void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
+void playch10_state::gboard_scanline_cb(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

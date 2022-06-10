@@ -40,11 +40,6 @@
 class cidelsa_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SET_CPU_MODE
-	};
-
 	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
@@ -79,11 +74,11 @@ public:
 	void destryera_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
 	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(reset_done);
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
@@ -91,6 +86,7 @@ protected:
 
 	// cpu state
 	int m_reset = 0;
+	emu_timer *m_reset_timer = nullptr;
 
 	// video state
 	int m_cdp1802_q = 0;

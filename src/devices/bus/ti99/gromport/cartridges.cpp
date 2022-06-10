@@ -27,11 +27,10 @@
 #define LOG_CRU          (1U<<5)   // CRU access
 #define LOG_READ         (1U<<6)   // Read operation
 #define LOG_WRITE        (1U<<7)   // Write operation
-#define LOG_GROM         (1U<<8)   // GROM access
-#define LOG_RPK          (1U<<9)   // RPK handler
-#define LOG_WARNW        (1U<<10)  // Warn when writing to cartridge space
+#define LOG_RPK          (1U<<8)   // RPK handler
+#define LOG_WARNW        (1U<<9)   // Warn when writing to cartridge space
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
@@ -39,7 +38,6 @@ DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99c
 namespace bus::ti99::gromport {
 
 #define CARTGROM_TAG "grom_contents"
-#define CARTROM_TAG "rom_contents"
 #define GROM3_TAG "grom3"
 #define GROM4_TAG "grom4"
 #define GROM5_TAG "grom5"
@@ -104,13 +102,12 @@ ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, cons
 
 void ti99_cartridge_device::prepare_cartridge()
 {
-	int rom2_length;
+	int rom1_length = 0;
+	int rom2_length = 0;
 
 	uint8_t* grom_ptr;
 	uint8_t* rom_ptr;
-
 	memory_region *regg;
-	memory_region *regr;
 
 	// Initialize some values.
 	m_pcb->m_rom_page = 0;
@@ -122,7 +119,10 @@ void ti99_cartridge_device::prepare_cartridge()
 	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = nullptr;
 
 	m_pcb->m_grom_size = loaded_through_softlist() ? get_software_region_length("grom") : m_rpk->get_resource_length("grom_socket");
-	LOGMASKED(LOG_CONFIG, "grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
+	if (m_pcb->m_grom_size == 0)
+		LOGMASKED(LOG_CONFIG, "No GROM dump\n");
+	else
+		LOGMASKED(LOG_CONFIG, "GROM dump size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
@@ -140,50 +140,85 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->set_grom_pointer(4, subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
+	rom1_length = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	m_pcb->m_bank_mask = 0;
 
-	if (m_pcb->m_rom_size > 0)
+	if (rom1_length > 0)
 	{
-		if (m_pcb->m_rom_size > 0x200000) fatalerror("Cartridge ROM size exceeding 2 MiB");
-		LOGMASKED(LOG_CONFIG, "rom size=0x%04x\n", m_pcb->m_rom_size);
+		LOGMASKED(LOG_CONFIG, "ROM dump size=0x%04x\n", rom1_length);
 
-		// Determine the bank mask for flexible ROM sizes in gromemu
-		int rsizet = m_pcb->m_rom_size;
-		int msizet = 0x2000;
+		// Round up to 8K multiple; dumps may be shorter, but we have
+		// a cartridge ROM window of 8K
+		// TODO: Allow for mirroring?
+		m_pcb->m_rom_size = rom1_length;
 
-		while (msizet < rsizet)
+		if ((rom1_length % 0x2000)!=0)
+			m_pcb->m_rom_size = (rom1_length + 0x2000) & ~0x1fff;
+
+		// Softlist uses only one ROM area, no second socket
+		if (!loaded_through_softlist())
 		{
-			m_pcb->m_bank_mask = (m_pcb->m_bank_mask<<1) | 1;
-			msizet <<= 1;
+			rom2_length = m_rpk->get_resource_length("rom2_socket");
 		}
-		LOGMASKED(LOG_CONFIG, "rom bank mask=0x%04x\n", m_pcb->m_bank_mask);
 
-		regr = memregion(CARTROM_TAG);
-		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
-		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
-		// Set both pointers to the same region for now
-		m_pcb->m_rom_ptr = regr->base();
-	}
-
-	// Softlist uses only one ROM area, no second socket
-	if (!loaded_through_softlist())
-	{
-		rom2_length = m_rpk->get_resource_length("rom2_socket");
+		// Using ROM2 socket automatically implies paged12, paged16,
+		// or gromemu schemes
 		if (rom2_length > 0)
 		{
-			// sizes do not differ between rom and rom2
-			// We use the large cartrom space for the second bank as well
-			regr = memregion(CARTROM_TAG);
-			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
-			memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
+			LOGMASKED(LOG_CONFIG, "Second ROM dump size = 0x%04x\n", rom2_length);
+			if (rom2_length > 0x2000)
+			{
+				LOGMASKED(LOG_WARN, "Can only use 8K for second socket; dump truncated\n");
+				rom2_length = 0x2000;
+			}
 
-			// Configurations with ROM1+ROM2 have exactly two banks; only
-			// the first 8K are used from ROM1.
+			if (m_pcb->m_rom_size > 0x2000)
+			{
+				m_pcb->m_rom_size = 0x2000;
+				LOGMASKED(LOG_WARN, "Can only use 8K for first socket when there is a second socket; dump truncated.\n");
+			}
+
+			// We assign 16K for both rom1 and rom2, so this is properly
+			// aligned with the 8K spaces even when the dumps are shorter
+			m_romspace = make_unique_clear<u8[]>(0x4000);
+
+			// Load the contents of the second socket in the upper half
+			// The contents of the first socket are copied later
+			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
+			memcpy(m_romspace.get() + 0x2000, rom_ptr, rom2_length);
+
 			m_pcb->m_bank_mask = 1;
-			LOGMASKED(LOG_CONFIG, "rom bank mask=0x0001 (using rom/rom2)\n");
+			LOGMASKED(LOG_CONFIG, "ROM bank mask=0x0001 (using ROM1/ROM2)\n");
 		}
+		else
+		{
+			m_romspace = make_unique_clear<u8[]>(m_pcb->m_rom_size);
+
+			// Determine the bank mask for flexible ROM sizes in gromemu
+			int rsizet = m_pcb->m_rom_size;
+			int msizet = 0x2000;
+			int banks = 1;
+
+			while (msizet < rsizet)
+			{
+				m_pcb->m_bank_mask = (m_pcb->m_bank_mask<<1) | 1;
+				banks<<=1;
+				msizet <<= 1;
+			}
+			if (banks > 1)
+				LOGMASKED(LOG_CONFIG, "ROM bank mask=0x%04x (%d banks)\n", m_pcb->m_bank_mask, banks);
+		}
+
+		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
+		memcpy(m_romspace.get(), rom_ptr, rom1_length);
+
+		m_pcb->m_rom_ptr = m_romspace.get();
 	}
+	else
+	{
+		LOGMASKED(LOG_CONFIG, "No ROM dump\n");
+	}
+
 
 	// (NV)RAM cartridges
 	if (loaded_through_softlist())
@@ -195,6 +230,7 @@ void ti99_cartridge_device::prepare_cartridge()
 			m_pcb->m_nvram.resize(m_pcb->m_ram_size);
 			m_pcb->m_ram_ptr = &m_pcb->m_nvram[0];
 			battery_load(m_pcb->m_ram_ptr, m_pcb->m_ram_size, 0xff);
+			LOGMASKED(LOG_CONFIG, "NVRAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 
 		// Do we have RAM?
@@ -203,6 +239,7 @@ void ti99_cartridge_device::prepare_cartridge()
 			m_pcb->m_ram_size = get_software_region_length("ram");
 			m_pcb->m_ram.resize(m_pcb->m_ram_size);
 			m_pcb->m_ram_ptr = &m_pcb->m_ram[0];
+			LOGMASKED(LOG_CONFIG, "RAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 	}
 	else
@@ -210,8 +247,8 @@ void ti99_cartridge_device::prepare_cartridge()
 		m_pcb->m_ram_size = m_rpk->get_resource_length("ram_socket");
 		if (m_pcb->m_ram_size > 0)
 		{
-			// TODO: Consider to use a region as well. If so, do not forget to memcpy.
 			m_pcb->m_ram_ptr = m_rpk->get_contents_of_socket("ram_socket");
+			LOGMASKED(LOG_CONFIG, "RAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 	}
 }
@@ -433,13 +470,12 @@ void ti99_cartridge_device::device_add_mconfig(machine_config& config)
 }
 
 /*
-    Memory area for one cartridge. For most cartridges we only need 8 KiB for
-    ROM contents, but cartridges of the "paged377" type have up to 2 MiB
-    organised as selectable banks, so we must be sure there is enough space.
+    Memory area for one cartridge. This only covers the GROM area, since we
+    assign portions of the memory to subdevices (TMC0430). For the ROM area,
+    we use a dynamically allocated space, since the sizes vary strongly.
 */
 ROM_START( cartridge_memory )
 	ROM_REGION(0xa000, CARTGROM_TAG, ROMREGION_ERASE00)
-	ROM_REGION(0x200000, CARTROM_TAG, ROMREGION_ERASE00)
 ROM_END
 
 const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
@@ -1335,16 +1371,15 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, uint8_t data)
   If rom2_socket is used, we assume that rom_socket and rom2_socket contain
   8K ROM each, so we have exactly two banks, regardless of the ROM length.
 
+  The maximum ROM size is 32 MiB (4096 pages of 8 KiB)
+
 ******************************************************************************/
 
 void ti99_gromemu_cartridge::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
-	if (m_grom_ptr != nullptr)
-	{
-		m_grom_selected = (gsq == ASSERT_LINE);
-		m_grom_read_mode = (mline == ASSERT_LINE);
-		m_grom_address_mode = (moline == ASSERT_LINE);
-	}
+	m_grom_selected = (gsq == ASSERT_LINE);
+	m_grom_read_mode = (mline == ASSERT_LINE);
+	m_grom_address_mode = (moline == ASSERT_LINE);
 }
 
 void ti99_gromemu_cartridge::readz(offs_t offset, uint8_t *value)
@@ -1409,7 +1444,8 @@ void ti99_gromemu_cartridge::gromemureadz(offs_t offset, uint8_t *value)
 	if (id > 2)
 	{
 		// Cartridge space (0x6000 - 0xffff)
-		*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
+		if (m_grom_ptr != nullptr)
+			*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
 	}
 
 	// The GROM emulation does not wrap at 8K boundaries.

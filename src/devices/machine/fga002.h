@@ -57,7 +57,8 @@ class fga002_device :  public device_t
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 #endif
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	devcb_write_line    m_out_int_cb;
 	devcb_read8         m_liack4_cb;
@@ -86,10 +87,7 @@ class fga002_device :  public device_t
 	uint8_t do_fga002reg_istim0_r();
 	void  do_fga002reg_istim0_w(uint8_t data);
 	emu_timer *fga_timer;
-	enum
-	{
-		TIMER_ID_FGA
-	};
+
 	enum {
 		REG_TIM0CTL_ZERO_STOP   = 0x80,
 		REG_TIM0CTL_AUTOPRELOAD = 0x40,

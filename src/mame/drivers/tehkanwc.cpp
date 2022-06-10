@@ -102,7 +102,7 @@ TO DO :
 
 void tehkanwc_state::machine_start()
 {
-	m_reset_timer = timer_alloc(TIMER_RESET);
+	m_reset_timer = timer_alloc(FUNC(tehkanwc_state::reset_audiocpu), this);
 
 	save_item(NAME(m_track0));
 	save_item(NAME(m_track1));
@@ -161,16 +161,9 @@ void tehkanwc_state::sound_command_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tehkanwc_state::reset_audiocpu)
 {
-	switch (id)
-	{
-	case TIMER_RESET:
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tehkanwc_state::device_timer");
-	}
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void tehkanwc_state::sound_answer_w(uint8_t data)

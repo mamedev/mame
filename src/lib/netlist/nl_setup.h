@@ -37,7 +37,7 @@
 #define DIPPINS(pin1, ...)                                                     \
 		setup.register_dip_alias_arr( # pin1 ", " # __VA_ARGS__);
 
-// to be used to reference new library truthtable devices
+// to be used to reference new library truth table devices
 #define NET_REGISTER_DEV(type, name)                                           \
 		setup.register_dev(# type, # name);
 
@@ -69,9 +69,8 @@
 		void NETLIST_NAME(name)(netlist::nlparse_t &setup);
 
 #define NETLIST_START(name)                                                    \
-void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
+void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 {                                                                              \
-	plib::unused_var(setup);
 
 #define NETLIST_END()  }
 
@@ -79,7 +78,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define EXTERNAL_SOURCE(name)                                                  \
-		NETLIST_EXTERNAL(name)                                                 \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define LOCAL_LIB_ENTRY_2(type, name)                                          \
@@ -106,7 +104,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_frontier(# attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
 
 // -----------------------------------------------------------------------------
-// truthtable defines
+// truth table defines
 // -----------------------------------------------------------------------------
 
 #define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
@@ -129,7 +127,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truthtable_create(desc, def_params, std::move(sloc)); \
+		setup.truth_table_create(desc, def_params, std::move(sloc)); \
 	NETLIST_END()
 
 #define TRUTHTABLE_ENTRY(name)                                                 \
@@ -140,7 +138,7 @@ namespace netlist
 {
 
 	// -----------------------------------------------------------------------------
-	// truthtable desc
+	// truth table desc
 	// -----------------------------------------------------------------------------
 
 	struct tt_desc
@@ -183,11 +181,11 @@ namespace netlist
 			register_dev(classname, name, std::vector<pstring>());
 		}
 
-		void register_hint(const pstring &objname, const pstring &hintname);
+		void register_hint(const pstring &objname, const pstring &hint_name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
-		// also called from devices for latebinding connected terminals
+		// also called from devices for late binding connected terminals
 		void register_link_fqn(const pstring &sin, const pstring &sout);
 
 		void register_param(const pstring &param, const pstring &value);
@@ -215,7 +213,7 @@ namespace netlist
 
 		void register_source_proc(const pstring &name, nlsetup_func func);
 
-		void truthtable_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
+		void truth_table_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
 
 		// include other files
 
@@ -227,8 +225,8 @@ namespace netlist
 		void namespace_pop();
 
 		// FIXME: used by source_t - need a different approach at some time
-		bool parse_stream(plib::istream_uptr &&istrm, const pstring &name);
-		bool parse_tokens(const plib::detail::token_store &tokens, const pstring &name);
+		bool parse_stream(plib::istream_uptr &&in_stream, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)
@@ -241,10 +239,10 @@ namespace netlist
 			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
 		}
 
-		void add_define(const pstring &defstr);
+		void add_define(const pstring &define);
 
 		// register a list of logs
-		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
+		void register_dynamic_log_devices(const std::vector<pstring> &log_list);
 
 		factory::list_t &factory() noexcept;
 		const factory::list_t &factory() const noexcept;
@@ -269,7 +267,6 @@ namespace netlist
 		plib::psource_collection_t                  m_sources;
 		detail::abstract_t &                        m_abstract;
 
-		//std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};

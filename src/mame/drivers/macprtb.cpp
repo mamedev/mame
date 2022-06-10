@@ -291,7 +291,7 @@ void macportable_state::machine_start()
 	m_pmu_ack = m_pmu_req = 0;
 	m_adb_line = 1;
 
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macportable_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macportable_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 }
 

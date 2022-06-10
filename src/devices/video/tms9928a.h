@@ -95,13 +95,15 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 16; }
+
+	TIMER_CALLBACK_MEMBER(clock_grom);
+	TIMER_CALLBACK_MEMBER(update_line);
 
 private:
 	void change_register(uint8_t reg, uint8_t val);
@@ -112,11 +114,8 @@ private:
 
 	void memmap(address_map &map);
 
-	static const device_timer_id TIMER_LINE = 0;
-	static const device_timer_id GROMCLK = 1;
-
 	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
-	devcb_write_line   m_out_int_line_cb; /* Callback is called whenever the state of the INT output changes */
+	devcb_write_line    m_out_int_line_cb; /* Callback is called whenever the state of the INT output changes */
 	devcb_write_line    m_out_gromclk_cb; // GROMCLK line is optional; if present, pulse it by XTAL/24 rate
 
 	/* TMS9928A internal settings */
@@ -132,12 +131,12 @@ private:
 	uint16_t  m_nametbl;
 	uint16_t  m_spriteattribute;
 	uint16_t  m_spritepattern;
-	int     m_colourmask;
-	int     m_patternmask;
+	int       m_colourmask;
+	int       m_patternmask;
 	const uint16_t m_total_horz;
-	const bool    m_50hz;
-	const bool    m_reva;
-	const bool    m_99;
+	const bool     m_50hz;
+	const bool     m_reva;
+	const bool     m_99;
 
 	/* memory */
 	const address_space_config      m_space_config;
@@ -146,7 +145,7 @@ private:
 	bitmap_rgb32 m_tmpbmp;
 	emu_timer   *m_line_timer;
 	emu_timer   *m_gromclk_timer;
-	uint8_t       m_mode;
+	uint8_t      m_mode;
 
 	/* emulation settings */
 	int         m_top_border;

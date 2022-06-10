@@ -164,7 +164,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(dac_update);
 
 private:
 	enum base_addr
@@ -400,16 +401,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(vint0_set);
+	TIMER_CALLBACK_MEMBER(vint1_set);
 
 private:
-	enum timer_id
-	{
-		TIMER_ID_VBLANK,
-		TIMER_ID_VINT0,
-		TIMER_ID_VINT1,
-	};
-
 	void set_vint_timer(uint32_t id);
 	void parse_dc_word(uint32_t data);
 	void parse_av_word(uint32_t data);
@@ -525,19 +521,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-
-	enum timer_id
-	{
-		TIMER_ID_READY,
-		TIMER_ID_CD_DMA1,
-		TIMER_ID_CD_DMA2,
-		TIMER_ID_DMA1,
-		TIMER_ID_DMA2,
-	};
-
 	enum reg_offs
 	{
 		// Miscellaneous
@@ -684,7 +669,8 @@ private:
 
 	void reset_dma(uint32_t ch);
 	void start_dma(uint32_t ch);
-	void next_dma(uint32_t ch);
+	TIMER_CALLBACK_MEMBER(next_dma);
+	TIMER_CALLBACK_MEMBER(trigger_ready_int);
 
 	static uint32_t address_to_biobus_slot(uint32_t addr)
 	{
@@ -699,6 +685,8 @@ private:
 	devcb_write_line    m_int_handler;
 	devcb_write32       m_sdbg_out_handler;
 
+	// Timers
+	emu_timer  *m_cd_ready_timer;
 
 	// Registers
 	uint32_t    m_sdbg_in;

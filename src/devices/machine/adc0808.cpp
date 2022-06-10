@@ -84,7 +84,7 @@ void adc0808_device::device_start()
 	m_in_cb.resolve_all_safe(0xff);
 
 	// allocate timers
-	m_cycle_timer = timer_alloc();
+	m_cycle_timer = timer_alloc(FUNC(adc0808_device::update_state), this);
 	m_cycle_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	// register for save states
@@ -96,10 +96,10 @@ void adc0808_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_state
 //-------------------------------------------------
 
-void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(adc0808_device::update_state)
 {
 	switch (m_state)
 	{

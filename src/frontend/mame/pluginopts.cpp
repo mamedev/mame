@@ -131,7 +131,7 @@ static core_options create_core_options(const plugin_options &plugin_opts)
 	// the data back
 	static const options_entry s_option_entries[] =
 	{
-		{ nullptr, nullptr, OPTION_HEADER, "PLUGINS OPTIONS" },
+		{ nullptr, nullptr, core_options::option_type::HEADER, "PLUGINS OPTIONS" },
 		{ nullptr }
 	};
 

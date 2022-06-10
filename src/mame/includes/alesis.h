@@ -34,20 +34,20 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	TIMER_CALLBACK_MEMBER(dac_update);
+
 private:
-	static const device_timer_id TIMER_DAC_UPDATE = 1;
 	required_device<dac_word_interface> m_dac;
 	required_region_ptr<int8_t> m_samples;
 
-	emu_timer * m_dac_update_timer = nullptr;
-	bool        m_output_active = false;
-	int         m_count = 0;
-	int         m_shift = 0;
-	uint32_t      m_cur_sample = 0;
-	uint8_t       m_cmd[5]{};
+	emu_timer * m_dac_update_timer;
+	bool        m_output_active;
+	int         m_count;
+	int         m_shift;
+	uint32_t    m_cur_sample;
+	uint8_t     m_cmd[5]{};
 };
 
 

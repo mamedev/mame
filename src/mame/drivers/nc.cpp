@@ -1102,7 +1102,7 @@ void nc_state::machine_start()
 		m_card_size = 0;
 
 	/* keyboard timer */
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
+	m_keyboard_timer = timer_alloc(FUNC(nc_state::nc_keyboard_timer_callback), this);
 	m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());

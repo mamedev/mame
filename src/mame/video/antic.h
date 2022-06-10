@@ -48,7 +48,6 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	template <typename T> void set_gtia_tag(T &&tag) { m_gtia.set_tag(std::forward<T>(tag)); }
 
@@ -59,11 +58,6 @@ public:
 	void generic_interrupt(int button_count);
 
 private:
-	static constexpr device_timer_id TIMER_CYCLE_STEAL = 0;
-	static constexpr device_timer_id TIMER_ISSUE_DLI = 1;
-	static constexpr device_timer_id TIMER_LINE_REND = 2;
-	static constexpr device_timer_id TIMER_LINE_DONE = 3;
-
 	static constexpr unsigned   HCHARS              = 44;   // visible characters per line
 	static constexpr unsigned   VCHARS              = (VDATA_END - VDATA_START + 7) / 8;
 	static constexpr unsigned   BUF_OFFS0           = (HWIDTH - HCHARS) / 2;
@@ -140,6 +134,10 @@ private:
 	inline void mode_gtia2(address_space &space, VIDEO *video, int bytes, int erase);
 	inline void mode_gtia3(address_space &space, VIDEO *video, int bytes, int erase);
 
+	emu_timer *m_cycle_steal_timer;
+	emu_timer *m_issue_dli_timer;
+	emu_timer *m_scanline_timer;
+	emu_timer *m_line_done_timer;
 	uint32_t  m_cmd;                /* currently executed display list command */
 	uint32_t  m_steal_cycles;       /* steal how many cpu cycles for this line ? */
 	uint32_t  m_vscrol_old;         /* old vscrol value */

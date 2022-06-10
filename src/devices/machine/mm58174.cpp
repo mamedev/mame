@@ -50,9 +50,9 @@ mm58174_device::mm58174_device(const machine_config &mconfig, const char *tag, d
 
 void mm58174_device::device_start()
 {
-	m_increment_rtc = timer_alloc();
-	m_increment_rtc->adjust(attotime::zero, 0, attotime::from_msec(100));
-	m_interrupt_timer = timer_alloc();
+	m_rtc_timer = timer_alloc(FUNC(mm58174_device::clock_tick), this);
+	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_msec(100));
+	m_interrupt_timer = timer_alloc(FUNC(mm58174_device::scheduler_sync), this);
 
 	// register for state saving
 	save_item(NAME(m_control));
@@ -282,10 +282,8 @@ void mm58174_device::write(offs_t offset, uint8_t data)
 
 
 // Increment RTC clock (timed interrupt every 1/10s)
-void mm58174_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm58174_device::clock_tick)
 {
-	if (id > 0) return;
-
 	if (m_control & ctl_clkrun)
 	{
 		if ((++m_tenths) == 10)
@@ -294,4 +292,13 @@ void mm58174_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			advance_seconds();
 		}
 	}
+}
+
+// TODO: Investigate if this is necessary, or if there's missing functionality from the device.
+// Prior to the device_timer removal, m_interrupt_timer was being allocated with the same default ID as m_rtc_timer.
+// As there was no interrupt-related logic in the existing device_timer implementation, the only possible thing that
+// m_interrupt_timer could possibly do, functionally, is force a scheduler sync by elapsing, and also cause the
+// RTC to tick at an erroneous rate.
+TIMER_CALLBACK_MEMBER(mm58174_device::scheduler_sync)
+{
 }

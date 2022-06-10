@@ -72,7 +72,7 @@ void ncr5380_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
-	m_state_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ncr5380_device::state_timer), this));
+	m_state_timer = timer_alloc(FUNC(ncr5380_device::state_timer), this);
 
 	save_item(NAME(m_state));
 

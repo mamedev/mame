@@ -101,10 +101,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_update);
 
 private:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	static const device_timer_id TIMER_UART_TX = 0;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -123,7 +119,7 @@ private:
 
 	void chip_sel_w(uint8_t data);
 
-	void handle_uart_tx();
+	TIMER_CALLBACK_MEMBER(handle_uart_tx);
 	void uart_tx_fifo_push(uint8_t value);
 
 	void update_mouse_buffer();
@@ -174,7 +170,7 @@ void clickstart_state::machine_start()
 
 	save_item(NAME(m_unk_portc_toggle));
 
-	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart_tx_timer = timer_alloc(FUNC(clickstart_state::handle_uart_tx), this);
 	m_uart_tx_timer->adjust(attotime::never);
 }
 
@@ -205,15 +201,7 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 	return image_init_result::PASS;
 }
 
-void clickstart_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if (id == TIMER_UART_TX)
-	{
-		handle_uart_tx();
-	}
-}
-
-void clickstart_state::handle_uart_tx()
+TIMER_CALLBACK_MEMBER(clickstart_state::handle_uart_tx)
 {
 	if (m_uart_tx_fifo_count == 0)
 		return;

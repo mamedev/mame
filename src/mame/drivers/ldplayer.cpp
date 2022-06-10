@@ -43,7 +43,6 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -56,12 +55,12 @@ protected:
 	// derived classes
 	virtual void execute_command(int command) { assert(false); }
 
-	// timer IDs
-	enum
-	{
-		TIMER_ID_AUTOPLAY,
-		TIMER_ID_VSYNC_UPDATE
-	};
+	// timers
+	TIMER_CALLBACK_MEMBER(vsync_update);
+	TIMER_CALLBACK_MEMBER(autoplay);
+
+	emu_timer *m_vsync_update_timer;
+	emu_timer *m_autoplay_timer;
 
 	// commands
 	enum
@@ -114,7 +113,6 @@ public:
 			void pr8210(machine_config &config);
 protected:
 	// device overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -124,17 +122,15 @@ protected:
 	// internal helpers
 	inline void add_command(uint8_t command);
 
-	// timer IDs
-	enum
-	{
-		TIMER_ID_BIT = 100,
-		TIMER_ID_BIT_OFF
-	};
+	// timers
+	TIMER_CALLBACK_MEMBER(bit_on);
+	TIMER_CALLBACK_MEMBER(bit_off);
 
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	// internal state
 	emu_timer *m_bit_timer = nullptr;
+	emu_timer *m_bit_off_timer = nullptr;
 	uint32_t m_command_buffer_in;
 	uint32_t m_command_buffer_out;
 	uint8_t m_command_buffer[10]{};
@@ -295,43 +291,41 @@ void ldplayer_state::process_commands()
 }
 
 
-void ldplayer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ldplayer_state::vsync_update)
 {
-	switch (id)
-	{
-		case TIMER_ID_VSYNC_UPDATE:
-		{
-			// handle commands
-			if (param == 0)
-				process_commands();
+	// handle commands
+	if (param == 0)
+		process_commands();
 
-			// set a timer to go off on the next VBLANK
-			int vblank_scanline = m_screen->visible_area().max_y + 1;
-			attotime target = m_screen->time_until_pos(vblank_scanline);
-			timer_set(target, TIMER_ID_VSYNC_UPDATE);
-			break;
-		}
+	// set a timer to go off on the next VBLANK
+	int vblank_scanline = m_screen->visible_area().max_y + 1;
+	attotime target = m_screen->time_until_pos(vblank_scanline);
+	m_vsync_update_timer->adjust(target);
+}
 
-		case TIMER_ID_AUTOPLAY:
-			// start playing
-			execute_command(CMD_PLAY);
-			m_playing = true;
-			break;
-	}
+
+TIMER_CALLBACK_MEMBER(ldplayer_state::autoplay)
+{
+	// start playing
+	execute_command(CMD_PLAY);
+	m_playing = true;
 }
 
 
 void ldplayer_state::machine_start()
 {
-	// start the vsync timer going
-	timer_set(attotime::zero, TIMER_ID_VSYNC_UPDATE, 1);
+	m_vsync_update_timer = timer_alloc(FUNC(ldplayer_state::vsync_update), this);
+	m_autoplay_timer = timer_alloc(FUNC(ldplayer_state::autoplay), this);
 }
 
 
 void ldplayer_state::machine_reset()
 {
 	// set up a timer to start playing immediately
-	timer_set(attotime::zero, TIMER_ID_AUTOPLAY);
+	m_autoplay_timer->adjust(attotime::zero);
+
+	// start the vsync timer going
+	m_vsync_update_timer->adjust(attotime::zero, 1);
 
 	// indicate the name of the file we opened
 	popmessage("Opened %s\n", m_filename);
@@ -351,62 +345,51 @@ void pr8210_state::add_command(uint8_t command)
 	m_command_buffer[m_command_buffer_in++ % std::size(m_command_buffer)] = 0x00 | 0x20;
 }
 
-
-void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pr8210_state::bit_on)
 {
-	switch (id)
+	attotime duration = attotime::from_msec(30);
+	uint8_t bitsleft = param >> 16;
+	uint8_t data = param;
+
+	// if we have bits, process
+	if (bitsleft != 0)
 	{
-		case TIMER_ID_BIT:
-		{
-			attotime duration = attotime::from_msec(30);
-			uint8_t bitsleft = param >> 16;
-			uint8_t data = param;
+		// assert the line and set a timer for deassertion
+		m_laserdisc->control_w(ASSERT_LINE);
+		m_bit_off_timer->adjust(attotime::from_usec(250));
 
-			// if we have bits, process
-			if (bitsleft != 0)
-			{
-				// assert the line and set a timer for deassertion
-				m_laserdisc->control_w(ASSERT_LINE);
-				timer_set(attotime::from_usec(250), TIMER_ID_BIT_OFF);
-
-				// space 0 bits apart by 1msec, and 1 bits by 2msec
-				duration = attotime::from_msec((data & 0x80) ? 2 : 1);
-				data <<= 1;
-				bitsleft--;
-			}
-
-			// if we're out of bits, queue up the next command
-			else if (bitsleft == 0 && m_command_buffer_in != m_command_buffer_out)
-			{
-				data = m_command_buffer[m_command_buffer_out++ % std::size(m_command_buffer)];
-				bitsleft = 12;
-			}
-			m_bit_timer->adjust(duration, (bitsleft << 16) | data);
-			break;
-		}
-
-		// deassert the control line
-		case TIMER_ID_BIT_OFF:
-			m_laserdisc->control_w(CLEAR_LINE);
-			break;
-
-		// others to the parent class
-		default:
-			ldplayer_state::device_timer(timer, id, param);
-			break;
+		// space 0 bits apart by 1msec, and 1 bits by 2msec
+		duration = attotime::from_msec((data & 0x80) ? 2 : 1);
+		data <<= 1;
+		bitsleft--;
 	}
+
+	// if we're out of bits, queue up the next command
+	else if (bitsleft == 0 && m_command_buffer_in != m_command_buffer_out)
+	{
+		data = m_command_buffer[m_command_buffer_out++ % std::size(m_command_buffer)];
+		bitsleft = 12;
+	}
+	m_bit_timer->adjust(duration, (bitsleft << 16) | data);
+}
+
+TIMER_CALLBACK_MEMBER(pr8210_state::bit_off)
+{
+	m_laserdisc->control_w(CLEAR_LINE);
 }
 
 void pr8210_state::machine_start()
 {
 	ldplayer_state::machine_start();
-	m_bit_timer = timer_alloc(TIMER_ID_BIT);
+	m_bit_timer = timer_alloc(FUNC(pr8210_state::bit_on), this);
+	m_bit_off_timer = timer_alloc(FUNC(pr8210_state::bit_off), this);
 }
 
 void pr8210_state::machine_reset()
 {
 	ldplayer_state::machine_reset();
 	m_bit_timer->adjust(attotime::zero);
+	m_bit_off_timer->adjust(attotime::never);
 }
 
 

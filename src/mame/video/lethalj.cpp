@@ -91,7 +91,7 @@ void lethalj_state::video_start()
 	/* predetermine blitter info */
 	m_blitter_rows = m_blitter_base.length() / BLITTER_SOURCE_WIDTH;
 
-	m_gen_ext1_int_timer = timer_alloc(TIMER_GEN_EXT1_INT);
+	m_gen_ext1_int_timer = timer_alloc(FUNC(lethalj_state::gen_ext1_int), this);
 
 	m_vispage = 0;
 }
@@ -104,16 +104,9 @@ void lethalj_state::video_start()
  *
  *************************************/
 
-void lethalj_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(lethalj_state::gen_ext1_int)
 {
-	switch (id)
-	{
-	case TIMER_GEN_EXT1_INT:
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in lethalj_state::device_timer");
-	}
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 

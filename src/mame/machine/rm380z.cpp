@@ -226,7 +226,7 @@ void rm380z_state::disk_0_control(uint8_t data)
 
 void rm380z_state::machine_start()
 {
-	m_static_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rm380z_state::static_vblank_timer), this));
+	m_static_vblank_timer = timer_alloc(FUNC(rm380z_state::static_vblank_timer), this);
 	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
 }
 

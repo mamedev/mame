@@ -320,10 +320,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  UV201_INTERFACE( uv_intf )
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 {
 	if (state)
@@ -334,7 +330,7 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 
 WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 {
-	if (state && m_joy_enable && !m_timer_ne555->enabled())
+	if (state && m_joy_enable)
 	{
 		uint8_t joydata = 0;
 
@@ -353,7 +349,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 		// t = 1.1 * R * C
 		double t = 1.1 * (RES_K(3.9) + RES_K(joydata)) * 3;
 
-		timer_set(attotime::from_nsec(t), TIMER_JOYSTICK);
+		m_timer_ne555->adjust(attotime::from_nsec(t));
 	}
 }
 
@@ -370,10 +366,10 @@ uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vidbrain_state::joystick_tick)
 {
 	m_uv->ext_int_w(0);
 	m_smi->ext_int_w(0);
@@ -387,7 +383,7 @@ void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void vidbrain_state::machine_start()
 {
 	// allocate timers
-	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);
+	m_timer_ne555 = timer_alloc(FUNC(vidbrain_state::joystick_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_keylatch));

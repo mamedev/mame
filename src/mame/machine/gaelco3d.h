@@ -88,6 +88,7 @@ private:
 	int m_slack_cnt;
 
 	emu_timer *m_sync_timer;
+	emu_timer *m_status_set_timer;
 
 	buf_t *m_in_ptr;
 	buf_t *m_out_ptr;

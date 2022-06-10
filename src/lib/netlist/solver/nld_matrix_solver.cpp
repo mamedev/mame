@@ -1,20 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+// Names
+// spell-checker: words Raphson, Seidel
+//
+// Specific technical terms
+// spell-checker: words vsolver
+
 #include "nld_solver.h"
 #include "core/setup.h"
 #include "nl_setup.h"
 #include "nld_matrix_solver.h"
 #include "plib/putil.h"
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
-	terms_for_net_t::terms_for_net_t(analog_net_t * net)
-		: m_net(net)
-		, m_railstart(0)
+	terms_for_net_t::terms_for_net_t(arena_type &arena, analog_net_t * net)
+		: m_nz(arena)
+		, m_nzrd(arena)
+		, m_nzbd(arena)
+		, m_connected_net_idx(arena)
+		, m_terms(arena)
+		, m_net(net)
+		, m_rail_start(0)
 	{
 	}
 
@@ -43,6 +52,10 @@ namespace solver
 		const solver::solver_parameters_t *params)
 		: device_t(static_cast<device_t &>(main_solver), name)
 		, m_params(*params)
+		, m_gonn(m_arena)
+		, m_gtn(m_arena)
+		, m_Idrn(m_arena)
+		, m_connected_net_Vn(m_arena)
 		, m_iterative_fail(*this, "m_iterative_fail", 0)
 		, m_iterative_total(*this, "m_iterative_total", 0)
 		, m_main_solver(main_solver)
@@ -51,6 +64,9 @@ namespace solver
 		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
+		, m_step_funcs(m_arena)
+		, m_dynamic_funcs(m_arena)
+		, m_inputs(m_arena)
 		, m_ops(0)
 	{
 		setup_base(this->state().setup(), nets);
@@ -80,8 +96,8 @@ namespace solver
 
 		for (const auto & net : nets)
 		{
-			m_terms.emplace_back(net);
-			m_rails_temp.emplace_back();
+			m_terms.emplace_back(m_arena, net);
+			m_rails_temp.emplace_back(m_arena);
 		}
 
 		for (std::size_t k = 0; k < nets.size(); k++)
@@ -98,7 +114,7 @@ namespace solver
 				switch (p->type())
 				{
 					case detail::terminal_type::TERMINAL:
-						if (p->device().is_timestep())
+						if (p->device().is_time_step())
 							if (!plib::container::contains(step_devices, &p->device()))
 								step_devices.push_back(&p->device());
 						if (p->device().is_dynamic())
@@ -113,7 +129,7 @@ namespace solver
 					case detail::terminal_type::INPUT:
 						{
 							proxied_analog_output_t *net_proxy_output = nullptr;
-							for (auto & input : m_inps)
+							for (auto & input : m_inputs)
 								if (input->proxied_net() == &p->net())
 								{
 									net_proxy_output = input.get();
@@ -122,11 +138,11 @@ namespace solver
 
 							if (net_proxy_output == nullptr)
 							{
-								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
+								pstring new_name(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inputs.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, nname, &dynamic_cast<analog_net_t &>(p->net()));
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, new_name, &dynamic_cast<analog_net_t &>(p->net()));
 								net_proxy_output = net_proxy_output_u.get();
-								m_inps.emplace_back(std::move(net_proxy_output_u));
+								m_inputs.emplace_back(std::move(net_proxy_output_u));
 							}
 							setup.add_terminal(net_proxy_output->net(), *p);
 							// FIXME: repeated calling - kind of brute force
@@ -141,32 +157,36 @@ namespace solver
 			}
 		}
 		for (auto &d : step_devices)
-			m_step_funcs.emplace_back(nldelegate_ts(&core_device_t::timestep, d));
+			m_step_funcs.emplace_back(nl_delegate_ts(&core_device_t::time_step, d));
 		for (auto &d : dynamic_devices)
-			m_dynamic_funcs.emplace_back(nldelegate_dyn(&core_device_t::update_terminals, d));
+			m_dynamic_funcs.emplace_back(nl_delegate_dyn(&core_device_t::update_terminals, d));
 	}
 
+	/// \brief Sort terminals
+	///
+	/// @param sort Sort algorithm to use.
+	///
+	/// Sort in descending order by number of connected matrix voltages.
+	///The idea is, that for Gauss-Seidel algorithm the first voltage computed
+	/// depends on the greatest number of previous voltages thus taking into
+	/// account the maximum amount of information.
+	///
+	/// This actually improves performance on popeye slightly. Average
+	/// GS computations reduce from 2.509 to 2.370
+	///
+	/// Smallest to largest : 2.613
+	/// Unsorted            : 2.509
+	/// Largest to smallest : 2.370
+	//
+	/// Sorting as a general matrix pre-conditioning is mentioned in
+	/// literature but I have found no articles about Gauss Seidel.
+	///
+	/// For Gaussian Elimination however increasing order is better suited.
+	/// NOTE: Even better would be to sort on elements right of the matrix diagonal.
+	/// FIXME: This entry needs an update.
+	///
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
 	{
-		// Sort in descending order by number of connected matrix voltages.
-		// The idea is, that for Gauss-Seidel algo the first voltage computed
-		// depends on the greatest number of previous voltages thus taking into
-		// account the maximum amout of information.
-		//
-		// This actually improves performance on popeye slightly. Average
-		// GS computations reduce from 2.509 to 2.370
-		//
-		// Smallest to largest : 2.613
-		// Unsorted            : 2.509
-		// Largest to smallest : 2.370
-		//
-		// Sorting as a general matrix pre-conditioning is mentioned in
-		// literature but I have found no articles about Gauss Seidel.
-		//
-		// For Gaussian Elimination however increasing order is better suited.
-		// NOTE: Even better would be to sort on elements right of the matrix diagonal.
-		//
-
 		const std::size_t iN = m_terms.size();
 
 		switch (sort)
@@ -175,14 +195,14 @@ namespace solver
 				{
 					for (std::size_t k = 0; k < iN - 1; k++)
 					{
-						auto pk = get_weight_around_diag(k,k);
+						auto pk = get_weight_around_diagonal(k,k);
 						for (std::size_t i = k+1; i < iN; i++)
 						{
-							auto pi = get_weight_around_diag(i,k);
+							auto pi = get_weight_around_diagonal(i,k);
 							if (pi < pk)
 							{
 								std::swap(m_terms[i], m_terms[k]);
-								pk = get_weight_around_diag(k,k);
+								pk = get_weight_around_diagonal(k,k);
 							}
 						}
 					}
@@ -192,14 +212,14 @@ namespace solver
 				{
 					for (std::size_t k = 0; k < iN - 1; k++)
 					{
-						auto pk = get_left_right_of_diag(k,k);
+						auto pk = get_left_right_of_diagonal(k,k);
 						for (std::size_t i = k+1; i < iN; i++)
 						{
-							auto pi = get_left_right_of_diag(i,k);
+							auto pi = get_left_right_of_diagonal(i,k);
 							if (pi.first <= pk.first && pi.second >= pk.second)
 							{
 								std::swap(m_terms[i], m_terms[k]);
-								pk = get_left_right_of_diag(k,k);
+								pk = get_left_right_of_diagonal(k,k);
 							}
 						}
 					}
@@ -213,7 +233,7 @@ namespace solver
 					for (std::size_t k = 0; k < iN - 1; k++)
 						for (std::size_t i = k+1; i < iN; i++)
 						{
-							if ((static_cast<int>(m_terms[k].railstart()) - static_cast<int>(m_terms[i].railstart())) * sort_order < 0)
+							if ((static_cast<int>(m_terms[k].rail_start()) - static_cast<int>(m_terms[i].rail_start())) * sort_order < 0)
 							{
 								std::swap(m_terms[i], m_terms[k]);
 							}
@@ -240,7 +260,7 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			m_terms[k].set_railstart(m_terms[k].count());
+			m_terms[k].set_rail_start(m_terms[k].count());
 			for (std::size_t i = 0; i < m_rails_temp[k].count(); i++)
 				this->m_terms[k].add_terminal(m_rails_temp[k].terms()[i], m_rails_temp[k].m_connected_net_idx.data()[i], false);
 		}
@@ -261,7 +281,7 @@ namespace solver
 
 			t.m_nz.clear();
 
-			for (std::size_t i = 0; i < t.railstart(); i++)
+			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nz, static_cast<unsigned>(other[i])))
 					t.m_nz.push_back(static_cast<unsigned>(other[i]));
 
@@ -295,7 +315,7 @@ namespace solver
 				}
 			}
 
-			for (std::size_t i = 0; i < t.railstart(); i++)
+			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
 					t.m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
@@ -336,7 +356,7 @@ namespace solver
 				}
 			}
 		}
-		log().verbose("Number of mults/adds for {1}: {2}", name(), m_ops);
+		log().verbose("Number of multiplications/additions for {1}: {2}", name(), m_ops);
 
 		if ((false))
 			for (std::size_t k = 0; k < iN; k++)
@@ -370,7 +390,7 @@ namespace solver
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			max_count = std::max(max_count, m_terms[k].count());
-			max_rail = std::max(max_rail, m_terms[k].railstart());
+			max_rail = std::max(max_rail, m_terms[k].rail_start());
 		}
 
 		m_gtn.resize(iN, max_count);
@@ -403,7 +423,7 @@ namespace solver
 	void matrix_solver_t::update_inputs()
 	{
 		// avoid recursive calls. Inputs are updated outside this call
-		for (auto &inp : m_inps)
+		for (auto &inp : m_inputs)
 			inp->push(inp->proxied_net()->Q_Analog());
 	}
 
@@ -414,7 +434,7 @@ namespace solver
 			for (const auto &t : m_terms )
 				if (t.is_net(net))
 					return true;
-			for (const auto &inp : m_inps)
+			for (const auto &inp : m_inputs)
 				if (&inp->net() == net)
 					return true;
 		}
@@ -433,7 +453,7 @@ namespace solver
 		//m_last_step = netlist_time_ext::zero();
 	}
 
-	void matrix_solver_t::step(timestep_type ts_type, netlist_time delta) noexcept
+	void matrix_solver_t::step(time_step_type ts_type, netlist_time delta) noexcept
 	{
 		const auto dd(delta.as_fp<fptype>());
 		for (auto &d : m_step_funcs)
@@ -447,9 +467,9 @@ namespace solver
 		do
 		{
 			update_dynamic();
-			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
+			// Gauss-Seidel will revert to Gaussian elimination if steps exceeded.
 			this->m_stat_calculations++;
-			this->vsolve_non_dynamic();
+			this->upstream_solve_non_dynamic();
 			this_resched = this->check_err();
 			this->store();
 			newton_loops++;
@@ -467,27 +487,27 @@ namespace solver
 		bool resched(false);
 
 		restore();
-		step(timestep_type::RESTORE, delta);
+		step(time_step_type::RESTORE, delta);
 
 		for (std::size_t i=0; i< 10; i++)
 		{
 			backup();
-			step(timestep_type::FORWARD, netlist_time::from_fp(m_params.m_min_ts_ts()));
+			step(time_step_type::FORWARD, netlist_time::from_fp(m_params.m_min_ts_ts()));
 			resched = solve_nr_base();
-			// update timestep calculation
-			next_time_step = compute_next_timestep(m_params.m_min_ts_ts(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
+			// update time step calculation
+			next_time_step = compute_next_time_step(m_params.m_min_ts_ts(), m_params.m_min_ts_ts(), m_params.m_max_time_step);
 			delta -= netlist_time::from_fp(m_params.m_min_ts_ts());
 		}
-		// try remaining time using compute_next_timestep
+		// try remaining time using compute_next_time step
 		while (delta > netlist_time::zero())
 		{
 			if (next_time_step > delta)
 				next_time_step = delta;
 			backup();
-			step(timestep_type::FORWARD, next_time_step);
+			step(time_step_type::FORWARD, next_time_step);
 			delta -= next_time_step;
 			resched = solve_nr_base();
-			next_time_step = compute_next_timestep(next_time_step.as_fp<nl_fptype>(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
+			next_time_step = compute_next_time_step(next_time_step.as_fp<nl_fptype>(), m_params.m_min_ts_ts(), m_params.m_max_time_step);
 		}
 
 		if (m_stat_newton_raphson % 100 == 0)
@@ -502,31 +522,30 @@ namespace solver
 		if (m_params.m_dynamic_ts)
 			return next_time_step;
 
-		return netlist_time::from_fp(m_params.m_max_timestep);
+		return netlist_time::from_fp(m_params.m_max_time_step);
 	}
 
-	netlist_time matrix_solver_t::solve(netlist_time_ext now, const char *source)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now, [[maybe_unused]] const char *source)
 	{
-		netlist_time delta = static_cast<netlist_time>(now - m_last_step());
+		auto delta = static_cast<netlist_time>(now - m_last_step());
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
-		plib::unused_var(source);
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
 		if (delta < netlist_time::quantum())
 		{
 			//printf("solve return %s at %f\n", source, now.as_double());
-			return timestep_device_count() > 0 ? netlist_time::from_fp(m_params.m_min_timestep) : netlist_time::zero();
+			return time_step_device_count() > 0 ? netlist_time::from_fp(m_params.m_min_time_step) : netlist_time::zero();
 		}
 
-		backup(); // save voltages for backup and timestep calculation
+		backup(); // save voltages for backup and time step calculation
 		// update all terminals for new time step
 		m_last_step = now;
 
 		++m_stat_vsolver_calls;
 		if (dynamic_device_count() != 0)
 		{
-			step(timestep_type::FORWARD, delta);
+			step(time_step_type::FORWARD, delta);
 			const auto resched = solve_nr_base();
 
 			if (resched)
@@ -534,20 +553,20 @@ namespace solver
 		}
 		else
 		{
-			step(timestep_type::FORWARD, delta);
+			step(time_step_type::FORWARD, delta);
 			this->m_stat_calculations++;
-			this->vsolve_non_dynamic();
+			this->upstream_solve_non_dynamic();
 			this->store();
 		}
 
 		if (m_params.m_dynamic_ts)
 		{
-			if (timestep_device_count() > 0)
-				return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_min_timestep, m_params.m_max_timestep);
+			if (time_step_device_count() > 0)
+				return compute_next_time_step(delta.as_fp<nl_fptype>(), m_params.m_min_time_step, m_params.m_max_time_step);
 		}
 
-		if (timestep_device_count() > 0)
-			return netlist_time::from_fp(m_params.m_max_timestep);
+		if (time_step_device_count() > 0)
+			return netlist_time::from_fp(m_params.m_max_time_step);
 
 		return netlist_time::zero();
 
@@ -561,7 +580,7 @@ namespace solver
 		return -1;
 	}
 
-	std::pair<int, int> matrix_solver_t::get_left_right_of_diag(std::size_t irow, std::size_t idiag)
+	std::pair<int, int> matrix_solver_t::get_left_right_of_diagonal(std::size_t irow, std::size_t idiag)
 	{
 		//
 		// return the maximum column left of the diagonal (-1 if no cols found)
@@ -593,7 +612,7 @@ namespace solver
 		return {colmax, colmin};
 	}
 
-	matrix_solver_t::fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
+	matrix_solver_t::fptype matrix_solver_t::get_weight_around_diagonal(std::size_t row, std::size_t diag)
 	{
 		{
 			//
@@ -653,7 +672,7 @@ namespace solver
 			log().verbose("Solver {1}", this->name());
 			log().verbose("       ==> {1} nets", this->m_terms.size());
 			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
-			log().verbose("       has {1} timestep elements", this->timestep_device_count());
+			log().verbose("       has {1} time step elements", this->time_step_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
 						static_cast<fptype>(this->m_stat_newton_raphson) / static_cast<fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
@@ -666,6 +685,5 @@ namespace solver
 		}
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 

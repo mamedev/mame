@@ -29,13 +29,6 @@ driver by Chris Moore
 class gameplan_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_CLEAR_SCREEN_DONE,
-		TIMER_VIA_IRQ_DELAYED,
-		TIMER_VIA_0_CAL
-	};
-
 	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -56,7 +49,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via_0;
@@ -67,27 +59,26 @@ protected:
 	void video_data_w(uint8_t data);
 	void gameplan_video_command_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
 	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	/* machine state */
-	uint8_t   m_current_port = 0U;
+	uint8_t    m_current_port = 0U;
 
 	/* video state */
 	std::unique_ptr<uint8_t[]>   m_videoram{};
-	size_t   m_videoram_size = 0U;
+	size_t     m_videoram_size = 0U;
 	uint8_t    m_video_x = 0U;
 	uint8_t    m_video_y = 0U;
 	uint8_t    m_video_command = 0U;
 	uint8_t    m_video_data = 0U;
 	uint8_t    m_video_previous = 0U;
+	emu_timer *m_clear_done_timer;
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<riot6532_device> m_riot;
 	optional_device<generic_latch_8_device> m_soundlatch;
-
 
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
@@ -99,7 +90,6 @@ private:
 
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
-	TIMER_CALLBACK_MEMBER(via_irq_delayed);
 	void leprechn_video_command_w(uint8_t data);
 	uint8_t leprechn_videoram_r();
 	void gameplan_get_pens( pen_t *pens );

@@ -17,6 +17,7 @@ namespace netlist
 	///  Use the state_var template to define a variable whose value is saved.
 	///  Within a device definition use
 	///
+	/// ```
 	///      NETLIB_OBJECT(abc)
 	///      {
 	///          NETLIB_CONSTRUCTOR(abc)
@@ -24,6 +25,8 @@ namespace netlist
 	///          ...
 	///          state_var<unsigned> m_var;
 	///      }
+	/// ```
+	///
 	template <typename T>
 	struct state_var
 	{
@@ -172,11 +175,26 @@ namespace netlist
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 	}
 
+	// -----------------------------------------------------------------------------
+	// Externals
+	// -----------------------------------------------------------------------------
+
+	extern template struct state_var<std::uint8_t>;
+	extern template struct state_var<std::uint16_t>;
+	extern template struct state_var<std::uint32_t>;
+	extern template struct state_var<std::uint64_t>;
+	extern template struct state_var<std::int8_t>;
+	extern template struct state_var<std::int16_t>;
+	extern template struct state_var<std::int32_t>;
+	extern template struct state_var<std::int64_t>;
+	extern template struct state_var<bool>;
+
+
 } // namespace netlist
 
 namespace plib
 {
-	template<typename X>
+	template <typename X>
 	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
 	{
 	};

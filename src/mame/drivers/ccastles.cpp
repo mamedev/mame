@@ -215,7 +215,7 @@ void ccastles_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ccastles_state::clock_irq),this));
+	m_irq_timer = timer_alloc(FUNC(ccastles_state::clock_irq), this);
 	m_irq_state = 0;
 	schedule_next_irq(0);
 

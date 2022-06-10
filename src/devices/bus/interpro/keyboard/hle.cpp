@@ -285,7 +285,7 @@ void hle_device_base::device_add_mconfig(machine_config &config)
 
 void hle_device_base::device_start()
 {
-	m_click_timer = timer_alloc(CLICK_TIMER_ID);
+	m_click_timer = timer_alloc(FUNC(hle_device_base::click_tick), this);
 
 	save_item(NAME(m_make_count));
 	save_item(NAME(m_rx_state));
@@ -316,18 +316,10 @@ void hle_device_base::device_reset()
 	start_processing(attotime::from_hz(1'200));
 }
 
-void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hle_device_base::click_tick)
 {
-	switch (id)
-	{
-	case CLICK_TIMER_ID:
-		m_beeper_state &= ~u8(BEEPER_CLICK);
-		m_beeper->set_state(m_beeper_state ? 1 : 0);
-		break;
-
-	default:
-		break;
-	}
+	m_beeper_state &= ~u8(BEEPER_CLICK);
+	m_beeper->set_state(m_beeper_state ? 1 : 0);
 }
 
 void hle_device_base::tra_callback()

@@ -616,6 +616,10 @@
 #include "tiki100_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_TIM011_DSK
+#include "tim011_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_TRD_DSK
 #include "trd_dsk.h"
 #endif
@@ -1257,6 +1261,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Tiki 100");
 #ifdef HAS_FORMATS_TIKI100_DSK
 	en.add(FLOPPY_TIKI100_FORMAT); // tiki100_dsk.h
+#endif
+
+	en.category("TIM 011");
+#ifdef HAS_FORMATS_TIM011_DSK
+	en.add(FLOPPY_TIM011_FORMAT); // tim011_dsk.h
 #endif
 
 	en.category("Videoton");

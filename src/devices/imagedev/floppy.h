@@ -137,7 +137,6 @@ public:
 	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 	void ds_w(int state) { ds = state; check_led(); }
 
-	void index_resync();
 	attotime time_next_index();
 	attotime get_next_transition(const attotime &from_when);
 	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
@@ -169,12 +168,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_config_complete() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
+
+	TIMER_CALLBACK_MEMBER(index_resync);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;

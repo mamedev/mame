@@ -913,7 +913,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="robotron">
-		<description>Robotron 2084 (Euro, USA)</description>
+		<description>Robotron: 2084 (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Williams Entertainment</publisher>
 		<info name="serial" value="PT5003" />
@@ -921,6 +921,18 @@ Known undumped prototypes:
 			<feature name="granularity" value="512"/>
 			<dataarea name="rom" size="131072">
 				<rom name="robotron 2084 (euro, usa).bin" size="131072" crc="7a6049b5" sha1="04048aa47c0ff99647608d4d1ccf48ba881a0f89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotronp" cloneof="robotron">
+		<description>Robotron: 2084 (prototype)</description>
+		<year>1991</year>
+		<publisher>Williams Entertainment</publisher>
+		<part name="cart" interface="lynx_cart">
+			<feature name="granularity" value="512"/>
+			<dataarea name="rom" size="131072">
+				<rom name="robotron 2084.u2" size="131072" crc="6e7b014f" sha1="d9d112806aa11e6d6a7b995c726079daf494b5cd" />
 			</dataarea>
 		</part>
 	</software>

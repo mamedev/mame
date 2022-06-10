@@ -166,9 +166,9 @@ void cmi01a_device::device_start()
 {
 	m_wave_ram = std::make_unique<uint8_t[]>(0x4000);
 
-	m_zx_timer = timer_alloc(TIMER_ZX);
-	m_eosi_timer = timer_alloc(TIMER_EOSI);
-	m_bcas_timer = timer_alloc(TIMER_BCAS);
+	m_zx_timer = timer_alloc(FUNC(cmi01a_device::zx_timer_cb), this);
+	m_eosi_timer = timer_alloc(FUNC(cmi01a_device::eosi_timer_cb), this);
+	m_bcas_timer = timer_alloc(FUNC(cmi01a_device::bcas_tick), this);
 
 	m_zx_timer->adjust(attotime::never);
 	m_eosi_timer->adjust(attotime::never);
@@ -340,21 +340,6 @@ WRITE_LINE_MEMBER( cmi01a_device::cmi01a_irq )
 	m_irq_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_ZX:
-			zx_timer_cb();
-			break;
-		case TIMER_EOSI:
-			eosi_timer_cb();
-			break;
-		case TIMER_BCAS:
-			bcas_tick();
-	}
-}
-
 void cmi01a_device::reset_bcas_counter()
 {
 	m_bcas_q1_ticks = 2;
@@ -367,13 +352,14 @@ void cmi01a_device::reset_bcas_counter()
 	m_ptm->set_clock(2, 0);
 }
 
-void cmi01a_device::bcas_tick()
+TIMER_CALLBACK_MEMBER(cmi01a_device::bcas_tick)
 {
 	if (m_ptm_o1 != m_zx_ff)
 		return;
+	// TODO
 }
 
-void cmi01a_device::eosi_timer_cb()
+TIMER_CALLBACK_MEMBER(cmi01a_device::eosi_timer_cb)
 {
 	m_stream->update();
 	m_segment_cnt &= ~0x4000;
@@ -382,7 +368,7 @@ void cmi01a_device::eosi_timer_cb()
 	if (m_channel == 5) LOG("CH%d: End of sound\n", m_channel);
 }
 
-void cmi01a_device::zx_timer_cb()
+TIMER_CALLBACK_MEMBER(cmi01a_device::zx_timer_cb)
 {
 	// Toggle ZX
 	m_zx_flag ^= 1;

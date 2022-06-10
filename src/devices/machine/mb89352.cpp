@@ -181,7 +181,7 @@ void mb89352_device::device_start()
 	m_drq_cb.resolve_safe();
 
 	// allocate read timer
-	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
+	m_transfer_timer = timer_alloc(FUNC(mb89352_device::transfer_tick), this);
 }
 
 void mb89352_device::device_reset()
@@ -217,17 +217,10 @@ int mb89352_device::get_scsi_cmd_len(uint8_t cbyte)
 	//return 6;
 }
 
-void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mb89352_device::transfer_tick)
 {
-	switch(id)
-	{
-	case TIMER_TRANSFER:
-		// TODO: check interrupts are actually enabled
-		{
-			m_drq_cb(1);
-		}
-		break;
-	}
+	// TODO: check interrupts are actually enabled
+	m_drq_cb(1);
 }
 
 void mb89352_device::set_phase(int phase)

@@ -56,35 +56,29 @@ public:
 	void sound_reset_w(u16 data = 0);
 
 	// sound cpu accessors
-	void sound_cpu_reset() { synchronize(TID_SOUND_RESET, 1); }
+	void sound_cpu_reset() { m_sound_reset_timer->adjust(attotime::zero, 1); }
 	void sound_response_w(u8 data);
 	u8 sound_command_r();
 
 protected:
 	// sound I/O helpers
-	void delayed_sound_reset(int param);
-	void delayed_sound_write(int data);
-	void delayed_6502_write(int data);
+	TIMER_CALLBACK_MEMBER(delayed_sound_reset);
+	TIMER_CALLBACK_MEMBER(delayed_sound_write);
+	TIMER_CALLBACK_MEMBER(delayed_6502_write);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	// timer IDs
-	enum
-	{
-		TID_SOUND_RESET,
-		TID_SOUND_WRITE,
-		TID_6502_WRITE
-	};
-
 	// configuration state
 	devcb_write_line   m_main_int_cb;
 
 	// internal state
 	required_device<cpu_device> m_sound_cpu;
+	emu_timer       *m_sound_reset_timer;
+	emu_timer       *m_sound_write_timer;
+	emu_timer       *m_6502_write_timer;
 	bool             m_main_to_sound_ready;
 	bool             m_sound_to_main_ready;
 	u8               m_main_to_sound_data;

@@ -25,27 +25,20 @@ namespace plib {
 	// timed queue
 	// ----------------------------------------------------------------------------------------
 
-	// Note: Don't even try the following approach for element:
-	//
-	//    template <typename Time, typename Element>
-	//    struct pqentry_t : public std::pair<Time, Element>
-	//
-	// This degrades performance significantly.
-
 	template <typename Time, typename Element>
-	struct pqentry_t final
+	struct queue_entry_t final
 	{
-		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
-		constexpr pqentry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
+		constexpr queue_entry_t() noexcept : m_exec_time(), m_object(nullptr) { }
+		constexpr queue_entry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
 
-		pqentry_t(const pqentry_t &) = default;
-		pqentry_t &operator=(const pqentry_t &) = default;
-		pqentry_t(pqentry_t &&) noexcept = default;
-		pqentry_t &operator=(pqentry_t &&) noexcept = default;
+		queue_entry_t(const queue_entry_t &) = default;
+		queue_entry_t &operator=(const queue_entry_t &) = default;
+		queue_entry_t(queue_entry_t &&) noexcept = default;
+		queue_entry_t &operator=(queue_entry_t &&) noexcept = default;
 
-		~pqentry_t() = default;
+		~queue_entry_t() = default;
 
-		constexpr bool operator ==(const pqentry_t &rhs) const noexcept
+		constexpr bool operator ==(const queue_entry_t &rhs) const noexcept
 		{
 			return m_object == rhs.m_object;
 		}
@@ -55,17 +48,17 @@ namespace plib {
 			return m_object == rhs;
 		}
 
-		constexpr bool operator <=(const pqentry_t &rhs) const noexcept
+		constexpr bool operator <=(const queue_entry_t &rhs) const noexcept
 		{
 			return (m_exec_time <= rhs.m_exec_time);
 		}
 
-		constexpr bool operator <(const pqentry_t &rhs) const noexcept
+		constexpr bool operator <(const queue_entry_t &rhs) const noexcept
 		{
 			return (m_exec_time < rhs.m_exec_time);
 		}
 
-		static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
+		static constexpr queue_entry_t never() noexcept { return queue_entry_t(Time::never(), nullptr); }
 
 		constexpr const Time &exec_time() const noexcept { return m_exec_time; }
 		constexpr const Element &object() const noexcept { return m_object; }
@@ -75,13 +68,13 @@ namespace plib {
 	};
 
 	// Use TS = true for a threadsafe queue
-	template <class T, bool TS>
+	template <class A, class T, bool TS>
 	class timed_queue_linear
 	{
 	public:
 
-		explicit timed_queue_linear(const std::size_t list_size)
-		: m_list(list_size)
+		explicit timed_queue_linear(A &arena, const std::size_t list_size)
+		: m_list(arena, list_size)
 		{
 			clear();
 		}
@@ -184,9 +177,9 @@ namespace plib {
 			m_end++;
 		}
 
-		// save state support & mame disasm
+		// save state support & mame disassembler
 
-		const T *listptr() const noexcept { return &m_list[1]; }
+		const T *list_pointer() const noexcept { return &m_list[1]; }
 		std::size_t size() const noexcept { return narrow_cast<std::size_t>(m_end - &m_list[1]); }
 		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
@@ -195,7 +188,7 @@ namespace plib {
 
 		mutex_type               m_lock;
 		T *                      m_end;
-		aligned_vector<T>        m_list;
+		plib::arena_vector<A, T> m_list;
 
 	public:
 		// profiling
@@ -205,7 +198,7 @@ namespace plib {
 		pperfcount_t<true> m_prof_remove; // NOLINT
 	};
 
-	template <class T, bool TS>
+	template <class A, class T, bool TS>
 	class timed_queue_heap
 	{
 	public:
@@ -215,8 +208,8 @@ namespace plib {
 			constexpr bool operator()(const T &a, const T &b) const noexcept { return b <= a; }
 		};
 
-		explicit timed_queue_heap(const std::size_t list_size)
-		: m_list(list_size)
+		explicit timed_queue_heap(A &arena, const std::size_t list_size)
+		: m_list(arena, list_size)
 		{
 			clear();
 		}
@@ -283,18 +276,18 @@ namespace plib {
 			m_end = &m_list[0];
 		}
 
-		// save state support & mame disasm
+		// save state support & mame disassembler
 
-		constexpr const T *listptr() const { return &m_list[0]; }
+		constexpr const T *list_pointer() const { return &m_list[0]; }
 		constexpr std::size_t size() const noexcept { return m_list.size(); }
 		constexpr const T & operator[](const std::size_t index) const { return m_list[ 0 + index]; }
 	private:
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
-		mutex_type         m_lock;
-		T *                m_end;
-		aligned_vector<T>  m_list;
+		mutex_type               m_lock;
+		T *                      m_end;
+		plib::arena_vector<A, T> m_list;
 
 	public:
 		// profiling

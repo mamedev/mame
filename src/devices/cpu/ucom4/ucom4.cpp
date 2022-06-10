@@ -160,7 +160,7 @@ void ucom4_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_dph_mask = m_datamask >> 4;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ucom4_cpu_device::simple_timer_cb), this));
+	m_timer = timer_alloc(FUNC(ucom4_cpu_device::simple_timer_cb), this);
 
 	// resolve callbacks
 	m_read_a.resolve_safe(0);

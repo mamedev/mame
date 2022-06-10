@@ -41,7 +41,7 @@ namespace netlist::devices {
 
 			// output
 			connect("_RV.2", "VDD");
-			register_subalias("OUT", "_RV.1");
+			register_sub_alias("OUT", "_RV.1");
 		}
 
 		NETLIB_RESETI()
@@ -94,7 +94,7 @@ namespace netlist::devices {
 
 		}
 
-		analog::NETLIB_SUB(twoterm) m_RV;
+		analog::NETLIB_SUB(two_terminal) m_RV;
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;

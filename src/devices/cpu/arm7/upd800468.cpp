@@ -61,7 +61,7 @@ void upd800468_timer_device::control_w(u8 data)
 
 void upd800468_timer_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(upd800468_timer_device::irq_timer_tick), this);
 
 	m_irq_cb.resolve_safe();
 
@@ -74,7 +74,7 @@ void upd800468_timer_device::device_reset()
 	m_rate = m_control = 0;
 }
 
-void upd800468_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd800468_timer_device::irq_timer_tick)
 {
 	if (BIT(m_control, 0))
 		m_irq_cb(1);

@@ -13,7 +13,6 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -161,7 +160,7 @@ namespace netlist
 			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
 		}
 
-		// get family -> truthtable
+		// get family -> truth table
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		param_ref_t find_param(const pstring &param_in) const;
@@ -197,7 +196,7 @@ namespace netlist
 		void resolve_inputs();
 		pstring resolve_alias(const pstring &name) const;
 
-		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
+		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
@@ -233,7 +232,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 		// FIXME: Limited to 3 additional terminals
 		std::unordered_map<const terminal_t *,
-			std::array<terminal_t *, 4>>   m_connected_terminals;
+			std::array<terminal_t *, 4>>                       m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>                         m_proxies;
@@ -243,7 +242,7 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// Specific netlist psource_t implementations
+	// Specific netlist `psource_t` implementations
 	// ----------------------------------------------------------------------------------------
 
 	class source_netlist_t : public plib::psource_t

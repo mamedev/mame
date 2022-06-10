@@ -405,10 +405,10 @@ void sr_state::starrider(machine_config &config)
 
 	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12); // 6820/21
 	m_main_pia2->readpa_handler().set_ioport("IN0");
-	m_main_pia2->readca1_handler().set_constant(0); // grounded
+	m_main_pia2->ca1_w(0); // grounded
 	m_main_pia2->ca2_handler().set(FUNC(sr_state::cpu_pia2_ca2_w));
 	m_main_pia2->readpb_handler().set_ioport("IN1");
-	m_main_pia2->readcb1_handler().set_constant(0); // grounded
+	m_main_pia2->cb1_w(0); // grounded
 	// CB2 is unused
 	// IRQA and IRQB are unused
 

@@ -573,7 +573,7 @@ license:CC0
 
 		<!-- pet20018 Side A: DRAW POKER 1 -->
 		<publisher>Commodore Business Machines, Inc.</publisher>
-			<part name="cass" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="10220420">
 				<rom name="draw poker (1978)(commodore busines machines).wav" size="10220420" crc="82f7871d" sha1="973cdc5d8ede2dffa6fb25abfadf8b5daabe6949"/>
 			</dataarea>
@@ -2370,7 +2370,7 @@ license:CC0
 		<year>1978</year>
 		<publisher>Commodore Business Machines, Inc.</publisher>
 
-		<!-- pet20018 Side A: OSERO, REVERSE  -->
+		<!-- pet20018 Side A: OSERO, REVERSE -->
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="15091952">
 				<rom name="osero, reverse (1978)(commodore business machines).wav" size="15091952" crc="e9fedf09" sha1="2b272e1c222d1d0fdc435f0bd21ef331715a5e3f"/>

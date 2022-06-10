@@ -103,17 +103,17 @@ void mtx_state::bankswitch(uint8_t data)
 		program.install_readwrite_bank(0x8000, 0xbfff, m_rammap_bank3);
 
 		/* set ram bank, for invalid pages a nop-handler will be installed */
-		if ((ram_page == 0 && m_ram->size() > 0xc000) || (ram_page > 0 && m_ram->size() > 0x10000 + ram_page * 0xc000))
+		if ((ram_page == 0 && m_ram->size() > 0xc000) || (ram_page > 0 && m_ram->size() > 0x4000 + ram_page * 0xc000))
 			m_rammap_bank1->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x0000, 0x3fff);
-		if ((ram_page == 0 && m_ram->size() > 0x8000) || (ram_page > 0 && m_ram->size() > 0x14000 + ram_page * 0xc000))
 
+		if ((ram_page == 0 && m_ram->size() > 0x8000) || (ram_page > 0 && m_ram->size() > 0x8000 + ram_page * 0xc000))
 			m_rammap_bank2->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x4000, 0x7fff);
-		if ((ram_page == 0 && m_ram->size() > 0x4000) || (ram_page > 0 && m_ram->size() > 0x18000 + ram_page * 0xc000))
 
+		if ((ram_page == 0 && m_ram->size() > 0x4000) || (ram_page > 0 && m_ram->size() > 0xc000 + ram_page * 0xc000))
 			m_rammap_bank3->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x8000, 0xbfff);
@@ -132,11 +132,12 @@ void mtx_state::bankswitch(uint8_t data)
 		m_rommap_bank1->set_entry(rom_page);
 
 		/* set ram bank, for invalid pages a nop-handler will be installed */
-		if ((ram_page == 0 && m_ram->size() > 0x8000) || (ram_page > 0 && m_ram->size() > 0x10000 + ram_page * 0x8000))
+		if (m_ram->size() > 0x8000 + ram_page * 0x8000)
 			m_rommap_bank2->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x4000, 0x7fff);
-		if ((ram_page == 0 && m_ram->size() > 0x4000) || (ram_page == 1 && m_ram->size() > 0xc000) || (ram_page > 1 && m_ram->size() > 0x14000 + ram_page * 0x8000))
+
+		if (m_ram->size() > 0x4000 + ram_page * 0x8000)
 			m_rommap_bank3->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x8000, 0xbfff);
@@ -146,6 +147,9 @@ void mtx_state::bankswitch(uint8_t data)
 void mtx_state::mtx_bankswitch_w(uint8_t data)
 {
 	bankswitch(data);
+
+	m_exp_int->bankswitch(data);
+	m_exp_ext->bankswitch(data);
 }
 
 /*-------------------------------------------------
@@ -263,18 +267,19 @@ void mtx_state::mtx_sense_w(uint8_t data)
 
 uint8_t mtx_state::mtx_key_lo_r()
 {
-	uint8_t data = 0xff;
+	uint16_t data = 0xffff;
 
-	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read();
-	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read();
-	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read();
-	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read();
-	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read();
-	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read();
-	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read();
-	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read();
+	for (int row = 0; row < 8; row++)
+	{
+		if (!(m_key_sense & (1 << row)))
+		{
+			data &= m_keyboard[row]->read();
+			if ((row == 7 && BIT(m_joysticks->read(), 0)) || (row != 7 && BIT(m_joysticks->read(), 1)))
+				data &= m_joystick[row]->read();
+		}
+	}
 
-	return data;
+	return data & 0xff;
 }
 
 /*-------------------------------------------------
@@ -283,18 +288,19 @@ uint8_t mtx_state::mtx_key_lo_r()
 
 uint8_t mtx_state::mtx_key_hi_r()
 {
-	uint8_t data = ioport("country_code")->read();
+	uint16_t data = 0xffff;
 
-	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read() >> 8;
-	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read() >> 8;
-	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read() >> 8;
-	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read() >> 8;
-	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read() >> 8;
-	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read() >> 8;
-	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read() >> 8;
-	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read() >> 8;
+	for (int row = 0; row < 8; row++)
+	{
+		if (!(m_key_sense & (1 << row)))
+		{
+			data &= m_keyboard[row]->read();
+			if ((row == 7 && BIT(m_joysticks->read(), 0)) || (row != 7 && BIT(m_joysticks->read(), 1)))
+				data &= m_joystick[row]->read();
+		}
+	}
 
-	return data;
+	return (m_country->read() | data) >> 8;
 }
 
 /*-------------------------------------------------
@@ -403,26 +409,6 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 
 	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-/***************************************************************************
-    ROMPAK ROMS
-***************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER( mtx_state::rompak_load )
-{
-	uint32_t size = m_rompak->common_get_size("rom");
-
-	if (size > 0x2000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
-
-	m_rompak->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_rompak->common_load_rom(m_rompak->get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
 }
@@ -573,8 +559,7 @@ void mtx_state::machine_start()
 	m_rommap_bank2->configure_entry(0, m_ram->pointer() + 0x8000);
 	m_rommap_bank2->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0x8000);
 	m_rommap_bank3->configure_entry(0, m_ram->pointer() + 0x4000);
-	m_rommap_bank3->configure_entry(1, m_ram->pointer() + 0xc000);
-	m_rommap_bank3->configure_entries(2, 14, m_ram->pointer() + 0x14000, 0x8000);
+	m_rommap_bank3->configure_entries(1, 15, m_ram->pointer() + 0xc000, 0x8000);
 
 	/* setup banks for ram based memory map */
 	program.install_readwrite_bank(0x0000, 0x3fff, m_rammap_bank1);
@@ -600,9 +585,6 @@ void mtx_state::machine_reset()
 	/* keyboard ROMs */
 	if (ioport("keyboard_rom")->read())
 		m_rommap_bank1->configure_entry(7, memregion("keyboard_rom")->base() + (ioport("keyboard_rom")->read() - 1) * 0x2000);
-	/* rompak ROMs */
-	if (m_rompak->exists())
-		m_rommap_bank1->configure_entry(7, m_rompak->get_rom_base());
 
 	/* bank switching */
 	bankswitch(0);

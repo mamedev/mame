@@ -62,12 +62,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
 
 private:
-	enum
-	{
-		TIMER_CASSETTE
-	};
-
-	bool m_txd = false, m_rts = false;
+	bool m_txd = false;
+	bool m_rts = false;
 	uint8_t m_rom_module_present = 0;
 	uint8_t m_ppi_port_outputs[4][3]{};
 	uint8_t m_startup_mem_map = 0;
@@ -132,7 +128,6 @@ private:
 	void mato_update_memory();
 	void c2717_update_memory();
 	void common_driver_init();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

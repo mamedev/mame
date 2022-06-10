@@ -54,11 +54,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 protected:
-	enum
-	{
-		TIMER_LIGHTGUN_TICK
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;

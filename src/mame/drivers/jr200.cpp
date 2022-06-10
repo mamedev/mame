@@ -575,7 +575,7 @@ GFXDECODE_END
 
 void jr200_state::machine_start()
 {
-	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
+	m_timer_d = timer_alloc(FUNC(jr200_state::timer_d_callback), this);
 	save_item(NAME(m_border_col));
 	save_item(NAME(m_old_keydata));
 	save_item(NAME(m_freq_reg));

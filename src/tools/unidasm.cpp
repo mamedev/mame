@@ -66,6 +66,7 @@ using util::BIT;
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
+#include "cpu/hp2100/hp2100d.h"
 #include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/i386/i386dasm.h"
@@ -186,6 +187,7 @@ using util::BIT;
 #include "cpu/upd78k/upd78k3d.h"
 #include "cpu/upd78k/upd78k4d.h"
 #include "cpu/v60/v60d.h"
+#include "cpu/v620/v620dasm.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/v850/v850dasm.h"
 #include "cpu/vax/vaxdasm.h"
@@ -360,7 +362,6 @@ struct options
 	uint8_t                 lower;
 	uint8_t                 upper;
 	uint8_t                 flipped;
-	int                     mode;
 	const dasm_table_entry *dasm;
 	uint32_t                skip;
 	uint32_t                count;
@@ -448,6 +449,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
 	{ "hd63701",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(63701); } },
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
+	{ "hp2100",          be, -1, []() -> util::disasm_interface * { return new hp2100_disassembler; } },
+	{ "hp21mx",          be, -1, []() -> util::disasm_interface * { return new hp21mx_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
 	{ "hp_5061_3011",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3011_disassembler; } },
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
@@ -655,6 +658,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "upd78k0kx2",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx2_disassembler; } },
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
+	{ "v620",            be, -1, []() -> util::disasm_interface * { return new v620_disassembler; } },
+	{ "v75",             be, -1, []() -> util::disasm_interface * { return new v75_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
 	{ "v850",            le,  0, []() -> util::disasm_interface * { return new v850_disassembler; } },
 	{ "v850es",          le,  0, []() -> util::disasm_interface * { return new v850es_disassembler; } },
@@ -1103,7 +1108,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 {
 	bool pending_base = false;
 	bool pending_arch = false;
-	bool pending_mode = false;
 	bool pending_skip = false;
 	bool pending_count = false;
 
@@ -1115,7 +1119,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		// is it a switch?
 		if(curarg[0] == '-' && curarg[1] != '\0') {
-			if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
+			if(pending_base || pending_arch || pending_skip || pending_count)
 				goto usage;
 
 			if(tolower((uint8_t)curarg[1]) == 'a')
@@ -1126,8 +1130,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->flipped = true;
 			else if(tolower((uint8_t)curarg[1]) == 'l')
 				opts->lower = true;
-			else if(tolower((uint8_t)curarg[1]) == 'm')
-				pending_mode = true;
 			else if(tolower((uint8_t)curarg[1]) == 's')
 				pending_skip = true;
 			else if(tolower((uint8_t)curarg[1]) == 'c')
@@ -1146,8 +1148,14 @@ static int parse_options(int argc, char *argv[], options *opts)
 		} else if(pending_base) {
 		// base PC
 			int result;
-			if(curarg[0] == '0' && curarg[1] == 'x')
-				result = sscanf(&curarg[2], "%x", &opts->basepc);
+			if(curarg[0] == '0') {
+				if(tolower((uint8_t)curarg[1]) == 'x')
+					result = sscanf(&curarg[2], "%x", &opts->basepc);
+				else if(tolower((uint8_t)curarg[1]) == 'o')
+					result = sscanf(&curarg[2], "%o", &opts->basepc);
+				else
+					result = sscanf(&curarg[1], "%o", &opts->basepc);
+			}
 			else if(curarg[0] == '$')
 				result = sscanf(&curarg[1], "%x", &opts->basepc);
 			else
@@ -1155,12 +1163,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if(result != 1)
 				goto usage;
 			pending_base = false;
-
-		} else if(pending_mode) {
-			// mode
-			if(sscanf(curarg, "%d", &opts->mode) != 1)
-				goto usage;
-			pending_mode = false;
 
 		} else if(pending_arch) {
 			// architecture
@@ -1176,8 +1178,16 @@ static int parse_options(int argc, char *argv[], options *opts)
 		} else if(pending_skip) {
 			// skip bytes
 			int result;
-			if(curarg[0] == '0' && curarg[1] == 'x')
-				result = sscanf(&curarg[2], "%x", &opts->skip);
+			if(curarg[0] == '0') {
+				if(tolower((uint8_t)curarg[1]) == 'x')
+					result = sscanf(&curarg[2], "%x", &opts->skip);
+				else if(tolower((uint8_t)curarg[1]) == 'o')
+					result = sscanf(&curarg[2], "%o", &opts->skip);
+				else
+					result = sscanf(&curarg[1], "%o", &opts->skip);
+			}
+			else if(curarg[0] == '$')
+				result = sscanf(&curarg[1], "%x", &opts->skip);
 			else
 				result = sscanf(curarg, "%d", &opts->skip);
 			if(result != 1)
@@ -1201,7 +1211,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 	}
 
 	// if we have a dangling option, error
-	if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
+	if(pending_base || pending_arch || pending_skip || pending_count)
 		goto usage;
 
 	// if no file or no architecture, fail
@@ -1212,7 +1222,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
-	printf("   [-mode <n>] [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
+	printf("   [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
 	printf("   [-skip <n>] [-count <n>] [-octal]\n");
 	printf("\n");
 	printf("Supported architectures:");

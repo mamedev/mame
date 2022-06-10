@@ -40,13 +40,16 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
+	TIMER_CALLBACK_MEMBER(set_irq_tick);
+	TIMER_CALLBACK_MEMBER(clr_irq_tick);
+
 private:
 	sound_stream *m_stream;
-	emu_timer *m_timer, *m_clrtimer;
+	emu_timer *m_timer;
+	emu_timer *m_clrtimer;
 	a2bus_mcms1_device *m_pBusDevice;
 	bool m_enabled;
 	uint8_t m_vols[16];

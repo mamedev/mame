@@ -600,7 +600,7 @@ void pdp1_state::machine_start()
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&pdp1_state::pdp1_machine_stop,this));
 
-	m_dpy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::dpy_callback),this));
+	m_dpy_timer = timer_alloc(FUNC(pdp1_state::dpy_callback), this);
 }
 
 
@@ -625,7 +625,7 @@ void pdp1_readtape_image_device::device_resolve_objects()
 
 void pdp1_readtape_image_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_readtape_image_device::reader_callback),this));
+	m_timer = timer_alloc(FUNC(pdp1_readtape_image_device::reader_callback), this);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(2500));
 	m_timer->enable(0);
 }
@@ -648,7 +648,7 @@ void pdp1_punchtape_image_device::device_resolve_objects()
 
 void pdp1_punchtape_image_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_punchtape_image_device::puncher_callback),this));
+	m_timer = timer_alloc(FUNC(pdp1_punchtape_image_device::puncher_callback), this);
 }
 
 
@@ -674,7 +674,7 @@ void pdp1_typewriter_device::device_resolve_objects()
 
 void pdp1_typewriter_device::device_start()
 {
-	m_tyo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_typewriter_device::tyo_callback),this));
+	m_tyo_timer = timer_alloc(FUNC(pdp1_typewriter_device::tyo_callback), this);
 
 	m_color = m_pos = m_case_shift = 0;
 }
@@ -1316,10 +1316,10 @@ TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 
 void pdp1_cylinder_image_device::parallel_drum_init()
 {
-	m_rotation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::rotation_timer_callback), this));
+	m_rotation_timer = timer_alloc(FUNC(pdp1_cylinder_image_device::rotation_timer_callback), this);
 	m_rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	m_il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::il_timer_callback), this));
+	m_il_timer = timer_alloc(FUNC(pdp1_cylinder_image_device::il_timer_callback), this);
 	set_il(0);
 }
 

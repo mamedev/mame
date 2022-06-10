@@ -246,8 +246,8 @@ void m79152pc_state::machine_start()
 	m_line_count = 0;
 	m_hsync = false;
 
-	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m79152pc_state::hsync_on), this));
-	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m79152pc_state::hsync_off), this));
+	m_hsync_on_timer = timer_alloc(FUNC(m79152pc_state::hsync_on), this);
+	m_hsync_off_timer = timer_alloc(FUNC(m79152pc_state::hsync_off), this);
 	m_hsync_off_timer->adjust(m_screen->time_until_pos(9, 0), 0, m_screen->scan_period());
 
 	save_item(NAME(m_latch_full));

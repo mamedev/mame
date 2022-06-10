@@ -89,7 +89,7 @@ void ws_rom_device::device_start()
 	// Set up RTC timer
 	if (m_has_rtc)
 	{
-		rtc_timer = timer_alloc(TIMER_RTC);
+		rtc_timer = timer_alloc(FUNC(ws_rom_device::rtc_tick), this);
 		rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	}
 
@@ -196,44 +196,41 @@ void ws_rom_eeprom_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  rtc_tick
 //-------------------------------------------------
 
-void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ws_rom_device::rtc_tick)
 {
-	if (id == TIMER_RTC)
+	// a second passed
+	m_rtc_second++;
+	if ((m_rtc_second & 0x0f) > 9)
+		m_rtc_second = (m_rtc_second & 0xf0) + 0x10;
+
+	// check for minute passed
+	if (m_rtc_second >= 0x60)
 	{
-		// a second passed
-		m_rtc_second++;
-		if ((m_rtc_second & 0x0f) > 9)
-			m_rtc_second = (m_rtc_second & 0xf0) + 0x10;
+		m_rtc_second = 0;
+		m_rtc_minute++;
+		if ((m_rtc_minute & 0x0f) > 9)
+			m_rtc_minute = (m_rtc_minute & 0xf0) + 0x10;
+	}
 
-		// check for minute passed
-		if (m_rtc_second >= 0x60)
-		{
-			m_rtc_second = 0;
-			m_rtc_minute++;
-			if ((m_rtc_minute & 0x0f) > 9)
-				m_rtc_minute = (m_rtc_minute & 0xf0) + 0x10;
-		}
+	// check for hour passed
+	if (m_rtc_minute >= 0x60)
+	{
+		m_rtc_minute = 0;
+		m_rtc_hour++;
+		if ((m_rtc_hour & 0x0f) > 9)
+			m_rtc_hour = (m_rtc_hour & 0xf0) + 0x10;
+		if (m_rtc_hour == 0x12)
+			m_rtc_hour |= 0x80;
+	}
 
-		// check for hour passed
-		if (m_rtc_minute >= 0x60)
-		{
-			m_rtc_minute = 0;
-			m_rtc_hour++;
-			if ((m_rtc_hour & 0x0f) > 9)
-				m_rtc_hour = (m_rtc_hour & 0xf0) + 0x10;
-			if (m_rtc_hour == 0x12)
-				m_rtc_hour |= 0x80;
-		}
-
-		// check for day passed
-		if (m_rtc_hour >= 0x24)
-		{
-			m_rtc_hour = 0;
-			m_rtc_day++;
-		}
+	// check for day passed
+	if (m_rtc_hour >= 0x24)
+	{
+		m_rtc_hour = 0;
+		m_rtc_day++;
 	}
 }
 

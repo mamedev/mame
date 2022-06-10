@@ -1087,7 +1087,7 @@ void mk68564_channel::device_start()
 {
 	z80sio_channel::device_start();
 
-	m_brg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mk68564_channel::brg_timeout), this));
+	m_brg_timer = timer_alloc(FUNC(mk68564_channel::brg_timeout), this);
 
 	save_item(NAME(m_tx_auto_enable));
 	save_item(NAME(m_brg_tc));

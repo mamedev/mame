@@ -128,27 +128,22 @@ uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 
 /***************************************************
 *
-* Hook-up for games that we have a proper MCU dump.
+* Hook-up for games that have a proper MCU dump.
 *
 ***************************************************/
 
-void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dec8_state::mcu_irq_clear)
 {
-	switch (id)
-	{
-	case TIMER_DEC8_I8751:
-		// The schematics show a clocked LS194 shift register (3A) is used to automatically
-		// clear the IRQ request.  The MCU does not clear it itself.
-		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-		break;
-	case TIMER_DEC8_M6502:
-		// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
-		// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in dec8_state::device_timer");
-	}
+	// The schematics show a clocked LS194 shift register (3A) is used to automatically
+	// clear the IRQ request.  The MCU does not clear it itself.
+	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(dec8_state::audiocpu_nmi_clear)
+{
+	// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
+	// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void dec8_state::dec8_i8751_w(offs_t offset, uint8_t data)
@@ -1796,8 +1791,8 @@ void dec8_state::machine_start()
 	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
-	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+	m_i8751_timer = timer_alloc(FUNC(dec8_state::mcu_irq_clear), this);
+	m_m6502_timer = timer_alloc(FUNC(dec8_state::audiocpu_nmi_clear), this);
 
 	m_i8751_p2 = 0xff;
 	m_latch = 0;

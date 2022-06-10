@@ -278,8 +278,8 @@ protected:
 
 	virtual void device_start() override
 	{
-		m_watchdog_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peripheral_base::watchdog_timeout), this));
-		m_watchdog_output = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peripheral_base::watchdog_output), this));
+		m_watchdog_timeout = timer_alloc(FUNC(peripheral_base::watchdog_timeout), this);
+		m_watchdog_output = timer_alloc(FUNC(peripheral_base::watchdog_output), this);
 
 		m_row_drive = make_bitmask<u16>(Rows);
 		m_host_clock_out = 1U;

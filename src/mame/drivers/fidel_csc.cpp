@@ -10,6 +10,8 @@ Fidelity CSC(and derived) hardware
 - Reversi Sensory Challenger
 
 TODO:
+- do ca1_w/cb1_w better, it's annoying since it's going through sensorboard_device
+  (it works fine though, since PIA interrupts are not connected)
 - hook up csce I/O properly, it doesn't have PIAs
 - verify csc/super9cc irq duration, it was measured 73.425us but that's too long,
   so it's using the one from csce for now instead
@@ -38,6 +40,9 @@ FE00-FFFF: 512 byte 74S474 or N82S141N PROM
 *: 101-64019 is also used on the VSC(fidel_vsc.cpp). It contains the opening book
 and "64 greatest games", as well as some Z80 code. Obviously the latter is unused
 on the CSC. Also seen with 101-1025A04 label, same ROM contents.
+
+101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
+instead of this ROM. Most of the opening book is in here.
 
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
@@ -270,13 +275,12 @@ protected:
 	void update_sound();
 	u8 speech_r(offs_t offset);
 
+	u8 pia0_read(offs_t offset);
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
-	DECLARE_READ_LINE_MEMBER(pia0_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia0_cb1_r);
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
@@ -403,6 +407,20 @@ u8 csc_state::speech_r(offs_t offset)
 
 // 6821 PIA 0
 
+u8 csc_state::pia0_read(offs_t offset)
+{
+	// CA1/CB1: button row 6/7
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 1)
+			m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		else if (offset == 3)
+			m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+	}
+
+	return m_pia[0]->read(offset);
+}
+
 u8 csc_state::pia0_pa_r()
 {
 	// d0-d5: button row 0-5
@@ -422,18 +440,6 @@ void csc_state::pia0_pb_w(u8 data)
 	// d0-d7: led row data
 	m_led_data = data;
 	update_display();
-}
-
-READ_LINE_MEMBER(csc_state::pia0_ca1_r)
-{
-	// button row 6
-	return read_inputs() >> 6 & 1;
-}
-
-READ_LINE_MEMBER(csc_state::pia0_cb1_r)
-{
-	// button row 7
-	return read_inputs() >> 7 & 1;
 }
 
 WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
@@ -511,7 +517,7 @@ void csc_state::csc_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x4000).ram();
 	map(0x0800, 0x0bff).mirror(0x4400).ram();
 	map(0x1000, 0x1003).mirror(0x47fc).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).mirror(0x47fc).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).mirror(0x47fc).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
 	map(0xa000, 0xafff).mirror(0x1000).rom();
 	map(0xc000, 0xffff).rom();
@@ -522,7 +528,7 @@ void csc_state::csce_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1003).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
 	map(0x2000, 0x3fff).rom();
 	map(0xa000, 0xffff).rom();
 }
@@ -531,7 +537,7 @@ void csc_state::rsc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x2000, 0x2003).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2003).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -623,8 +629,6 @@ void csc_state::csc(machine_config &config)
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
-	m_pia[0]->readca1_handler().set(FUNC(csc_state::pia0_ca1_r));
-	m_pia[0]->readcb1_handler().set(FUNC(csc_state::pia0_cb1_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));
@@ -691,8 +695,6 @@ void csc_state::rsc(machine_config &config)
 
 	PIA6821(config, m_pia[0], 0); // MOS 6520
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
-	m_pia[0]->readca1_handler().set(FUNC(csc_state::pia0_ca1_r));
-	m_pia[0]->readcb1_handler().set(FUNC(csc_state::pia0_cb1_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));

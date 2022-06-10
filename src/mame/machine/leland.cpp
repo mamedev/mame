@@ -306,7 +306,7 @@ void ataxx_state::indyheat_analog_w(offs_t offset, u8 data)
 void leland_state::machine_start()
 {
 	/* start scanline interrupts going */
-	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::leland_interrupt_callback),this));
+	m_master_int_timer = timer_alloc(FUNC(leland_state::leland_interrupt_callback), this);
 
 	save_item(NAME(m_dac_control));
 	save_item(NAME(m_wcol_enable));
@@ -365,7 +365,7 @@ void ataxx_state::machine_start()
 	m_extra_tram = std::make_unique<u8[]>(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
+	m_master_int_timer = timer_alloc(FUNC(leland_state::ataxx_interrupt_callback), this);
 
 	save_item(NAME(m_wcol_enable));
 	save_item(NAME(m_dial_last_input));

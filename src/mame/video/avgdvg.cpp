@@ -655,9 +655,14 @@ int avg_device::handler_7() // avg_strobe3
 
 	if (!OP0() && !OP2())
 	{
+		int x = m_xpos;
+		int y = m_ypos;
+
+		apply_flipping(x, y);
+
 		vg_add_point_buf(
-				m_xpos,
-				m_ypos,
+				x,
+				y,
 				vector_device::color111(m_color),
 				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 	}
@@ -1298,8 +1303,8 @@ void avgdvg_device_base::device_start()
 	if (!m_vector->started())
 		throw device_missing_dependencies();
 
-	m_vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device_base::vg_set_halt_callback), this));
-	m_vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device_base::run_state_machine), this));
+	m_vg_halt_timer = timer_alloc(FUNC(avgdvg_device_base::vg_set_halt_callback), this);
+	m_vg_run_timer = timer_alloc(FUNC(avgdvg_device_base::run_state_machine), this);
 
 	m_flip_x = m_flip_y = false;
 
