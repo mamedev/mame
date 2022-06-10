@@ -48301,4 +48301,54 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="suprearc">
+		<description>Super Ear Challenger (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-06-09"/>
+		<!--"Super Ear Challenger" is a 1985 educational program developed by Stephen Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. It is preserved here for the first time.-->
+        <!-- It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="super ear challenger- a music game (4am crack).dsk" size="143360" crc="461f0401" sha1="5002c1a3c9de2dc015fb46746f105dbec1c0a145"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyborgss">
+		<description>Cyborg (Softsmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2022-06-09"/>
+		<!--"Cyborg" is a 1982 adventure game developed by Sentient Software. This 1983 re-release is distributed by Softsmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cyborg (softsmith) (4am crack).dsk" size="143360" crc="56e9da76" sha1="97356be1d74d7ebf525b57e671537b2ea496c4d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kittenkf0386">
+		<description>Kittens, Kids, and a Frog (Version 03.12.86) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Kittens, Kids, and a Frog" is a 1986 educational program with content by Janet Goldman and distributed by Hartley Courseware. This version is dated 03.12.86. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kittens, kids, and a frog 03.12.86 (4am crack) disk 1.dsk" size="143360" crc="5f3b43f7" sha1="bb9975903497d879125f1b33328eb044855c67eb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kittens, kids, and a frog 03.12.86 (4am crack) disk 2.dsk" size="143360" crc="b55f6ff0" sha1="2d39b36503c096bfed5dc5e3b32730aeed771ee0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
