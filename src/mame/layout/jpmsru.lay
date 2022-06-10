@@ -61,7 +61,7 @@ license:CC0
 		</repeat>
 		<element name="digit0" ref="LCD"><bounds x="220" y="350" width="24" height="40" /></element>
 		<element name="digit1" ref="LCD"><bounds x="244" y="350" width="24" height="40" /></element>
-		<repeat count="7">
+		<repeat count="13">
 			<param name="i" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
