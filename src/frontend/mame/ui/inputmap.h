@@ -64,8 +64,6 @@ protected:
 
 	menu_input(mame_ui_manager &mui, render_container &container);
 
-	virtual void menu_activated() override;
-
 	void populate_sorted(float &customtop, float &custombottom);
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
@@ -92,8 +90,11 @@ private:
 class menu_input_general : public menu_input
 {
 public:
-	menu_input_general(mame_ui_manager &mui, render_container &container, int group);
+	menu_input_general(mame_ui_manager &mui, render_container &container, int group, std::string &&heading);
 	virtual ~menu_input_general() override;
+
+protected:
+	virtual void menu_activated() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
@@ -108,6 +109,9 @@ class menu_input_specific : public menu_input
 public:
 	menu_input_specific(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_input_specific() override;
+
+protected:
+	virtual void menu_activated() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
