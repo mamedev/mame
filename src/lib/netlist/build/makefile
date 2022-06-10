@@ -290,7 +290,7 @@ gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
 emsdk:
-	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pongf.cpp@nl_pongf.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pong.cpp@nl_pong.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
 	# LDFLAGS  -s ASSERTIONS=1
 	
 clang:

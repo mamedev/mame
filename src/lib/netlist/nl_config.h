@@ -140,7 +140,7 @@ namespace netlist
 		/// \brief Prefer 128bit int type for ptime if supported
 		///
 		/// Set this to one if you want to use 128 bit int for ptime.
-		/// This is about 10% slower on a skylake processor for pongf.
+		/// This is about 10% slower on a skylake processor for pong.
 		///
 		using prefer_int128 = std::integral_constant<bool, false>;
 
