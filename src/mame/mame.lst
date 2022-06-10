@@ -13376,6 +13376,10 @@ ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 @source:efdt.cpp
 efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
 
+@source:efg8080.cpp
+blackhol
+foolrace
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 
@@ -16442,10 +16446,6 @@ hcastlek                        // GX768 (c) 1988
 
 @source:hds200.cpp
 hds200                          // (c) Human Designed Systems
-
-@source:headonb.cpp
-blackhol
-foolrace                        // bootleg
 
 @source:hec2hrp.cpp
 hec2hr                          //
