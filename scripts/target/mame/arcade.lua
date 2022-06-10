@@ -3533,6 +3533,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sms_bootleg.cpp",
 	MAME_DIR .. "src/mame/drivers/shtzone.cpp",
 	MAME_DIR .. "src/mame/drivers/segacoin.cpp",
+	MAME_DIR .. "src/mame/drivers/segafruit.cpp",
 	MAME_DIR .. "src/mame/drivers/segag80r.cpp",
 	MAME_DIR .. "src/mame/includes/segag80r.h",
 	MAME_DIR .. "src/mame/machine/segag80.cpp",

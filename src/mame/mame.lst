@@ -37824,6 +37824,10 @@ slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
 
+@source:segafruit.cpp
+m3001
+m4001
+
 @source:segag80r.cpp
 005                             // (c) 1981
 astrob                          // (c) 1981
