@@ -115,7 +115,7 @@ public:
 			fatalerror("DirectInput: Unable to enumerate devices (result=%08X)\n", uint32_t(result));
 	}
 
-	static std::string device_item_name(dinput_device * devinfo, int offset, const char * defstring, const TCHAR * suffix)
+	static std::string device_item_name(dinput_device *devinfo, int offset, const char *defstring, const char *suffix)
 	{
 		DIDEVICEOBJECTINSTANCE instance = { 0 };
 		HRESULT result;
@@ -131,21 +131,19 @@ public:
 				return nullptr;
 
 			// Return the default value
-			return std::string(defstring);
+			std::string result(defstring);
+			if (suffix)
+				result.append(" ").append(suffix);
+			return result;
 		}
 
 		// convert the name to utf8
 		std::string namestring = osd::text::from_tstring(instance.tszName);
 
 		// if no suffix, return as-is
-		if (suffix == nullptr)
-			return namestring;
-
-		// convert the suffix to utf8
-		std::string suffix_utf8 = osd::text::from_tstring(suffix);
-
-		// Concat the name and suffix
-		return namestring + " " + suffix_utf8;
+		if (suffix)
+			namestring.append(" ").append(suffix);
+		return namestring;
 	}
 
 protected:
@@ -251,7 +249,7 @@ public:
 			auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
 
 			// add to the mouse device
-			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
+			std::string name = device_item_name(devinfo, offset, default_button_name(butnum).c_str(), nullptr);
 			devinfo->device()->add_item(
 				name,
 				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
@@ -494,19 +492,19 @@ int dinput_joystick_device::configure()
 		std::string name;
 
 		// left
-		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Left");
 		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_LEFT)));
 
 		// right
-		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Right");
 		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_RIGHT)));
 
 		// up
-		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Up");
 		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_UP)));
 
 		// down
-		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
+		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Down");
 		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_DOWN)));
 	}
 
@@ -514,7 +512,7 @@ int dinput_joystick_device::configure()
 	for (uint32_t butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
 	{
 		auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
-		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum), nullptr);
+		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum).c_str(), nullptr);
 
 		input_item_id itemid;
 

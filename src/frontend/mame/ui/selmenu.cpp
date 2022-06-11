@@ -167,9 +167,6 @@ public:
 	software_parts(mame_ui_manager &mui, render_container &container, s_parts &&parts, ui_software_info const &ui_info);
 	virtual ~software_parts() override;
 
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
@@ -184,9 +181,6 @@ public:
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, game_driver const &driver, bool inlist);
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, ui_software_info const &swinfo, bool inlist);
 	virtual ~bios_selection() override;
-
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
@@ -263,6 +257,7 @@ menu_select_launch::software_parts::software_parts(mame_ui_manager &mui, render_
 	, m_uiinfo(ui_info)
 	, m_parts(std::move(parts))
 {
+	set_heading(_("Select Software Package Part"));
 }
 
 //-------------------------------------------------
@@ -288,7 +283,6 @@ void menu_select_launch::software_parts::populate(float &customtop, float &custo
 		item_append(elem->first, elem->second, 0, (void *)&*elem);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -309,20 +303,6 @@ void menu_select_launch::software_parts::handle(event const *ev)
 			}
 		}
 	}
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_launch::software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	char const *const text[] = { _("Software part selection:") };
-	draw_text_box(
-			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -347,6 +327,7 @@ menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_
 	, m_inlist(inlist)
 	, m_bios(std::move(biosname))
 {
+	set_heading(_("Select System BIOS"));
 }
 
 //-------------------------------------------------
@@ -363,11 +344,10 @@ menu_select_launch::bios_selection::~bios_selection()
 
 void menu_select_launch::bios_selection::populate(float &customtop, float &custombottom)
 {
-	for (auto & elem : m_bios)
+	for (auto &elem : m_bios)
 		item_append(elem.first, 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -414,20 +394,6 @@ void menu_select_launch::bios_selection::handle(event const *ev)
 			}
 		}
 	}
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_launch::bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	char const *const text[] = { _("BIOS selection:") };
-	draw_text_box(
-			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 
@@ -712,11 +678,11 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		int cloneof = driver_list::non_bios_clone(driver);
 
 		if (0 > cloneof)
-			tempbuf[1] = _("Driver is parent");
+			tempbuf[1] = _("System is parent");
 		else if (system)
-			tempbuf[1] = string_format(_("Driver is clone of: %1$s"), system->parent);
+			tempbuf[1] = string_format(_("System is clone of: %1$s"), system->parent);
 		else
-			tempbuf[1] = string_format(_("Driver is clone of: %1$s"), driver_list::driver(cloneof).type.fullname());
+			tempbuf[1] = string_format(_("System is clone of: %1$s"), driver_list::driver(cloneof).type.fullname());
 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
@@ -869,9 +835,10 @@ void menu_select_launch::inkey_dats()
 
 void menu_select_launch::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
 {
-	auto line_height = ui().get_line_height();
-	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect(&container());
-	auto gutter_width = lr_arrow_width * 1.3f;
+	float const aspect = machine().render().ui_aspect(&container());
+	float const line_height = ui().get_line_height();
+	float const lr_arrow_width = 0.4f * line_height * aspect;
+	float const gutter_width = 0.5f * line_height * aspect;
 
 	// set left-right arrows dimension
 	float const ar_x0 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width - lr_arrow_width;
@@ -2894,7 +2861,7 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 		str << driver.type.fullname();
 	str << "\t\n\n";
 
-	util::stream_format(str, _("Romset\t%1$s\n"), driver.name);
+	util::stream_format(str, _("Short Name\t%1$s\n"), driver.name);
 	util::stream_format(str, _("Year\t%1$s\n"), driver.year);
 	util::stream_format(str, _("Manufacturer\t%1$s\n"), driver.manufacturer);
 
@@ -2903,12 +2870,12 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	{
 		util::stream_format(
 				str,
-				_("Driver is Clone of\t%1$s\n"),
+				_("System is Clone of\t%1$s\n"),
 				system ? std::string_view(system->parent) : std::string_view(driver_list::driver(cloneof).type.fullname()));
 	}
 	else
 	{
-		str << _("Driver is Parent\t\n");
+		str << _("System is Parent\t\n");
 	}
 
 	if (flags.has_analog())
@@ -3028,12 +2995,12 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	else if (flags.imperfect_features() & device_t::feature::TIMING)
 		str << _("Timing\tImperfect\n");
 
-	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical Machine\tYes\n")         : _("Mechanical Machine\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical System\tYes\n")          : _("Mechanical System\tNo\n"));
 	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)  ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
 	str << ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Requires Clickable Artwork\tYes\n") : _("Requires Clickable Artwork\tNo\n"));
 	if (flags.machine_flags() & machine_flags::NO_COCKTAIL)
 		str << _("Support Cocktail\tNo\n");
-	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("Driver is BIOS\tYes\n")             : _("Driver is BIOS\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("System is BIOS\tYes\n")             : _("System is BIOS\tNo\n"));
 	str << ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE)     ? _("Support Save\tYes\n")               : _("Support Save\tNo\n"));
 	str << ((flags.machine_flags() & ORIENTATION_SWAP_XY)              ? _("Screen Orientation\tVertical\n")    : _("Screen Orientation\tHorizontal\n"));
 	bool found = false;

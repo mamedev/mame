@@ -11,7 +11,7 @@ MAME’s User Interface
 Introduction
 ------------
 
-MAME provides a simple user interface for selecting a system and software to
+MAME provides a simple user interface for selecting the system and software to
 run and changing settings while running an emulated system.  MAME’s user
 interface is designed to be usable with a keyboard, game controller, or pointing
 device, but will require a keyboard for initial configuration.
@@ -62,8 +62,9 @@ Forward Delete, or Fn+Delete on some compact keyboards (UI Clear)
     Clear setting or reset to default value.
 Escape (UI Cancel)
     Clear the search if searching the menu, otherwise close the menu, returning
-    to the previous menu, or returning to the emulated machine for the main menu
-    (there’s usually an item at the bottom of the menu for the same purpose).
+    to the previous menu, or returning to the emulated system in the case of the
+    main menu (there’s usually an item at the bottom of the menu for the same
+    purpose).
 Home (UI Home)
     Highlight the first menu item and scroll to the top of the menu.
 End (UI End)
@@ -91,6 +92,10 @@ most important UI controls have joystick assignments by default:
 * Move the first joystick left or right in the X axis to adjust settings.
 * Press the first button on the first joystick to select the highlighted menu
   item.
+
+For gamepad-style controllers, the left analog thumb stick usually controls UI
+navigation.  You may find it convenient to assign directional pad controls to UI
+navigation in addition to or in place of the left thumb stick.
 
 If you want to be able to use MAME with a game controller without needing a
 keyboard, you’ll need to assign joystick buttons (or combinations of buttons) to
@@ -145,26 +150,31 @@ Configuring inputs
 MAME needs a flexible input system to support the control schemes of the vast
 array of systems it emulates.  In MAME, inputs that only have two distinct
 states, on and off or active and inactive, are called *digital inputs*, and all
-other inputs are called *analog inputs*, even if this is not strictly true.
+other inputs are called *analog inputs*, even if this is not strictly true (for
+example multi-position switches are called analog inputs in MAME).
 
 To assign MAME’s user interface controls or the default inputs for all systems,
-select **Input (general)** from the main menu during emulation, or select
-**Configure Options** from the system selection menu and then select **General
-Inputs**.  From there, select a category.
+select **Input Settings** from the main menu during emulation and then select
+**Input Assignments (general)** from the Input Settings menu, or select
+**General Settings** from the system selection menu and then select **Input
+Assignments** from the General Settings menu.  From there, select a category.
 
-To assign inputs for the currently running machine, select **Input (this
-Machine)** from the main menu during emulation.  Inputs are grouped by device
-and sorted by type.  You can move between devices with the next group and
-previous group keys/buttons (**[** and **]** on the keyboard by default).
+To assign inputs for the currently running system, select **Input Settings**
+from the main menu during emulation and then select **Input Assignments (this
+system)** from the Input Settings menu.  Inputs are grouped by device and sorted
+by type.  You can move between devices with the next group and previous group
+keys/buttons (opening/closing brackets **[** and **]** on the keyboard by
+default).
 
 The input assignment menus show the name of the emulated input or user interface
-control on the left, and the input (or combination of inputs) assigned to it on
-the right.
+control on the left, and the controls (or combination of controls) assigned to
+it on the right.
 
 To adjust the sensitivity, auto-centre speed and inversion settings, or to see
-how emulated analog controls react to your inputs, select **Analog Controls**
-from the main menu during emulation.  (This item only appears on the main menu
-for systems with analog controls.)
+how emulated analog controls react to your inputs, select **Input Settings**
+from the main menu during emulation, and then select **Analog Input
+Adjustments** from the Input Settings Menu (this item only appears on the Input
+Settings menu for systems with analog controls).
 
 
 .. _ui-inptcfg-digital:
@@ -173,7 +183,7 @@ Digital input settings
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Each emulated digital input has a single assignment setting.  For flexibility,
-MAME can combine host inputs (keys, buttons and joystick axes) using logical
+MAME can combine controls (keys, buttons and joystick axes) using logical
 **and**, **not** and **or** operations.  This is best illustrated with some
 examples:
 
@@ -195,11 +205,12 @@ Kbd P Kbd Shift or Kbd P Kbd Right Shift
 (In technical terms, MAME uses Boolean sum of products logic to combine inputs.)
 
 When a digital input setting is highlighted, the prompt below the menu shows
-whether selecting it will set the assignment or append an **or** operation to
-it.  Press **UI Left/Right** before selecting the setting to switch between
-setting or appending an **or** operation.  Press **UI Clear** (**Delete** or
-**Forward Delete** by default) to clear the setting or restore the default
-assignment.
+whether selecting it will replace the current assignment or append an **or**
+operation to it.  Press **UI Left/Right** before selecting the setting to switch
+between replacing the assignment or appending an **or** operation to it.  Press
+**UI Clear** (**Delete** or **Forward Delete** by default) to clear the
+highlighted setting, or restore the default assignment if it is currently
+cleared.
 
 When you select a digital input setting, MAME will wait for you to enter an
 input or a combination of inputs for a logical **and** operation:
@@ -211,7 +222,7 @@ input or a combination of inputs for a logical **and** operation:
   analog control additional times toggles the **not** on and off.
 * Pressing **UI Cancel** (**Escape** by default) *before* activating any other
   controls clears the setting or restores the default assignment.
-* Pressing **UI Cancel** *after* activating another control leaves the setting
+* Press **UI Cancel** *after* activating another control to leave the setting
   unchanged.
 * The new setting is shown below the menu.  Wait one second after activating an
   input to accept the new setting.
@@ -242,14 +253,14 @@ Each emulated analog input has three assignment settings:
   input.  The axis setting uses the name of the input with the suffix “Analog”.
   For example the axis setting for the steering wheel in Ridge Racer is called
   **Steering Wheel Analog**.
-* Use the *increment setting* assign an input (or combination of inputs) to
+* Use the *increment setting* assign a control (or combination of controls) to
   increase the value of the emulated analog input.  The increment setting uses
   the name of the input with the suffix “Analog Inc”.  For example the increment
   setting for the steering wheel in Ridge Racer is called **Steering Wheel
   Analog Inc**.  This is a digital input setting – if an analog axis is
   assigned to it, MAME will not increase the emulated input value at a
   proportional speed.
-* Use the *decrement setting* assign an input (or combination of inputs) to
+* Use the *decrement setting* assign a control (or combination of controls) to
   decrease the value of the emulated analog input.  The decrement setting uses
   the name of the input with the suffix “Analog Dec”.  For example the decrement
   setting for the steering wheel in Ridge Racer is called **Steering Wheel
@@ -272,12 +283,12 @@ You can assign one or more analog axes to the axis setting for an emulated
 analog input.  When multiple axes are assigned to an axis setting, they will be
 added together, but absolute position controls will override relative position
 controls.  For example suppose for Arkanoid you assign the **Dial Analog** axis
-setting to **Mouse X or Joy 1 LSX or Joy 1 RSX** on a mouse Xbox-style
+setting to **Mouse X or Joy 1 LSX or Joy 1 RSX** on a mouse and Xbox-style
 controller.  You will be able to control the paddle with the mouse or either
 analog stick, but the mouse will only take effect if both analog sticks are in
 the neutral position (centred) on the X axis.  If either analog stick is *not*
 centred on the X axis, the mouse will have no effect, because a mouse is a
-relative position control while a joystick is an absolute position control.
+relative position control while joysticks are absolute position controls.
 
 For absolute position controls like joysticks and pedals, MAME allows you to
 assign either the full range of an axis or the range on one side of the neutral
@@ -311,10 +322,10 @@ Mouse X or Joy 1 LT or Joy 1 RT Reverse
     direction to the left trigger.
 Joy 1 LB Joy 1 LSX
     Use horizontal movement of the left analog stick to control the emulated
-    input, but *only* while holding the left shoulder button.  If the right
+    input, but *only* while holding the left shoulder button.  If the left
     shoulder button is released while the left analog stick is not centred
-    horizontally, the emulated input will hold its value until the right
-    shoulder button is pressed again (a “sticky” control).
+    horizontally, the emulated input will hold its value until the left shoulder
+    button is pressed again (a “sticky” control).
 not Joy 1 RB Joy 1 RSX or Joy 1 RB Joy 1 RSX Reverse
     Use horizontal movement of the right analog stick to control the emulated
     input, but invert the control if the right shoulder button is held.
@@ -341,15 +352,16 @@ When you select an axis setting, MAME will wait for you to enter an input:
   analog control to accept the new setting.
 
 To adjust sensitivity, auto-centring speed and inversion settings for emulated
-analog inputs, or to see how they respond to your settings, select **Analog
-Controls** from the main menu during emulation.  Settings for emulated analog
+analog inputs, or to see how they respond to controls with your settings, select
+**Input Settings** from the main menu during emulation, and then select **Analog
+Input Adjustments** from the Input Settings Menu.  Settings for emulated analog
 inputs are grouped by device and sorted by type.  You can move between devices
-with the next group and previous group keys/buttons (**[** and **]** on the
-keyboard by default).  The state of the emulated analog inputs is shown below
-the menu, and reacts in real time.  Press the **On Screen Display** key or
-button (the backtick/tilde key by default on a US ANSI QWERTY keyboard) to hide
-the menu to make it easier to test without changing settings.  Press the same
-key or button to show the menu again.
+with the next group and previous group keys/buttons (opening/closing brackets
+**[** and **]** on the keyboard by default).  The state of the emulated analog
+inputs is shown below the menu, and reacts in real time.  Press the **On Screen
+Display** key or button (the backtick/tilde key by default on a US ANSI QWERTY
+keyboard) to hide the menu to make it easier to test without changing settings.
+Press the same key or button to show the menu again.
 
 Each emulated input has four settings on the **Analog Controls** menu:
 
@@ -387,7 +399,7 @@ The system and software selection menus
 If you start MAME without specifying a system on the command line, the system
 selection menu will be shown (assuming the
 :ref:`ui option <mame-commandline-ui>` is set to **cabinet**).  The system
-selection menu is also shown if you select **Select New Machine** from the main
+selection menu is also shown if you select **Select New System** from the main
 menu during emulation.  Selecting a system that uses software lists shows the
 similar software selection menu.
 
@@ -407,7 +419,7 @@ The system and software selection menus have the following parts:
 * The list of systems or software in the centre.  For the system selection menu,
   there are configuration options below the list of systems.  Clones are shown
   with a different text colour (grey by default).  You can right-click a system
-  name as a shortcut to show the machine configuration options for the system.
+  name as a shortcut to show the System Settings menu for the system.
 
   Systems or software items are sorted by full name or description, keeping
   clones immediately below their parents.  This may appear confusing if your
@@ -454,8 +466,8 @@ Navigation controls
 In addition to the usual :ref:`menu navigation controls <ui-menus>`, the system
 and software selection menus have additional configurable controls for
 navigating the multi-pane layout, and providing alternatives to toolbar buttons
-if you don’t want to use a pointing device.  The default additional controls (on
-a US ANSI QWERTY keyboard), and the settings they correspond to, are:
+if you don’t want to use a pointing device.  The default additional controls
+(with a US ANSI QWERTY keyboard), and the settings they correspond to, are:
 
 Tab (UI Focus Next)
     Move focus to the next area.  The order is system/software list,
@@ -488,7 +500,7 @@ The simple system selection menu
 --------------------------------
 
 If you start MAME without specifying a system on the command line (or choose
-**Select New Machine** from the main menu during emulation) with the
+**Select New System** from the main menu during emulation) with the
 :ref:`ui option <mame-commandline-ui>` set to **simple**, the simple system
 selection menu will be shown.  The simple system selection menu shows fifteen
 randomly selected systems that have ROM sets present in your configured

@@ -91,7 +91,6 @@ menu_load_save_state_base::menu_load_save_state_base(
 		bool one_shot)
 	: autopause_menu<>(mui, container)
 	, m_switch_poller(machine().input())
-	, m_header(header)
 	, m_footer(footer)
 	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
@@ -99,6 +98,7 @@ menu_load_save_state_base::menu_load_save_state_base(
 {
 	set_one_shot(one_shot);
 	set_needs_prev_menu_item(!one_shot);
+	set_heading(header);
 }
 
 
@@ -222,7 +222,6 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		item_append(_("Cancel"), 0, nullptr);
 
 	// set up custom render proc
-	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
 
 	// get ready to poll inputs
@@ -405,13 +404,6 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	// draw menu title
-	draw_text_box(
-			&m_header, &m_header + 1,
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
-
 	std::string_view text[2];
 	unsigned count(0U);
 

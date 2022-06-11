@@ -63,7 +63,8 @@ and saving/loading save states.
     Highlight first or last UI menu option.
 **[** **]**
     Move to previous or next group in UI menus that support it (e.g. move to the
-    inputs for the previous or next device in the Input (this Machine) menu).
+    inputs for the previous or next device in the **Input Assignments (this
+    System)** menu).
 **Enter**/**Joystick 1 Button 1**
     Select currently highlighted UI menu option.
 **Space**
@@ -706,8 +707,8 @@ All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 Note that controls can vary widely by computer type, so not all keys are shown
-here. See the “Input (this Machine)” section of MAME’s configuration menu for
-details for the machine you are currently using.
+here. See the **Input Assignments (this system)** section of MAME’s Input
+Settings menu for details for the machine you are currently using.
 
 
 **Tab**
@@ -742,5 +743,5 @@ All the keys are fully configurable in the user interface.
 
 Note that controls can vary widely by machine type, so default keys are not
 shown here and defaults will vary considerably based on the manufacturer and
-style. See the “Input (this Machine)” section of MAME’s configuration menu for
-details for the machine you are currently using.
+style. See the **Input Assignments (this system)** section of MAME’s Input
+Settings menu for details for the machine you are currently using.

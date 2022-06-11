@@ -333,7 +333,7 @@ public:
 	}
 
 	template <typename TActual, typename... TArgs>
-	TActual &create_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module, TArgs&&... args)
+	TActual &create_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module, TArgs &&... args)
 	{
 		// allocate the device object
 		auto devinfo = std::make_unique<TActual>(machine, std::move(name), std::move(id), module, std::forward<TArgs>(args)...);
@@ -342,7 +342,7 @@ public:
 	}
 
 	template <typename TActual>
-	TActual &add_device(running_machine &machine, std::unique_ptr<TActual> devinfo)
+	TActual &add_device(running_machine &machine, std::unique_ptr<TActual> &&devinfo)
 	{
 		// Add the device to the machine
 		devinfo->m_device = &machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo->id(), devinfo.get());
@@ -510,7 +510,7 @@ public:
 protected:
 	virtual int init_internal() { return 0; }
 	virtual bool should_poll_devices(running_machine &machine) = 0;
-	virtual void before_poll(running_machine &machine) {}
+	virtual void before_poll(running_machine &machine) { }
 };
 
 template <class TItem>
@@ -539,22 +539,18 @@ int generic_axis_get_state(void *device_internal, void *item_internal)
 //  default_button_name
 //============================================================
 
-inline const char *default_button_name(int which)
+inline std::string default_button_name(int which)
 {
-	static char buffer[20];
-	snprintf(buffer, std::size(buffer), "B%d", which);
-	return buffer;
+	return util::string_format("Button %d", which + 1);
 }
 
 //============================================================
 //  default_pov_name
 //============================================================
 
-inline const char *default_pov_name(int which)
+inline std::string default_pov_name(int which)
 {
-	static char buffer[20];
-	snprintf(buffer, std::size(buffer), "POV%d", which);
-	return buffer;
+	return util::string_format("Hat %d", which + 1);
 }
 
 // default axis names
