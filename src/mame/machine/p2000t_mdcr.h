@@ -75,9 +75,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(read_timer_tick);
 
 private:
 	/// \brief A Phase Decoder used in a Philips MDCR220 Mini Cassette Recorder

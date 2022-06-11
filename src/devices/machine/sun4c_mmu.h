@@ -122,12 +122,11 @@ protected:
 		uint8_t pad[3];
 	};
 
-	static const device_timer_id TIMER_RESET = 0;
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(reset_off_tick);
 
 	uint32_t page_entry_to_uint(uint32_t index);
 	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);

@@ -99,10 +99,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	enum
-	{
-		TIMER_INTERRUPT6
-	};
+	TIMER_CALLBACK_MEMBER(trigger_int6);
 
 	struct f2_tempsprite
 	{
@@ -288,8 +285,6 @@ protected:
 	void thundfox_map(address_map &map);
 	void yesnoj_map(address_map &map);
 	void yuyugogo_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_TAITO_F2_H

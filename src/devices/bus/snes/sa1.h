@@ -20,14 +20,11 @@ public:
 	sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	static const device_timer_id TIMER_SA1 = 0; // SA-1 internal timer (18 bit linear timer or HV timer)
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// reading and writing
 	virtual u8 read_l(offs_t offset) override;
@@ -38,6 +35,8 @@ protected:
 	// additional reading and writing
 	virtual u8 chip_read(offs_t offset) override;
 	virtual void chip_write(offs_t offset, u8 data) override;
+
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 private:
 	u8 var_length_read(offs_t offset);

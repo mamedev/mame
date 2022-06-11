@@ -247,7 +247,7 @@ void macquadra_state::machine_start()
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca2_data = 0;
 
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 }
 
@@ -351,8 +351,8 @@ TIMER_CALLBACK_MEMBER(macquadra_state::dafb_cursor_tick)
 
 void macquadra_state::video_start() // DAFB
 {
-	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_vbl_tick),this));
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_cursor_tick),this));
+	m_vbl_timer = timer_alloc(FUNC(macquadra_state::dafb_vbl_tick), this);
+	m_cursor_timer = timer_alloc(FUNC(macquadra_state::dafb_cursor_tick), this);
 
 	m_vbl_timer->adjust(attotime::never);
 	m_cursor_timer->adjust(attotime::never);

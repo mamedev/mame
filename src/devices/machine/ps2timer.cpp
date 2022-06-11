@@ -42,10 +42,10 @@ ps2_timer_device::ps2_timer_device(const machine_config &mconfig, const char *ta
 void ps2_timer_device::device_start()
 {
 	if (!m_compare_timer)
-		m_compare_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2_timer_device::compare), this));
+		m_compare_timer = timer_alloc(FUNC(ps2_timer_device::compare), this);
 
 	if (!m_overflow_timer)
-		m_overflow_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2_timer_device::overflow), this));
+		m_overflow_timer = timer_alloc(FUNC(ps2_timer_device::overflow), this);
 }
 
 void ps2_timer_device::device_reset()

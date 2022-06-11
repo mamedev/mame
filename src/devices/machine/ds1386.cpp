@@ -12,20 +12,6 @@
 #include "ds1386.h"
 #include "machine/timehelp.h"
 
-#define DISABLE_OSC     (0x80)
-#define DISABLE_SQW     (0x40)
-
-#define COMMAND_TE      (0x80)
-#define COMMAND_IPSW    (0x40)
-#define COMMAND_IBH_LO  (0x20)
-#define COMMAND_PU_LVL  (0x10)
-#define COMMAND_WAM     (0x08)
-#define COMMAND_TDM     (0x04)
-#define COMMAND_WAF     (0x02)
-#define COMMAND_TDF     (0x01)
-
-#define HOURS_12_24     (0x40)
-#define HOURS_AM_PM     (0x20)
 
 DEFINE_DEVICE_TYPE(DS1286,     ds1286_device,     "ds1286",     "DS1286 Watchdog Timekeeper")
 DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386-8K RAMified Watchdog Timekeeper")
@@ -77,48 +63,30 @@ ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *
 {
 }
 
-void ds1386_device::safe_inta_cb(int state)
-{
-	if (!m_inta_cb.isnull())
-		m_inta_cb(state);
-}
-
-void ds1386_device::safe_intb_cb(int state)
-{
-	if (!m_intb_cb.isnull())
-		m_intb_cb(state);
-}
-
-void ds1386_device::safe_sqw_cb(int state)
-{
-	if (!m_sqw_cb.isnull())
-		m_sqw_cb(state);
-}
-
 void ds1386_device::device_start()
 {
-	m_inta_cb.resolve();
-	m_intb_cb.resolve();
-	m_sqw_cb.resolve();
+	m_inta_cb.resolve_safe();
+	m_intb_cb.resolve_safe();
+	m_sqw_cb.resolve_safe();
 
 	m_tod_alarm = 0;
 	m_watchdog_alarm = 0;
 	m_square = 1;
 
-	safe_inta_cb(0);
-	safe_intb_cb(0);
-	safe_sqw_cb(1);
+	m_inta_cb(0);
+	m_intb_cb(0);
+	m_sqw_cb(1);
 
 	// allocate timers
-	m_clock_timer = timer_alloc(CLOCK_TIMER);
+	m_clock_timer = timer_alloc(FUNC(ds1386_device::advance_hundredths), this);
 	m_clock_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
-	m_square_timer = timer_alloc(SQUAREWAVE_TIMER);
+	m_square_timer = timer_alloc(FUNC(ds1386_device::square_tick), this);
 	m_square_timer->adjust(attotime::never);
-	m_watchdog_timer = timer_alloc(WATCHDOG_TIMER);
+	m_watchdog_timer = timer_alloc(FUNC(ds1386_device::watchdog_tick), this);
 	m_watchdog_timer->adjust(attotime::never);
-	m_inta_timer= timer_alloc(INTA_TIMER);
+	m_inta_timer = timer_alloc(FUNC(ds1386_device::inta_timer_elapsed), this);
 	m_inta_timer->adjust(attotime::never);
-	m_intb_timer= timer_alloc(INTB_TIMER);
+	m_intb_timer = timer_alloc(FUNC(ds1386_device::intb_timer_elapsed), this);
 	m_intb_timer->adjust(attotime::never);
 
 	// state saving
@@ -160,7 +128,7 @@ void ds1386_device::time_of_day_alarm()
 
 	if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
 	{
-		safe_inta_cb(m_tod_alarm);
+		m_inta_cb(m_tod_alarm);
 		if (m_ram[REGISTER_COMMAND] & COMMAND_PU_LVL)
 		{
 			m_inta_timer->adjust(attotime::from_msec(3));
@@ -168,7 +136,7 @@ void ds1386_device::time_of_day_alarm()
 	}
 	else
 	{
-		safe_intb_cb(m_tod_alarm);
+		m_intb_cb(m_tod_alarm);
 		if (m_ram[REGISTER_COMMAND] & COMMAND_PU_LVL)
 		{
 			m_intb_timer->adjust(attotime::from_msec(3));
@@ -183,7 +151,7 @@ void ds1386_device::watchdog_alarm()
 
 	if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
 	{
-		safe_intb_cb(m_watchdog_alarm);
+		m_intb_cb(m_watchdog_alarm);
 		if (m_ram[REGISTER_COMMAND] & COMMAND_PU_LVL)
 		{
 			m_intb_timer->adjust(attotime::from_msec(3));
@@ -191,7 +159,7 @@ void ds1386_device::watchdog_alarm()
 	}
 	else
 	{
-		safe_inta_cb(m_watchdog_alarm);
+		m_inta_cb(m_watchdog_alarm);
 		if (m_ram[REGISTER_COMMAND] & COMMAND_PU_LVL)
 		{
 			m_inta_timer->adjust(attotime::from_msec(3));
@@ -199,51 +167,37 @@ void ds1386_device::watchdog_alarm()
 	}
 }
 
-void ds1386_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ds1386_device::square_tick)
 {
-	switch (id)
-	{
-		case CLOCK_TIMER:
-			advance_hundredths();
-			break;
-
-		case SQUAREWAVE_TIMER:
-			m_square = ((m_square == 0) ? 1 : 0);
-			safe_sqw_cb(m_square);
-			break;
-
-		case WATCHDOG_TIMER:
-			if ((m_ram[REGISTER_COMMAND] & COMMAND_WAF) == 0)
-				watchdog_alarm();
-			break;
-
-		case INTA_TIMER:
-			if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
-			{
-				m_tod_alarm = 0;
-			}
-			else
-			{
-				m_watchdog_alarm = 0;
-			}
-			safe_inta_cb(0);
-			break;
-
-		case INTB_TIMER:
-			if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
-			{
-				m_watchdog_alarm = 0;
-			}
-			else
-			{
-				m_tod_alarm = 0;
-			}
-			safe_intb_cb(0);
-			break;
-	}
+	m_square = 1 - m_square;
+	m_sqw_cb(m_square);
 }
 
-void ds1386_device::advance_hundredths()
+TIMER_CALLBACK_MEMBER(ds1386_device::watchdog_tick)
+{
+	if ((m_ram[REGISTER_COMMAND] & COMMAND_WAF) == 0)
+		watchdog_alarm();
+}
+
+TIMER_CALLBACK_MEMBER(ds1386_device::inta_timer_elapsed)
+{
+	if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
+		m_tod_alarm = 0;
+	else
+		m_watchdog_alarm = 0;
+	m_inta_cb(0);
+}
+
+TIMER_CALLBACK_MEMBER(ds1386_device::intb_timer_elapsed)
+{
+	if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
+		m_watchdog_alarm = 0;
+	else
+		m_tod_alarm = 0;
+	m_intb_cb(0);
+}
+
+TIMER_CALLBACK_MEMBER(ds1386_device::advance_hundredths)
 {
 	if ((m_ram[REGISTER_COMMAND] & COMMAND_TE) != 0)
 	{
@@ -378,9 +332,6 @@ void ds1386_device::check_tod_alarm()
 	bool zeroes = (m_hundredths == 0 && m_seconds == 0);
 	if (zeroes && (m_ram[REGISTER_COMMAND] & COMMAND_TDF) == 0)
 	{
-		bool minutes_match = (m_minutes & 0x7f) == (m_minutes_alarm & 0x7f);
-		bool hours_match = (m_hours & 0x7f) == (m_hours_alarm & 0x7f);
-		bool days_match = (m_days & 0x7) == (m_days_alarm & 0x07);
 		bool alarm_match = false;
 		switch (mode)
 		{
@@ -388,13 +339,13 @@ void ds1386_device::check_tod_alarm()
 				alarm_match = true;
 				break;
 			case ALARM_MINUTES_MATCH:
-				alarm_match = minutes_match;
+				alarm_match = (m_minutes & 0x7f) == (m_minutes_alarm & 0x7f);
 				break;
 			case ALARM_HOURS_MATCH:
-				alarm_match = hours_match;
+				alarm_match = (m_hours & 0x7f) == (m_hours_alarm & 0x7f);
 				break;
 			case ALARM_DAYS_MATCH:
-				alarm_match = days_match;
+				alarm_match = (m_days & 0x7) == (m_days_alarm & 0x07);
 				break;
 			default:
 				break;
@@ -439,7 +390,7 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 		{
 			case 0x00: // hundredths
 			case 0x03: // minutes alarm
-			case 0x05: // horus alarm
+			case 0x05: // hours alarm
 			case 0x0a: // years
 				m_ram[offset] = data;
 				break;
@@ -470,24 +421,16 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 				if (changed & DISABLE_SQW)
 				{
 					if (m_ram[offset] & DISABLE_SQW)
-					{
 						m_square_timer->adjust(attotime::never);
-					}
 					else
-					{
 						m_square_timer->adjust(attotime::from_hz(2048));
-					}
 				}
 				if (changed & DISABLE_OSC)
 				{
 					if (m_ram[offset] & DISABLE_OSC)
-					{
 						m_clock_timer->adjust(attotime::never);
-					}
 					else
-					{
 						m_clock_timer->adjust(attotime::from_hz(100));
-					}
 				}
 				break;
 			}
@@ -500,9 +443,9 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 					m_ram[REGISTER_COMMAND] &= ~COMMAND_WAF;
 					m_watchdog_alarm = 0;
 					if (m_ram[REGISTER_COMMAND] & COMMAND_IPSW)
-						safe_intb_cb(0);
+						m_intb_cb(0);
 					else
-						safe_inta_cb(0);
+						m_inta_cb(0);
 				}
 				m_ram[offset] = data;
 				uint8_t wd_hundredths = m_ram[REGISTER_WATCHDOG_HUNDREDTHS];
@@ -532,16 +475,16 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 					if (a_changed)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_inta_cb(m_tod_alarm);
+							m_inta_cb(m_tod_alarm);
 						else
-							safe_inta_cb(m_watchdog_alarm);
+							m_inta_cb(m_watchdog_alarm);
 					}
 					if (b_changed)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_intb_cb(m_watchdog_alarm);
+							m_intb_cb(m_watchdog_alarm);
 						else
-							safe_intb_cb(m_tod_alarm);
+							m_intb_cb(m_tod_alarm);
 					}
 				}
 				if (changed & COMMAND_WAM)
@@ -549,16 +492,16 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 					if (m_ram[offset] & COMMAND_WAF)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_intb_cb(0);
+							m_intb_cb(0);
 						else
-							safe_inta_cb(0);
+							m_inta_cb(0);
 					}
 					else if (m_watchdog_alarm)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_intb_cb(m_watchdog_alarm);
+							m_intb_cb(m_watchdog_alarm);
 						else
-							safe_inta_cb(m_watchdog_alarm);
+							m_inta_cb(m_watchdog_alarm);
 					}
 				}
 				if (changed & COMMAND_TDM)
@@ -566,16 +509,16 @@ void ds1386_device::data_w(offs_t offset, uint8_t data)
 					if (m_ram[offset] & COMMAND_TDF)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_inta_cb(0);
+							m_inta_cb(0);
 						else
-							safe_intb_cb(0);
+							m_intb_cb(0);
 					}
 					else if (m_tod_alarm)
 					{
 						if (m_ram[offset] & COMMAND_IPSW)
-							safe_inta_cb(m_tod_alarm);
+							m_inta_cb(m_tod_alarm);
 						else
-							safe_intb_cb(m_tod_alarm);
+							m_intb_cb(m_tod_alarm);
 					}
 				}
 				break;

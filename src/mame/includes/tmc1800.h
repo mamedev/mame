@@ -49,11 +49,6 @@ protected:
 class tmc1800_state : public tmc1800_base_state
 {
 public:
-	enum
-	{
-		TIMER_SETUP_BEEP
-	};
-
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_vdc(*this, CDP1861_TAG)
@@ -67,8 +62,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
-	void init_tmc1800();
-
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);
 	void tmc1800_io_map(address_map &map);
@@ -77,7 +70,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cdp1861_device> m_vdc;
 	/* keyboard state */
@@ -175,11 +167,6 @@ public:
 		, m_led(*this, "led1")
 	{ }
 
-	enum
-	{
-		TIMER_ID_EF4
-	};
-
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
@@ -195,15 +182,19 @@ public:
 	void nano_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(assert_ef4);
 
 	required_device<cdp1864_device> m_cti;
 	required_ioport m_ny0;
 	required_ioport m_ny1;
 	required_ioport m_monitor;
 	output_finder<> m_led;
+
+	emu_timer *m_ef4_timer = nullptr;
+
 	/* keyboard state */
 	int m_keylatch = 0;
 };

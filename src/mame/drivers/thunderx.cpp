@@ -1057,7 +1057,7 @@ ROM_END
 
 void thunderx_state::init_thunderx()
 {
-	m_thunderx_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thunderx_state::thunderx_firq_cb), this));
+	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
 }
 
 /***************************************************************************/

@@ -108,7 +108,6 @@ private:
 	void vblank_irq(int state);
 	void bagmanf_vblank_irq(int state);
 
-	[[maybe_unused]] DECLARE_MACHINE_RESET(cclimber);
 	DECLARE_VIDEO_START(cclimber);
 	void cclimber_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(swimmer);

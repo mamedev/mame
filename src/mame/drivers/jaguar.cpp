@@ -879,7 +879,7 @@ void jaguar_state::gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	gpu_resume();
 
 	/* start the sync timer going, and note that there is a command pending */
-	synchronize(TID_GPU_SYNC);
+	m_gpu_sync_timer->adjust(attotime::zero);
 	m_gpu_command_pending = true;
 }
 

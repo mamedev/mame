@@ -276,6 +276,10 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 
 void pioneer_pr8210_device::device_start()
 {
+	// alocate timers
+	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
+	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
+
 	// resolve outputs
 	m_audio1.resolve();
 	m_audio2.resolve();
@@ -312,71 +316,66 @@ void pioneer_pr8210_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  process_vbi_data - process VBI data which was
+//  fetched by the parent device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pioneer_pr8210_device::process_vbi_data)
 {
-	switch (id)
+	// update the VBI data in the PIA as soon as it is ready;
+	// this must happen early in the frame because the player
+	// logic relies on fetching it here
+
+	// logging
+	if (LOG_VBLANK_VBI)
 	{
-		// update the VBI data in the PIA as soon as it is ready;
-		// this must happen early in the frame because the player
-		// logic relies on fetching it here
-		case TID_VBI_DATA_FETCH:
-
-			// logging
-			if (LOG_VBLANK_VBI)
-			{
-				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
-				if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-					logerror("%3d:VBI(%05d)\n", screen().vpos(), VBI_CAV_PICTURE(line1718));
-				else
-					logerror("%3d:VBI()\n", screen().vpos());
-			}
-
-			// update PIA registers based on vbi code
-			m_pia.vbi1 = 0xff;
-			m_pia.vbi2 = 0xff;
-			if (focus_on() && laser_on())
-			{
-				uint32_t line16 = get_field_code(LASERDISC_CODE_LINE16, false);
-				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
-				if (line1718 == VBI_CODE_LEADIN)
-					m_pia.vbi1 &= ~0x01;
-				if (line1718 == VBI_CODE_LEADOUT)
-					m_pia.vbi1 &= ~0x02;
-				if (line16 == VBI_CODE_STOP)
-					m_pia.vbi1 &= ~0x04;
-				// unsure what this bit means: m_pia.vbi1 &= ~0x08;
-				if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-				{
-					m_pia.vbi1 &= ~0x10;
-					m_pia.frame[2] = 0xf0 | ((line1718 >> 16) & 0x07);
-					m_pia.frame[3] = 0xf0 | ((line1718 >> 12) & 0x0f);
-					m_pia.frame[4] = 0xf0 | ((line1718 >>  8) & 0x0f);
-					m_pia.frame[5] = 0xf0 | ((line1718 >>  4) & 0x0f);
-					m_pia.frame[6] = 0xf0 | ((line1718 >>  0) & 0x0f);
-				}
-				if ((line1718 & VBI_MASK_CHAPTER) == VBI_CODE_CHAPTER)
-				{
-					m_pia.vbi2 &= ~0x01;
-					m_pia.frame[0] = 0xf0 | ((line1718 >> 16) & 0x07);
-					m_pia.frame[1] = 0xf0 | ((line1718 >> 12) & 0x0f);
-				}
-			}
-			break;
-
-		// clear the VSYNC flag
-		case TID_VSYNC_OFF:
-			m_vsync = false;
-			break;
-
-		// pass everything else onto the parent
-		default:
-			laserdisc_device::device_timer(timer, id, param);
-			break;
+		uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
+		if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+			logerror("%3d:VBI(%05d)\n", screen().vpos(), VBI_CAV_PICTURE(line1718));
+		else
+			logerror("%3d:VBI()\n", screen().vpos());
 	}
+
+	// update PIA registers based on vbi code
+	m_pia.vbi1 = 0xff;
+	m_pia.vbi2 = 0xff;
+	if (focus_on() && laser_on())
+	{
+		uint32_t line16 = get_field_code(LASERDISC_CODE_LINE16, false);
+		uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
+		if (line1718 == VBI_CODE_LEADIN)
+			m_pia.vbi1 &= ~0x01;
+		if (line1718 == VBI_CODE_LEADOUT)
+			m_pia.vbi1 &= ~0x02;
+		if (line16 == VBI_CODE_STOP)
+			m_pia.vbi1 &= ~0x04;
+		// unsure what this bit means: m_pia.vbi1 &= ~0x08;
+		if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+		{
+			m_pia.vbi1 &= ~0x10;
+			m_pia.frame[2] = 0xf0 | ((line1718 >> 16) & 0x07);
+			m_pia.frame[3] = 0xf0 | ((line1718 >> 12) & 0x0f);
+			m_pia.frame[4] = 0xf0 | ((line1718 >>  8) & 0x0f);
+			m_pia.frame[5] = 0xf0 | ((line1718 >>  4) & 0x0f);
+			m_pia.frame[6] = 0xf0 | ((line1718 >>  0) & 0x0f);
+		}
+		if ((line1718 & VBI_MASK_CHAPTER) == VBI_CODE_CHAPTER)
+		{
+			m_pia.vbi2 &= ~0x01;
+			m_pia.frame[0] = 0xf0 | ((line1718 >> 16) & 0x07);
+			m_pia.frame[1] = 0xf0 | ((line1718 >> 12) & 0x0f);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  vsync_off - clear the VSYNC flag
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(pioneer_pr8210_device::vsync_off)
+{
+	m_vsync = false;
 }
 
 
@@ -425,10 +424,10 @@ void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, 
 
 	// signal VSYNC and set a timer to turn it off
 	m_vsync = true;
-	timer_set(screen().scan_period() * 4, TID_VSYNC_OFF);
+	m_vsync_off_timer->adjust(screen().scan_period() * 4);
 
 	// also set a timer to fetch the VBI data when it is ready
-	timer_set(screen().time_until_pos(19*2), TID_VBI_DATA_FETCH);
+	m_process_vbi_timer->adjust(screen().time_until_pos(19*2));
 }
 
 
@@ -905,7 +904,7 @@ simutrek_special_device::simutrek_special_device(const machine_config &mconfig, 
 
 void simutrek_special_device::data_w(uint8_t data)
 {
-	synchronize(TID_LATCH_DATA, data);
+	m_latch_data_timer->adjust(attotime::zero, data);
 	if (LOG_SIMUTREK)
 		logerror("%03d:**** Simutrek Command = %02X\n", screen().vpos(), data);
 }
@@ -950,7 +949,7 @@ void simutrek_special_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 		if (LOG_SIMUTREK)
 			logerror("%3d:VSYNC IRQ\n", screen().vpos());
 		m_i8748_cpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(screen().scan_period(), TID_IRQ_OFF);
+		m_irq_off_timer->adjust(screen().scan_period());
 	}
 }
 
@@ -961,6 +960,10 @@ void simutrek_special_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 
 void simutrek_special_device::device_start()
 {
+	// alocate timers
+	m_irq_off_timer = timer_alloc(FUNC(simutrek_special_device::irq_off), this);
+	m_latch_data_timer = timer_alloc(FUNC(simutrek_special_device::latch_data), this);
+
 	// pass through to the parent
 	pioneer_pr8210_device::device_start();
 }
@@ -982,30 +985,23 @@ void simutrek_special_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  irq_off - clear the 8748 IRQ
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(simutrek_special_device::irq_off)
 {
-	switch (id)
-	{
-		// clear the 8748 IRQ
-		case TID_IRQ_OFF:
-			m_i8748_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
-			break;
+	m_i8748_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+}
 
-		// latch data
-		case TID_LATCH_DATA:
-			m_data = param;
-			m_data_ready = true;
-			break;
 
-		// pass everything else onto the parent
-		default:
-			pioneer_pr8210_device::device_timer(timer, id, param);
-			break;
-	}
+//-------------------------------------------------
+//  latch_data - perform delayed latching of data
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(simutrek_special_device::latch_data)
+{
+	m_data = param;
+	m_data_ready = true;
 }
 
 

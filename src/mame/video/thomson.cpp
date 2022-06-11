@@ -1166,15 +1166,15 @@ void thomson_state::video_start()
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_thom_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_scanline_start),this));
+	m_thom_scanline_timer = timer_alloc(FUNC(thomson_state::thom_scanline_start), this);
 
 	m_thom_lightpen_nb = 0;
 	m_thom_lightpen_cb = nullptr;
-	m_thom_lightpen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_lightpen_step),this));
+	m_thom_lightpen_timer = timer_alloc(FUNC(thomson_state::thom_lightpen_step), this);
 	save_item(NAME(m_thom_lightpen_nb));
 
 	m_thom_init_cb = nullptr;
-	m_thom_init_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_set_init),this));
+	m_thom_init_timer = timer_alloc(FUNC(thomson_state::thom_set_init), this);
 
 	m_thom_bwidth = 0;
 	m_thom_bheight = 0;

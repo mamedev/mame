@@ -61,7 +61,7 @@ void dw_fdc_device::device_start()
 	m_out_data.resolve_safe();
 	m_out_clock.resolve_safe();
 	m_out_strobe.resolve_safe();
-	m_reset_timer = timer_alloc();
+	m_reset_timer = timer_alloc(FUNC(dw_fdc_device::assert_reset_line), this);
 }
 
 void dw_fdc_device::device_reset()
@@ -69,7 +69,7 @@ void dw_fdc_device::device_reset()
 	m_p1 = m_p2 = m_t0 = m_t1 = 0;
 }
 
-void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dw_fdc_device::assert_reset_line)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

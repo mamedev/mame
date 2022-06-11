@@ -110,7 +110,7 @@ void nes_sunsoft_2_device::pcb_reset()
 void nes_sunsoft_3_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_sunsoft_3_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -149,7 +149,7 @@ void nes_sunsoft_4_device::pcb_reset()
 void nes_sunsoft_fme7_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_sunsoft_fme7_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
@@ -242,15 +242,12 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_sunsoft_3_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable && --m_irq_count == 0xffff)
 	{
-		if (m_irq_enable && --m_irq_count == 0xffff)
-		{
-			set_irq_line(ASSERT_LINE);
-			m_irq_enable = 0;
-		}
+		set_irq_line(ASSERT_LINE);
+		m_irq_enable = 0;
 	}
 }
 
@@ -382,17 +379,14 @@ u8 nes_sunsoft_4_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_sunsoft_fme7_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (BIT(m_irq_enable, 7)) // counter decrement enabled
 	{
-		if (BIT(m_irq_enable, 7)) // counter decrement enabled
+		if (--m_irq_count == 0xffff)
 		{
-			if (--m_irq_count == 0xffff)
-			{
-				if (BIT(m_irq_enable, 0)) // IRQs enabled
-					set_irq_line(ASSERT_LINE);
-			}
+			if (BIT(m_irq_enable, 0)) // IRQs enabled
+				set_irq_line(ASSERT_LINE);
 		}
 	}
 }

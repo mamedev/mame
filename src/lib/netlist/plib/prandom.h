@@ -145,10 +145,9 @@ namespace plib
 		}
 
 		template <typename ST>
-		void save_state(ST &st)
+		void save_state([[maybe_unused]] ST &st)
 		{
-			plib::unused_var(st);
-			/* no state to save */
+			// no state to save
 		}
 
 	private:

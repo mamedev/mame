@@ -66,10 +66,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	enum
-	{
-		TIMER_NMI
-	};
+	TIMER_CALLBACK_MEMBER(audio_nmi);
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -93,10 +90,11 @@ protected:
 	int        m_dim_v = 0; /* lgtnfght, ssriders, tmnt2 only */
 
 	/* misc */
+	emu_timer *m_audio_nmi_timer = nullptr;
 	int        m_tmnt_soundlatch = 0;
 	int        m_toggle = 0;
 	int        m_last = 0;
-	uint16_t     m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
+	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -203,8 +201,6 @@ protected:
 	void tmnt_audio_map(address_map &map);
 	void tmntucbl_audio_map(address_map &map);
 	void tmnt_main_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class glfgreat_state : public tmnt_state

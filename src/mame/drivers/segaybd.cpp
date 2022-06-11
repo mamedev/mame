@@ -168,100 +168,94 @@ void segaybd_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  irq2_gen_tick - generate IRQ2 for the main CPU
 //-------------------------------------------------
 
-void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segaybd_state::irq2_gen_tick)
 {
-	switch (id)
+	//
+	// IRQ2 timing: the timing of this interrupt is VERY sensitive! If it is at the
+	// wrong time, many games will screw up their rendering. Also, since there is
+	// no ack on the interrupt, it only fires for a single scanline, so if it fires
+	// too early, it's possible it could be missed.
+	//
+	// As far as I can tell, the interrupt is not programmable. It comes from the
+	// pair of rotation/video sync chips. There is no obvious location in the
+	// rotation RAM where it is specified, so I am assuming it is a hard-coded
+	// interrupt.
+	//
+	// Through trial and error, here is what I have found. Scanline 170 seems to
+	// be the earliest we can fire it and have it work reliably. Firing it later
+	// seems to introduce some glitches. Firing it too early means it will get
+	// missed and even worse things happen.
+	//
+	// Enable the TWEAK_IRQ2_SCANLINE define at the top of this file to fiddle with
+	// the timing.
+	//
+	// pdrift:
+	//     100-110 = glitchy logo
+	//     120     = glitchy logo + flickering 16B during logo
+	//     150-170 = ok, very little logo glitching
+	//     180-200 = ok, slightly glitchy logo
+	//     210-220 = ok, but no palette fade
+	//
+	// gforce2:
+	//     140     = no palette fade up
+	//     150-200 = ok
+	//
+	// strkfgtr:
+	//     150-200 = ok
+	//
+
+	// on scanline 'irq2_scanline' generate an IRQ2
+	int scanline = param;
+	if (scanline == m_irq2_scanline)
 	{
-		case TID_IRQ2_GEN:
-			//
-			// IRQ2 timing: the timing of this interrupt is VERY sensitive! If it is at the
-			// wrong time, many games will screw up their rendering. Also, since there is
-			// no ack on the interrupt, it only fires for a single scanline, so if it fires
-			// too early, it's possible it could be missed.
-			//
-			// As far as I can tell, the interrupt is not programmable. It comes from the
-			// pair of rotation/video sync chips. There is no obvious location in the
-			// rotation RAM where it is specified, so I am assuming it is a hard-coded
-			// interrupt.
-			//
-			// Through trial and error, here is what I have found. Scanline 170 seems to
-			// be the earliest we can fire it and have it work reliably. Firing it later
-			// seems to introduce some glitches. Firing it too early means it will get
-			// missed and even worse things happen.
-			//
-			// Enable the TWEAK_IRQ2_SCANLINE define at the top of this file to fiddle with
-			// the timing.
-			//
-			// pdrift:
-			//     100-110 = glitchy logo
-			//     120     = glitchy logo + flickering 16B during logo
-			//     150-170 = ok, very little logo glitching
-			//     180-200 = ok, slightly glitchy logo
-			//     210-220 = ok, but no palette fade
-			//
-			// gforce2:
-			//     140     = no palette fade up
-			//     150-200 = ok
-			//
-			// strkfgtr:
-			//     150-200 = ok
-			//
-			{
-				// on scanline 'irq2_scanline' generate an IRQ2
-				int scanline = param;
-				if (scanline == m_irq2_scanline)
-				{
-					m_timer_irq_state = 1;
-					scanline = m_irq2_scanline + 1;
-				}
-
-				// on scanline 'irq2_scanline' + 1, clear the IRQ2
-				else if (scanline == m_irq2_scanline + 1)
-				{
-					m_timer_irq_state = 0;
-					scanline = 223;
-				}
-
-				// on scanline 223 generate VBLANK for all CPUs
-				else if (scanline == 223)
-				{
-					m_vblank_irq_state = 1;
-					scanline = 224;
-				}
-
-				// on scanline 224 we turn it off
-				else if (scanline == 224)
-				{
-					m_vblank_irq_state = 0;
-					scanline = m_irq2_scanline;
-				}
-
-				// update IRQs on the main CPU
-				update_irqs();
-
-				// come back at the next appropriate scanline
-				m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
-
-			#if TWEAK_IRQ2_SCANLINE
-				if (scanline == 223)
-				{
-					int old = m_irq2_scanline;
-
-					// Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines
-					if (machine().input().code_pressed(KEYCODE_Q)) { while (machine().input().code_pressed(KEYCODE_Q)) ; m_irq2_scanline -= 10; }
-					if (machine().input().code_pressed(KEYCODE_W)) { while (machine().input().code_pressed(KEYCODE_W)) ; m_irq2_scanline -= 1; }
-					if (machine().input().code_pressed(KEYCODE_E)) { while (machine().input().code_pressed(KEYCODE_E)) ; m_irq2_scanline += 1; }
-					if (machine().input().code_pressed(KEYCODE_R)) { while (machine().input().code_pressed(KEYCODE_R)) ; m_irq2_scanline += 10; }
-					if (old != m_irq2_scanline)
-						popmessage("scanline = %d", m_irq2_scanline);
-				}
-			#endif
-			}
-			break;
+		m_timer_irq_state = 1;
+		scanline = m_irq2_scanline + 1;
 	}
+
+	// on scanline 'irq2_scanline' + 1, clear the IRQ2
+	else if (scanline == m_irq2_scanline + 1)
+	{
+		m_timer_irq_state = 0;
+		scanline = 223;
+	}
+
+	// on scanline 223 generate VBLANK for all CPUs
+	else if (scanline == 223)
+	{
+		m_vblank_irq_state = 1;
+		scanline = 224;
+	}
+
+	// on scanline 224 we turn it off
+	else if (scanline == 224)
+	{
+		m_vblank_irq_state = 0;
+		scanline = m_irq2_scanline;
+	}
+
+	// update IRQs on the main CPU
+	update_irqs();
+
+	// come back at the next appropriate scanline
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+
+#if TWEAK_IRQ2_SCANLINE
+	if (scanline == 223)
+	{
+		int old = m_irq2_scanline;
+
+		// Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines
+		if (machine().input().code_pressed(KEYCODE_Q)) { while (machine().input().code_pressed(KEYCODE_Q)) ; m_irq2_scanline -= 10; }
+		if (machine().input().code_pressed(KEYCODE_W)) { while (machine().input().code_pressed(KEYCODE_W)) ; m_irq2_scanline -= 1; }
+		if (machine().input().code_pressed(KEYCODE_E)) { while (machine().input().code_pressed(KEYCODE_E)) ; m_irq2_scanline += 1; }
+		if (machine().input().code_pressed(KEYCODE_R)) { while (machine().input().code_pressed(KEYCODE_R)) ; m_irq2_scanline += 10; }
+		if (old != m_irq2_scanline)
+			popmessage("scanline = %d", m_irq2_scanline);
+	}
+#endif
 }
 
 
@@ -2757,7 +2751,7 @@ ROM_END
 void segaybd_state::init_generic()
 {
 	// allocate a scanline timer
-	m_scanline_timer = timer_alloc(TID_IRQ2_GEN);
+	m_scanline_timer = timer_alloc(FUNC(segaybd_state::irq2_gen_tick), this);
 
 	// save state
 	save_item(NAME(m_pdrift_bank));

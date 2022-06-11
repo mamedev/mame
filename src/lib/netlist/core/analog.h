@@ -29,7 +29,7 @@ namespace netlist
 	public:
 
 		analog_t(core_device_t &dev, const pstring &aname, state_e state,
-			nldelegate delegate);
+			nl_delegate delegate);
 
 		const analog_net_t & net() const noexcept
 		{
@@ -46,7 +46,7 @@ namespace netlist
 
 	/// \brief Base class for terminals.
 	///
-	/// Each \ref nld_twoterm object consists of two terminals. Terminals
+	/// Each \ref nld_two_terminal object consists of two terminals. Terminals
 	/// are at the core of analog netlists and are connected to  \ref net_t
 	/// objects.
 	///
@@ -56,25 +56,25 @@ namespace netlist
 
 		/// \brief constructor
 		///
-		/// @param dev core_devict_t object owning the terminal
-		/// @param aname name of this terminal
-		/// @param otherterm pointer to the sibling terminal
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate);
+		/// \param dev object owning the terminal
+		/// \param aname name of this terminal
+		/// \param other_terminal pointer to the sibling terminal
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *other_terminal, nl_delegate delegate);
 
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm,
-			const std::array<terminal_t *, 2> &splitterterms, nldelegate delegate);
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *other_terminal,
+			const std::array<terminal_t *, 2> &splitter_terms, nl_delegate delegate);
 
 		/// \brief Returns voltage of connected net
 		///
-		/// @return voltage of net this terminal is connected to
+		/// \return voltage of net this terminal is connected to
 		nl_fptype operator ()() const  noexcept
 		{
 			return net().Q_Analog();
 		}
 
-		/// @brief sets conductivity value of this terminal
+		/// \brief sets conductivity value of this terminal
 		///
-		/// @param G Conductivity
+		/// \param G Conductivity
 		void set_conductivity(nl_fptype G) const noexcept
 		{
 			set_go_gt_I(-G, G, nlconst::zero());
@@ -120,7 +120,7 @@ namespace netlist
 		/// \brief Constructor
 		analog_input_t(core_device_t &dev,  ///< owning device
 				const pstring &aname,       ///< name of terminal
-				nldelegate delegate ///< delegate
+				nl_delegate delegate ///< delegate
 		);
 
 		/// \brief returns voltage at terminal.

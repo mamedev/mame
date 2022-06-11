@@ -1572,7 +1572,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="eug23">
+	<software name="eug23">
 		<description>Electron User Group #23 (3.5")</description>
 		<year>1995</year>
 		<publisher>E.U.G.</publisher>

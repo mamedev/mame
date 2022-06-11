@@ -117,12 +117,14 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void set_fcr(u8 data) override;
 	virtual void push_tx(u8 data) override;
 	virtual u8 pop_rx() override;
+
+	TIMER_CALLBACK_MEMBER(timeout_expired);
 private:
 	void set_timer() { m_timeout->adjust(attotime::from_hz((clock()*4*8)/(m_regs.dl*16))); }
 	int m_rintlvl;

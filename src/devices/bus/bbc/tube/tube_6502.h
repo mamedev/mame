@@ -59,6 +59,8 @@ protected:
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+
+	DECLARE_WRITE_LINE_MEMBER(prst_w);
 };
 
 

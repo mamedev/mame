@@ -65,12 +65,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	static const device_timer_id TIMER_DMA0 = 0;
-	static const device_timer_id TIMER_OSTIMER0 = 16;
-	static const device_timer_id TIMER_LCD_EOF0 = 20;
-	static const device_timer_id TIMER_RTC = 22;
 
 	void dma_irq_check();
 	void dma_load_descriptor_and_start(int channel);
@@ -83,11 +77,13 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void dma_end_tick(int channel);
-	void ostimer_match_tick(int channel);
-	void lcd_dma_eof_tick(int channel);
-	void rtc_tick();
+	TIMER_CALLBACK_MEMBER(dma_end_tick);
+	TIMER_CALLBACK_MEMBER(audio_dma_end_tick);
+	TIMER_CALLBACK_MEMBER(ostimer_match_tick);
+	TIMER_CALLBACK_MEMBER(lcd_dma_eof_tick);
+	TIMER_CALLBACK_MEMBER(rtc_tick);
 
+	void dma_finish(int channel);
 	void set_irq_line(uint32_t line, int state);
 
 	struct dma_regs
@@ -269,7 +265,6 @@ protected:
 
 	std::unique_ptr<uint32_t[]> m_lcd_palette; // 0x100
 	std::unique_ptr<uint8_t[]> m_lcd_framebuffer; // 0x100000
-	std::unique_ptr<uint32_t[]> m_words; // 0x800
 	std::unique_ptr<int16_t[]> m_samples; // 0x1000
 };
 

@@ -142,7 +142,7 @@ protected:
 
 		save_item(NAME(m_shift));
 
-		m_clear_display_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80clock_state::clear_display), this));
+		m_clear_display_timer = timer_alloc(FUNC(z80clock_state::clear_display), this);
 		m_clear_display_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
 		m_clear_display_count.resize(3);
 

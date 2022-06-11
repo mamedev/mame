@@ -78,12 +78,6 @@ Address   Description
 class h19_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_KEY_CLICK_OFF,
-		TIMER_BELL_OFF
-	};
-
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -102,8 +96,13 @@ public:
 	void h19(machine_config &config);
 
 private:
-	void h19_keyclick_w(uint8_t data);
-	void h19_bell_w(uint8_t data);
+	virtual void machine_start() override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
+	void key_click_w(uint8_t data);
+	void bell_w(uint8_t data);
 	uint8_t kbd_key_r();
 	uint8_t kbd_flags_r();
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
@@ -112,11 +111,11 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	TIMER_CALLBACK_MEMBER(key_click_off);
+	TIMER_CALLBACK_MEMBER(bell_off);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
+	emu_timer *m_key_click_timer = nullptr;
+	emu_timer *m_bell_timer = nullptr;
 
 	required_device<palette_device> m_palette;
 	required_device<cpu_device>     m_maincpu;
@@ -137,19 +136,17 @@ private:
 	uint16_t translate_mm5740_b(uint16_t b);
 };
 
-void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(h19_state::key_click_off)
 {
-	switch (id)
-	{
-	case TIMER_KEY_CLICK_OFF:
-		m_keyclickactive = false;
-		break;
-	case TIMER_BELL_OFF:
-		m_bellactive = false;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in h19_state::device_timer");
-	}
+	m_keyclickactive = false;
+
+	if (!m_keyclickactive && !m_bellactive)
+		m_beep->set_state(0);
+}
+
+TIMER_CALLBACK_MEMBER(h19_state::bell_off)
+{
+	m_keyclickactive = false;
 
 	if (!m_keyclickactive && !m_bellactive)
 		m_beep->set_state(0);
@@ -175,9 +172,9 @@ void h19_state::io_map(address_map &map)
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
-	map(0xA0, 0xA0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
-	map(0xC0, 0xC0).mirror(0x1f).w(FUNC(h19_state::h19_keyclick_w));
-	map(0xE0, 0xE0).mirror(0x1f).w(FUNC(h19_state::h19_bell_w));
+	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(h19_state::key_click_w));
+	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(h19_state::bell_w));
 }
 
 /* Input ports */
@@ -357,7 +354,7 @@ static INPUT_PORTS_START( h19 )
 INPUT_PORTS_END
 
 // Keyboard encoder masks
-#define KB_ENCODER_KEY_VALUE_MASK 0x7F
+#define KB_ENCODER_KEY_VALUE_MASK 0x7f
 #define KB_ENCODER_CONTROL_KEY_MASK 0x80
 
 // Keyboard flag masks
@@ -375,25 +372,28 @@ void h19_state::machine_start()
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
+
+	m_key_click_timer = timer_alloc(FUNC(h19_state::key_click_off), this);
+	m_bell_timer = timer_alloc(FUNC(h19_state::bell_off), this);
 }
 
 
-void h19_state::h19_keyclick_w(uint8_t data)
+void h19_state::key_click_w(uint8_t data)
 {
 /* Keyclick - 6 mSec */
 
 	m_beep->set_state(1);
 	m_keyclickactive = true;
-	timer_set(attotime::from_msec(6), TIMER_KEY_CLICK_OFF);
+	m_key_click_timer->adjust(attotime::from_msec(6));
 }
 
-void h19_state::h19_bell_w(uint8_t data)
+void h19_state::bell_w(uint8_t data)
 {
 /* Bell (^G) - 200 mSec */
 
 	m_beep->set_state(1);
 	m_bellactive = true;
-	timer_set(attotime::from_msec(200), TIMER_BELL_OFF);
+	m_bell_timer->adjust(attotime::from_msec(200));
 }
 
 
@@ -433,7 +433,7 @@ uint8_t h19_state::kbd_flags_r()
 	uint8_t rv = modifiers & 0x7f;
 
 	// check both shifts
-	if (((modifiers & 0x020) == 0) || ((modifiers & 0x100) == 0))
+	if ((modifiers & 0x020) == 0 || (modifiers & 0x100) == 0)
 	{
 		rv |= KB_STATUS_SHIFT_KEYS_MASK;
 	}

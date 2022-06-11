@@ -111,7 +111,7 @@ void namcona1_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 
 /*************************************************************************/
 
-void namcona1_state::UpdatePalette(int offset)
+void namcona1_state::update_palette(int offset)
 {
 	const u16 data = m_paletteram[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
@@ -133,7 +133,7 @@ void namcona1_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_paletteram[offset]);
 	if (m_vreg[0x8e / 2])
 	{ /* graphics enabled; update palette immediately */
-		UpdatePalette(offset);
+		update_palette(offset);
 	}
 	else
 	{
@@ -566,7 +566,7 @@ u32 namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			/* palette updates are delayed when graphics are disabled */
 			for (int which = 0; which < 0x1000; which++)
 			{
-				UpdatePalette(which);
+				update_palette(which);
 			}
 			m_palette_is_dirty = 0;
 		}

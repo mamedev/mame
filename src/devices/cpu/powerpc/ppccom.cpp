@@ -754,22 +754,22 @@ void ppc_device::device_start()
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
-		m_decrementer_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::decrementer_int_callback), this));
+		m_decrementer_int_timer = timer_alloc(FUNC(ppc_device::decrementer_int_callback), this);
 
 	/* and for the 4XX interrupts if needed */
 	if (m_cap & PPCCAP_4XX)
 	{
-		m_fit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_fit_callback), this));
-		m_pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_pit_callback), this));
-		m_spu.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_spu_callback), this));
+		m_fit_timer = timer_alloc(FUNC(ppc_device::ppc4xx_fit_callback), this);
+		m_pit_timer = timer_alloc(FUNC(ppc_device::ppc4xx_pit_callback), this);
+		m_spu.timer = timer_alloc(FUNC(ppc_device::ppc4xx_spu_callback), this);
 	}
 
 	if (m_cap & PPCCAP_4XX)
 	{
-		m_buffered_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
+		m_buffered_dma_timer[0] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[1] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[2] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[3] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
 
 		m_buffered_dma_rate[0] = 10000;
 		m_buffered_dma_rate[1] = 10000;

@@ -386,9 +386,9 @@ void apple1_state::machine_start()
 
 	m_reset_down = m_clear_down = false;
 
-	m_ready_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_start_cb), this));
-	m_ready_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_end_cb), this));
-	m_kbd_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::keyboard_strobe_cb), this));
+	m_ready_start_timer = timer_alloc(FUNC(apple1_state::ready_start_cb), this);
+	m_ready_end_timer = timer_alloc(FUNC(apple1_state::ready_end_cb), this);
+	m_kbd_strobe_timer = timer_alloc(FUNC(apple1_state::keyboard_strobe_cb), this);
 
 	// setup save states
 	save_item(NAME(m_vram));

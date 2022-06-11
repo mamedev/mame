@@ -36,7 +36,7 @@ cdp1879_device::cdp1879_device(const machine_config &mconfig, const char *tag, d
 void cdp1879_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(cdp1879_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	m_irq_w.resolve_safe();
@@ -61,10 +61,10 @@ void cdp1879_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the clock
 //-------------------------------------------------
 
-void cdp1879_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cdp1879_device::clock_tick)
 {
 	advance_seconds();
 

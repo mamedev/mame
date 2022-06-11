@@ -36,14 +36,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
+
+	TIMER_CALLBACK_MEMBER(on_tick);
 
 private:
 	uint8_t compute_newval(uint8_t type, uint8_t oldval, uint8_t newval);
 	uint8_t get_char(uint16_t pos);
 
-	static const device_timer_id ON_TIMER = 1;
 	emu_timer *m_on_timer;
 
 	uint8_t m_video_ram[2][0x180];

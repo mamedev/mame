@@ -114,7 +114,7 @@ void gic_device::device_start()
 	// Let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_vblank_timer = timer_alloc(TIMER_VBLANK);
+	m_vblank_timer = timer_alloc(FUNC(gic_device::vblank_tick), this);
 	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream
@@ -239,15 +239,10 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 /* AUDIO SECTION */
 
-void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gic_device::vblank_tick)
 {
-	switch ( id )
-	{
-		case TIMER_VBLANK:
-			//flag the audio to reset
-			m_audioreset = 1;//phase need to reset! on next clock/228
-		break;
-	}
+	//flag the audio to reset
+	m_audioreset = 1;//phase need to reset! on next clock/228
 }
 
 #define GIC_AUDIO_BYTE 0x96

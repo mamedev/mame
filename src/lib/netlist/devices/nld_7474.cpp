@@ -103,7 +103,7 @@ namespace netlist::devices {
 
 		nld_power_pins m_power_pins;
 
-		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
+		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ) noexcept
 		{
 			// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };

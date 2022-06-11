@@ -140,8 +140,8 @@ void a2bus_agat_fdc_device::device_start()
 
 	m_mxcs = MXCSR_SYNC;
 
-	m_timer_lss = timer_alloc(TIMER_ID_LSS);
-	m_timer_motor = timer_alloc(TIMER_ID_MOTOR);
+	m_timer_lss = timer_alloc(FUNC(a2bus_agat_fdc_device::lss_sync), this);
+	m_timer_motor = timer_alloc(FUNC(a2bus_agat_fdc_device::motor_off), this);
 
 	m_seektime = 6; // ms, per es5323.txt
 	m_waittime = 32; // us - 16 bits x 2 us
@@ -162,19 +162,10 @@ void a2bus_agat_fdc_device::device_reset()
 	m_timer_lss->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
-void a2bus_agat_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::motor_off)
 {
-	switch (id)
-	{
-	case TIMER_ID_LSS:
-		lss_sync();
-		break;
-
-	case TIMER_ID_MOTOR:
-		active = 0;
-		floppy->mon_w(1);
-		break;
-	}
+	active = 0;
+	floppy->mon_w(1);
 }
 
 uint64_t a2bus_agat_fdc_device::time_to_cycles(const attotime &tm)
@@ -199,7 +190,7 @@ void a2bus_agat_fdc_device::lss_start()
 	bits = 8;
 }
 
-void a2bus_agat_fdc_device::lss_sync()
+TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::lss_sync)
 {
 	if(!active)
 		return;
@@ -301,7 +292,7 @@ uint8_t a2bus_agat_fdc_device::read_c0nx(uint8_t offset)
 {
 	u8 data;
 
-	lss_sync();
+	lss_sync(0);
 
 	switch (offset)
 	{
@@ -328,7 +319,7 @@ uint8_t a2bus_agat_fdc_device::read_c0nx(uint8_t offset)
 
 void a2bus_agat_fdc_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	lss_sync();
+	lss_sync(0);
 
 	switch (offset)
 	{

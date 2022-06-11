@@ -26,7 +26,7 @@ void glukrs_device::device_start()
 {
   m_nvram->set_base(&m_cmos, sizeof(m_cmos));
 
-  m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(glukrs_device::timer_callback), this));
+  m_timer = timer_alloc(FUNC(glukrs_device::timer_callback), this);
   m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 }
 

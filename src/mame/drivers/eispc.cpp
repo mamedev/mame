@@ -527,7 +527,7 @@ void epc_state::machine_reset()
 void epc_state::init_epc()
 {
 	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider */
-	m_kbdclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epc_state::rxtxclk_w), this));
+	m_kbdclk_timer = timer_alloc(FUNC(epc_state::rxtxclk_w), this);
 	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
 }
 

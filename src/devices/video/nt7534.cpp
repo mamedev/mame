@@ -44,7 +44,7 @@ nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, co
 
 void nt7534_device::device_start()
 {
-	m_busy_timer = timer_alloc(TIMER_BUSY);
+	m_busy_timer = timer_alloc(FUNC(nt7534_device::clear_busy_flag), this);
 
 	m_pixel_update_cb.resolve();
 
@@ -97,17 +97,12 @@ void nt7534_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clear_busy_flag -
 //-------------------------------------------------
 
-void nt7534_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nt7534_device::clear_busy_flag)
 {
-	switch (id)
-	{
-		case TIMER_BUSY:
-			m_busy_flag = false;
-			break;
-	}
+	m_busy_flag = false;
 }
 
 

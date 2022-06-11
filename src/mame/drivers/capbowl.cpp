@@ -535,7 +535,7 @@ INPUT_PORTS_END
 
 void capbowl_base_state::machine_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(capbowl_base_state::update), this));
+	m_update_timer = timer_alloc(FUNC(capbowl_base_state::update), this);
 
 	save_item(NAME(m_last_trackball_val));
 }

@@ -532,7 +532,7 @@ void apple3_state::apple3_update_memory()
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 	}
 
-	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)));
+	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)), true);
 
 	/* bank 2 (0100-01FF) */
 	if (!(m_via_0_a & ENV_STACK1XX))
@@ -729,8 +729,8 @@ void apple3_state::init_apple3()
 	m_via[1]->write_pb6(1);
 	m_via[1]->write_pb7(1);
 
-	m_scanstart = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanstart_cb),this));
-	m_scanend = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanend_cb),this));
+	m_scanstart = timer_alloc(FUNC(apple3_state::scanstart_cb), this);
+	m_scanend = timer_alloc(FUNC(apple3_state::scanend_cb), this);
 
 	apple3_update_memory();
 

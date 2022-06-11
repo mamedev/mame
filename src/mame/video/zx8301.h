@@ -67,13 +67,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// address space configurations
 	const address_space_config      m_space_config;
+
+	TIMER_CALLBACK_MEMBER(output_vsync);
+	TIMER_CALLBACK_MEMBER(toggle_flash);
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t data);
@@ -82,12 +84,6 @@ protected:
 	void draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da);
 
 private:
-	enum
-	{
-		TIMER_VSYNC,
-		TIMER_FLASH
-	};
-
 	required_device<cpu_device> m_cpu;
 
 	devcb_write_line   m_write_vsync;

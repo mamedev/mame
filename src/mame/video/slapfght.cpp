@@ -55,6 +55,8 @@ VIDEO_START_MEMBER(slapfght_state, perfrman)
 {
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	m_pf1_tilemap->set_scrolldy(-16, 0);
+
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 
@@ -63,8 +65,8 @@ VIDEO_START_MEMBER(slapfght_state, slapfight)
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_pf1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_fix_tilemap->set_scrolldy(0, 15);
-	m_pf1_tilemap->set_scrolldy(0, 14);
+	m_fix_tilemap->set_scrolldy(-16, 0);
+	m_pf1_tilemap->set_scrolldy(-17, -1);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
@@ -136,9 +138,9 @@ WRITE_LINE_MEMBER(slapfght_state::palette_bank_w)
 
 void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
-	const uint8_t *src = m_spriteram;
+	const uint8_t *src = m_spriteram_buffer->buffer();
 
-	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < 0x800; offs += 4)
 	{
 		/*
 		    0: xxxxxxxx - code
@@ -152,7 +154,7 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 		*/
 
 		int code = src[offs + 0];
-		int sy = src[offs + 3] - 1;
+		int sy = src[offs + 3] - 17;
 		int sx = src[offs + 1] - 13;
 		int pri = src[offs + 2] >> 6 & 3;
 		int color = (src[offs + 2] >> 1 & 3) | (src[offs + 2] << 2 & 4) | (m_palette_bank << 3);
@@ -160,8 +162,8 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 
 		if (flip_screen())
 		{
-			sy = 256 - sy;
-			sx = 240 - sx;
+			sy = (206 - sy) & 0xff;
+			sx = 284 - sx;
 			fx = fy = 1;
 		}
 
@@ -186,9 +188,9 @@ uint32_t slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_in
 
 void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *src = m_spriteram;
+	const uint8_t *src = m_spriteram_buffer->buffer();
 
-	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < 0x800; offs += 4)
 	{
 		/*
 		    0: xxxxxxxx - code low
@@ -201,14 +203,14 @@ void slapfght_state::draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangl
 		*/
 
 		int code = src[offs + 0] | ((src[offs + 2] & 0xc0) << 2);
-		int sy = src[offs + 3] + 2;
-		int sx = (src[offs + 1] | (src[offs + 2] << 8 & 0x100)) - 17;
+		int sy = src[offs + 3] - 17;
+		int sx = (src[offs + 1] | (src[offs + 2] << 8 & 0x100)) - 13;
 		int color = src[offs + 2] >> 1 & 0xf;
 		int fx = 0, fy = 0;
 
 		if (flip_screen())
 		{
-			sy = (238 - sy) & 0xff;
+			sy = (206 - sy) & 0xff;
 			sx = 284 - sx;
 			fx = fy = 1;
 		}

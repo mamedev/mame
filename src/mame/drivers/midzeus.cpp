@@ -140,10 +140,10 @@ void midzeus_state::machine_start()
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
-	m_gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+	m_gun_timer[0] = timer_alloc(FUNC(midzeus_state::invasn_gun_callback), this);
+	m_gun_timer[1] = timer_alloc(FUNC(midzeus_state::invasn_gun_callback), this);
 
-	m_display_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::display_irq_off), this));
+	m_display_irq_off_timer = timer_alloc(FUNC(midzeus_state::display_irq_off), this);
 
 	save_item(NAME(m_crusnexo_leds_select));
 	save_item(NAME(m_disk_asic_jr));

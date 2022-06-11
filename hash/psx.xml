@@ -48067,7 +48067,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK, Patra GFX logo has minor stripes glitch  -->
+	<!-- boot OK, Patra GFX logo has minor stripes glitch -->
 	<software name="ldrun2" supported="partial">
 		<!--
 		Unknown source
@@ -48088,7 +48088,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK, Patra GFX logo has minor stripes glitch  -->
+	<!-- boot OK, Patra GFX logo has minor stripes glitch -->
 	<software name="ldrunx" cloneof="ldrun2" supported="partial">
 		<!--
 		Unknown source
@@ -59167,7 +59167,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK, but it needs extra controller emulated for the RL 3d models cfr. https://youtu.be/IOT2MwtLWD0  -->
+	<!-- boot OK, but it needs extra controller emulated for the RL 3d models cfr. https://youtu.be/IOT2MwtLWD0 -->
 	<software name="zxed" supported="no">
 		<!--
 		Unknown source

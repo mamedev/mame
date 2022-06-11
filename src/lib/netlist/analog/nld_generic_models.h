@@ -8,6 +8,7 @@
 /// \file nld_generic_models.h
 ///
 
+#include "core/state_var.h"
 #include "nl_base.h"
 
 //
@@ -66,15 +67,14 @@ namespace netlist::analog
 			//return m_h * cap +  m_gmin;
 		}
 
-		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const noexcept
+		nl_fptype Ieq(nl_fptype cap, [[maybe_unused]] nl_fptype v) const noexcept
 		{
-			plib::unused_var(v);
 			//return -m_h * 0.5 * ((cap + m_c) * m_v + (cap - m_c) * v) ;
 			return -m_h * nlconst::half() * (cap + m_c) * m_v;
 			//return -m_h * cap * m_v;
 		}
 
-		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			m_h = plib::reciprocal(step);
 			m_c = cap;
@@ -86,7 +86,7 @@ namespace netlist::analog
 			// no state used
 		}
 
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_params(nl_fptype gmin) noexcept { m_gmin = gmin; }
 
 	private:
 		state_var<nl_fptype> m_h;
@@ -109,15 +109,13 @@ namespace netlist::analog
 
 		static capacitor_e type() noexcept { return capacitor_e::CONSTANT_CAPACITY; }
 		nl_fptype G(nl_fptype cap) const noexcept { return cap * m_h +  m_gmin; }
-		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const noexcept
+		nl_fptype Ieq(nl_fptype cap, [[maybe_unused]] nl_fptype v) const noexcept
 		{
-			plib::unused_var(v);
 			return - G(cap) * m_v;
 		}
 
-		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step([[maybe_unused]] nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
-			plib::unused_var(cap);
 			m_h = plib::reciprocal(step);
 			m_v = v;
 		}
@@ -135,14 +133,15 @@ namespace netlist::analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(core_device_t &dev, const pstring &name)
+		generic_capacitor_const( /*[[maybe_unused]]*/ core_device_t &dev, /*[[maybe_unused]]*/ const pstring &name)
 		: m_gmin(nlconst::zero())
 		{
+			// gcc 7.2 (mingw) and 7.5 (ubuntu) don't accept maybe_unused here
 			plib::unused_var(dev, name);
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			const nl_fptype G(cap * h + m_gmin);
@@ -152,7 +151,7 @@ namespace netlist::analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 	};
@@ -163,17 +162,16 @@ namespace netlist::analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(core_device_t &dev, const pstring &name)
+		generic_capacitor_const([[maybe_unused]] core_device_t &dev, [[maybe_unused]] const pstring &name)
 		: m_gmin(nlconst::zero())
 		, m_vn(0)
 		, m_in(0)
 		, m_trn(0.0)
 		{
-			plib::unused_var(dev, name);
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			if (m_trn == 0.0)
@@ -196,7 +194,7 @@ namespace netlist::analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 		nl_fptype m_vn;

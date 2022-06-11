@@ -58,8 +58,8 @@ namespace netlist::detail {
 
 		static store_type &store() noexcept
 		{
-			static store_type lstore;
-			return lstore;
+			static store_type static_store;
+			return static_store;
 		}
 
 	};
@@ -110,7 +110,7 @@ namespace netlist::detail {
 	private:
 	};
 
-	/// \brief Base class for all objects bejng owned by a netlist
+	/// \brief Base class for all objects being owned by a netlist
 	///
 	/// The object provides adds \ref netlist_state_t and \ref netlist_t
 	/// accessors.
@@ -131,11 +131,11 @@ namespace netlist::detail {
 		netlist_state_t & state() noexcept;
 		const netlist_state_t & state() const noexcept;
 
-		netlist_t & exec() noexcept { return m_netlist; }
-		const netlist_t & exec() const noexcept { return m_netlist; }
+		constexpr netlist_t & exec() noexcept { return m_netlist; }
+		constexpr const netlist_t & exec() const noexcept { return m_netlist; }
 
 		// to ease template design
-		template<typename T, typename... Args>
+		template <typename T, typename... Args>
 		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
 			return state().make_pool_object<T>(std::forward<Args>(args)...);
@@ -192,16 +192,19 @@ namespace netlist::detail {
 	///
 	/// All terminals are derived from this class.
 	///
-	class core_terminal_t : public device_object_t,
-							public plib::linkedlist_t<core_terminal_t>::element_t
+	class core_terminal_t : public device_object_t
+						  , public plib::linked_list_t<core_terminal_t, 0>::element_t
+#if NL_USE_INPLACE_CORE_TERMS
+						  , public plib::linked_list_t<core_terminal_t, 1>::element_t
+#endif
 	{
 	public:
 		/// \brief Number of signal bits
 		///
 		/// Going forward setting this to 8 will allow 8-bit signal
-		/// busses to be used in netlist, e.g. for more complex memory
+		/// buses to be used in netlist, e.g. for more complex memory
 		/// arrangements.
-		/// Mimimum value is 2 here to support tristate output on proxies.
+		/// Minimum value is 2 here to support tristate output on proxies.
 		static constexpr const unsigned int INP_BITS = 2;
 
 		static constexpr const unsigned int INP_MASK = (1 << INP_BITS) - 1;
@@ -222,7 +225,7 @@ namespace netlist::detail {
 		};
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
-				state_e state, nldelegate delegate);
+				state_e state, nl_delegate delegate);
 		virtual ~core_terminal_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -240,7 +243,7 @@ namespace netlist::detail {
 		void clear_net() noexcept { m_net = nullptr; }
 		constexpr bool has_net() const noexcept { return (m_net != nullptr); }
 
-		net_t & net() const noexcept { return *m_net;}
+		constexpr net_t & net() const noexcept { return *m_net;}
 
 		bool is_logic() const noexcept;
 		bool is_logic_input() const noexcept;
@@ -250,28 +253,28 @@ namespace netlist::detail {
 		bool is_analog_input() const noexcept;
 		bool is_analog_output() const noexcept;
 
-		constexpr bool is_state(state_e astate) const noexcept { return (m_state == astate); }
-		constexpr const state_e &terminal_state() const noexcept { return m_state; }
-		void set_state(state_e astate) noexcept { m_state = astate; }
+		constexpr bool is_state(state_e state) const noexcept { return (m_state == state); }
+		constexpr state_e terminal_state() const noexcept { return m_state; }
+		constexpr void set_state(state_e state) noexcept { m_state = state; }
 
 		void reset() noexcept { set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
 
-#if NL_USE_COPY_INSTEAD_OF_REFERENCE
-		void set_copied_input(netlist_sig_t val) noexcept
+		constexpr void set_copied_input([[maybe_unused]] netlist_sig_t val) noexcept
 		{
-			m_Q = val;
+			if constexpr (config::use_copy_instead_of_reference::value)
+			{
+				m_Q_CIR = val;
+			}
 		}
 
-		state_var_sig m_Q;
-#else
-		void set_copied_input(const netlist_sig_t &val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
-#endif
-
-		void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
-		const nldelegate &delegate() const noexcept { return m_delegate; }
+		void set_delegate(const nl_delegate &delegate) noexcept { m_delegate = delegate; }
+		const nl_delegate &delegate() const noexcept { return m_delegate; }
 		void run_delegate() const noexcept { return m_delegate(); }
+	protected:
+		//std::conditional_t<config::use_copy_instead_of_reference::value, state_var_sig, void *> m_Q;
+		state_var_sig m_Q_CIR;
 	private:
-		nldelegate m_delegate;
+		nl_delegate m_delegate;
 		net_t * m_net;
 		state_var<state_e> m_state;
 	};

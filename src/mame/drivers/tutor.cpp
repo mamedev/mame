@@ -249,7 +249,7 @@ void tutor_state::machine_start()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 
-	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
+	m_tape_interrupt_timer = timer_alloc(FUNC(tutor_state::tape_interrupt_handler), this);
 
 	m_bank1->configure_entry(0, memregion("maincpu")->base() + 0x4000);
 	m_bank1->set_entry(0);

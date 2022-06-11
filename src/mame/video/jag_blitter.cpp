@@ -68,7 +68,7 @@ void jag_blitter_device::device_start()
 	save_item(NAME(m_a1.xstep));
 	save_item(NAME(m_a1.ystep));
 
-	m_command_timer = timer_alloc(0);
+	m_command_timer = timer_alloc(FUNC(jag_blitter_device::command_run), this);
 }
 
 
@@ -131,7 +131,7 @@ inline void jag_blitter_device::command_start()
 	m_command_timer->adjust(attotime::from_ticks(m_count_lines * m_count_pixels, this->clock()));
 }
 
-inline void jag_blitter_device::command_run()
+TIMER_CALLBACK_MEMBER(jag_blitter_device::command_run)
 {
 	// TODO: need to single step, have different timings between pixel and phrase modes,
 	// calculate collision detection, delay a bit the kickoff due of bus chain requests,
@@ -151,11 +151,6 @@ inline void jag_blitter_device::command_done()
 {
 	// m_status_idle = true;
 	// ...
-}
-
-void jag_blitter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	command_run();
 }
 
 //**************************************************************************

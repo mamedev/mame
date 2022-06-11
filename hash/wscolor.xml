@@ -962,8 +962,7 @@ See the wswan software list for the full game list.
 
 	<!-- hangs after story scroll when starting a new game -->
 	<!-- The IRQ routine at 22F13 expects the counter at 0F22A to have a valid
-	 value. This will likely get fixed with more accurate cycle counting.
-  -->
+	 value. This will likely get fixed with more accurate cycle counting. -->
 	<software name="hanjuher" supported="no">
 		<!-- WSC only -->
 		<!-- Rev 1 -->

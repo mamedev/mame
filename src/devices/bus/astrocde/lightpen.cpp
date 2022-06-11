@@ -31,7 +31,7 @@ astrocade_lightpen_device::~astrocade_lightpen_device()
 
 void astrocade_lightpen_device::device_start()
 {
-	m_pen_timer = timer_alloc(TIMER_TRIGGER);
+	m_pen_timer = timer_alloc(FUNC(astrocade_lightpen_device::trigger_tick), this);
 
 	save_item(NAME(m_retrigger));
 }
@@ -42,20 +42,17 @@ void astrocade_lightpen_device::device_reset()
 	m_retrigger = false;
 }
 
-void astrocade_lightpen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(astrocade_lightpen_device::trigger_tick)
 {
-	if (id == TIMER_TRIGGER)
-	{
-		write_ltpen(1);
-		write_ltpen(0);
-		if (m_retrigger)
-			m_pen_timer->adjust(m_screen->time_until_pos(m_lighty->read(), m_lightx->read()));
-		else
-			m_pen_timer->adjust(attotime::never);
-	}
+	write_ltpen(1);
+	write_ltpen(0);
+	if (m_retrigger)
+		m_pen_timer->adjust(m_screen->time_until_pos(m_lighty->read(), m_lightx->read()));
+	else
+		m_pen_timer->adjust(attotime::never);
 }
 
-INPUT_CHANGED_MEMBER( astrocade_lightpen_device::trigger )
+INPUT_CHANGED_MEMBER(astrocade_lightpen_device::trigger)
 {
 	if (newval)
 	{

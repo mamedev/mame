@@ -220,9 +220,8 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param)
+void ohci_usb_controller::timer(int param)
 {
-	uint32_t hcca;
 	uint32_t plh;
 	int changed = 0;
 	int list = 1;
@@ -230,7 +229,7 @@ void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param)
 	bool retire = false;
 	int pid, remain, mps, done;
 
-	hcca = ohcist.hc_regs[HcHCCA];
+	uint32_t hcca = ohcist.hc_regs[HcHCCA];
 	if (ohcist.state == UsbOperational) {
 		// increment frame number
 		ohcist.framenumber = (ohcist.framenumber + 1) & 0xffff;

@@ -455,11 +455,12 @@ public:
 
   //! \}
 
-  //! \name ARM Specific Features
+  //! \name Clone
   //! \{
 
   //! Clones the memory operand.
   inline constexpr Mem clone() const noexcept { return Mem(*this); }
+
   //! Gets new memory operand adjusted by `off`.
   inline Mem cloneAdjusted(int64_t off) const noexcept {
     Mem result(*this);
@@ -467,12 +468,62 @@ public:
     return result;
   }
 
+  //! Clones the memory operand and makes it pre-index.
+  inline Mem pre() const noexcept {
+    Mem result(*this);
+    result.setPredicate(kOffsetPreIndex);
+    return result;
+  }
+
+  //! Clones the memory operand, applies a given offset `off` and makes it pre-index.
+  inline Mem pre(int64_t off) const noexcept {
+    Mem result(*this);
+    result.setPredicate(kOffsetPreIndex);
+    result.addOffset(off);
+    return result;
+  }
+
+  //! Clones the memory operand and makes it post-index.
+  inline Mem post() const noexcept {
+    Mem result(*this);
+    result.setPredicate(kOffsetPreIndex);
+    return result;
+  }
+
+  //! Clones the memory operand, applies a given offset `off` and makes it post-index.
+  inline Mem post(int64_t off) const noexcept {
+    Mem result(*this);
+    result.setPredicate(kOffsetPostIndex);
+    result.addOffset(off);
+    return result;
+  }
+
+  //! \}
+
+  //! \name Base & Index
+  //! \{
+
+  //! Converts memory `baseType` and `baseId` to `arm::Reg` instance.
+  //!
+  //! The memory must have a valid base register otherwise the result will be wrong.
+  inline Reg baseReg() const noexcept { return Reg::fromTypeAndId(baseType(), baseId()); }
+
+  //! Converts memory `indexType` and `indexId` to `arm::Reg` instance.
+  //!
+  //! The memory must have a valid index register otherwise the result will be wrong.
+  inline Reg indexReg() const noexcept { return Reg::fromTypeAndId(indexType(), indexId()); }
+
   using BaseMem::setIndex;
 
   inline void setIndex(const BaseReg& index, uint32_t shift) noexcept {
     setIndex(index);
     setShift(shift);
   }
+
+  //! \}
+
+  //! \name ARM Specific Features
+  //! \{
 
   //! Gets whether the memory operand has shift (aka scale) constant.
   inline constexpr bool hasShift() const noexcept { return _signature.hasField<kSignatureMemShiftValueMask>(); }
@@ -498,32 +549,6 @@ public:
   inline void resetToFixedOffset() noexcept { resetPredicate(); }
   inline void makePreIndex() noexcept { setPredicate(kOffsetPreIndex); }
   inline void makePostIndex() noexcept { setPredicate(kOffsetPostIndex); }
-
-  inline Mem pre() const noexcept {
-    Mem result(*this);
-    result.setPredicate(kOffsetPreIndex);
-    return result;
-  }
-
-  inline Mem pre(int64_t off) const noexcept {
-    Mem result(*this);
-    result.setPredicate(kOffsetPreIndex);
-    result.addOffset(off);
-    return result;
-  }
-
-  inline Mem post() const noexcept {
-    Mem result(*this);
-    result.setPredicate(kOffsetPreIndex);
-    return result;
-  }
-
-  inline Mem post(int64_t off) const noexcept {
-    Mem result(*this);
-    result.setPredicate(kOffsetPostIndex);
-    result.addOffset(off);
-    return result;
-  }
 
   //! \}
 };

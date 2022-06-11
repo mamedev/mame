@@ -557,7 +557,7 @@ void vendetta_state::machine_start()
 	m_mainbank->configure_entries(0, 28, memregion("maincpu")->base(), 0x2000);
 	m_mainbank->set_entry(0);
 
-	m_z80_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vendetta_state::z80_nmi), this));
+	m_z80_nmi_timer = timer_alloc(FUNC(vendetta_state::z80_nmi), this);
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));

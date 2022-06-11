@@ -52,7 +52,7 @@ NETLIST_START(ICL8038_DIP)
 
 	ALIAS(11, VI.ON) // GND
 	ALIAS(9, V_SQR.OP) // Square out
-	ALIAS(3, VO.OP) // Triag out
+	ALIAS(3, VO.OP) // Triangle out
 	ALIAS(8, VI.IP) // VC
 	ALIAS(4, CI1.IP) // R1
 	ALIAS(5, CI2.IP) // R2

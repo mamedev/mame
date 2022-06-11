@@ -89,17 +89,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(y_update_tick);
+	TIMER_CALLBACK_MEMBER(hblank_on);
+	TIMER_CALLBACK_MEMBER(hblank_off);
 
 private:
-	enum
-	{
-		TIMER_Y_ODD,
-		TIMER_Y_EVEN,
-		TIMER_HBLANK_ON,
-		TIMER_HBLANK_OFF
-	};
-
 	void initialize_palette();
 	int get_field_vpos();
 	int get_field();

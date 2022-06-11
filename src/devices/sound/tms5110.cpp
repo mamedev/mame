@@ -1051,7 +1051,7 @@ void tms5110_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
-	m_romclk_hack_timer = timer_alloc(0);
+	m_romclk_hack_timer = timer_alloc(FUNC(tms5110_device::romclk_hack_toggle), this);
 
 	register_for_save_states();
 }
@@ -1187,16 +1187,14 @@ uint8_t m58817_device::status_r()
 	return (TALK_STATUS() << 0); /*CTL1 = still talking ? */
 }
 
-/******************************************************************************
-
-     tms5110_romclk_hack_r -- read status of romclk
-
-******************************************************************************/
-
-void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms5110_device::romclk_hack_toggle)
 {
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
+
+//-------------------------------------------------
+//  romclk_hack_r - read status of romclk
+//-------------------------------------------------
 
 int tms5110_device::romclk_hack_r()
 {
@@ -1322,7 +1320,7 @@ void tmsprom_device::update_prom_cnt()
 		m_prom_cnt &= 0x0f;
 }
 
-void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tmsprom_device::update_romclk)
 {
 	/* only 16 bytes needed ... The original dump is bad. This
 	 * is what is needed to get speech to work. The prom data has
@@ -1332,10 +1330,8 @@ void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	 * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
 	 *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
 	 */
-	uint16_t ctrl;
-
 	update_prom_cnt();
-	ctrl = (m_prom[m_prom_cnt] | 0x200);
+	uint16_t ctrl = (m_prom[m_prom_cnt] | 0x200);
 
 	//if (m_enable && m_prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, m_enable, m_prom_cnt);
 	m_prom_cnt = ((m_prom_cnt + 1) & 0x0f) | (m_prom_cnt & 0x10);
@@ -1359,7 +1355,7 @@ void tmsprom_device::device_start()
 	m_pdc_cb.resolve_safe();
 	m_ctl_cb.resolve_safe();
 
-	m_romclk_timer = timer_alloc(0);
+	m_romclk_timer = timer_alloc(FUNC(tmsprom_device::update_romclk), this);
 	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	m_bit = 0;

@@ -28,22 +28,6 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 }
 
 
-void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SERIAL:
-		serial_tc(param);
-		break;
-	case TIMER_CASSETTE:
-		cassette_tc(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in sorcerer_state::device_timer");
-	}
-}
-
-
 /* timer to read cassette waveforms */
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
@@ -437,8 +421,8 @@ u8 sorcerer_state::portfe_r()
 // ************ MACHINE **************
 void sorcerer_state::machine_start_common(offs_t endmem)
 {
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_cassette_timer = timer_alloc(FUNC(sorcerer_state::cassette_tc), this);
+	m_serial_timer = timer_alloc(FUNC(sorcerer_state::serial_tc), this);
 
 	m_halt = false;
 

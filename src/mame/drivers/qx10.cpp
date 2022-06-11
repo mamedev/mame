@@ -375,7 +375,7 @@ void qx10_state::update_memory_mapping()
 	{
 		if (m_external_bank)
 		{
-			m_ram_view.select(1);;
+			m_ram_view.select(1);
 		}
 		else
 		{

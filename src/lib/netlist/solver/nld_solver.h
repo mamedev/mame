@@ -8,8 +8,11 @@
 /// \file nld_solver.h
 ///
 
-#include "../nl_base.h"
 #include "../plib/pstream.h"
+
+#include "core/core_device.h"
+#include "core/logic.h"
+#include "core/state_var.h"
 #include "nld_matrix_solver.h"
 
 #include <map>
@@ -25,14 +28,14 @@ namespace netlist::devices
 	NETLIB_OBJECT(solver)
 	{
 	public:
-		using queue_type = detail::queue_base<solver::matrix_solver_t, false>;
 		using solver_arena = device_arena;
+		using queue_type = detail::queue_base<solver_arena, solver::matrix_solver_t>;
 
 		NETLIB_CONSTRUCTOR(solver)
 		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
 		, m_Q_step(*this, "Q_step")
 		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-		, m_queue(config::max_solver_queue_size(),
+		, m_queue(this->state().pool(), config::max_solver_queue_size(),
 			queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
 			queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
 		{
@@ -75,7 +78,7 @@ namespace netlist::devices
 		queue_type m_queue;
 
 		template <typename FT, int SIZE>
-		solver_ptr create_solver(std::size_t size, const pstring &solvername,
+		solver_ptr create_solver(std::size_t size, const pstring &solver_name,
 			const solver::solver_parameters_t *params,net_list_t &nets);
 
 		template <typename FT>

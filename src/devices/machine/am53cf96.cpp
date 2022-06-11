@@ -47,7 +47,7 @@ uint8_t am53cf96_device::read(offs_t offset)
 	return rv;
 }
 
-void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(am53cf96_device::irq_timer_tick)
 {
 	scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 	scsi_regs[REG_STATUS] |= 0x80;  // indicate IRQ
@@ -169,7 +169,7 @@ void am53cf96_device::device_start()
 	save_item( NAME( xfer_state ) );
 	save_item( NAME( last_id ) );
 
-	m_transfer_timer = timer_alloc( TIMER_TRANSFER );
+	m_transfer_timer = timer_alloc( FUNC( am53cf96_device::irq_timer_tick ), this );
 }
 
 // retrieve data from the SCSI controller

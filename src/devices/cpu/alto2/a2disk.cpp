@@ -1741,16 +1741,16 @@ void alto2_cpu_device::init_disk()
 
 	m_dsk.kcom = 066000;
 
-	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
+	m_dsk.strobon_timer = timer_alloc(FUNC(alto2_cpu_device::disk_strobon), this);
 	m_dsk.strobon_timer->reset();
 
-	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
+	m_dsk.seclate_timer = timer_alloc(FUNC(alto2_cpu_device::disk_seclate), this);
 	m_dsk.seclate_timer->reset();
 
-	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
+	m_dsk.ok_to_run_timer = timer_alloc(FUNC(alto2_cpu_device::disk_ok_to_run), this);
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(35 * ALTO2_UCYCLE / 1000), 1);
 
-	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
+	m_dsk.ready_timer = timer_alloc(FUNC(alto2_cpu_device::disk_ready_mf31a), this);
 	m_dsk.ready_timer->reset();
 
 	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);

@@ -101,7 +101,7 @@ void a2bus_corvfdc02_device::device_start()
 {
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(a2bus_corvfdc02_device::tc_tick), this);
 
 	save_item(NAME(m_fdc_local_status));
 	save_item(NAME(m_fdc_local_command));
@@ -118,7 +118,7 @@ void a2bus_corvfdc02_device::device_reset()
 	m_timer->adjust(attotime::never);
 }
 
-void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a2bus_corvfdc02_device::tc_tick)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);

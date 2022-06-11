@@ -73,7 +73,7 @@ sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &m
 
 void spg2xx_audio_device::device_start()
 {
-	m_audio_beat = timer_alloc(TIMER_BEAT);
+	m_audio_beat = timer_alloc(FUNC(spg2xx_audio_device::audio_beat_tick), this);
 	m_audio_beat->adjust(attotime::never);
 
 	m_stream = stream_alloc(0, 2, 281250/4);
@@ -107,7 +107,7 @@ void spg2xx_audio_device::device_start()
 
 		memset(m_adpcm36_state + i, 0, sizeof(adpcm36_state));
 
-		m_channel_irq[i] = timer_alloc(TIMER_IRQ + i);
+		m_channel_irq[i] = timer_alloc(FUNC(spg2xx_audio_device::irq_tick), this);
 		m_channel_irq[i]->adjust(attotime::never);
 	}
 
@@ -159,24 +159,12 @@ void spg2xx_audio_device::device_stop()
 #endif
 }
 
-void spg2xx_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg2xx_audio_device::irq_tick)
 {
-	if (id >= TIMER_IRQ && id < (TIMER_IRQ + 16))
+	if (!BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS], param))
 	{
-		const uint32_t bit = id - TIMER_IRQ;
-		if (!BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS], bit))
-		{
-			m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS] |= (1 << (id - TIMER_IRQ));
-			m_ch_irq_cb(1);
-		}
-		return;
-	}
-
-	switch (id)
-	{
-	case TIMER_BEAT:
-		audio_beat_tick();
-		break;
+		m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS] |= (1 << param);
+		m_ch_irq_cb(1);
 	}
 }
 
@@ -480,7 +468,7 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 					m_audio_ctrl_regs[offset] |= mask;
 					if (BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_ENABLE], channel_bit))
 					{
-						m_channel_irq[channel_bit]->adjust(attotime::from_hz(m_channel_rate[channel_bit]), 0, attotime::from_hz(m_channel_rate[channel_bit]));
+						m_channel_irq[channel_bit]->adjust(attotime::from_hz(m_channel_rate[channel_bit]), channel_bit, attotime::from_hz(m_channel_rate[channel_bit]));
 					}
 					else
 					{
@@ -1250,7 +1238,7 @@ inline void spg2xx_audio_device::loop_channel(const uint32_t channel)
 	LOGMASKED(LOG_SAMPLES, "Channel %d: Looping to address %08x\n", channel, m_sample_addr[channel]);
 }
 
-void spg2xx_audio_device::audio_beat_tick()
+TIMER_CALLBACK_MEMBER(spg2xx_audio_device::audio_beat_tick)
 {
 	if (m_audio_curr_beat_base_count > 0)
 	{

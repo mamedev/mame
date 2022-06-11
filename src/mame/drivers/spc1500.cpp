@@ -828,7 +828,7 @@ void spc1500_state::machine_start()
 	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(m_p_ram);
 	membank("bank4")->set_base(m_p_ram + 0x8000);
-	m_timer = timer_alloc(0);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer->adjust(attotime::zero);
 }
 

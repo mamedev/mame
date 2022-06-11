@@ -73,7 +73,7 @@ void rtc4543_device::device_start()
 	m_data_cb.resolve_safe();
 
 	// allocate timers
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(rtc4543_device::advance_clock), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving
@@ -101,10 +101,10 @@ void rtc4543_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  advance_clock -
 //-------------------------------------------------
 
-void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(rtc4543_device::advance_clock)
 {
 	advance_seconds();
 }

@@ -356,16 +356,9 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cidelsa_state::reset_done)
 {
-	switch (id)
-	{
-	case TIMER_SET_CPU_MODE:
-		m_reset = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in cidelsa_state::device_timer");
-	}
+	m_reset = 1;
 }
 
 void cidelsa_state::machine_start()
@@ -374,6 +367,8 @@ void cidelsa_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_reset));
+
+	m_reset_timer = timer_alloc(FUNC(cidelsa_state::reset_done), this);
 }
 
 void draco_state::machine_start()
@@ -395,7 +390,7 @@ void cidelsa_state::machine_reset()
 {
 	/* reset the CPU */
 	m_reset = 0;
-	timer_set(attotime::from_msec(200), TIMER_SET_CPU_MODE);
+	m_reset_timer->adjust(attotime::from_msec(200));
 }
 
 /* Machine Drivers */

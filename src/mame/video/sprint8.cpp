@@ -117,7 +117,7 @@ void sprint8_state::video_start()
 	m_tilemap1->set_scrolly(0, +24);
 	m_tilemap2->set_scrolly(0, +24);
 
-	m_collision_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sprint8_state::collision_callback),this));
+	m_collision_timer = timer_alloc(FUNC(sprint8_state::collision_callback), this);
 }
 
 

@@ -8,6 +8,29 @@
     -CPU: Celeron, socket 478, 800/533MHz
     -Video: R9600PRO 256M DDR AGP.
     -Boot from USB flash drive.
+
+ Additional I/O board that serves also as protection (labeled "HYdra V2.3"),
+ connected via RS-232 (DB9):
+     _________
+   _| RS-232 |________________________
+  | |__DB9___|              ········ |
+  |               ______             |
+  |              MAX3232C         __ |
+  |  _____       |_____|         |o| |
+  |  34064                       |o| |
+  | ..                  ________ |o| |
+  |                   SN74HC125N |o| |
+  |        ______                    |
+  |       MC908AP8                   |
+  |       |_____|                    |
+  |                                  |
+  |                       ________   |
+  |                      SN74HC125N  |
+  |      _________________________   |
+  |     |::::::::::::::::::::::::|   |
+  | _______________________   ____   |
+  ||oooooooooooooooooooooo|  |ooo|   |
+  |__________________________________| 
 */
 
 #include "emu.h"
@@ -87,6 +110,10 @@ void rbowlorama_state::rbowlorama(machine_config &config)
 ROM_START( rbowlorama )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD("p4m8p478.rom", 0x00000, 0x80000, CRC(a43b33c6) SHA1(1633273f9f06862b63aeb10899006b10fab4f4af) )
+
+	// I/O PCB
+	ROM_REGION(0x2000, "io", 0)
+	ROM_LOAD("mc908ap8.u102", 0x0000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Sandisk Cruzer USB 8GB flash drive
 	DISK_IMAGE( "namco_bowling", 0, BAD_DUMP SHA1(138971fa22ba5a4f0e78daad989d444ebb072213) ) // v2.1.1. May contain operator and players data

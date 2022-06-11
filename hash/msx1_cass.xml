@@ -13344,7 +13344,7 @@ license:CC0
 		<description>Superkarateka (Spa)</description>
 		<year>198?</year>
 		<publisher>Onaki</publisher>
-				<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="35135">

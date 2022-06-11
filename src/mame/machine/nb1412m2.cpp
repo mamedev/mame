@@ -158,9 +158,9 @@ void nb1412m2_device::device_start()
 	save_item(NAME(m_const90));
 	save_item(NAME(m_timer_rate));
 
-	m_timer = timer_alloc(TIMER_MAIN);
+	m_timer = timer_alloc(FUNC(nb1412m2_device::main_timer_tick), this);
 	m_timer->adjust(attotime::never);
-	m_dac_timer = timer_alloc(TIMER_DAC);
+	m_dac_timer = timer_alloc(FUNC(nb1412m2_device::update_dac), this);
 
 	m_dac_cb.resolve_safe();
 }
@@ -184,29 +184,24 @@ void nb1412m2_device::device_reset()
 	m_dac_timer->adjust(attotime::never);
 }
 
-void nb1412m2_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nb1412m2_device::main_timer_tick)
 {
-	switch (id)
-	{
-		case TIMER_MAIN:
-			m_timer_reg = true;
-			m_timer->adjust(attotime::never);
-			break;
-		case TIMER_DAC:
-			if(m_dac_playback == true)
-			{
-				uint8_t dac_value;
-				dac_value = m_data[m_dac_current_address];
-				m_dac_cb(dac_value);
-				m_dac_current_address++;
-				m_dac_current_address &= m_data.length() - 1;
-				if(dac_value == 0x80)
-					m_dac_playback = false;
-			}
+	m_timer_reg = true;
+}
 
-			break;
-		default:
-			throw emu_fatalerror("Unknown id in nb1412m2_device::device_timer");
+TIMER_CALLBACK_MEMBER(nb1412m2_device::update_dac)
+{
+	if(m_dac_playback == true)
+	{
+		uint8_t dac_value;
+		dac_value = m_data[m_dac_current_address];
+		m_dac_cb(dac_value);
+		m_dac_current_address++;
+		m_dac_current_address &= m_data.length() - 1;
+		if(dac_value == 0x80)
+		{
+			m_dac_playback = false;
+		}
 	}
 }
 

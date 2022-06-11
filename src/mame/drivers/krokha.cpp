@@ -65,8 +65,6 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
-
-	int m_speaker_state = 0;
 };
 
 //
@@ -82,8 +80,7 @@ void krokha_state::status_callback(uint8_t data)
 
 void krokha_state::speaker_w(uint8_t data)
 {
-	m_speaker_state = BIT(data, 1);
-	m_speaker->level_w(m_speaker_state);
+	m_speaker->level_w(BIT(data, 1));
 }
 
 //
@@ -108,11 +105,7 @@ INPUT_PORTS_END
 
 void krokha_state::machine_reset()
 {
-	m_speaker_state = 0;
-	m_speaker->level_w(m_speaker_state);
-
-	// setup save states
-	save_item(NAME(m_speaker_state));
+	m_speaker->level_w(0);
 }
 
 uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -171,4 +164,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROT,   COMPANY        FULLNAME
-GAME( 1990, krokha,  0,      krokha,  krokha, krokha_state, empty_init, ROT0,  "SKB Kontur",  "Krokha",  0 )
+GAME( 1990, krokha,  0,      krokha,  krokha, krokha_state, empty_init, ROT0,  "SKB Kontur",  "Krokha", MACHINE_SUPPORTS_SAVE )

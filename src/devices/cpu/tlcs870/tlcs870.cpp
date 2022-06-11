@@ -1244,13 +1244,13 @@ void tlcs870_device::device_start()
 	m_port_analog_in_cb.resolve_all_safe(0xff);
 	m_serial_out_cb.resolve_all_safe();
 
-	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
-	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));
+	m_serial_transmit_timer[0] = timer_alloc(FUNC(tlcs870_device::sio0_transmit_cb), this);
+	m_serial_transmit_timer[1] = timer_alloc(FUNC(tlcs870_device::sio1_transmit_cb), this);
 
-	m_tcx_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc1_cb), this));
-	m_tcx_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc2_cb), this));
-	m_tcx_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc3_cb), this));
-	m_tcx_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc4_cb), this));
+	m_tcx_timer[0] = timer_alloc(FUNC(tlcs870_device::tc1_cb), this);
+	m_tcx_timer[1] = timer_alloc(FUNC(tlcs870_device::tc2_cb), this);
+	m_tcx_timer[2] = timer_alloc(FUNC(tlcs870_device::tc3_cb), this);
+	m_tcx_timer[3] = timer_alloc(FUNC(tlcs870_device::tc4_cb), this);
 }
 
 

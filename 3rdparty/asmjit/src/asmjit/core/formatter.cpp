@@ -143,7 +143,7 @@ Error formatLabel(
     }
 
     if (le->type() == LabelType::kAnonymous)
-      ASMJIT_PROPAGATE(sb.append("L%u@", labelId));
+      ASMJIT_PROPAGATE(sb.appendFormat("L%u@", labelId));
     return sb.append(le->name());
   }
   else {

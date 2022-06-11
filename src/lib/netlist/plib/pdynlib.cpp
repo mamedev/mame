@@ -16,7 +16,7 @@ namespace plib
 	using winapi_string = std::conditional<compile_info::unicode::value,
 		pwstring, pu8string>::type;
 
-dynlib::dynlib(const pstring &libname)
+dynamic_library::dynamic_library(const pstring &libname)
 : m_lib(nullptr)
 {
 #ifdef _WIN32
@@ -40,11 +40,10 @@ dynlib::dynlib(const pstring &libname)
 	//  printf("library <%s> not found: %s\n", libname.c_str(), dlerror());
 	}
 
-dynlib::dynlib(const pstring &path, const pstring &libname)
+dynamic_library::dynamic_library([[maybe_unused]] const pstring &path, const pstring &libname)
 : m_lib(nullptr)
 {
 	// FIXME: implement path search
-	plib::unused_var(path);
 	//  printf("win: loading <%s>\n", libname.c_str());
 #ifdef _WIN32
 	if (!libname.empty())
@@ -68,7 +67,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	}
 }
 
-dynlib::~dynlib()
+dynamic_library::~dynamic_library()
 {
 	if (m_lib != nullptr)
 	{
@@ -80,7 +79,7 @@ dynlib::~dynlib()
 	}
 }
 
-void *dynlib::getsym_p(const pstring &name) const noexcept
+void *dynamic_library::get_symbol_pointer(const pstring &name) const noexcept
 {
 #ifdef _WIN32
 	return (void *) GetProcAddress((HMODULE) m_lib, putf8string(name).c_str());

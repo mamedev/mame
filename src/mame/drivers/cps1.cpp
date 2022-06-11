@@ -14247,7 +14247,7 @@ void cps_state::init_dinohunt()
 {
 	// is this shared with the new sound hw?
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16smo_delegate(*this, FUNC(cps_state::dinohunt_sound_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2");
 	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
 
 	init_cps1();

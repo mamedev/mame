@@ -17,8 +17,6 @@
 
 class cmi_music_keyboard_device : public device_t
 {
-	static const device_timer_id TIMER_CMI10_SCND = 0;
-
 public:
 	cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
@@ -38,7 +36,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(scnd_update);
 
 private:
 	void cmi10_u20_a_w(u8 data);

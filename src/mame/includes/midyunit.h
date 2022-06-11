@@ -93,12 +93,6 @@ private:
 		uint16_t      color = 0;          // current foreground color with palette
 	};
 
-	enum
-	{
-		TIMER_DMA,
-		TIMER_AUTOERASE_LINE
-	};
-
 	required_device<tms34010_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
@@ -175,7 +169,6 @@ private:
 	void main_map(address_map &map);
 	void yawdim_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16s_delegate hack_w);

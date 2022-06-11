@@ -301,7 +301,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	virtual ioport_constructor device_input_ports() const override;
 

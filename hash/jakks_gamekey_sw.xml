@@ -7,8 +7,8 @@ license:CC0
 
 	<!-- This list is for the 'SW' coded Game Keys, for Star Wars base systems -->
 
-	<!--  There are 4 pads on the PCB labeled A0 A1 A2 and A3.  A1 and A2 are connected to VCC.
-	      The gamekey PCB had the same silkscreened boxes as the Disney Games, with A1 H and A3 H marked. -->
+	<!-- There are 4 pads on the PCB labeled A0 A1 A2 and A3.  A1 and A2 are connected to VCC.
+	     The gamekey PCB had the same silkscreened boxes as the Disney Games, with A1 H and A3 H marked. -->
 
 	<software name="tdyoda">
 		<description>Turret Defense &amp; Yoda's Escape</description>

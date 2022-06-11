@@ -268,20 +268,11 @@ void upd7759_device::device_start()
 
 	m_sample_offset_shift = 1;
 
-	m_timer = timer_alloc(TID_SLAVE_UPDATE);
+	m_timer = timer_alloc(FUNC(upd7759_device::drq_update), this);
 
 	m_drqcallback.resolve_safe();
-
-	device_reset();
 }
 
-
-void upd7756_device::device_start()
-{
-	upd775x_device::device_start();
-
-	device_reset();
-}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -390,8 +381,6 @@ void upd775x_device::advance_state()
 	{
 		// Idle state: we stick around here while there's nothing to do
 		case STATE_IDLE:
-			// If we have dropped back to idle state we always switch back to stand alone mode
-			m_mode = MODE_STAND_ALONE;
 			m_clocks_left = 4;
 			break;
 
@@ -576,54 +565,29 @@ void upd775x_device::advance_state()
 	}
 }
 
-/************************************************************
+TIMER_CALLBACK_MEMBER(upd775x_device::sync_port_write)
+{
+	m_fifo_in = param;
+}
 
-    DRQ callback
-
-*************************************************************/
-
-void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd7759_device::drq_update)
 {
 	uint8_t olddrq = m_drq;
 	int old_state = m_state;
 
-	switch (id)
+	m_channel->update();
+
+	advance_state();
+
+	LOG_STATE("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
+	if (olddrq != m_drq)
 	{
-		case TID_PORT_WRITE:
-			m_fifo_in = param;
-			break;
-
-		case TID_RESET_WRITE:
-			internal_reset_w(param);
-			break;
-
-		case TID_START_WRITE:
-			internal_start_w(param);
-			break;
-
-		case TID_MD_WRITE:
-			internal_md_w(param);
-			break;
-
-		case TID_SLAVE_UPDATE:
-			m_channel->update();
-
-			advance_state();
-
-			LOG_STATE("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
-			if (olddrq != m_drq)
-			{
-				LOG_DRQ("DRQ changed %d->%d\n", olddrq, m_drq);
-				m_drqcallback(m_drq);
-			}
-
-			if (m_state != STATE_IDLE || old_state != STATE_IDLE)
-				m_timer->adjust(m_clock_period * m_clocks_left);
-			break;
-
-		default:
-			throw emu_fatalerror("Unknown id in upd7759_device::device_timer");
+		LOG_DRQ("DRQ changed %d->%d\n", olddrq, m_drq);
+		m_drqcallback(m_drq);
 	}
+
+	if (m_state != STATE_IDLE || old_state != STATE_IDLE)
+		m_timer->adjust(m_clock_period * m_clocks_left);
 }
 
 /************************************************************
@@ -634,13 +598,13 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
-	synchronize(TID_RESET_WRITE, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_reset_w), this), state);
 }
 
-void upd775x_device::internal_reset_w(int state)
+TIMER_CALLBACK_MEMBER(upd775x_device::internal_reset_w)
 {
 	uint8_t oldreset = m_reset;
-	m_reset = (state != 0);
+	m_reset = (param != 0);
 
 	m_channel->update();
 
@@ -648,10 +612,10 @@ void upd775x_device::internal_reset_w(int state)
 		device_reset();
 }
 
-void upd7759_device::internal_reset_w(int state)
+TIMER_CALLBACK_MEMBER(upd7759_device::internal_reset_w)
 {
 	uint8_t oldreset = m_reset;
-	upd775x_device::internal_reset_w(state);
+	upd775x_device::internal_reset_w(param);
 
 	if (!oldreset && m_reset)
 	{
@@ -666,7 +630,7 @@ void upd7759_device::internal_reset_w(int state)
 
 WRITE_LINE_MEMBER( upd775x_device::start_w )
 {
-	synchronize(TID_START_WRITE, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_start_w), this), state);
 }
 
 void upd7759_device::internal_start_w(int state)
@@ -678,7 +642,7 @@ void upd7759_device::internal_start_w(int state)
 
 	m_channel->update();
 
-	if (m_state == STATE_IDLE && oldstart && !m_start && m_reset)
+	if (m_state == STATE_IDLE && m_mode == MODE_STAND_ALONE && oldstart && !m_start && m_reset)
 	{
 		m_state = STATE_START;
 
@@ -712,31 +676,38 @@ WRITE_LINE_MEMBER(upd7759_device::md_w)
 		m_md = state;
 		return;
 	}
-	synchronize(TID_MD_WRITE, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd7759_device::internal_md_w), this), state);
 }
 
 
-void upd7759_device::internal_md_w(int state)
+TIMER_CALLBACK_MEMBER(upd7759_device::internal_md_w)
 {
 	uint8_t old_md = m_md;
-	m_md = (state != 0);
+	m_md = (param != 0);
 
 	LOG_STATE("upd7759_md_w: %d->%d\n", old_md, m_md);
 
 	m_channel->update();
 
-	if (m_state == STATE_IDLE && old_md && !m_md && m_reset)
+	if (m_state == STATE_IDLE && m_reset)
 	{
-		m_mode = MODE_SLAVE;
-		m_state = STATE_START;
-		m_timer->adjust(attotime::zero);
+		if (old_md && !m_md)
+		{
+			m_mode = MODE_SLAVE;
+			m_state = STATE_START;
+			m_timer->adjust(attotime::zero);
+		}
+		else if (!old_md && m_md)
+		{
+			m_mode = MODE_STAND_ALONE;
+		}
 	}
 }
 
 
 void upd775x_device::port_w(u8 data)
 {
-	synchronize(TID_PORT_WRITE, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::sync_port_write), this), data);
 }
 
 

@@ -91,7 +91,7 @@ void z8038_device::device_start()
 
 	//save_item(NAME(m_fifo));
 
-	m_int_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8038_device::int_check), this));
+	m_int_check = timer_alloc(FUNC(z8038_device::int_check), this);
 
 	// suppress startup interrupt line changes
 	m_port[0].int_asserted = false;

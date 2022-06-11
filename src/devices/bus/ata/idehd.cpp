@@ -812,7 +812,7 @@ void ide_hdd_device::device_start()
 	ata_mass_storage_device::device_start();
 
 	/* create a timer for timing status */
-	m_last_status_timer = timer_alloc(TID_NULL);
+	m_last_status_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 //-------------------------------------------------

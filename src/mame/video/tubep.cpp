@@ -133,7 +133,7 @@
 ***************************************************************************/
 
 
-void tubep_state::tubep_palette(palette_device &palette)
+void tubep_state::palette_init(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -328,7 +328,7 @@ void tubep_state::video_start()
 {
 	m_spritemap = std::make_unique<uint8_t[]>(256*256*2);
 
-	m_sprite_timer = timer_alloc(TIMER_SPRITE);
+	m_sprite_timer = timer_alloc(FUNC(tubep_state::assert_sprite_int), this);
 
 	/* Set up save state */
 	save_item(NAME(m_romD_addr));
@@ -409,13 +409,13 @@ WRITE_LINE_MEMBER(tubep_state::colorproms_A4_line_w)
 }
 
 
-void tubep_state::tubep_background_a000_w(uint8_t data)
+void tubep_state::background_a000_w(uint8_t data)
 {
 	m_ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
-void tubep_state::tubep_background_c000_w(uint8_t data)
+void tubep_state::background_c000_w(uint8_t data)
 {
 	m_ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
@@ -490,7 +490,7 @@ void tubep_state::draw_sprite()
 }
 
 
-void tubep_state::tubep_sprite_control_w(offs_t offset, uint8_t data)
+void tubep_state::sprite_control_w(offs_t offset, uint8_t data)
 {
 	if (offset < 10)
 	{
@@ -557,7 +557,7 @@ void tubep_state::tubep_sprite_control_w(offs_t offset, uint8_t data)
 	}
 }
 
-void tubep_state::tubep_vblank_end()
+void tubep_state::vblank_end()
 {
 	m_DISP = m_DISP ^ 1;
 	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", m_DISP); */
@@ -566,7 +566,7 @@ void tubep_state::tubep_vblank_end()
 }
 
 
-uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tubep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int DISP_ = m_DISP^1;
 
@@ -686,7 +686,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-void rjammer_state::rjammer_palette(palette_device &palette) const
+void rjammer_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
 
@@ -726,19 +726,19 @@ void rjammer_state::rjammer_palette(palette_device &palette) const
 }
 
 
-void rjammer_state::rjammer_background_LS377_w(uint8_t data)
+void rjammer_state::background_ls377_w(uint8_t data)
 {
 	m_ls377_data = data & 0xff;
 }
 
 
-void rjammer_state::rjammer_background_page_w(uint8_t data)
+void rjammer_state::background_page_w(uint8_t data)
 {
 	m_page = (data & 1) * 0x200;
 }
 
 
-uint32_t rjammer_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rjammer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int DISP_ = m_DISP^1;
 

@@ -49,7 +49,7 @@
 
 namespace netlist::analog {
 
-	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
+	NETLIB_OBJECT_DERIVED(r2r_dac, two_terminal)
 	{
 		NETLIB_CONSTRUCTOR(r2r_dac)
 		, m_VIN(*this, "VIN", nlconst::one())
@@ -57,8 +57,8 @@ namespace netlist::analog {
 		, m_num(*this, "N", 1)
 		, m_val(*this, "VAL", 1)
 		{
-			register_subalias("VOUT", P());
-			register_subalias("VGND", N());
+			register_sub_alias("VOUT", P());
+			register_sub_alias("VGND", N());
 		}
 
 		NETLIB_UPDATE_PARAMI();

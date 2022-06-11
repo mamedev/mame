@@ -110,13 +110,9 @@ private:
 	uint8_t m_imsk;
 
 	/* Debug stuff */
-	/* Timer */
-	enum
-	{
-	  TIMER_POLL_START,
-	  TIMER_POLL_BIT
-	};
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	/* Timer callbacks */
+	TIMER_CALLBACK_MEMBER(poll_start);
+	TIMER_CALLBACK_MEMBER(poll_bit);
 
 	// DEBUG stuff, will be removed when hooked up towards remote peer
 	/* zero extended SDLC poll message frame to feed into receiver as a test
@@ -130,6 +126,8 @@ private:
 	   0 1 1 1 1 1 1 0   ; closing flag 0x7e
 	*/
 	uint8_t txBuf[10] = {0x7e, 0x00, 0xff, 0xc0, 0xa0, 0x8d, 0x55, 0x7e};
+	emu_timer *m_poll_start_timer = nullptr;
+	emu_timer *m_poll_bit_timer = nullptr;
 	int index = 0;
 	int pos   = 0;
 	int ones  = 0;
@@ -373,7 +371,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PIA6821(config, m_mic_pia, 0); // Main board PIA
-	m_mic_pia->readcb1_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CB1 read\n"); return 0;});
+	m_mic_pia->cb1_w(0);
 	m_mic_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGMIC("->MIC PIA: CB2 write %d\n", data); });
 
 	/*
@@ -431,18 +429,18 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 						return 0;
 					});
 	m_mic_pia->readpb_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: Port B read\n"); return 0;});
-	m_mic_pia->readca1_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CA1 read\n"); return 0;});
-	m_mic_pia->readca2_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CA2 read\n"); return 0;});
+	m_mic_pia->ca1_w(0);
+	m_mic_pia->ca2_w(0);
 
 	PIA6821(config, m_dia_pia, 0); // Display PIA, controls how the CRTC accesses memory etc
-	m_dia_pia->readcb1_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CB1_r\n"); return 0;});
+	m_dia_pia->cb1_w(0);
 	m_dia_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: CB2_w %d\n", data); });
 	m_dia_pia->writepa_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: PA_w %02x\n", data); });
 	m_dia_pia->writepb_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: PB_w %02x\n", data); });
 	m_dia_pia->readpa_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: PA_r\n"); return 0;});
 	m_dia_pia->readpb_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: PB_r\n"); return 0;});
-	m_dia_pia->readca1_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA1_r\n"); return 0;});
-	m_dia_pia->readca2_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA2_r\n"); return 0;});
+	m_dia_pia->ca1_w(0);
+	m_dia_pia->ca2_w(0);
 
 	ACIA6850(config, m_kbd_acia, 0);
 	//CLOCK(config, "acia_clock", ACIA_CLOCK).signal_handler().set(FUNC(alfaskop4110_state::write_acia_clock));
@@ -477,23 +475,27 @@ void alfaskop4110_state::machine_start()
 {
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
-	timer_set(attotime::from_msec(5000), TIMER_POLL_START);
+
+	m_poll_start_timer = timer_alloc(FUNC(alfaskop4110_state::poll_start), this);
+	m_poll_start_timer->adjust(attotime::from_msec(5000));
+
+	m_poll_bit_timer = timer_alloc(FUNC(alfaskop4110_state::poll_bit), this);
+	m_poll_bit_timer->adjust(attotime::never);
 }
 
-void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+// Debug - inserts a poll SDLC frame through the ADLC, it ends up at address 0x140 in RAM through DMA
+TIMER_CALLBACK_MEMBER(alfaskop4110_state::poll_start)
 {
-	// Debug, inserts a poll SDLC frame through the ADLC, it ends up at address 0x140 in RAM through DMA
-	switch (id)
+	/* The serial transfer of 8 bits is complete. Now trigger INT7. */
+	LOGADLC("Starting poll message\n");
+	m_tia_adlc->set_rx(0);
+	m_poll_bit_timer->adjust(attotime::from_hz(300000));
+}
+
+TIMER_CALLBACK_MEMBER(alfaskop4110_state::poll_bit)
+{
+	if (flank)
 	{
-	case TIMER_POLL_START:
-		/* The serial transfer of 8 bits is complete. Now trigger INT7. */
-		LOGADLC("Starting poll message\n");
-		m_tia_adlc->set_rx(0);
-		timer_set(attotime::from_hz(300000), TIMER_POLL_BIT);
-		break;
-	case TIMER_POLL_BIT:
-	  if (flank)
-	  {
 		if (index != 0 && index != 7 && BIT(txBuf[index], (pos % 8)) && ones == 5)
 		{
 			LOGADLC("%d%c", 2, (pos % 8) == 7 ? '\n' : ' ');
@@ -511,13 +513,11 @@ void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int 
 			pos++;
 			index = pos / 8;
 		}
-	  }
-	  m_tia_adlc->rxc_w(flank ? 1 : 0);
-	  if (index < 8)
-		timer_set(attotime::from_hz(300000) / 2, TIMER_POLL_BIT);
-	  flank = !flank;
-	  break;
 	}
+	m_tia_adlc->rxc_w(flank ? 1 : 0);
+	if (index < 8)
+		m_poll_bit_timer->adjust(attotime::from_hz(300000) / 2);
+	flank = !flank;
 }
 
 void alfaskop4110_state::machine_reset()

@@ -226,7 +226,7 @@ void pc1512_keyboard_device::device_start()
 {
 	m_leds.resolve();
 	// allocate timers
-	m_reset_timer = timer_alloc();
+	m_reset_timer = timer_alloc(FUNC(pc1512_keyboard_device::reset_timer_tick), this);
 
 	// resolve callbacks
 	m_write_clock.resolve_safe();
@@ -253,10 +253,10 @@ void pc1512_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  reset_timer_tick - reset the keyboard
 //-------------------------------------------------
 
-void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc1512_keyboard_device::reset_timer_tick)
 {
 	if (!m_clock_in)
 	{

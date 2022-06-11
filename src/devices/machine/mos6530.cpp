@@ -66,7 +66,7 @@ void mos6530_device::device_start()
 	m_out_pb_cb.resolve_safe();
 
 	/* allocate timers */
-	m_timer = timer_alloc(TIMER_END_CALLBACK);
+	m_timer = timer_alloc(FUNC(mos6530_device::end_state), this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));
@@ -153,36 +153,29 @@ uint8_t mos6530_device::get_timer()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    timer_end_callback - callback to process the
-    timer
+    end_state - callback to process the timer
 -------------------------------------------------*/
 
-void mos6530_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mos6530_device::end_state)
 {
-	switch (id)
+	assert(m_timerstate != TIMER_IDLE);
+
+	/* if we finished counting, switch to the finishing state */
+	if (m_timerstate == TIMER_COUNTING)
 	{
-		// deferred reset
-		case TIMER_END_CALLBACK:
-			assert(m_timerstate != TIMER_IDLE);
+		m_timerstate = TIMER_FINISHING;
+		m_timer->adjust(attotime::from_ticks(256, m_clock));
 
-			/* if we finished counting, switch to the finishing state */
-			if (m_timerstate == TIMER_COUNTING)
-			{
-				m_timerstate = TIMER_FINISHING;
-				m_timer->adjust(attotime::from_ticks(256, m_clock));
+		/* signal timer IRQ as well */
+		m_irqstate |= TIMER_FLAG;
+		update_irqstate();
+	}
 
-				/* signal timer IRQ as well */
-				m_irqstate |= TIMER_FLAG;
-				update_irqstate();
-			}
-
-			/* if we finished finishing, switch to the idle state */
-			else if (m_timerstate == TIMER_FINISHING)
-			{
-				m_timerstate = TIMER_IDLE;
-				m_timer->adjust(attotime::never);
-			}
-			break;
+	/* if we finished finishing, switch to the idle state */
+	else if (m_timerstate == TIMER_FINISHING)
+	{
+		m_timerstate = TIMER_IDLE;
+		m_timer->adjust(attotime::never);
 	}
 }
 

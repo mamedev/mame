@@ -320,7 +320,7 @@ void beta_state::machine_start()
 	m_digits.resolve();
 	m_leds.resolve();
 
-	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
+	m_led_refresh_timer = timer_alloc(FUNC(beta_state::led_refresh), this);
 
 	m_eprom_rom.resize(0x800);
 

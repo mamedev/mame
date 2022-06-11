@@ -120,12 +120,6 @@ private:
 	void sound_portmap(address_map &map);
 	void system18_map(address_map &map);
 
-	// timer IDs
-	enum
-	{
-		TID_INITIAL_BOOST
-	};
-
 	// rom board types
 	enum segas18_rom_board
 	{
@@ -140,9 +134,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
+	TIMER_CALLBACK_MEMBER(initial_boost);
 	void init_generic(segas18_rom_board rom_board);
 	void set_vdp_mixing(uint8_t mixing);
 	void draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
@@ -176,14 +170,15 @@ private:
 	write16sm_delegate  m_custom_io_w;
 
 	// internal state
+	emu_timer *         m_init_boost_timer = nullptr;
 	int                 m_grayscale_enable = 0;
 	int                 m_vdp_enable = 0;
-	uint8_t               m_vdp_mixing = 0;
+	uint8_t             m_vdp_mixing = 0;
 	bitmap_ind16        m_temp_bitmap;
 
 	// game-specific state
-	uint8_t               m_lghost_value = 0;
-	uint8_t               m_lghost_select = 0;
+	uint8_t             m_lghost_value = 0;
+	uint8_t             m_lghost_select = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAS18_H

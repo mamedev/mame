@@ -59,12 +59,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_resolve_objects() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void subtract_from_counter(int counter, int count);
 	void tick(int counter, int count);
-	void timeout(int idx);
+	TIMER_CALLBACK_MEMBER(timeout);
 
 	uint16_t compute_counter(int counter) const;
 	void reload_count(int idx);

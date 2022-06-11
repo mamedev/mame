@@ -21,11 +21,6 @@
 class bublbobl_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_M68705_IRQ_ACK
-	};
-
 	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this, "videoram")
@@ -74,6 +69,7 @@ public:
 	uint8_t    m_port2_out = 0U;
 	uint8_t    m_port3_out = 0U;
 	uint8_t    m_port4_out = 0U;
+	emu_timer *m_irq_ack_timer = nullptr;
 	/* Bobble Bobble */
 	int      m_ic43_a = 0;
 	int      m_ic43_b = 0;
@@ -134,8 +130,9 @@ public:
 	void tokio_map_mcu(address_map &map);
 	void tokio_sound_map(address_map &map);
 	void tokio_subcpu_map(address_map &map);
+
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(irq_ack);
 };
 
 

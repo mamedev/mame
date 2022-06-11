@@ -865,13 +865,14 @@ float render_font::string_width(float height, float aspect, std::string_view str
 	char32_t schar;
 
 	// loop over characters
-	while (!string.empty())
+	int scharcount;
+	while ((scharcount = uchar_from_utf8(&schar, string)) != 0)
 	{
-		int scharcount = uchar_from_utf8(&schar, string);
+		if (0 > scharcount)
+			schar = 0xfffd;
+		string.remove_prefix((0 > scharcount) ? 1 : scharcount);
 		totwidth += get_char(schar).width;
-		string.remove_prefix(scharcount);
 	}
-
 
 	// scale the final result based on height
 	return float(totwidth) * m_scale * height * aspect;

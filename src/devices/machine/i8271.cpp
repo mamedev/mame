@@ -47,7 +47,7 @@ void i8271_device::device_start()
 
 	for(int i=0; i != 2; i++) {
 		char name[2];
-		flopi[i].tm = timer_alloc(i);
+		flopi[i].tm = timer_alloc(FUNC(i8271_device::floppy_tick), this);
 		flopi[i].id = i;
 		if(select_connected) {
 			name[0] = '0'+i;
@@ -316,7 +316,7 @@ void i8271_device::live_delay(int state)
 {
 	cur_live.next_state = state;
 	if(cur_live.tm != machine().time())
-		cur_live.fi->tm->adjust(cur_live.tm - machine().time());
+		cur_live.fi->tm->adjust(cur_live.tm - machine().time(), cur_live.fi->id);
 	else
 		live_sync();
 }
@@ -380,7 +380,7 @@ void i8271_device::live_run(attotime limit)
 			// infinity looking for data too.
 
 			limit = machine().time() + attotime::from_msec(1);
-			cur_live.fi->tm->adjust(attotime::from_msec(1));
+			cur_live.fi->tm->adjust(attotime::from_msec(1), cur_live.fi->id);
 		}
 	}
 
@@ -945,9 +945,9 @@ void i8271_device::seek_start(floppy_info &fi)
 	seek_continue(fi);
 }
 
-void i8271_device::delay_cycles(emu_timer *tm, int cycles)
+void i8271_device::delay_cycles(floppy_info &fi, int cycles)
 {
-	tm->adjust(attotime::from_double(double(cycles)/cur_rate));
+	fi.tm->adjust(attotime::from_double(double(cycles)/cur_rate), fi.id);
 }
 
 void i8271_device::seek_continue(floppy_info &fi)
@@ -960,7 +960,7 @@ void i8271_device::seek_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -977,7 +977,7 @@ void i8271_device::seek_continue(floppy_info &fi)
 					fi.pcn++;
 			} while((fi.pcn == fi.badtrack[0]) || (fi.pcn == fi.badtrack[1]));
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*srate);
+			delay_cycles(fi, 500*srate);
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1115,7 +1115,7 @@ void i8271_device::read_data_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1126,7 +1126,7 @@ void i8271_device::read_data_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*srate);
+			delay_cycles(fi, 500*srate);
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1256,7 +1256,7 @@ void i8271_device::write_data_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1267,7 +1267,7 @@ void i8271_device::write_data_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*srate);
+			delay_cycles(fi, 500*srate);
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1383,7 +1383,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1394,7 +1394,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*srate);
+			delay_cycles(fi, 500*srate);
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1476,7 +1476,7 @@ void i8271_device::read_id_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1487,7 +1487,7 @@ void i8271_device::read_id_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*srate);
+			delay_cycles(fi, 500*srate);
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1546,11 +1546,11 @@ std::string i8271_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(i8271_device::floppy_tick)
 {
 	live_sync();
 
-	floppy_info &fi = flopi[id];
+	floppy_info &fi = flopi[param];
 	switch(fi.sub_state) {
 	case SEEK_WAIT_STEP_SIGNAL_TIME:
 		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;

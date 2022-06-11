@@ -9849,11 +9849,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>
@@ -9879,11 +9879,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>

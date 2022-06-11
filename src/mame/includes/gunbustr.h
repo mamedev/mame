@@ -44,10 +44,20 @@ public:
 	void init_gunbustr();
 
 private:
-	enum
-	{
-		TIMER_GUNBUSTR_INTERRUPT5
-	};
+	virtual void video_start() override;
+
+	void gunbustr_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(trigger_irq5);
+
+	void motor_control_w(u32 data);
+	u32 gun_r();
+	void gun_w(u32 data);
+	u32 main_cycle_r();
+	void coin_word_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0480scp_device> m_tc0480scp;
@@ -64,20 +74,6 @@ private:
 	bool m_coin_lockout;
 	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
 	emu_timer *m_interrupt5_timer = nullptr;
-
-	void motor_control_w(u32 data);
-	u32 gun_r();
-	void gun_w(u32 data);
-	u32 main_cycle_r();
-	void coin_word_w(u8 data);
-	virtual void video_start() override;
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
-
-	void gunbustr_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_GUNBUSTR_H

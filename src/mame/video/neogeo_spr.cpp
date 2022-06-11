@@ -151,7 +151,7 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::auto_animation_timer_callback)
 
 void neosprite_base_device::create_auto_animation_timer()
 {
-	m_auto_animation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neosprite_base_device::auto_animation_timer_callback),this));
+	m_auto_animation_timer = timer_alloc(FUNC(neosprite_base_device::auto_animation_timer_callback), this);
 }
 
 
@@ -536,7 +536,7 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::sprite_line_timer_callback)
 
 void neosprite_base_device::create_sprite_line_timer()
 {
-	m_sprite_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neosprite_base_device::sprite_line_timer_callback),this));
+	m_sprite_line_timer = timer_alloc(FUNC(neosprite_base_device::sprite_line_timer_callback), this);
 }
 
 

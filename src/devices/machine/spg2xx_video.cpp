@@ -31,13 +31,13 @@ spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_t
 	m_guny_in(*this),
 	m_gunx_in(*this),
 	m_sprlimit_read_cb(*this),
+	m_video_irq_cb(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_scrollram(*this, "scrollram"),
 	m_hcompram(*this, "hcompram"),
 	m_paletteram(*this, "paletteram"),
 	m_spriteram(*this, "spriteram"),
-	m_video_irq_cb(*this),
 	m_renderer(*this, "renderer")
 {
 }
@@ -52,7 +52,7 @@ void spg2xx_video_device::device_start()
 	m_guny_in.resolve_safe(0);
 	m_gunx_in.resolve_safe(0);
 
-	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
+	m_screenpos_timer = timer_alloc(FUNC(spg2xx_video_device::screenpos_hit), this);
 	m_screenpos_timer->adjust(attotime::never);
 
 	save_item(NAME(m_video_regs));
@@ -463,24 +463,17 @@ void spg2xx_video_device::check_video_irq()
 	m_video_irq_cb((VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void spg2xx_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg2xx_video_device::screenpos_hit)
 {
-	switch (id)
+	if (VIDEO_IRQ_ENABLE & 2)
 	{
-		case TIMER_SCREENPOS:
-		{
-			if (VIDEO_IRQ_ENABLE & 2)
-			{
-				VIDEO_IRQ_STATUS |= 2;
-				check_video_irq();
-			}
-			m_screen->update_partial(m_screen->vpos());
-
-			// fire again, jak_dbz pinball needs this
-			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
-			break;
-		}
+		VIDEO_IRQ_STATUS |= 2;
+		check_video_irq();
 	}
+	m_screen->update_partial(m_screen->vpos());
+
+	// fire again, jak_dbz pinball needs this
+	m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 }
 
 

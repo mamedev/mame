@@ -169,7 +169,7 @@ namespace netlist::devices {
 		, m_A(*this, 0, "A{}", NETLIB_DELEGATE(addr))
 		, m_CEQ(*this, 1,
 			D::chip_enable_mask::value ^ static_cast<size_t>(0xffff), pstring("CE{}"),
-			std::array<nldelegate, 3>{ NETLIB_DELEGATE(ce<0>),
+			std::array<nl_delegate, 3>{ NETLIB_DELEGATE(ce<0>),
 			  NETLIB_DELEGATE(ce<1>),
 			  NETLIB_DELEGATE(ce<2>)})
 		, m_O(*this, D::data_name_offset::value, "O{}", m_TE())

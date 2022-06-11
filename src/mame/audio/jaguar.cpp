@@ -199,7 +199,7 @@ WRITE_LINE_MEMBER( jaguar_state::external_int )
 
 void jaguar_state::sound_start()
 {
-	m_serial_timer = timer_alloc(TID_SERIAL);
+	m_serial_timer = timer_alloc(FUNC(jaguar_state::serial_update), this);
 
 	m_gpu_irq_state = 0;
 
@@ -289,7 +289,7 @@ void jaguar_state::dsp_flags_w(address_space &space, offs_t offset, uint32_t dat
  *
  *************************************/
 
-void jaguar_state::serial_update()
+TIMER_CALLBACK_MEMBER(jaguar_state::serial_update)
 {
 	if (m_hacks_enabled)
 	{

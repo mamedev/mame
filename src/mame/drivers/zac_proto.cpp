@@ -385,6 +385,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state, empty_init, ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

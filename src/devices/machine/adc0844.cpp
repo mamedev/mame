@@ -67,7 +67,7 @@ void adc0844_device::device_start()
 	m_ch4_cb.resolve_safe(0xff);
 
 	// allocate timers
-	m_conversion_timer = timer_alloc();
+	m_conversion_timer = timer_alloc(FUNC(adc0844_device::conversion_complete), this);
 
 	// register for save states
 	save_item(NAME(m_channel));
@@ -100,10 +100,10 @@ uint8_t adc0844_device::clamp(int value)
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  conversion_complete - finish ADC conversion
 //-------------------------------------------------
 
-void adc0844_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(adc0844_device::conversion_complete)
 {
 	switch (m_channel)
 	{
@@ -132,7 +132,7 @@ void adc0844_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_intr_cb(ASSERT_LINE);
 }
 
-void adc0848_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(adc0848_device::conversion_complete)
 {
 	switch (m_channel)
 	{

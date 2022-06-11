@@ -541,20 +541,7 @@ void grmatch_state::xscroll_w(uint8_t data)
 }
 
 
-void grmatch_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PALETTE:
-		palette_update();
-		break;
-	default:
-		itech8_state::device_timer(timer, id, param);
-		break;
-	}
-}
-
-void grmatch_state::palette_update()
+TIMER_CALLBACK_MEMBER(grmatch_state::palette_update)
 {
 	/* if the high bit is set, we are supposed to latch the palette values */
 	if (m_palcontrol & 0x80)

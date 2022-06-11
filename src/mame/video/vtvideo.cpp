@@ -111,11 +111,11 @@ void vt100_video_device::device_start()
 	m_write_lba7.resolve_safe();
 
 	// LBA7 is scan line frequency update
-	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer = timer_alloc(FUNC(vt100_video_device::lba7_change), this);
 	m_lba7_change_timer->adjust(clocks_to_attotime(765), 0, clocks_to_attotime(765));
 
 	// LBA3 and LBA4 are first two stages of divide-by-17 counter
-	m_lba3_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba3_change), this));
+	m_lba3_change_timer = timer_alloc(FUNC(vt100_video_device::lba3_change), this);
 
 	screen().register_vblank_callback(vblank_state_delegate(&vt100_video_device::vblank_callback, this));
 

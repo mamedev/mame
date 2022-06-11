@@ -89,7 +89,7 @@ void cirrus_gd5428_device::device_start()
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
 	save_item(NAME(m_chip_id));
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 
 	m_chip_id = 0x98;  // GD5428 - Rev 0
 }

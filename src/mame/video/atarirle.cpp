@@ -470,7 +470,7 @@ void atari_rle_objects_device::sort_and_render()
 	// now loop back and process
 	int bitmap_index = (~m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2;
 	int count = 0;
-int hilite = -1;
+	int hilite = -1;
 	for (int order = 1; order < 256; order++)
 		for (sort_entry_t *current = list_head[order]; current != nullptr; current = current->next)
 		{
@@ -488,8 +488,8 @@ int hilite = -1;
 				int y = m_yposmask.extract(m_ram, current->entry);
 				int which = m_vrammask.extract(m_ram, current->entry);
 
-if (count++ == atarirle_hilite_index)
-	hilite = current->entry;
+				if (count++ == atarirle_hilite_index)
+					hilite = current->entry;
 
 				if (x & ((m_xposmask.mask() + 1) >> 1))
 					x = (s16)(x | ~m_xposmask.mask());

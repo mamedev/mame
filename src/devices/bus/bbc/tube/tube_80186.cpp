@@ -75,6 +75,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula, 0);
 	m_ula->pirq_handler().set(m_i80186, FUNC(i80186_cpu_device::int0_w));
 	m_ula->drq_handler().set(m_i80186, FUNC(i80186_cpu_device::drq0_w));
+	m_ula->prst_handler().set(FUNC(bbc_tube_80186_device::prst_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("512K");
@@ -167,6 +168,13 @@ void bbc_tube_pcplus_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_80186_device::prst_w)
+{
+	device_reset();
+
+	m_i80186->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_80186_device::host_r(offs_t offset)
 {

@@ -31,6 +31,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram_buffer(*this, "spriteram"),
 		m_fixvideoram(*this, "fixvideoram"),
 		m_fixcolorram(*this, "fixcolorram")
 	{ }
@@ -64,6 +65,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram_buffer;
 	optional_shared_ptr<uint8_t> m_fixvideoram;
 	optional_shared_ptr<uint8_t> m_fixcolorram;
 

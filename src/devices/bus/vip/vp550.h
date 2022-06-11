@@ -32,7 +32,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vip_expansion_card_interface overrides
@@ -41,14 +40,15 @@ protected:
 	virtual void vip_q_w(int state) override;
 	virtual void vip_run_w(int state) override;
 
+	TIMER_CALLBACK_MEMBER(sync_tick);
+
 private:
 	void octave_w(uint8_t data);
 	void vlmna_w(uint8_t data);
 	void vlmnb_w(uint8_t data);
 	void sync_w(uint8_t data);
 
-	required_device<cdp1863_device> m_pfg_a;
-	required_device<cdp1863_device> m_pfg_b;
+	required_device_array<cdp1863_device, 2> m_pfg;
 
 	// timers
 	emu_timer *m_sync_timer;

@@ -111,7 +111,6 @@ protected:
 	virtual void sound_start() override;
 	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void video_config(machine_config &config, const XTAL clock);
 
@@ -180,6 +179,9 @@ private:
 	uint32_t m_blitter_regs[40]{};
 	uint16_t m_gpu_regs[0x100/2]{};
 	emu_timer *m_object_timer = nullptr;
+	emu_timer *m_blitter_done_timer = nullptr;
+	emu_timer *m_pit_timer = nullptr;
+	emu_timer *m_gpu_sync_timer = nullptr;
 	uint8_t m_cpu_irq_state = 0;
 	bitmap_rgb32 m_screen_bitmap;
 	uint8_t m_blitter_status = 0;
@@ -251,7 +253,7 @@ private:
 	void jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t serial_r(offs_t offset);
 	void serial_w(offs_t offset, uint32_t data);
-	void serial_update();
+	TIMER_CALLBACK_MEMBER(serial_update);
 
 	// from video/jaguar.cpp
 	uint32_t blitter_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -261,6 +263,9 @@ private:
 	uint32_t cojag_gun_input_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jagpal_ycc(palette_device &palette) const;
+	TIMER_CALLBACK_MEMBER(blitter_done);
+	TIMER_CALLBACK_MEMBER(pit_update);
+	TIMER_CALLBACK_MEMBER(gpu_sync);
 
 	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
@@ -278,16 +283,6 @@ private:
 	void m68020_map(address_map &map);
 	void r3000_map(address_map &map);
 	void r3000_rom_map(address_map &map);
-
-	// timer IDs
-	enum
-	{
-		TID_SCANLINE,
-		TID_BLITTER_DONE,
-		TID_PIT,
-		TID_SERIAL,
-		TID_GPU_SYNC
-	};
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
@@ -310,7 +305,7 @@ private:
 	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
-	void scanline_update(int param);
+	TIMER_CALLBACK_MEMBER(scanline_update);
 	void set_palette(uint16_t vmode);
 
 	/* from jagobj.cpp */

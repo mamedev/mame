@@ -16,8 +16,6 @@ public:
 	virtual void maple_reset();
 
 protected:
-	enum { TIMER_ID = 1000 };
-
 	maple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t reply_size = 0;
@@ -26,9 +24,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	void reply_ready();
+	TIMER_CALLBACK_MEMBER(reply_ready);
 	void reply_ready_with_delay();
 
 	// Copy a string and complete it with spaces up to size len
