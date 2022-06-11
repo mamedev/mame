@@ -16,7 +16,6 @@
     - Netlist audio works but isn't quite right. The tone pot needs to
       be set to 17% for it to not cut out, and even then popping can be heard.
       Needs a look from someone with more analog knowledge than me.
-    - Add remaining games
 
     Expansion boards:
     Bus Extension
@@ -67,6 +66,7 @@
 #include "j_ewsdlx.lh"
 #include "j_la.lh"
 #include "j_lan.lh"
+#include "j_lc.lh"
 #include "j_lt.lh"
 #include "j_ndu.lh"
 #include "j_plus2.lh"
@@ -88,21 +88,24 @@ public:
 			m_digits(*this, "digit%u", 0U),
 			m_audio_in(*this, "nl_audio:in%u", 0U),
 			m_samples(*this, "samples"),
-			m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG),
+			m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
 			m_dips(*this, "DIP%u", 0U)
 	{ }
 
 	void jpmsru_3k(machine_config &config);
 	void jpmsru_3k_busext(machine_config &config);
 	void jpmsru_4k(machine_config &config);
+	void jpmsru_6k(machine_config &config);
 	void ewn(machine_config &config);
 	void ewn2(machine_config &config);
 	void ndu(machine_config &config);
 	void dud(machine_config &config);
 	void lan(machine_config &config);
+	void super2(machine_config &config);
 	void ews(machine_config &config);
 	void lt(machine_config &config);
 	void sup2p(machine_config &config);
+	void lc(machine_config &config);
 
 	void init_jpmsru();
 
@@ -114,6 +117,7 @@ private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
 
 	uint8_t inputs_r(offs_t offset);
+	uint8_t inputs_ext_r(offs_t offset);
 	void reel_w(offs_t offset, uint8_t data);
 	void update_int();
 	void audio_w(offs_t offset, uint8_t data);
@@ -130,12 +134,17 @@ private:
 	void out_disp_w(offs_t offset, uint8_t data);
 	void out_payout_cash_w(offs_t offset, uint8_t data);
 	void out_payout_token_w(offs_t offset, uint8_t data);
+	void out_payout_2x50p_a_w(offs_t offset, uint8_t data);
+	void out_payout_2x50p_b_w(offs_t offset, uint8_t data);
 	template<unsigned Meter> void out_meter_w(offs_t offset, uint8_t data);
 	void out_coin_lockout_w(offs_t offset, uint8_t data);
+	void out_10p_lockout_w(offs_t offset, uint8_t data);
 	void out_50p_lockout_w(offs_t offset, uint8_t data);
+	void out_logicext_w(offs_t offset, uint8_t data);
 
 	void jpmsru_3k_map(address_map &map);
 	void jpmsru_4k_map(address_map &map);
+	void jpmsru_6k_map(address_map &map);
 	void jpmsru_io(address_map &map);
 	void jpmsru_busext_io(address_map &map);
 	void outputs_ewn(address_map &map);
@@ -143,8 +152,10 @@ private:
 	void outputs_ndu(address_map &map);
 	void outputs_dud(address_map &map);
 	void outputs_lan(address_map &map);
+	void outputs_super2(address_map &map);
 	void outputs_ews(address_map &map);
 	void outputs_sup2p(address_map &map);
+	void outputs_lc(address_map &map);
 
 	bool m_int1;
 	bool m_int2;
@@ -155,6 +166,8 @@ private:
 	int m_disp_digit;
 	bool m_disp_d1;
 	bool m_disp_d2;
+	uint8_t m_logicext_addr;
+	bool m_logicext_data;
 	bool m_busext_bdir;
 	uint8_t m_busext_mode;
 	uint8_t m_busext_addr;
@@ -164,9 +177,9 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<3> m_inputs;
+	required_ioport_array<4> m_inputs;
 	required_device_array<stepper_device, 4> m_reel;
-	output_finder<56> m_lamp;
+	output_finder<104> m_lamp;
 	output_finder<2> m_digits;
 	required_device_array<netlist_mame_logic_input_device, 6> m_audio_in;
 	required_device<fruit_samples_device> m_samples;
@@ -193,6 +206,15 @@ void jpmsru_state::jpmsru_4k_map(address_map &map)
 	map(0x1000, 0x13ff).rom();
 	map(0x1400, 0x14ff).noprw(); // Unpopulated NVRAM
 	map(0x1800, 0x1bff).nopr(); // Unused ROM space, stops read spam
+}
+
+void jpmsru_state::jpmsru_6k_map(address_map &map)
+{
+	jpmsru_3k_map(map);
+
+	map(0x1000, 0x13ff).rom();
+	map(0x1400, 0x14ff).ram().share("nvram");
+	map(0x1800, 0x1fff).rom();
 }
 
 void jpmsru_state::jpmsru_io(address_map &map)
@@ -303,6 +325,13 @@ void jpmsru_state::outputs_lan(address_map &map)
 	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
 }
 
+void jpmsru_state::outputs_super2(address_map &map)
+{
+	outputs_lan(map);
+
+	map(0x5a, 0x5b).w(FUNC(jpmsru_state::out_50p_lockout_w));
+}
+
 void jpmsru_state::outputs_ews(address_map &map)
 {
 	jpmsru_io(map);
@@ -336,9 +365,43 @@ void jpmsru_state::outputs_sup2p(address_map &map)
 	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
 }
 
+void jpmsru_state::outputs_lc(address_map &map)
+{
+	jpmsru_io(map);
+
+	map(0x60, 0x6f).r(FUNC(jpmsru_state::inputs_ext_r)); // Input Extension
+
+	/* There are 2 outputs for each payout, labeled payout 1 and payout 2.
+	   Both are always written to at the same time. I'm using the first output for payouts. */
+	map(0x28, 0x29).nopw(); // 10p payout 2
+	map(0x2a, 0x2b).nopw(); // 2x50p A payout 2
+	map(0x30, 0x31).w(FUNC(jpmsru_state::out_meter_w<0>));
+	map(0x32, 0x33).w(FUNC(jpmsru_state::out_meter_w<1>));
+	map(0x34, 0x35).w(FUNC(jpmsru_state::out_meter_w<2>));
+	map(0x36, 0x37).w(FUNC(jpmsru_state::out_meter_w<3>));
+	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<4>));
+	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_payout_cash_w)); // 10p payout
+	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_payout_2x50p_a_w));
+	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_payout_2x50p_b_w));
+	map(0x40, 0x4b).w(FUNC(jpmsru_state::out_disp_w));
+	/* Manual calls this "Loudspeaker"
+	   It's toggled at a regular speed, not fast like a DAC, so looks like a
+	   fixed beeper of some kind. No other information on what this is. */
+	map(0x4e, 0x4f).nopw();
+	map(0x50, 0x61).w(FUNC(jpmsru_state::out_logicext_w));
+	map(0x62, 0x63).nopw(); // 2x50p B payout 2
+	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_10p_lockout_w));
+	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_50p_lockout_w));
+}
+
 uint8_t jpmsru_state::inputs_r(offs_t offset)
 {
 	return BIT(m_inputs[(offset & 0x18) >> 3]->read(), offset & 0x7);
+}
+
+uint8_t jpmsru_state::inputs_ext_r(offs_t offset)
+{
+	return BIT(m_inputs[3]->read(), offset);
 }
 
 void jpmsru_state::reel_w(offs_t offset, uint8_t data)
@@ -370,10 +433,10 @@ void jpmsru_state::out_disp_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0: m_disp_digit = (m_disp_digit & ~0x01) | (data ? 0x00 : 0x01); break;
-		case 1: m_disp_digit = (m_disp_digit & ~0x02) | (data ? 0x00 : 0x02); break;
-		case 2: m_disp_digit = (m_disp_digit & ~0x04) | (data ? 0x00 : 0x04); break;
-		case 3: m_disp_digit = (m_disp_digit & ~0x08) | (data ? 0x00 : 0x08); break;
+		case 0:
+		case 1:
+		case 2:
+		case 3: m_disp_digit = (m_disp_digit & ~(1 << offset)) | (data ? 0 : (1 << offset)); break;
 		case 4: m_disp_d1 = data; break;
 		case 5: m_disp_d2 = data; break;
 	}
@@ -400,6 +463,16 @@ void jpmsru_state::out_payout_token_w(offs_t offset, uint8_t data)
 	if(data) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
 }
 
+void jpmsru_state::out_payout_2x50p_a_w(offs_t offset, uint8_t data) // First 2x50p tube on Lucky Casino
+{
+	if(data) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+}
+
+void jpmsru_state::out_payout_2x50p_b_w(offs_t offset, uint8_t data) // Second 2x50p tube on Lucky Casino
+{
+	if(data) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+}
+
 void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, !data);
@@ -408,10 +481,32 @@ void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 	machine().bookkeeping().coin_lockout_w(3, !data);
 }
 
+void jpmsru_state::out_10p_lockout_w(offs_t offset, uint8_t data) // 10p lockout on Lucky Casino
+{
+	machine().bookkeeping().coin_lockout_w(0, !data);
+}
+
 void jpmsru_state::out_50p_lockout_w(offs_t offset, uint8_t data)
 {
 	// 50p is always coin 4
 	machine().bookkeeping().coin_lockout_w(3, !data);
+}
+
+void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 0: out_lamp_ext_w(m_logicext_addr, m_logicext_data); break; /* j_lc has solely lamps as outputs and is the only dumped
+																			game to use this, so keep things simple for now */
+		case 1: m_logicext_data = data; break;
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7: m_logicext_addr = (m_logicext_addr & ~(1 << (offset - 2))) | (data ? 0 : (1 << (offset - 2))); break;
+		case 8: m_logicext_addr = 0; break;
+	}
 }
 
 void jpmsru_state::audio_w(offs_t offset, uint8_t data)
@@ -536,6 +631,16 @@ static INPUT_PORTS_START( jpmsru_inputs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+
+	PORT_START("IN3") // Input Extension
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("POT")
 	PORT_ADJUSTER( 50, "Tone Pot" )  NETLIST_ANALOG_PORT_CHANGED("nl_audio", "pot")
@@ -787,7 +892,7 @@ static INPUT_PORTS_START( j_super2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ews )
@@ -926,6 +1031,55 @@ static INPUT_PORTS_START( j_la )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("1p")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( j_lc )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN0")
+	PORT_CONFNAME( 0x80, 0x80, "Game type" )
+	PORT_CONFSETTING(    0x00, "Club Casino (£50, 5p stake)" )
+	PORT_CONFSETTING(    0x80, "Lucky Casino (£100, 10p stake)" )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Self Test")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_DIPNAME( 0x80, 0x00, "Win Freeze" )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x00, "Test Hold" ) // Always gives holds if door is open
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Take Win")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_HALF ) PORT_NAME("Take Half")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gamble 8/1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gamble 4/1")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gamble Evens")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gamble Odds")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shuffle")
+	PORT_CONFNAME( 0x08, 0x08, "10p coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x08, "Full" )
+	PORT_CONFNAME( 0x10, 0x10, "50p coin tube A" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x10, "Full" )
+	PORT_CONFNAME( 0x20, 0x20, "50p coin tube B" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x20, "Full" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+INPUT_PORTS_END
+
 void jpmsru_state::machine_start()
 {
 	m_lamp.resolve();
@@ -1013,6 +1167,16 @@ void jpmsru_state::jpmsru_4k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_4k_map);
 }
 
+// SRU with 6K ROM card
+void jpmsru_state::jpmsru_6k(machine_config &config)
+{
+	jpmsru_3k(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_6k_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 // Game configs
 void jpmsru_state::ewn(machine_config &config)
 {
@@ -1044,6 +1208,12 @@ void jpmsru_state::lan(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lan);
 }
 
+void jpmsru_state::super2(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_super2);
+}
+
 void jpmsru_state::ews(machine_config &config)
 {
 	jpmsru_3k(config);
@@ -1060,6 +1230,12 @@ void jpmsru_state::sup2p(machine_config &config)
 {
 	jpmsru_3k(config);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_sup2p);
+}
+
+void jpmsru_state::lc(machine_config &config)
+{
+	jpmsru_6k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lc);
 }
 
 ROM_START( j_ewn )
@@ -1251,8 +1427,27 @@ ROM_START( j_la )
 	ROM_LOAD( "la.3", 0x0800, 0x400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
 ROM_END
 
+ROM_START( j_lc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lc8.a1", 0x0000, 0x400, CRC(48cf1e66) SHA1(22df81e7c82a009fbac0a3974f670d716820e6db) )
+	ROM_LOAD( "lc8.2", 0x0400, 0x400, CRC(bfc3065d) SHA1(8a80bd1bbd222c84c678c1117c1c0b1f72ed1ffe) )
+	ROM_LOAD( "lc8.3", 0x0800, 0x400, CRC(615e2942) SHA1(e5bf8247fe0362c85800110bdf1334492bb14d47) )
+	ROM_LOAD( "lc8.4", 0x1000, 0x400, CRC(950b393a) SHA1(74d6867d170fb74e183595b94c5aae5501e04b27) )
+	ROM_LOAD( "lc8.5", 0x1800, 0x400, CRC(76a720bc) SHA1(c7e6a8e2e2d1b5e6fcfd560ce7a93c4b5775cef8) )
+ROM_END
+
+ROM_START( j_lca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lc8.1", 0x0000, 0x400, CRC(ca6f21b8) SHA1(a538b6d02c44f13568a021ccc34d8deeae02e742) )
+	ROM_LOAD( "lc8.2", 0x0400, 0x400, CRC(bfc3065d) SHA1(8a80bd1bbd222c84c678c1117c1c0b1f72ed1ffe) )
+	ROM_LOAD( "lc8.3", 0x0800, 0x400, CRC(615e2942) SHA1(e5bf8247fe0362c85800110bdf1334492bb14d47) )
+	ROM_LOAD( "lc8.4", 0x1000, 0x400, CRC(950b393a) SHA1(74d6867d170fb74e183595b94c5aae5501e04b27) )
+	ROM_LOAD( "lc8.5", 0x1800, 0x400, CRC(76a720bc) SHA1(c7e6a8e2e2d1b5e6fcfd560ce7a93c4b5775cef8) )
+ROM_END
+
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND|MACHINE_SUPPORTS_SAVE
 
+// AWP
 GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
@@ -1267,7 +1462,7 @@ GAMEL( 1981?, j_dt,      j_dud,    dud,       j_dud2,        jpmsru_state, init_
 GAMEL( 1980?, j_lan,     0,        lan,       j_lan,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (revision 17F, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
 GAMEL( 1981?, j_lana,    j_lan,    lan,       j_lan2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_lan )
 GAMEL( 1980?, j_lanb,    j_lan,    lan,       j_lan,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
-GAMEL( 198?,  j_super2,  j_lan,    lan,       j_super2,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Super 2 (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_super2 ) // £1/2p rebuild of Lite A Nudge
+GAMEL( 198?,  j_super2,  j_lan,    super2,    j_super2,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Super 2 (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_super2 ) // £1/2p rebuild of Lite A Nudge
 GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 8A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13C, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
@@ -1279,3 +1474,6 @@ GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, init_
 GAMEL( 1983?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
 GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_jpmsru, ROT0, "Mdm", "Super 2p Shuffle (Mdm) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_sup2p )
 GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
+// Club
+GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc )
+GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C

@@ -154,9 +154,73 @@ const tiny_rom_entry *rom_ram_512k_device::device_rom_region() const
 	return ROM_NAME( rc2014_rom_ram_512k );
 }
 
+//**************************************************************************
+//  SC119 Z180 Memory module
+//  Module author: Stephen C Cousins
+//**************************************************************************
+
+class sc119_device : public device_t, public device_rc2014_rc80_card_interface
+{
+public:
+	// construction/destruction
+	sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	std::unique_ptr<u8[]> m_ram;
+	required_device<sst_39sf040_device> m_flash;
+};
+
+sc119_device::sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, RC2014_SC119, tag, owner, clock)
+	, device_rc2014_rc80_card_interface(mconfig, *this)
+	, m_ram(nullptr)
+	, m_flash(*this, "flash")
+{
+}
+
+void sc119_device::device_start()
+{
+	m_ram = std::make_unique<u8[]>(0x80000);
+	std::fill_n(m_ram.get(), 0x80000, 0xff);
+	save_pointer(NAME(m_ram), 0x80000);
+
+	// TODO: fix intelfsh
+	//m_bus->installer(AS_PROGRAM)->install_readwrite_handler(0x00000, 0x7ffff, read8sm_delegate(m_flash, FUNC(intelfsh8_device::read)), write8sm_delegate(m_flash, FUNC(intelfsh8_device::write)));
+	m_bus->installer(AS_PROGRAM)->install_readwrite_handler(0x00000, 0x7ffff, read8sm_delegate(m_flash, FUNC(intelfsh8_device::read_raw)), write8sm_delegate(m_flash, FUNC(intelfsh8_device::write_raw)));
+	m_bus->installer(AS_PROGRAM)->install_ram(0x80000, 0xfffff, m_ram.get());
+}
+
+void sc119_device::device_add_mconfig(machine_config &config)
+{
+	SST_39SF040(config, m_flash);
+}
+
+ROM_START(sc119_rom)
+	ROM_REGION( 0x80000, "flash", 0)
+	ROM_DEFAULT_BIOS("3.0.1")
+	ROM_SYSTEM_BIOS(0, "2.9.1", "Official RomWBW 2.9.1") // requires 38400 baudrate
+	ROMX_LOAD( "rcz180_nat_2_9_1.rom", 0x00000, 0x80000, CRC(a538538f) SHA1(8f989e7e777bd37fe552d55bc0b14771c4cb340b), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "3.0.0", "Official RomWBW 3.0.0")
+	ROMX_LOAD( "rcz180_nat_3_0_0.rom", 0x00000, 0x80000, CRC(9715e94e) SHA1(8dd7179a3bc471fb7fc1e5e2d1a930e8a858ab24), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "3.0.1", "Official RomWBW 3.0.1")
+	ROMX_LOAD( "rcz180_nat_3_0_1.rom", 0x00000, 0x80000, CRC(a6cb0d80) SHA1(cf4ad058931f0297fd2f8f81d15eb83ecbd29376), ROM_BIOS(2))
+ROM_END
+
+const tiny_rom_entry *sc119_device::device_rom_region() const
+{
+	return ROM_NAME( sc119_rom );
+}
+
 }
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_ROM_RAM_512, device_rc2014_card_interface, rom_ram_512k_device, "rc2014_rom_ram_512k", "RC2014 512K RAM / 512K Flash")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SC119, device_rc2014_rc80_card_interface, sc119_device, "sc119", "SC119 Z180 Memory module")

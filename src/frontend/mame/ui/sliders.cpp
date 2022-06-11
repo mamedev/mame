@@ -27,6 +27,7 @@ menu_sliders::menu_sliders(mame_ui_manager &mui, render_container &container, bo
 	set_one_shot(menuless_mode);
 	set_needs_prev_menu_item(!menuless_mode);
 	set_process_flags(PROCESS_LR_REPEAT | (m_hidden ? PROCESS_CUSTOM_ONLY : 0));
+	set_heading(_("Slider Controls"));
 }
 
 menu_sliders::~menu_sliders()

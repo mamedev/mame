@@ -194,13 +194,13 @@ function commonui.switch_polling_helper(starting_sequence)
 				return true
 			else
 				-- invalid sequence entered
-				machine:popmessage(_p('plugin-commonui', 'Invalid sequence entered'))
+				machine:popmessage(_p('plugin-commonui', 'Invalid combination entered'))
 				self.sequence = nil
 				return true
 			end
 		else
 			machine:popmessage(string.format(
-					_p('plugin-commonui', 'Enter sequence or press %s to cancel\n%s'),
+					_p('plugin-commonui', 'Enter combination or press %s to cancel\n%s'),
 					cancel_prompt,
 					input:seq_name(poller.sequence)))
 			return false

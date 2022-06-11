@@ -208,7 +208,7 @@ private:
 	u16 m_reg[64];
 	u64 m_cam[16];
 
-	// These wrappers are needed because some SONIC data is stored as 16-bit data stored on dword boundaries when in 32-bit mode
+	// These wrappers handle 16-bit data stored on 32-bit word boundaries when in 32-bit mode
 	u16 read_bus_word(offs_t address);
 	void write_bus_word(offs_t address, u16 data);
 };

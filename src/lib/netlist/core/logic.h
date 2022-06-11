@@ -36,7 +36,7 @@ namespace netlist
 		{
 			return plib::downcast<logic_net_t &>(core_terminal_t::net());
 		}
-		const logic_net_t & net() const noexcept
+		constexpr const logic_net_t & net() const noexcept
 		{
 			return plib::downcast<const logic_net_t &>(core_terminal_t::net());
 		}
@@ -52,14 +52,14 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nl_delegate delegate);
 
-		const netlist_sig_t &operator()() const noexcept
+		//const netlist_sig_t &operator()() const noexcept
+		constexpr netlist_sig_t operator()() const noexcept
 		{
 			gsl_Expects(terminal_state() != STATE_INP_PASSIVE);
-	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
-			return m_Q;
-	#else
-			return net().Q();
-	#endif
+			if constexpr (config::use_copy_instead_of_reference::value)
+				return m_Q_CIR;
+			else
+				return net().Q();
 		}
 
 		void inactivate() noexcept
@@ -97,6 +97,7 @@ namespace netlist
 				set_state(STATE_INP_LH);
 			}
 		}
+
 	};
 
 	// -----------------------------------------------------------------------------
@@ -120,14 +121,14 @@ namespace netlist
 
 		void initial(netlist_sig_t val) noexcept;
 
-		void push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
+		void push(netlist_sig_t newQ, const netlist_time &delay) noexcept
 		{
 			gsl_Expects(delay >= netlist_time::zero());
 
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 
-		void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
+		void set_Q_time(netlist_sig_t newQ, const netlist_time_ext &at) noexcept
 		{
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}

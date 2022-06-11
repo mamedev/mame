@@ -1034,6 +1034,28 @@ void mac_state::machine_start()
 	else
 		m_6015_timer = timer_alloc(FUNC(mac_state::oss_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_se30_vbl_enable));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(irq_count));
+	save_item(NAME(ca1_data));
+	save_item(NAME(ca2_data));
+	save_item(NAME(m_rbv_regs));
+	save_item(NAME(m_rbv_ier));
+	save_item(NAME(m_rbv_ifr));
+	save_item(NAME(m_rbv_colors));
+	save_item(NAME(m_rbv_count));
+	save_item(NAME(m_rbv_clutoffs));
+	save_item(NAME(m_rbv_palette));
+	save_item(NAME(m_sonora_vctl));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scsi_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_oss_regs));
+	save_item(NAME(m_via2_ca1_hack));
 }
 
 void mac_state::machine_reset()

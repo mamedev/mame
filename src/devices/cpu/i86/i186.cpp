@@ -152,6 +152,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_out_tmrout0_func(*this)
 	, m_out_tmrout1_func(*this)
 	, m_irmx_irq_cb(*this)
+	, m_irqa_cb(*this)
 	, m_irmx_irq_ack(*this)
 {
 }
@@ -724,6 +725,7 @@ void i80186_cpu_device::device_start()
 	m_read_slave_ack_func.resolve_safe(0);
 	m_out_chip_select_func.resolve_safe();
 	m_irmx_irq_cb.resolve_safe();
+	m_irqa_cb.resolve_safe();
 	m_irmx_irq_ack.resolve();
 }
 
@@ -886,6 +888,11 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
  *************************************/
 IRQ_CALLBACK_MEMBER(i80186_cpu_device::inta_callback)
 {
+	if (!m_irqa_cb.isnull()) // s-state 0 is irqack
+	{
+		m_irqa_cb(ASSERT_LINE);
+		m_irqa_cb(CLEAR_LINE);
+	}
 	if (BIT(m_reloc, 14))
 	{
 		if (!m_irmx_irq_ack.isnull())

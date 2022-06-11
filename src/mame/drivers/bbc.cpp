@@ -342,6 +342,10 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 		if (m_intube) m_intube->reset();
 		if (m_extube) m_extube->reset();
 		if (m_internal) m_internal->reset();
+		if (m_userport) m_userport->reset();
+		if (m_modem) m_modem->reset();
+		if (m_cart[0]) m_cart[0]->reset();
+		if (m_cart[1]) m_cart[0]->reset();
 	}
 }
 
@@ -1942,7 +1946,7 @@ void bbcm_state::mpc_prisma_default(device_t* device)
 }
 
 
-void bbcm_state::mpc800(machine_config& config)
+void bbcm_state::mpc800(machine_config &config)
 {
 	bbcm(config);
 	/* Acorn 65C102 co-processor */
@@ -1960,7 +1964,7 @@ void bbcm_state::mpc800(machine_config& config)
 }
 
 
-void bbcm_state::mpc900(machine_config& config)
+void bbcm_state::mpc900(machine_config &config)
 {
 	mpc800(config);
 	/* Prisma 3 */
@@ -1970,7 +1974,7 @@ void bbcm_state::mpc900(machine_config& config)
 }
 
 
-void bbcm_state::mpc900gx(machine_config& config)
+void bbcm_state::mpc900gx(machine_config &config)
 {
 	mpc800(config);
 	/* Prisma 3+ */

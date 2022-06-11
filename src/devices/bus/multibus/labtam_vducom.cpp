@@ -39,6 +39,7 @@ labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char c
 	, m_com(*this, "com%u", 0U)
 	, m_nvram(*this, "nvram%u", 0U)
 	, m_crtc(*this, "crtc")
+	, m_palette(*this, "palette")
 	, m_screen(*this, "screen")
 	, m_ram(*this, "ram%u", 0U)
 	, m_e4(*this, "E4")
@@ -77,6 +78,29 @@ static INPUT_PORTS_START(labtam_vducom)
 	PORT_DIPSETTING(0x40, DEF_STR(No))
 	PORT_DIPUNUSED_DIPLOC(0xa0, 0xa0, "E4:6,8")
 INPUT_PORTS_END
+
+static const gfx_layout vducom_char_set_1 =
+{
+	8, 12, 64, 1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8 },
+	8 * 12
+};
+
+static const gfx_layout vducom_char_set_2 =
+{
+	8, 12, 96, 1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8 },
+	8 * 12
+};
+
+static GFXDECODE_START(labtam_vducom)
+	GFXDECODE_ENTRY("eprom", 0xbc80, vducom_char_set_1, 0, 1)
+	GFXDECODE_ENTRY("eprom", 0xc100, vducom_char_set_2, 0, 1)
+GFXDECODE_END
 
 const tiny_rom_entry *labtam_vducom_device::device_rom_region() const
 {
@@ -152,9 +176,14 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
 
+	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1'000'000, 62*16, 2*16, 52*16, 78*4, 3*4, 75*4);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+
+	// gfxdecode is only to show the font data in the tile viewer
+	GFXDECODE(config, "gfx", m_palette, labtam_vducom);
 }
 
 void labtam_vducom_device::cpu_mem(address_map &map)
@@ -181,19 +210,26 @@ void labtam_vducom_device::cpu_pio(address_map &map)
 	map(0xec00, 0xec03).rw(m_ctc[1], FUNC(am9513_device::read8), FUNC(am9513_device::write8)).umask16(0x00ff);
 	map(0xee00, 0xefff).rw(FUNC(labtam_vducom_device::nvram_r), FUNC(labtam_vducom_device::nvram_w)).umask16(0x00ff);
 
-	map(0xf000, 0xf00f).rw(FUNC(labtam_vducom_device::u7_r), FUNC(labtam_vducom_device::u7_w)).umask16(0x00ff);
+	map(0xf000, 0xf00f).rw(FUNC(labtam_vducom_device::u15_r), FUNC(labtam_vducom_device::u7_w)).umask16(0x00ff);
 	map(0xf200, 0xf200).lw8([this](u8 data) { m_start = (m_start & 0xff00) | u16(data) << 0; }, "start_lo");
 	map(0xf400, 0xf400).lw8([this](u8 data) { m_start = (m_start & 0x00ff) | u16(data) << 8; }, "start_hi");
 	map(0xfe00, 0xfe00).lw8([this](u8 data) { m_nvram[0]->store(1); m_nvram[1]->store(1); }, "store_array");
+}
+
+void labtam_vducom_device::palette_init(palette_device &palette)
+{
+	// 0=black, 1=dim, 2=normal, 3=bold
+
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0x80, 0x80, 0x80));
+	palette.set_pen_color(2, rgb_t(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(3, rgb_t::white());
 }
 
 // non-interlace: two planes 800x300, each 32k, 2bpp -> 4 levels (black, dim, normal, bold)
 // interlace: one plane 800x600, 64k, (black, normal)
 MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 {
-	// 0=black, 1=dim, 2=normal, 3=bold
-	static const rgb_t color[4] = { rgb_t::black(), rgb_t(0x80,0x80,0x80), rgb_t(0xc0,0xc0,0xc0), rgb_t::white() };
-
 	required_shared_ptr<u16> const ram = m_ram[BIT(m_u7, 2)];
 	offs_t const offset = (m_start >> 1) + ma * 4 + ra * 50;
 
@@ -208,7 +244,7 @@ MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 			if (m_u7 & U7_HALF)
 				c |= BIT(data1, b);
 
-			bitmap.pix(y, x * 16 + b) = color[c];
+			bitmap.pix(y, x * 16 + b) = m_palette->pen_color(c);
 		}
 	}
 }

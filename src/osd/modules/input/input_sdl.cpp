@@ -965,10 +965,7 @@ public:
 		for (int button = 0; button < 4; button++)
 		{
 			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
-			char defname[20];
-			snprintf(defname, sizeof(defname), "B%d", button + 1);
-
-			devinfo.device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
+			devinfo.device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
 		}
 
 		osd_printf_verbose("Mouse: Registered %s\n", devinfo.name());
@@ -1144,8 +1141,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_SWITCH;
 
-				snprintf(tempname, sizeof(tempname), "Button %d", button + 1);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
+				devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
 			}
 
 			// loop over all hats

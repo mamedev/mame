@@ -235,12 +235,12 @@ namespace netlist
 		/// \brief prior to running free no longer needed resources
 		///
 		void free_setup_resources();
-
-		std::vector<detail::core_terminal_t *> &core_terms(const detail::net_t &net) noexcept
+#if !(NL_USE_INPLACE_CORE_TERMS)
+		std::vector<detail::core_terminal_t *> &core_terms(const detail::net_t &net)
 		{
 			return m_core_terms[&net];
 		}
-
+#endif
 	private:
 
 		device_arena                               m_pool; // must be deleted last!
@@ -258,8 +258,10 @@ namespace netlist
 		devices_collection_type                    m_devices;
 		// sole use is to manage lifetime of family objects
 		family_collection_type                     m_family_cache;
+#if !(NL_USE_INPLACE_CORE_TERMS)
 		// all terms for a net
 		std::unordered_map<const detail::net_t *, std::vector<detail::core_terminal_t *>> m_core_terms;
+#endif
 		// dummy version
 		int                                        m_dummy_version;
 	};

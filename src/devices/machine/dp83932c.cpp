@@ -223,31 +223,26 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 	switch (offset)
 	{
 	case CR:
+		if (m_reg[CR] & CR_RST)
 		{
-			if (m_reg[CR] & CR_RST)
+			if (!(data & CR_RST))
 			{
-				if (!(data & CR_RST))
-				{
-					LOGMASKED(LOG_COMMAND, "exit software reset\n");
+				LOGMASKED(LOG_COMMAND, "exit software reset\n");
 
-					m_reg[CR] &= ~CR_RST;
-				}
-
-				return;
+				m_reg[CR] &= ~CR_RST;
 			}
+		}
+		else if (data & CR_RST)
+		{
+			LOGMASKED(LOG_COMMAND, "enter software reset\n");
 
-			if (data & CR_RST)
-			{
-				LOGMASKED(LOG_COMMAND, "enter software reset\n");
+			m_command->adjust(attotime::never);
 
-				m_command->adjust(attotime::never);
-
-				m_reg[CR] &= ~(CR_LCAM | CR_RRRA | CR_TXP | CR_HTX);
-				m_reg[CR] |= (CR_RST | CR_RXDIS);
-
-				return;
-			}
-
+			m_reg[CR] &= ~(CR_LCAM | CR_RRRA | CR_TXP | CR_HTX);
+			m_reg[CR] |= (CR_RST | CR_RXDIS);
+		}
+		else
+		{
 			u16 cmd_to_run = data & regmask[offset];
 			if (m_reg[CR] & CR_TXP)
 			{
@@ -260,9 +255,9 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 			}
 			m_reg[offset] |= data & regmask[offset];
 			m_command->adjust(attotime::zero, cmd_to_run);
-
-			break;
 		}
+		break;
+
 	case RCR:
 		m_reg[offset] = (m_reg[offset] & ~regmask[offset]) | (data & regmask[offset]);
 		set_loopback(bool(m_reg[offset] & RCR_LB));

@@ -25,35 +25,16 @@ namespace netlist
 		core_device_t(netlist_state_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
-		PCOPYASSIGNMOVE(core_device_t, delete)
+		core_device_t(const core_device_t &) = delete;
+		core_device_t &operator=(const core_device_t &) = delete;
+		core_device_t(core_device_t &&) noexcept = delete;
+		core_device_t &operator=(core_device_t &&) noexcept = delete;
 
 		virtual ~core_device_t() noexcept = default;
 
-		void do_inc_active() noexcept
-		{
-			gsl_Expects(m_active_outputs >= 0);
+		void do_inc_active() noexcept;
 
-			if (!m_activate.isnull() && m_hint_deactivate)
-			{
-				if (++m_active_outputs == 1)
-				{
-					if (m_stats)
-						m_stats->m_stat_inc_active.inc();
-					m_activate(true);//inc_active();
-				}
-			}
-		}
-
-		void do_dec_active() noexcept
-		{
-			gsl_Expects(m_active_outputs >= 1);
-
-			if (!m_activate.isnull() && m_hint_deactivate)
-				if (--m_active_outputs == 0)
-				{
-					m_activate(false); //dec_active();
-				}
-		}
+		void do_dec_active() noexcept;
 
 		void set_hint_deactivate(bool v) noexcept { m_hint_deactivate = v; }
 		bool get_hint_deactivate() const noexcept { return m_hint_deactivate; }
@@ -94,10 +75,38 @@ namespace netlist
 		virtual bool is_time_step() const noexcept { return false; }
 
 	private:
+		// FIXME: should this be a state_var?
 		bool            m_hint_deactivate;
 		state_var_s32   m_active_outputs;
 		device_arena::unique_ptr<stats_t> m_stats;
 	};
+
+	inline void core_device_t::do_inc_active() noexcept
+	{
+		gsl_Expects(m_active_outputs >= 0);
+
+		if (!m_activate.isnull() && m_hint_deactivate)
+		{
+			if (++m_active_outputs == 1)
+			{
+				if (m_stats)
+					m_stats->m_stat_inc_active.inc();
+				m_activate(true);//inc_active();
+			}
+		}
+	}
+
+	inline void core_device_t::do_dec_active() noexcept
+	{
+		gsl_Expects(m_active_outputs >= 1);
+
+		if (!m_activate.isnull() && m_hint_deactivate)
+			if (--m_active_outputs == 0)
+			{
+				m_activate(false); //dec_active();
+			}
+	}
+
 
 	// -----------------------------------------------------------------------------
 	// base_device_t

@@ -39,7 +39,7 @@ private:
 };
 #endif
 
-pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
+pfmt::rtype pfmt::set_format(std::stringstream &strm, char32_t cfmt_spec)
 {
 	pstring fmt;
 	pstring search("{");

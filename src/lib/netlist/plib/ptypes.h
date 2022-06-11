@@ -57,6 +57,12 @@ namespace plib
 
 	struct plog_level;
 
+	template <typename A, typename T>
+	class timed_queue_linear;
+
+	template <typename A, typename T>
+	class timed_queue_heap;
+
 	namespace detail
 	{
 		class token_store_t;
@@ -227,9 +233,9 @@ namespace plib
 		using mingw = std::integral_constant<bool, false>;
 	#endif
 	#if defined(__APPLE__)
-		using clang_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::full::value < 110003)>;
 	#else
-		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 8)>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 9)>;
 	#endif
 	#if defined(__ia64__)
 		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;

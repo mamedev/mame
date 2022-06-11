@@ -123,6 +123,7 @@ unkpacg                         // (c) 19?? ???
 unkpacga                        //
 unkpacgb                        //
 unkpacgc                        //
+unkpacgd                        //
 unksig                          // 1998?
 unksiga                         // 1998?
 unksigb                         // 1998?
@@ -11826,6 +11827,7 @@ dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
 
 @source:dangbar.cpp
+bellybmbr                       //
 dangbar                         //
 sspanic                         //
 
@@ -13374,6 +13376,10 @@ ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 @source:efdt.cpp
 efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
 
+@source:efg8080.cpp
+blackhol
+foolrace
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 
@@ -14254,6 +14260,9 @@ pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 @source:freeway.cpp
 freeway
 freewaya
+
+@source:frenzyxprss.cpp
+frenzyxprss                     // (c) 2001 ICE / Uniana
 
 @source:fresh.cpp
 fresh                           // (c) Chain Leisure
@@ -16438,10 +16447,6 @@ hcastlek                        // GX768 (c) 1988
 @source:hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:headonb.cpp
-blackhol
-foolrace                        // bootleg
-
 @source:hec2hrp.cpp
 hec2hr                          //
 hec2hrp                         //
@@ -17294,10 +17299,11 @@ wlcc                            // (c) 1996
 xymg                            // (c) 1996
 
 @source:igs017.cpp
+cpoker2                         // (c) 2000?
 genius6                         // (c) 1998
 genius6a                        // (c) 1997
 genius6b                        // (c) 1997
-happyskl                        // (c) 2001?
+happyskl                        // (c) 2000?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 lhzb2                           // (c) 1998
@@ -17307,13 +17313,12 @@ mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
 slqz2                           // (c) 1998
-spkrform                        // (c) ????
+spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
 tarzan                          // (c) 1999
 tarzana                         // (c) 1999
 tarzanc                         // (c) 1999
 tjsb                            // (c) 1997
-unkigs                          // (c) 2001?
 
 @source:igspc.cpp
 eztouch                         // (c) 200?
@@ -19130,32 +19135,34 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
+j_dt                            // Double Top (JPM)
+j_dud                           // Nudge Double Up Deluxe (JPM)
+j_duda                          //
+j_dudb                          //
 j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
 j_ewnc                          //
-j_ndu                           // Nudge Double Up (JPM)
-j_ndua                          //
-j_ndub                          //
-j_dud                           // Nudge Double Up Deluxe (JPM)
-j_duda                          //
-j_dudb                          //
-j_dt                            //
-j_lan                           // Lite A Nudge (JPM)
-j_lana                          //
-j_lanb                          //
-j_super2                        // Super 2
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
-j_ssh                           // Silver Shuffle (CTL)
-j_lt                            // Lucky 2's (JPM)
-j_ts                            //
-j_plus2                         // Plus 2 (CTL)
 j_goldn2                        // Golden 2's (CTL)
-j_sup2p                         // Super 2p Shuffle (MDM)
 j_la                            // Lucky Aces
+j_lan                           // Lite A Nudge (JPM)
+j_lana                          //
+j_lanb                          //
+j_lc                            // Lucky Casino (JPM)
+j_lca                           //
+j_lt                            // Lucky 2's (JPM)
+j_ndu                           // Nudge Double Up (JPM)
+j_ndua                          //
+j_ndub                          //
+j_plus2                         // Plus 2 (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
+j_super2                        // Super 2
+j_ts                            // Two Step (JPM)
 
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
@@ -19739,6 +19746,7 @@ gs471
 crossmg2
 dobouchn
 fruitsmg
+ggoemon
 kattobas
 koropens
 kzaurus
@@ -20529,6 +20537,7 @@ kidnikib                        // bootleg
 kidnikiu                        // (c) 1986 + Data East USA license
 kungfub                         // bootleg
 kungfub2                        // bootleg
+kungfub3s                       // bootleg
 kungfum                         // (c) 1984
 kungfumd                        // (c) 1984 + Data East license
 ldrun                           // (c) 1984 licensed from Broderbund
@@ -23354,6 +23363,7 @@ mondl68k                        // 1988 Mephisto Mondial 68000XL
 @source:mephisto_montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
+montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
@@ -35746,6 +35756,7 @@ hb_jailb                        // Jail Break (Qps)
 hb_jailba                       //
 hb_jkrwl                        // Jokers Wild (Fairgames)
 hb_jkrwla                       //
+hb_junglet                      // Jungle Treasures (Sega)
 hb_medal                        // Medallion Job (Qps)
 hb_mrmon                        // Mr. Money (Qps)
 hb_mrmona                       //
@@ -35899,7 +35910,6 @@ poly61                          //
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
-pongf                           // (c) 1972 Atari
 rebound                         //
 
 @source:poolshrk.cpp
@@ -37548,6 +37558,9 @@ savia84                         //
 @source:savquest.cpp
 savquest                        //
 
+@source:sb180.cpp
+sb180                          //
+
 @source:sb8085.cpp
 sb8085                          //
 
@@ -37814,6 +37827,10 @@ slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
 
+@source:segafruit.cpp
+m3001
+m4001
+
 @source:segag80r.cpp
 005                             // (c) 1981
 astrob                          // (c) 1981
@@ -37874,10 +37891,6 @@ cobraseg                        // (c) ????
 galaxyr                         // (c) 1983
 galaxyrp                        // (c) 1983
 sblazerp                        // (c) 1983
-
-@source:segam1.cpp
-bingpty                         // ?
-unkm1                           // ?
 
 @source:segaorun.cpp
 outrun                          // Revision B
@@ -38046,7 +38059,6 @@ hwchamp                         // (c) 1987 (Unprotected)
 hwchampa                        // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
-isgsm                           //
 lockonph                        //
 mvp                             // (c) 1989 (FD1094)
 mvpd                            //
@@ -38069,7 +38081,6 @@ sdibl3                          // bootleg
 sdibl4                          // bootleg
 sdibl5                          // bootleg
 sdibl6                          // bootleg
-shinfz                          //
 shinobi2                        // (c) 1987 (FD1094)
 shinobi2d                       //
 shinobi3                        // (c) 1987 (MC-8123B)
@@ -38081,7 +38092,6 @@ snapper                         // (c) 1990 Philko - korean clone board
 sonicbom                        // (c) 1987 (FD1094)
 sonicbomd                       //
 suprleag                        // (c) 1987 (FD1094)
-tetrbx                          //
 tetris1                         // (c) 1988 (FD1094) S16B
 tetris1d                        //
 tetris2                         // (c) 1988 (FD1094) S16B
@@ -38103,6 +38113,11 @@ wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
+
+@source:segas16b_isgsm.cpp
+isgsm                           //
+shinfz                          //
+tetrbx                          //
 
 @source:segas18.cpp
 astorm                          // 1990.?? Alien Storm (World, FD1094, 2 Players)
@@ -38250,6 +38265,12 @@ svs                             // 1994.?? Super Visual Soccer
 titlef                          // 1993.?? Title Fight (World)
 titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
+
+@source:segasm1.cpp
+tinkerbl                        // (c) 1990 Sega
+blicks							// (c) 1991 Sega
+unkm1                           // (c) 1992 Sega
+bingpty                         // (c) 1994 Sega
 
 @source:segasp.cpp
 aminosan                        // 2010.?? Aminosan (satellite)
@@ -43697,6 +43718,7 @@ nbaf_31a                        //
 ngg_10                          //
 ngg_13                          //
 ngg_p06                         //
+ph_04                           //
 sc_091                          //
 sc_10                           //
 sc_14                           //
@@ -43914,6 +43936,7 @@ ts_lm6                          //
 ts_lx4                          //
 ts_lx5                          //
 ts_pa1                          //
+wcs_l1                          //
 wcs_l2                          //
 wcs_la2                         //
 wcs_p2                          //
@@ -44630,3 +44653,9 @@ rc2014zed                       // RC2014 Zed
 rc2014zedp                      // RC2014 Zed Pro
 rc2014mini                      // RC2014 Mini
 rc2014minicpm                   // RC2014 Mini with CP/M upgrade
+rc2014micro                     // RC2014 Micro
+sc105                           // SC105 - Modular Backplane (RC2014)
+sc112                           // SC112 - Modular Backplane (RC2014)
+sc116                           // SC116 - Modular Backplane (RC2014)
+sc133                           // SC133 - Modular Backplane (RC2014)
+sc203                           // SC203 - Modular Z180 Computer
