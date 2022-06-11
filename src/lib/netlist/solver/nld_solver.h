@@ -29,7 +29,7 @@ namespace netlist::devices
 	{
 	public:
 		using solver_arena = device_arena;
-		using queue_type = detail::queue_base<solver_arena, solver::matrix_solver_t, false>;
+		using queue_type = detail::queue_base<solver_arena, solver::matrix_solver_t>;
 
 		NETLIB_CONSTRUCTOR(solver)
 		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))

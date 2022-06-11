@@ -543,8 +543,8 @@ namespace analog
 		const nl_fptype gbs = nlconst::zero();
 #endif
 		// exchange controlling nodes if necessary
-		const nl_fptype gsource = is_forward ? (gm + gmb) : nlconst::zero();
-		const nl_fptype gdrain  = is_forward ? nlconst::zero() : (gm + gmb);
+		const nl_fptype gate_source = is_forward ? (gm + gmb) : nlconst::zero();
+		const nl_fptype gate_drain  = is_forward ? nlconst::zero() : (gm + gmb);
 
 		const nl_fptype IeqDS = (is_forward) ?
 			   Ids - gm * Vgs - gmb * Vbs - gds * Vds
@@ -562,13 +562,13 @@ namespace analog
 		nl_fptype gGB = nlconst::zero();
 
 		nl_fptype gDG =  gm;
-		nl_fptype gDD =  gds + gbd - gdrain;
-		const nl_fptype gDS = -gds - gsource;
+		nl_fptype gDD =  gds + gbd - gate_drain;
+		const nl_fptype gDS = -gds - gate_source;
 		const nl_fptype gDB =  gmb - gbd;
 
 		nl_fptype gSG = -gm;
-		const nl_fptype gSD = -gds + gdrain;
-		nl_fptype gSS =  gbs + gds + gsource;
+		const nl_fptype gSD = -gds + gate_drain;
+		nl_fptype gSS =  gbs + gds + gate_source;
 		const nl_fptype gSB = -gbs - gmb;
 
 		nl_fptype gBG =  nlconst::zero();

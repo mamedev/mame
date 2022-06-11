@@ -172,8 +172,8 @@ namespace plib
 		}
 
 		constexpr double as_double() const noexcept { return as_fp<double>(); }
-		constexpr double as_float() const noexcept { return as_fp<float>(); }
-		constexpr double as_long_double() const noexcept { return as_fp<long double>(); }
+		constexpr float as_float() const noexcept { return as_fp<float>(); }
+		constexpr long double as_long_double() const noexcept { return as_fp<long double>(); }
 
 
 		constexpr ptime shl(unsigned shift) const noexcept { return ptime(m_time << shift); }

@@ -57,6 +57,12 @@ namespace plib
 
 	struct plog_level;
 
+	template <typename A, typename T>
+	class timed_queue_linear;
+
+	template <typename A, typename T>
+	class timed_queue_heap;
+
 	namespace detail
 	{
 		class token_store_t;

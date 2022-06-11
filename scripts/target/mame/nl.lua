@@ -146,8 +146,8 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.h",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",

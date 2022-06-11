@@ -28,6 +28,8 @@ namespace plib {
 	template <typename Time, typename Element>
 	struct queue_entry_t final
 	{
+		using element_type = Element;
+
 		constexpr queue_entry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr queue_entry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
 
@@ -67,8 +69,7 @@ namespace plib {
 		Element m_object;
 	};
 
-	// Use TS = true for a threadsafe queue
-	template <class A, class T, bool TS>
+	template <class A, class T>
 	class timed_queue_linear
 	{
 	public:
@@ -80,94 +81,34 @@ namespace plib {
 		}
 		~timed_queue_linear() = default;
 
-		PCOPYASSIGNMOVE(timed_queue_linear, delete)
+		timed_queue_linear(const timed_queue_linear &) = delete;
+		timed_queue_linear &operator=(const timed_queue_linear &) = delete;
+		timed_queue_linear(timed_queue_linear &&) noexcept = delete;
+		timed_queue_linear &operator=(timed_queue_linear &&) noexcept = delete;
 
-		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
-		bool empty() const noexcept { return (m_end == &m_list[1]); }
+		constexpr std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
+		constexpr bool empty() const noexcept { return (m_end == &m_list[1]); }
 
 		template<bool KEEPSTAT, typename... Args>
-		void emplace(Args&&... args) noexcept
-		{
-			// Lock
-			lock_guard_type lck(m_lock);
-			T * i(m_end++);
-			*i = T(std::forward<Args>(args)...);
-
-			if (!KEEPSTAT)
-			{
-				for (; *(i-1) < *i; --i)
-				{
-					std::swap(*(i-1), *(i));
-				}
-			}
-			else
-			{
-				for (; *(i-1) < *i; --i)
-				{
-					std::swap(*(i-1), *(i));
-					m_prof_sortmove.inc();
-				}
-				m_prof_call.inc();
-			}
-		}
+		constexpr void emplace (Args&&... args) noexcept;
 
 		template<bool KEEPSTAT>
-		void push(T && e) noexcept
+		constexpr void push(T && e) noexcept;
+
+		constexpr void pop() noexcept       { --m_end; }
+
+		constexpr const T &top() const noexcept { return *(m_end-1); }
+
+		constexpr bool exists(const typename T::element_type &elem) const noexcept;
+
+		template <bool KEEPSTAT>
+		constexpr void remove(const T &elem) noexcept;
+
+		template <bool KEEPSTAT>
+		constexpr void remove(const typename T::element_type &elem) noexcept;
+
+		constexpr void clear() noexcept
 		{
-#if 0
-			// Lock
-			lock_guard_type lck(m_lock);
-			T * i(m_end-1);
-			for (; *i < e; --i)
-			{
-				*(i+1) = *(i);
-				if (KEEPSTAT)
-					m_prof_sortmove.inc();
-			}
-			*(i+1) = std::move(e);
-			++m_end;
-#else
-			// Lock
-			lock_guard_type lck(m_lock);
-			T * i(m_end++);
-			*i = std::move(e);
-			for (; *(i-1) < *i; --i)
-			{
-				std::swap(*(i-1), *(i));
-				if (KEEPSTAT)
-					m_prof_sortmove.inc();
-			}
-#endif
-			if (KEEPSTAT)
-				m_prof_call.inc();
-		}
-
-		void pop() noexcept       { --m_end; }
-
-		const T &top() const noexcept { return *(m_end-1); }
-
-		template <bool KEEPSTAT, class R>
-		void remove(const R &elem) noexcept
-		{
-			// Lock
-			lock_guard_type lck(m_lock);
-			if (KEEPSTAT)
-				m_prof_remove.inc();
-			for (T * i = m_end - 1; i > &m_list[0]; --i)
-			{
-				// == operator ignores time!
-				if (*i == elem)
-				{
-					std::copy(i+1, m_end--, i);
-					return;
-				}
-			}
-			//printf("Element not found in delete %s\n", elem->name().c_str());
-		}
-
-		void clear() noexcept
-		{
-			lock_guard_type lck(m_lock);
 			m_end = &m_list[0];
 			// put an empty element with maximum time into the queue.
 			// the insert algo above will run into this element and doesn't
@@ -179,26 +120,135 @@ namespace plib {
 
 		// save state support & mame disassembler
 
-		const T *list_pointer() const noexcept { return &m_list[1]; }
-		std::size_t size() const noexcept { return narrow_cast<std::size_t>(m_end - &m_list[1]); }
-		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
-	private:
-		using mutex_type       = pspin_mutex<TS>;
-		using lock_guard_type  = std::lock_guard<mutex_type>;
+		constexpr const T *list_pointer() const noexcept { return &m_list[1]; }
+		constexpr std::size_t size() const noexcept { return narrow_cast<std::size_t>(m_end - &m_list[1]); }
+		constexpr const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 
-		mutex_type               m_lock;
+	private:
+		PALIGNAS(PALIGN_CACHELINE)
 		T *                      m_end;
-		plib::arena_vector<A, T> m_list;
+		plib::arena_vector<A, T, PALIGN_CACHELINE> m_list;
 
 	public:
 		// profiling
 		// FIXME: Make those private
-		pperfcount_t<true> m_prof_sortmove; // NOLINT
+		pperfcount_t<true> m_prof_sort_move; // NOLINT
 		pperfcount_t<true> m_prof_call; // NOLINT
 		pperfcount_t<true> m_prof_remove; // NOLINT
 	};
 
-	template <class A, class T, bool TS>
+	template <class A, class T>
+	template<bool KEEPSTAT, typename... Args>
+	inline constexpr void timed_queue_linear<A, T>::emplace (Args&&... args) noexcept
+	{
+		T * i(m_end);
+		*i = T(std::forward<Args>(args)...);
+		//if (i->object() != nullptr && exists(i->object()))
+		//  printf("Object exists %s\n", i->object()->name().c_str());
+		m_end++;
+		if constexpr (!KEEPSTAT)
+		{
+			for (; *(i-1) < *i; --i)
+			{
+				std::swap(*(i-1), *(i));
+			}
+		}
+		else
+		{
+			for (; *(i-1) < *i; --i)
+			{
+				std::swap(*(i-1), *(i));
+				m_prof_sort_move.inc();
+			}
+			m_prof_call.inc();
+		}
+	}
+
+	template <class A, class T>
+	template<bool KEEPSTAT>
+	inline constexpr void timed_queue_linear<A, T>::push(T && e) noexcept
+	{
+#if 0
+		// The code is not as fast as the code path which is enabled.
+		// It is left here in case on a platform different to x64 it may
+		// be faster.
+		T * i(m_end-1);
+		for (; *i < e; --i)
+		{
+			*(i+1) = *(i);
+			if (KEEPSTAT)
+				m_prof_sort_move.inc();
+		}
+		*(i+1) = std::move(e);
+		++m_end;
+#else
+		//if (e.object() != nullptr && exists(e.object()))
+		//  printf("Object exists %s\n", e.object()->name().c_str());
+		T * i(m_end++);
+		*i = std::move(e);
+		for (; *(i-1) < *i; --i)
+		{
+			std::swap(*(i-1), *(i));
+			if constexpr (KEEPSTAT)
+				m_prof_sort_move.inc();
+		}
+#endif
+		if constexpr (KEEPSTAT)
+			m_prof_call.inc();
+	}
+
+	template <class A, class T>
+	template <bool KEEPSTAT>
+	inline constexpr void timed_queue_linear<A, T>::remove(const T &elem) noexcept
+	{
+		if constexpr (KEEPSTAT)
+			m_prof_remove.inc();
+		for (T * i = m_end - 1; i > &m_list[0]; --i)
+		{
+			// == operator ignores time!
+			if (*i == elem)
+			{
+				std::copy(i+1, m_end--, i);
+				return;
+			}
+		}
+		//printf("Element not found in delete %s\n", elem->name().c_str());
+	}
+
+	template <class A, class T>
+	template <bool KEEPSTAT>
+	inline constexpr void timed_queue_linear<A, T>::remove(const typename T::element_type &elem) noexcept
+	{
+		if constexpr (KEEPSTAT)
+			m_prof_remove.inc();
+		for (T * i = m_end - 1; i > &m_list[0]; --i)
+		{
+			// == operator ignores time!
+			if (*i == elem)
+			{
+				std::copy(i+1, m_end--, i);
+				return;
+			}
+		}
+		//printf("Element not found in delete %s\n", elem->name().c_str());
+	}
+
+	template <class A, class T>
+	inline constexpr bool timed_queue_linear<A, T>::exists(const typename T::element_type &elem) const noexcept
+	{
+		for (T * i = &m_list[1]; i < m_end; ++i)
+		{
+			if (*i == elem)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
+	template <class A, class T>
 	class timed_queue_heap
 	{
 	public:
@@ -223,8 +273,6 @@ namespace plib {
 		template<bool KEEPSTAT, typename... Args>
 		void emplace(Args&&... args) noexcept
 		{
-			// Lock
-			lock_guard_type lck(m_lock);
 			*m_end++ = T(std::forward<Args>(args)...);
 			std::push_heap(&m_list[0], m_end, compare());
 			if (KEEPSTAT)
@@ -234,8 +282,6 @@ namespace plib {
 		template <bool KEEPSTAT>
 		void push(T &&e) noexcept
 		{
-			// Lock
-			lock_guard_type lck(m_lock);
 			*m_end++ = e;
 			std::push_heap(&m_list[0], m_end, compare());
 			if (KEEPSTAT)
@@ -250,11 +296,26 @@ namespace plib {
 
 		const T &top() const noexcept { return m_list[0]; }
 
-		template <bool KEEPSTAT, class R>
-		void remove(const R &elem) noexcept
+		template <bool KEEPSTAT>
+		void remove(const T &elem) noexcept
 		{
-			// Lock
-			lock_guard_type lck(m_lock);
+			if (KEEPSTAT)
+				m_prof_remove.inc();
+			for (T * i = m_end - 1; i >= &m_list[0]; i--)
+			{
+				if (*i == elem)
+				{
+					m_end--;
+					*i = *m_end;
+					std::make_heap(&m_list[0], m_end, compare());
+					return;
+				}
+			}
+		}
+
+		template <bool KEEPSTAT>
+		void remove(const typename T::element_type &elem) noexcept
+		{
 			if (KEEPSTAT)
 				m_prof_remove.inc();
 			for (T * i = m_end - 1; i >= &m_list[0]; i--)
@@ -271,7 +332,6 @@ namespace plib {
 
 		void clear()
 		{
-			lock_guard_type lck(m_lock);
 			m_list.clear();
 			m_end = &m_list[0];
 		}
@@ -282,16 +342,12 @@ namespace plib {
 		constexpr std::size_t size() const noexcept { return m_list.size(); }
 		constexpr const T & operator[](const std::size_t index) const { return m_list[ 0 + index]; }
 	private:
-		using mutex_type = pspin_mutex<TS>;
-		using lock_guard_type = std::lock_guard<mutex_type>;
-
-		mutex_type               m_lock;
 		T *                      m_end;
 		plib::arena_vector<A, T> m_list;
 
 	public:
 		// profiling
-		pperfcount_t<true> m_prof_sortmove; // NOLINT
+		pperfcount_t<true> m_prof_sort_move; // NOLINT
 		pperfcount_t<true> m_prof_call; // NOLINT
 		pperfcount_t<true> m_prof_remove; // NOLINT
 	};

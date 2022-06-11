@@ -78,18 +78,18 @@ namespace plib {
 			{ "G", narrow_cast<F>( 1e9) }, // NOLINT: Giga
 			{ "M", narrow_cast<F>( 1e6) }, // NOLINT: Mega
 			{ "k", narrow_cast<F>( 1e3) }, // NOLINT: Kilo
-			{ "h", narrow_cast<F>( 1e2) }, // NOLINT: Hekto
-			//{ "da", narrow_cast<F>(1e1) }, // NOLINT: Deka
-			{ "d", narrow_cast<F>(1e-1) }, // NOLINT: Dezi
-			{ "c", narrow_cast<F>(1e-2) }, // NOLINT: Zenti
+			{ "h", narrow_cast<F>( 1e2) }, // NOLINT: Hecto
+			//{ "da", narrow_cast<F>(1e1) }, // NOLINT: Deca
+			{ "d", narrow_cast<F>(1e-1) }, // NOLINT: Deci
+			{ "c", narrow_cast<F>(1e-2) }, // NOLINT: Centi
 			{ "m", narrow_cast<F>(1e-3) }, // NOLINT: Milli
-			{ "μ", narrow_cast<F>(1e-6) }, // NOLINT: Mikro
+			{ "μ", narrow_cast<F>(1e-6) }, // NOLINT: Micro
 			{ "n", narrow_cast<F>(1e-9) }, // NOLINT: Nano
-			{ "p", narrow_cast<F>(1e-12) }, // NOLINT: Piko
+			{ "p", narrow_cast<F>(1e-12) }, // NOLINT: Pico
 			{ "f", narrow_cast<F>(1e-15) }, // NOLINT: Femto
 			{ "a", narrow_cast<F>(1e-18) }, // NOLINT: Atto
 			{ "z", narrow_cast<F>(1e-21) }, // NOLINT: Zepto
-			{ "y", narrow_cast<F>(1e-24) }, // NOLINT: Yokto
+			{ "y", narrow_cast<F>(1e-24) }, // NOLINT: Yocto
 		};
 		return units_si_stat;
 	}

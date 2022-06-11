@@ -137,10 +137,10 @@ protected:
 	nl_double delta(const nl_double * RESTRICT V);
 	void store(const nl_double * RESTRICT V);
 
-	/* bring the whole system to the current time
-	 * Don't schedule a new calculation time. The recalculation has to be
-	 * triggered by the caller after the netlist element was changed.
-	 */
+	// bring the whole system to the current time
+	// Don't schedule a new calculation time. The recalculation has to be
+	// triggered by the caller after the netlist element was changed.
+
 	nl_double compute_next_time_step();
 
 	template <typename T1, typename T2>
@@ -175,10 +175,9 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_time_step()
 
 	if (m_params.m_dynamic_ts)
 	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
+		//
+		// FIXME: We should extend the logic to use either all nets or
+		//        only output nets.
 		for (unsigned k = 0, iN=N(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
@@ -223,7 +222,7 @@ void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 		{
 			m_terms[k]->add(term, ot, true);
 		}
-		/* Should this be allowed ? */
+		// Should this be allowed ?
 		else // if (ot<0)
 		{
 			m_rails_temp[k].add(term, ot, true);
@@ -259,25 +258,25 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 #if 1
 
-	/* Sort in descending order by number of connected matrix voltages.
-	 * The idea is, that for Gauss-Seidel algo the first voltage computed
-	 * depends on the greatest number of previous voltages thus taking into
-	 * account the maximum amount of information.
-	 *
-	 * This actually improves performance on popeye slightly. Average
-	 * GS computations reduce from 2.509 to 2.370
-	 *
-	 * Smallest to largest : 2.613
-	 * Unsorted            : 2.509
-	 * Largest to smallest : 2.370
-	 *
-	 * Sorting as a general matrix pre-conditioning is mentioned in
-	 * literature but I have found no articles about Gauss Seidel.
-	 *
-	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
-	 *
-	 */
+	// Sort in descending order by number of connected matrix voltages.
+	// The idea is, that for Gauss-Seidel algo the first voltage computed
+	// depends on the greatest number of previous voltages thus taking into
+	// account the maximum amount of information.
+	//
+	// This actually improves performance on popeye slightly. Average
+	// GS computations reduce from 2.509 to 2.370
+	//
+	// Smallest to largest : 2.613
+	// Unsorted            : 2.509
+	// Largest to smallest : 2.370
+	//
+	// Sorting as a general matrix pre-conditioning is mentioned in
+	// literature but I have found no articles about Gauss Seidel.
+	//
+	// For Gaussian Elimination however increasing order is better suited.
+	// FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	//
+	//
 
 	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
 
@@ -301,14 +300,13 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 #endif
 
-	/* create a list of non zero elements right of the diagonal
-	 * These list anticipate the population of array elements by
-	 * Gaussian elimination.
-	 */
+	// create a list of non zero elements right of the diagonal
+	// These list anticipate the population of array elements by
+	// Gaussian elimination.
+
 	for (unsigned k = 0; k < N(); k++)
 	{
 		terms_for_net_t * t = m_terms[k];
-		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
 		t->m_nz.clear();
@@ -354,9 +352,10 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 			log("\n");
 		}
 
-	/*
-	 * save states
-	 */
+	//
+	// save states
+	//
+
 	save(NLNAME(m_RHS));
 	save(NLNAME(m_last_V));
 
@@ -494,7 +493,6 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 				m_A[imax][k]=m_A[j][k];
 				m_A[j][k]=dum;
 			}
-			//*d = -(*d);
 			vv[imax]=vv[j];
 		}
 		indx[j]=imax;
@@ -514,7 +512,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 {
 	const unsigned kN = N();
 
-	/* back substitution */
+	// back substitution
 
 	// int ip;
 	// ii=-1
@@ -546,10 +544,9 @@ template <unsigned m_N, unsigned storage_N>
 nl_double matrix_solver_direct_t<m_N, storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
-	 * need a revaluation of the right hand side after voltages have been updated
-	 * and thus belong into a different calculation. This applies to all solvers.
-	 */
+	// FIXME: Ideally we should also include currents (RHS) here. This would
+	// need a revaluation of the right hand side after voltages have been updated
+	// and thus belong into a different calculation. This applies to all solvers.
 
 	const unsigned iN = this->N();
 	nl_double cerr = 0;
@@ -626,5 +623,5 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	} //namespace devices
 } // namespace netlist
 
-#endif /* NLD_MS_DIRECT_H_ */
+#endif // NLD_MS_DIRECT_H_
 #endif

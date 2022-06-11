@@ -377,6 +377,7 @@ ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
 efdt.cpp
+efg8080.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -546,7 +547,6 @@ hapyfish.cpp
 harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
-headonb.cpp
 heromem.cpp
 hexion.cpp
 hideseek.cpp
@@ -1141,6 +1141,7 @@ segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
+segafruit.cpp
 segag80r.cpp
 segag80v.cpp
 segahang.cpp

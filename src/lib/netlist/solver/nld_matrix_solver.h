@@ -245,14 +245,6 @@ namespace netlist::solver
 		netlist_time solve(netlist_time_ext now, const char *source);
 		void update_inputs();
 
-		/// \brief Checks if solver may alter a net
-		///
-		/// This checks if a solver will alter a net. Returns true if the
-		/// net is either part of the voltage vector or if it belongs to
-		/// the analog input nets connected to the solver.
-
-		bool updates_net(const analog_net_t *net) const noexcept;
-
 		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
 		std::size_t time_step_device_count() const noexcept { return m_step_funcs.size(); }
 
@@ -307,7 +299,7 @@ namespace netlist::solver
 
 		virtual std::pair<pstring, pstring> create_solver_code([[maybe_unused]] solver::static_compile_target target)
 		{
-			return { "", plib::pfmt("/* solver doesn't support static compile */\n\n") };
+			return { "", plib::pfmt("// solver doesn't support static compile\n\n") };
 		}
 
 		// return number of floating point operations for solve

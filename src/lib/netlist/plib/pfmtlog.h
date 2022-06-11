@@ -18,12 +18,12 @@
 #include <locale>
 #include <sstream>
 
-#define PERRMSGV(name, narg, str) \
+#define PERRMSGV(name, argument_count, str) \
 	struct name : public plib::perrmsg \
 	{ \
 		template<typename... Args> explicit name(Args&&... args) \
 		: plib::perrmsg(str, std::forward<Args>(args)...) \
-		{ static_assert((narg) == sizeof...(args), "Argument count mismatch"); } \
+		{ static_assert((argument_count) == sizeof...(args), "Argument count mismatch"); } \
 	};
 
 namespace plib {
@@ -37,7 +37,7 @@ namespace plib {
 		FATAL)
 
 	template <typename T>
-	struct ptype_traits_base
+	struct format_traits_base
 	{
 		static constexpr const bool is_signed = std::numeric_limits<T>::is_signed;
 		static char32_t fmt_spec() { return 'u'; }
@@ -49,7 +49,7 @@ namespace plib {
 
 	#if (PUSE_FLOAT128)
 	template <>
-	struct ptype_traits_base<FLOAT128>
+	struct format_traits_base<FLOAT128>
 	{
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
@@ -62,10 +62,10 @@ namespace plib {
 	#endif
 
 	template <typename T>
-	struct ptype_traits;
+	struct format_traits;
 
 	template<>
-	struct ptype_traits<compile_info::int128_type>
+	struct format_traits<compile_info::int128_type>
 	{
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
@@ -78,97 +78,97 @@ namespace plib {
 	};
 
 	template<>
-	struct ptype_traits<bool> : ptype_traits_base<bool>
+	struct format_traits<bool> : format_traits_base<bool>
 	{
 	};
 
 	template<>
-	struct ptype_traits<char> : ptype_traits_base<char>
+	struct format_traits<char> : format_traits_base<char>
 	{
 		static char32_t fmt_spec() { return is_signed ? 'd' : 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<short> : ptype_traits_base<short>
+	struct format_traits<short> : format_traits_base<short>
 	{
 		static char32_t fmt_spec() { return 'd'; }
 	};
 
 	template<>
-	struct ptype_traits<int> : ptype_traits_base<int>
+	struct format_traits<int> : format_traits_base<int>
 	{
 		static char32_t fmt_spec() { return 'd'; }
 	};
 
 	template<>
-	struct ptype_traits<long> : ptype_traits_base<long>
+	struct format_traits<long> : format_traits_base<long>
 	{
 		static char32_t fmt_spec() { return 'd'; }
 	};
 
 	template<>
-	struct ptype_traits<long long> : ptype_traits_base<long long>
+	struct format_traits<long long> : format_traits_base<long long>
 	{
 		static char32_t fmt_spec() { return 'd'; }
 	};
 
 	template<>
-	struct ptype_traits<signed char> : ptype_traits_base<signed char>
+	struct format_traits<signed char> : format_traits_base<signed char>
 	{
 		static char32_t fmt_spec() { return 'd'; }
 	};
 
 	template<>
-	struct ptype_traits<unsigned char> : ptype_traits_base<unsigned char>
+	struct format_traits<unsigned char> : format_traits_base<unsigned char>
 	{
 		static char32_t fmt_spec() { return 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<unsigned short> : ptype_traits_base<unsigned short>
+	struct format_traits<unsigned short> : format_traits_base<unsigned short>
 	{
 		static char32_t fmt_spec() { return 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<unsigned int> : ptype_traits_base<unsigned int>
+	struct format_traits<unsigned int> : format_traits_base<unsigned int>
 	{
 		static char32_t fmt_spec() { return 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<unsigned long> : ptype_traits_base<unsigned long>
+	struct format_traits<unsigned long> : format_traits_base<unsigned long>
 	{
 		static char32_t fmt_spec() { return 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<unsigned long long> : ptype_traits_base<unsigned long long>
+	struct format_traits<unsigned long long> : format_traits_base<unsigned long long>
 	{
 		static char32_t fmt_spec() { return 'u'; }
 	};
 
 	template<>
-	struct ptype_traits<float> : ptype_traits_base<float>
+	struct format_traits<float> : format_traits_base<float>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
 
 	template<>
-	struct ptype_traits<double> : ptype_traits_base<double>
+	struct format_traits<double> : format_traits_base<double>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
 
 	template<>
-	struct ptype_traits<long double> : ptype_traits_base<long double>
+	struct format_traits<long double> : format_traits_base<long double>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
 
 	#if (PUSE_FLOAT128)
 	template<>
-	struct ptype_traits<FLOAT128> : ptype_traits_base<FLOAT128>
+	struct format_traits<FLOAT128> : format_traits_base<FLOAT128>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
@@ -176,19 +176,19 @@ namespace plib {
 
 
 	template<>
-	struct ptype_traits<char *> : ptype_traits_base<char *>
+	struct format_traits<char *> : format_traits_base<char *>
 	{
 		static char32_t fmt_spec() { return 's'; }
 	};
 
 	template<>
-	struct ptype_traits<const char *> : ptype_traits_base<const char *>
+	struct format_traits<const char *> : format_traits_base<const char *>
 	{
 		static char32_t fmt_spec() { return 's'; }
 	};
 
 	template<>
-	struct ptype_traits<const char16_t *> : ptype_traits_base<const char16_t *>
+	struct format_traits<const char16_t *> : format_traits_base<const char16_t *>
 	{
 		static char32_t fmt_spec() { return 's'; }
 		static void streamify(std::ostream &s, const char16_t *v)
@@ -199,7 +199,7 @@ namespace plib {
 	};
 
 	template<>
-	struct ptype_traits<const char32_t *> : ptype_traits_base<const char32_t *>
+	struct format_traits<const char32_t *> : format_traits_base<const char32_t *>
 	{
 		static char32_t fmt_spec() { return 's'; }
 		static void streamify(std::ostream &s, const char32_t *v)
@@ -210,19 +210,19 @@ namespace plib {
 	};
 
 	template<>
-	struct ptype_traits<std::string> : ptype_traits_base<std::string>
+	struct format_traits<std::string> : format_traits_base<std::string>
 	{
 		static char32_t fmt_spec() { return 's'; }
 	};
 
 	template<>
-	struct ptype_traits<putf8string> : ptype_traits_base<putf8string>
+	struct format_traits<putf8string> : format_traits_base<putf8string>
 	{
 		static char32_t fmt_spec() { return 's'; }
 	};
 
 	template<>
-	struct ptype_traits<putf16string> : ptype_traits_base<putf16string>
+	struct format_traits<putf16string> : format_traits_base<putf16string>
 	{
 		static char32_t fmt_spec() { return 's'; }
 		static void streamify(std::ostream &s, const putf16string &v)
@@ -232,7 +232,7 @@ namespace plib {
 	};
 
 	template<>
-	struct ptype_traits<const void *> : ptype_traits_base<const void *>
+	struct format_traits<const void *> : format_traits_base<const void *>
 	{
 		static char32_t fmt_spec() { return 'p'; }
 	};
@@ -307,10 +307,10 @@ namespace plib {
 			return format_element('o', x);
 		}
 
-		friend std::ostream& operator<<(std::ostream &ostrm, const pfmt &fmt)
+		friend std::ostream& operator<<(std::ostream &out_stream, const pfmt &fmt)
 		{
-			ostrm << putf8string(fmt.m_str);
-			return ostrm;
+			out_stream << putf8string(fmt.m_str);
+			return out_stream;
 		}
 
 	protected:
@@ -322,16 +322,16 @@ namespace plib {
 			pstring::size_type p;
 			pstring::size_type sl;
 		};
-		rtype setfmt(std::stringstream &strm, char32_t cfmt_spec);
+		rtype set_format(std::stringstream &strm, char32_t char_format);
 
 		template <typename T>
 		pfmt &format_element(T &&v)
 		{
-			return format_element(ptype_traits<typename std::decay<T>::type>::fmt_spec(), std::forward<T>(v));
+			return format_element(format_traits<typename std::decay<T>::type>::fmt_spec(), std::forward<T>(v));
 		}
 
 		template <typename T>
-		pfmt &format_element(const char32_t cfmt_spec, T &&v)
+		pfmt &format_element(const char32_t char_format, T &&v)
 		{
 			rtype ret;
 
@@ -340,10 +340,10 @@ namespace plib {
 			do {
 				std::stringstream strm;
 				strm.imbue(m_locale);
-				ret = setfmt(strm, cfmt_spec);
+				ret = set_format(strm, char_format);
 				if (ret.ret>=0)
 				{
-					ptype_traits<typename std::decay<T>::type>::streamify(strm, std::forward<T>(v));
+					format_traits<typename std::decay<T>::type>::streamify(strm, std::forward<T>(v));
 					const pstring ps(putf8string(strm.str()));
 					m_str = m_str.substr(0, ret.p) + ps + m_str.substr(ret.p + ret.sl);
 				}
@@ -375,7 +375,7 @@ namespace plib {
 			if (build_enabled && enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				dynamic_cast<T &>(*this).upstream_write(xlog(pf, std::forward<Args>(args)...));
+				dynamic_cast<T &>(*this).upstream_write(log_translate(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -385,7 +385,7 @@ namespace plib {
 			if (build_enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				static_cast<const T &>(*this).upstream_write(xlog(pf, std::forward<Args>(args)...));
+				static_cast<const T &>(*this).upstream_write(log_translate(pf, std::forward<Args>(args)...));
 			}
 		}
 
@@ -400,12 +400,12 @@ namespace plib {
 		~pfmt_writer_t() noexcept = default;
 
 	private:
-		pfmt &xlog(pfmt &fmt) const { return fmt; }
+		pfmt &log_translate(pfmt &fmt) const { return fmt; }
 
 		template<typename X, typename... Args>
-		pfmt &xlog(pfmt &fmt, X&& x, Args&&... args) const
+		pfmt &log_translate(pfmt &fmt, X&& x, Args&&... args) const
 		{
-			return xlog(fmt(std::forward<X>(x)), std::forward<Args>(args)...);
+			return log_translate(fmt(std::forward<X>(x)), std::forward<Args>(args)...);
 		}
 
 		bool m_enabled;

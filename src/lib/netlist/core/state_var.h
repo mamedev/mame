@@ -47,7 +47,8 @@ namespace netlist
 				const pstring &name     //!< identifier/name for this state variable
 		);
 
-		PMOVEASSIGN(state_var, delete)
+		state_var(state_var &&) noexcept = delete;
+		state_var &operator=(state_var &&) noexcept = delete;
 
 		//! Destructor.
 		~state_var() noexcept = default;
@@ -195,7 +196,7 @@ namespace netlist
 namespace plib
 {
 	template <typename X>
-	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
+	struct format_traits<netlist::state_var<X>> : format_traits<X>
 	{
 	};
 } // namespace plib

@@ -13376,6 +13376,10 @@ ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 @source:efdt.cpp
 efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
 
+@source:efg8080.cpp
+blackhol
+foolrace
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 
@@ -16443,10 +16447,6 @@ hcastlek                        // GX768 (c) 1988
 @source:hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:headonb.cpp
-blackhol
-foolrace                        // bootleg
-
 @source:hec2hrp.cpp
 hec2hr                          //
 hec2hrp                         //
@@ -19135,32 +19135,34 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
+j_dt                            // Double Top (JPM)
+j_dud                           // Nudge Double Up Deluxe (JPM)
+j_duda                          //
+j_dudb                          //
 j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
 j_ewnc                          //
-j_ndu                           // Nudge Double Up (JPM)
-j_ndua                          //
-j_ndub                          //
-j_dud                           // Nudge Double Up Deluxe (JPM)
-j_duda                          //
-j_dudb                          //
-j_dt                            //
-j_lan                           // Lite A Nudge (JPM)
-j_lana                          //
-j_lanb                          //
-j_super2                        // Super 2
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
-j_ssh                           // Silver Shuffle (CTL)
-j_lt                            // Lucky 2's (JPM)
-j_ts                            //
-j_plus2                         // Plus 2 (CTL)
 j_goldn2                        // Golden 2's (CTL)
-j_sup2p                         // Super 2p Shuffle (MDM)
 j_la                            // Lucky Aces
+j_lan                           // Lite A Nudge (JPM)
+j_lana                          //
+j_lanb                          //
+j_lc                            // Lucky Casino (JPM)
+j_lca                           //
+j_lt                            // Lucky 2's (JPM)
+j_ndu                           // Nudge Double Up (JPM)
+j_ndua                          //
+j_ndub                          //
+j_plus2                         // Plus 2 (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
+j_super2                        // Super 2
+j_ts                            // Two Step (JPM)
 
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
@@ -35905,7 +35907,6 @@ poly61                          //
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
-pongf                           // (c) 1972 Atari
 rebound                         //
 
 @source:poolshrk.cpp
@@ -37822,6 +37823,10 @@ ridleofp                        // (c) 1986 Sega / Nasco
 slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
+
+@source:segafruit.cpp
+m3001
+m4001
 
 @source:segag80r.cpp
 005                             // (c) 1981
