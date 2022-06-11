@@ -48351,4 +48351,194 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pythdrgn">
+		<description>Pythagoras and The Dragon (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Pythagoras and The Dragon" is a 1983 educational game developed and distributed by Krell Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pythagoras and the dragon (4am crack).dsk" size="143360" crc="c21b3d07" sha1="759a6f56911f2e0e4f8b09b120bc50e8f3bf994f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrescu">
+		<description>Space Rescue (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Space Rescue" is a 1982 action game developed by Rod Nelsen and distributed by Level-10.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space rescue (4am crack).dsk" size="143360" crc="35c570ee" sha1="0da6e145b183a07916fd13b0933fe207903a6551"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcksmth50g">
+		<description>Locksmith (Version 5.0 Revision G) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Locksmith" is a 1984 disk utility developed and distributed by Alpha Logic Business Systems. This is version 5.0G.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith v5.0g (4am crack).dsk" size="143360" crc="4be27a62" sha1="3e19e176a314c6c888e6c3d53fe361d4767d3285"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vt100emu">
+		<description>VT-100 Emulator (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"VT-100 Emulator" is a 1980 communications program developed and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vt-100 emulator (4am and san inc crack).dsk" size="143360" crc="6c9aefb6" sha1="1145f21c0904556f1dd897d93f80f22fa17c6954"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ortrk13a">
+		<description>Order Tracking System (Version 1.3a) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Order Tracking System" is a 1981 productivity program developed by Loggins and distributed by Apple Computer. This is version 1.3a. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="order tracking system v1.3a (4am and san inc crack) disk 1 - master disk.dsk" size="143360" crc="c38a08b6" sha1="17a537b514dd1df22b60abb25246dfb2079d2064"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="order tracking system v1.3a (4am and san inc crack) disk 2 - data disk.dsk" size="143360" crc="c05b5270" sha1="2df14e5463e291da1c25e3a7f1fd8c82f6c98075"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsbsbasic">
+		<description>The New Step by Step: A Computer Course in BASIC (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Program Design</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"The New Step by Step: A Computer Course in BASIC" is a 1981 educational program developed and distributed by Program Design. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the new step by step (4am crack) disk 1.dsk" size="143360" crc="04cee7af" sha1="89ace8ba63e1b076748e3980b90df5a8c5b6259a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the new step by step (4am crack) disk 2.dsk" size="143360" crc="2afc9d0e" sha1="2f04f279a07fbfcf1b1160591cc245611079eeed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrhlpr15">
+		<description>Writer's Helper (Version 1.5) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>CONDUIT Educational Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Writer's Helper" is a 1985 educational program developed by William Wresch and distributed by CONDUIT Educational Software. This is version 1.5. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer's helper v1.5 (4am crack) disk 1 - program disk.dsk" size="143360" crc="b417f300" sha1="f60ee9583aa39821bb55d6a37b9ce76554a56c11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muptvller2">
+		<description>Muppetville (Revision 2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Muppetville" is a 1986 educational program developed and distributed by Sunburst Communications. This is revision 2, with a filename fix and other unspecified changes. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="muppetville rev. 2 (4am crack).dsk" size="143360" crc="99891244" sha1="43449499e6b21b6d49d0002f9db9f9fca6443e57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faymathw">
+		<description>Fay: That Math Woman! (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2022-06-11"/>
+		<!--"Fay: That Math Woman!" is a 1983 educational program developed by David Vincent and Paul Melhus, and distributed by Didatech Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fay- that math woman (4am crack).dsk" size="143360" crc="708f4de6" sha1="8c25121dbef45710183576b0145c7d23c7614004"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebuswr">
+		<description>Rebus Writer (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Rebus Writer" is a 1987 educational program developed by TJ and distributed by Mindscape. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebus writer (4am crack) side a - program.dsk" size="143360" crc="9fdb3d8f" sha1="a8c94406aa0eb42faa3fcf2cc44a2908dcb4682a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Pictionary disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebus writer (4am crack) side b - pictionary.dsk" size="143360" crc="d42ae5a3" sha1="ed2f9d42a9e023de2156ee05aa1d4b3f534aef67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoo">
+		<description>Desktop Zoo (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gothmogl">
+		<description>Gothmog's Lair (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Progressive Peripherals and Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Gothmog's Lair" is a 1984 adventure game developed by Sean A. Moore and distributed by Progressive Peripherals and Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gothmog's lair (4am crack).dsk" size="143360" crc="b543c4c7" sha1="1c792662f3690849c60e284fd8d8be9f43569c37"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
