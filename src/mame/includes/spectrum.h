@@ -119,8 +119,6 @@ protected:
 	s8 m_contention_offset = -1;
 	u64 m_int_at;
 
-	emu_timer *m_irq_off_timer;
-
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_rom_r(offs_t offset);
