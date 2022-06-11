@@ -136,8 +136,8 @@ namespace analog
 	{
 	public:
 
-		NETLIB_CONSTRUCTOR_EX(QBJT, const pstring &model = "NPN")
-		, m_model(*this, "MODEL", model)
+		NETLIB_BASE_OBJECT_CONSTRUCTOR(QBJT)
+		, m_model(*this, "MODEL", "NPN")
 		, m_qtype(bjt_type::BJT_NPN)
 		{
 		}
@@ -210,9 +210,9 @@ namespace analog
 
 	private:
 		bjt_model_t m_bjt_model;
-		nld_two_terminal m_RB;
-		nld_two_terminal m_RC;
-		nld_two_terminal m_BC;
+		NETLIB_NAME(two_terminal) m_RB;
+		NETLIB_NAME(two_terminal) m_RC;
+		NETLIB_NAME(two_terminal) m_BC;
 
 		nl_fptype m_gB; // base conductance / switch on
 		nl_fptype m_gC; // collector conductance / switch on
@@ -283,9 +283,9 @@ namespace analog
 		generic_diode<diode_e::BIPOLAR> m_gD_BC;
 		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
-		nld_two_terminal m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
-		nld_two_terminal m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
-		nld_two_terminal m_D_EC;  // 0, -gec, -gcc, 0 | 0
+		NETLIB_NAME(two_terminal) m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
+		NETLIB_NAME(two_terminal) m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
+		NETLIB_NAME(two_terminal) m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
 		nl_fptype m_alpha_f;
 		nl_fptype m_alpha_r;
@@ -406,11 +406,11 @@ namespace analog
 		// "Circuit Design", page 174
 
 		m_D_EB.set_mat(      gee, gec - gee,  -Ie,
-					   gce - gee, gee - gec,   Ie);
+				  	   gce - gee, gee - gec,   Ie);
 		m_D_CB.set_mat(      gcc, gce - gcc,  -Ic,
-					   gec - gcc, gcc - gce,   Ic);
+				       gec - gcc, gcc - gce,   Ic);
 		m_D_EC.set_mat(        0,      -gec,    0,
-							-gce,         0,    0);
+				            -gce,         0,    0);
 	}
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)

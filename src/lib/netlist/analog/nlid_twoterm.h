@@ -51,31 +51,20 @@ namespace netlist::analog
 	// nld_two_terminal
 	// -----------------------------------------------------------------------------
 
-	template <class C>
-	static inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
-	{
-		auto *h = dynamic_cast<core_device_t *>(&d1);
-		return b ? *h : d2;
-	}
-	template <>
-	inline core_device_t &bselect(bool b, [[maybe_unused]] netlist_state_t &d1, core_device_t &d2)
-	{
-		if (b)
-			throw nl_exception("bselect with netlist and b==true");
-		return d2;
-	}
-
 	NETLIB_BASE_OBJECT(two_terminal)
 	{
-		NETLIB_CONSTRUCTOR(two_terminal)
+		NETLIB_BASE_OBJECT_CONSTRUCTOR(two_terminal)
 		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(terminal_handler))
 		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(terminal_handler))
 		{
 		}
-		//#NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
-		template <class C>
-		NETLIB_NAME(two_terminal)(C &owner, const pstring &name, nl_delegate owner_delegate) \
-				: base_type(owner, name)
+
+		// This constructor covers the case in which the terminals are "owned"
+		// by the device using a two_terminal. In this case it passes
+		// the terminal handler on to the terminals.
+
+		NETLIB_NAME(two_terminal)(base_device_t &owner, const pstring &name, nl_delegate owner_delegate) \
+				: constructor_type(constructor_data_t{owner.state(), owner.name() + "." + name})
 		, m_P(owner, name + ".1", &m_N, owner_delegate)
 		, m_N(owner, name + ".2", &m_P, owner_delegate)
 		{
@@ -244,7 +233,7 @@ namespace netlist::analog
 
 	NETLIB_BASE_OBJECT(POT)
 	{
-		NETLIB_CONSTRUCTOR(POT)
+		NETLIB_BASE_OBJECT_CONSTRUCTOR(POT)
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
 		, m_R(*this, "R", 10000)
@@ -252,12 +241,11 @@ namespace netlist::analog
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_sub_alias("1", m_R1.P());
-			register_sub_alias("2", m_R1.N());
-			register_sub_alias("3", m_R2.N());
+			register_sub_alias("1", m_R1().P());
+			register_sub_alias("2", m_R1().N());
+			register_sub_alias("3", m_R2().N());
 
-			connect(m_R2.P(), m_R1.N());
-
+			connect(m_R2().P(), m_R1().N());
 		}
 
 		//NETLIB_UPDATEI();
@@ -265,8 +253,8 @@ namespace netlist::analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		NETLIB_SUB(R_base) m_R1;
-		NETLIB_SUB(R_base) m_R2;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R2;
 
 		param_fp_t m_R;
 		param_fp_t m_Dial;
@@ -276,16 +264,15 @@ namespace netlist::analog
 
 	NETLIB_BASE_OBJECT(POT2)
 	{
-		NETLIB_CONSTRUCTOR(POT2)
+		NETLIB_BASE_OBJECT_CONSTRUCTOR(POT2)
 		, m_R1(*this, "_R1")
 		, m_R(*this, "R", nlconst::magic(10000.0))
 		, m_Dial(*this, "DIAL", nlconst::half())
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_sub_alias("1", m_R1.P());
-			register_sub_alias("2", m_R1.N());
-
+			register_sub_alias("1", m_R1().P());
+			register_sub_alias("2", m_R1().N());
 		}
 
 		//NETLIB_UPDATEI();
@@ -293,7 +280,7 @@ namespace netlist::analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		NETLIB_SUB(R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
 
 		param_fp_t m_R;
 		param_fp_t m_Dial;

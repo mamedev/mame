@@ -44,14 +44,10 @@ namespace netlist::analog {
 		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON}, NETLIB_DELEGATE(terminal_handler))
 		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(terminal_handler))
 		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(terminal_handler))
-		//, m_IPx(*this, "_IPx", &m_OP, NETLIB_DELEGATE(terminal_handler))   // <= this should be NULL and terminal be filtered out prior to solving...
-		//, m_INx(*this, "_INx", &m_ON, NETLIB_DELEGATE(terminal_handler))   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_gfac(nlconst::one())
 		{
 			connect(m_OP, m_OP1);
 			connect(m_ON, m_ON1);
-			//connect(m_IP, m_IPx);
-			//connect(m_IN, m_INx);
 		}
 
 		NETLIB_RESETI();
@@ -84,9 +80,6 @@ namespace netlist::analog {
 
 		terminal_t m_OP1;
 		terminal_t m_ON1;
-
-		//terminal_t m_IPx;
-		//terminal_t m_INx;
 
 	private:
 		nl_fptype m_gfac;

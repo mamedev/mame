@@ -47,8 +47,8 @@ namespace analog
 		if (m_DialIsLog())
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-		m_R2.set_R(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
+		m_R1().set_R(std::max(m_R() * v, exec().gmin()));
+		m_R2().set_R(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
 	}
 
 	NETLIB_UPDATE_PARAM(POT)
@@ -62,12 +62,12 @@ namespace analog
 		nl_fptype r1(std::max(m_R() * v, exec().gmin()));
 		nl_fptype r2(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
 
-		if (m_R1.solver() == m_R2.solver())
-			m_R1.change_state([this, &r1, &r2]() { m_R1.set_R(r1); m_R2.set_R(r2); });
+		if (m_R1().solver() == m_R2().solver())
+			m_R1().change_state([this, &r1, &r2]() { m_R1().set_R(r1); m_R2().set_R(r2); });
 		else
 		{
-			m_R1.change_state([this, &r1]() { m_R1.set_R(r1); });
-			m_R2.change_state([this, &r2]() { m_R2.set_R(r2); });
+			m_R1().change_state([this, &r1]() { m_R1().set_R(r1); });
+			m_R2().change_state([this, &r2]() { m_R2().set_R(r2); });
 		}
 
 	}
@@ -84,7 +84,7 @@ namespace analog
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 		if (m_Reverse())
 			v = nlconst::one() - v;
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+		m_R1().set_R(std::max(m_R() * v, exec().gmin()));
 	}
 
 
@@ -97,9 +97,9 @@ namespace analog
 		if (m_Reverse())
 			v = nlconst::one() - v;
 
-		m_R1.change_state([this, &v]()
+		m_R1().change_state([this, &v]()
 		{
-			m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+			m_R1().set_R(std::max(m_R() * v, exec().gmin()));
 		});
 	}
 

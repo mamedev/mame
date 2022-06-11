@@ -32,6 +32,21 @@ namespace netlist::devices
 	// solver
 	// ----------------------------------------------------------------------------------------
 
+	NETLIB_NAME(solver)::NETLIB_NAME(solver)(constructor_param_t data)
+	: constructor_type(data)
+	, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
+	, m_Q_step(*this, "Q_step")
+	, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
+	, m_queue(this->state().pool(), config::max_solver_queue_size(),
+		queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
+		queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
+	{
+		// internal stuff
+		state().save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), this->name(), "m_queue");
+
+		connect("FB_step", "Q_step");
+	}
+
 	NETLIB_RESET(solver)
 	{
 		if (exec().stats_enabled())
@@ -285,11 +300,12 @@ namespace netlist::devices
 				{
 					nl_state.log().verbose("   ==> not a rail net");
 					// Must be an analog net
-					auto &n = dynamic_cast<analog_net_t &>(*net);
-					if (!already_processed(n))
+					auto n = plib::dynamic_downcast<analog_net_t *>(net.get());
+					nl_assert_always(bool(n), "Unable to cast to analog_net_t &");
+					if (!already_processed(*(*n)))
 					{
 						groupspre.emplace_back(NETLIB_NAME(solver)::net_list_t());
-						process_net(nl_state, n);
+						process_net(nl_state, *(*n));
 					}
 				}
 			}
@@ -359,9 +375,10 @@ namespace netlist::devices
 					// only process analog terminals
 					if (term->is_type(detail::terminal_type::TERMINAL))
 					{
-						auto &pt = dynamic_cast<terminal_t &>(*term);
+						auto pt = plib::dynamic_downcast<terminal_t *>(term);
+						nl_assert_always(bool(pt), "Error casting *term to terminal_t &");
 						// check the connected terminal
-						const auto *const connected_terminals = nl_state.setup().get_connected_terminals(pt);
+						const auto *const connected_terminals = nl_state.setup().get_connected_terminals(*(*pt));
 						// NOLINTNEXTLINE proposal does not work for VS
 						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
@@ -417,9 +434,8 @@ namespace netlist::devices
 					}
 					else
 					{
-						auto *other_terminal = dynamic_cast<terminal_t *>(t);
-						if (other_terminal != nullptr)
-							if (state().setup().get_connected_terminal(*other_terminal)->net().is_rail_net())
+						if (auto other_terminal = plib::dynamic_downcast<terminal_t *>(t))
+							if (state().setup().get_connected_terminal(*(*other_terminal))->net().is_rail_net())
 								rail_terminals++;
 					}
 				}
@@ -465,6 +481,8 @@ namespace netlist::devices
 #endif
 					break;
 			}
+
+			state().register_device(ms->name(), device_arena::owned_ptr<core_device_t>(ms.get(), false));
 
 			log().verbose("Solver {1}", ms->name());
 			log().verbose("       ==> {1} nets", grp.size());

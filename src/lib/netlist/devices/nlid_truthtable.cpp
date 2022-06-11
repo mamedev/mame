@@ -36,11 +36,9 @@ namespace netlist::devices {
 			std::array<netlist_time, 16> m_timing_nt;
 		};
 
-		template <class C>
-		nld_truth_table_t(C &owner, const pstring &name,
-				const pstring &model,
+		nld_truth_table_t(device_param_t data, const pstring &model,
 				truth_table_t &ttp, const std::vector<pstring> &desc)
-		: device_t(owner, name, model)
+		: device_t(data, model)
 #if NL_USE_TT_ALTERNATIVE
 		, m_state(*this, "m_state", 0)
 #endif
@@ -272,8 +270,8 @@ namespace netlist::devices {
 			return ret;
 		}
 
-		static constexpr const pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
-		static constexpr const pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
+		static constexpr pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
+		static constexpr pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};
@@ -414,7 +412,7 @@ namespace netlist::devices {
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
 			pstring tmp = "_" + outputs[i];
-			const std::size_t idx = plib::container::indexof(inout, tmp);
+			const std::size_t idx = plib::container::index_of(inout, tmp);
 			if (idx != plib::container::npos)
 				connect(m_Q[i], m_I[idx]);
 		}
@@ -426,10 +424,10 @@ namespace netlist::devices {
 	// ----------------------------------------------------------------------------------------
 
 	template<unsigned m_NI, unsigned m_NO>
-	class netlist_factory_truth_table_t : public factory::truth_table_base_element_t
+	class factory_truth_table_t : public factory::truth_table_base_element_t
 	{
 	public:
-		netlist_factory_truth_table_t(const pstring &name,
+		factory_truth_table_t(const pstring &name,
 			factory::properties &&props)
 		: truth_table_base_element_t(name, std::move(props))
 		{ }
@@ -448,7 +446,7 @@ namespace netlist::devices {
 				desc_s.parse(m_desc);
 			}
 
-			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_table, m_desc);
+			return plib::make_unique<tt_type>(pool, device_data_t{anetlist, name}, m_family_name, *m_table, m_desc);
 		}
 	private:
 		device_arena::unique_ptr<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t> m_table;
@@ -667,7 +665,7 @@ namespace netlist::factory {
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
-		{ using dev_type = devices::netlist_factory_truth_table_t<n, m>; \
+		{ using dev_type = devices::factory_truth_table_t<n, m>; \
 			auto cs=s; \
 			ret = plib::make_unique<dev_type, host_arena>(desc.name, std::move(cs)); } \
 			break

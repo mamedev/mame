@@ -31,19 +31,7 @@ namespace netlist::devices
 		using solver_arena = device_arena;
 		using queue_type = detail::queue_base<solver_arena, solver::matrix_solver_t>;
 
-		NETLIB_CONSTRUCTOR(solver)
-		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
-		, m_Q_step(*this, "Q_step")
-		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-		, m_queue(this->state().pool(), config::max_solver_queue_size(),
-			queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
-			queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
-		{
-			// internal stuff
-			state().save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), this->name(), "m_queue");
-
-			connect("FB_step", "Q_step");
-		}
+		NETLIB_NAME(solver)(constructor_param_t data);
 
 		void post_start();
 		void stop();

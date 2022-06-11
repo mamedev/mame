@@ -11,14 +11,17 @@
 #define NLINTERFACE_H_
 
 #include "nl_setup.h"
+
 #include "core/analog.h"
 #include "core/device.h"
 #include "core/device_macros.h"
 #include "core/logic.h"
 #include "core/setup.h"
 
-#include <memory>
 #include <array>
+#include <memory>
+
+// clang-format off
 
 namespace netlist
 {
@@ -123,7 +126,7 @@ namespace netlist
 
 		/// \brief Set parameters to buffers contents at regular intervals
 		///
-		/// This device will update a parameter from a buffers passed to the device.
+		/// This device will update a parameter from a buffer passed to the device.
 		/// It is the responsibility of the controlling application to ensure that
 		/// the buffer is filled at regular intervals.
 		///
@@ -192,9 +195,9 @@ namespace netlist
 				{
 					param_t *p = &state().setup().find_param(m_param_name()).param();
 					m_param = p;
-					if (dynamic_cast<param_fp_t *>(p) != nullptr)
+					if (plib::dynamic_downcast<param_fp_t *>(p))
 						m_param_setter = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_fp_t>, this);
-					else if (dynamic_cast<param_logic_t *>(p) != nullptr)
+					else if (plib::dynamic_downcast<param_logic_t *>(p))
 						m_param_setter = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_logic_t>, this);
 				}
 			}
@@ -238,5 +241,5 @@ namespace netlist
 
 } // namespace netlist
 
-
+// clang-format on
 #endif // NLINTERFACE_H_

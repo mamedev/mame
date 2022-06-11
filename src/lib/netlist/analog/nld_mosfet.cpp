@@ -159,7 +159,7 @@ namespace analog
 			FET_PMOS
 		};
 
-		NETLIB_CONSTRUCTOR(FET)
+		NETLIB_BASE_OBJECT_CONSTRUCTOR(FET)
 		, m_model(*this, "MODEL", "NMOS")
 		, m_qtype(FET_NMOS)
 		{
@@ -351,9 +351,9 @@ namespace analog
 
 	private:
 
-		nld_two_terminal m_DG;
-		nld_two_terminal m_SG;
-		nld_two_terminal m_SD;
+		NETLIB_NAME(two_terminal) m_DG;
+		NETLIB_NAME(two_terminal) m_SG;
+		NETLIB_NAME(two_terminal) m_SD;
 
 		generic_diode<diode_e::MOS> m_D_BD;
 #if (!BODY_CONNECTED_TO_SOURCE)
@@ -594,14 +594,14 @@ namespace analog
 		const nl_fptype gSSBB = gSS + gBB + gBS + gSB;
 		const auto zero(nlconst::zero());
 		//                 S          G
-		m_SG.set_mat(    gSSBB,   gSG + gBG, +(IS + IB),       // S
-					   gGS + gGB,    gGG,      IG       );     // G
+		m_SG.set_mat(  gSSBB,   gSG + gBG, +(IS + IB),       // S
+					   gGS + gGB,    gGG,        IG     );     // G
 		//                 D          G
-		m_DG.set_mat(     gDD,       gDG,    +ID,              // D
-						  gGD,      zero,   zero        );     // G
+		m_DG.set_mat(   gDD,       gDG,        +ID,          // D
+						  gGD,      zero,       zero    );     // G
 		//                 S          D
-		m_SD.set_mat(    zero,    gSD + gBD, zero,             // S
-					   gDS + gDB,   zero,    zero);            // D
+		m_SD.set_mat(  zero,    gSD + gBD,    zero,          // S
+					   gDS + gDB,   zero,       zero    );     // D
 	}
 
 	NETLIB_UPDATE_PARAM(MOSFET)
