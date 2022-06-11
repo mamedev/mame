@@ -107,7 +107,7 @@ ROM_START( kof2002umj )
 	ROM_LOAD( "nand08gw3b2cn6.u102", 0x00000000, 0x42000000, CRC(db931dca) SHA1(1b1fc88732944e9ede09e584c7b07e28a59df3e2) )
 ROM_END
 
-ROM_START( higurashi ) //ひぐらしの哭く頃に 雀 / Higurashi no Naku Koro NiJong - AM-Y2 ROM_V0 PCB (also has a XILINX XC2C64A etched 0012)
+ROM_START( higurashi ) //ひぐらしの哭く頃に 雀 / Higurashi no Naku Koro Ni Jong - AM-Y2 ROM_V0 PCB (also has a XILINX XC2C64A etched 0012)
 	ROM_REGION( 0x10000000, "boot", 0 )
 	ROM_LOAD( "s29gl01gp11tfcr2.u103", 0x0000000, 0x8000000, CRC(1a20bb8b) SHA1(49beb0c9d3549355b55192ba4a24e3f06b750038) )
 	ROM_LOAD( "s29gl01gp11tfcr2.u104", 0x8000000, 0x8000000, CRC(ea7a4ba4) SHA1(bd801eb4b21ee1bade906a4faa172cb7eb0fd5ac) )
