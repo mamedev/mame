@@ -126,7 +126,7 @@ struct dir_entry {
 	dir_entry_type m_type;
 	u64 m_key;
 
-	dir_entry(const std::string &name, dir_entry_type type, u64 key) : m_name(name), m_type(type), m_key(key) {}
+	dir_entry(std::string &&name, dir_entry_type type, u64 key) : m_name(std::move(name)), m_type(type), m_key(key) {}
 };
 
 class fsblk_t {
