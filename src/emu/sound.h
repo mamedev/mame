@@ -693,6 +693,8 @@ private:
 	bool m_resampling_disabled;                    // is resampling of input streams disabled?
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
+	attotime m_last_update_end;                    // last end_time() in update
+
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
