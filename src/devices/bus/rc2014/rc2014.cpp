@@ -59,7 +59,8 @@ void rc2014_bus_device::device_start()
 
 void rc2014_bus_device::device_reset()
 {
-	installer(AS_IO)->unmap_readwrite(0, (1 << installer(AS_IO)->space_config().addr_width()) - 1);
+	if (m_installer[AS_IO])
+		installer(AS_IO)->unmap_readwrite(0, (1 << installer(AS_IO)->space_config().addr_width()) - 1);
 }
 
 void rc2014_bus_device::set_bus_clock(u32 clock)
@@ -184,7 +185,7 @@ void rc2014_ext_bus_device::device_start()
 //-------------------------------------------------
 
 device_rc2014_ext_card_interface::device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device)
-	: device_rc2014_card_interface(mconfig,device)
+	: device_rc2014_card_interface(mconfig, device)
 	, m_bus(nullptr)
 {
 }
@@ -250,7 +251,7 @@ void rc2014_rc80_bus_device::device_start()
 //-------------------------------------------------
 
 device_rc2014_rc80_card_interface::device_rc2014_rc80_card_interface(const machine_config &mconfig, device_t &device)
-	: device_rc2014_ext_card_interface(mconfig,device)
+	: device_rc2014_ext_card_interface(mconfig, device)
 	, m_bus(nullptr)
 {
 }

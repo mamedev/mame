@@ -20,7 +20,7 @@
 ///      Use the same approach as MAME for deriving the function pointer.
 ///      This is compiler-dependent as well
 ///
-///  Benchmarks for `./nltool -c run  -t 10 -n pongf src/mame/machine/nl_pongf.cpp`
+///  Benchmarks for `./nltool -c run  -t 10 -n pong src/mame/machine/nl_pong.cpp`
 ///
 ///  PMF_TYPE_INTERNAL:       215%    215%    564%    580%
 ///  PMF_TYPE_GNUC_PMF:       163%    196%    516%    490%

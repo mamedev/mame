@@ -105,6 +105,7 @@ tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *ta
 	m_waitinit(false),
 	m_rpiconn(false),
 	m_tc(0),
+	m_rd(0),
 	m_lasttc(0)
 {
 }
@@ -155,9 +156,8 @@ void tipi_card_device::readz(offs_t offset, uint8_t *value)
 			int val = 0;
 			if (m_address & 2)
 			{
-				val = m_indqueue.front();
-				m_indqueue.pop();
-				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", val);
+				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", m_rd);
+				val = m_rd;
 			}
 			else
 			{
@@ -393,6 +393,9 @@ void tipi_card_device::process_message()
 					{
 						m_rc = m_tc;   // Auto-acknowledge
 						m_lasttc = m_tc;
+
+						m_rd = m_indqueue.front();
+						m_indqueue.pop();
 					}
 				}
 			}

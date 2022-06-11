@@ -3,6 +3,9 @@
 license:CC0
 -->
 <mamelayout version="2">
+
+<!-- define elements -->
+
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="192" bottom="44" />
@@ -38,55 +41,103 @@ license:CC0
 		</rect>
 	</element>
 
+	<element name="white">
+		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
+	</element>
+
+	<element name="text_serve">
+		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<text string="SERVE BUTTON"><color red="0.1" green="0.1" blue="0.1" /></text>
+	</element>
+
 	<element name="serve_led" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
-		</disk>
-		<text string="SERVE" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="lamp_credit1" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="1.0" blue="1.0" />
+		<disk>
+			<bounds x="0" y="0" width="10" height="10" />
+			<color red="0.1" green="0.1" blue="0.1" />
 		</disk>
-		<text string="CREDIT1" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<disk state="0">
+			<bounds x="2" y="2" width="6" height="6" />
+			<color red="0.99" green="0.99" blue="0.99" />
+		</disk>
+		<disk state="1">
+			<bounds x="2" y="2" width="6" height="6" />
+			<color red="1.0" green="1.0" blue="0.5" />
+		</disk>
+		<text string="ONE">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="3" width="10" height="1.25" />
+		</text>
+		<text string="PLAYER">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="4.25" width="10" height="1.25" />
+		</text>
+		<text string="START">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="5.5" width="10" height="1.25" />
 		</text>
 	</element>
 
 	<element name="lamp_credit2" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="1.0" blue="1.0" />
+		<disk>
+			<bounds x="0" y="0" width="10" height="10" />
+			<color red="0.1" green="0.1" blue="0.1" />
 		</disk>
-		<text string="CREDIT2" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+		<disk state="0">
+			<bounds x="2" y="2" width="6" height="6" />
+			<color red="0.99" green="0.99" blue="0.99" />
+		</disk>
+		<disk state="1">
+			<bounds x="2" y="2" width="6" height="6" />
+			<color red="1.0" green="1.0" blue="0.5" />
+		</disk>
+		<text string="TWO">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="3" width="10" height="1.25" />
+		</text>
+		<text string="PLAYER">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="4.25" width="10" height="1.25" />
+		</text>
+		<text string="START">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="5.5" width="10" height="1.25" />
 		</text>
 	</element>
 
-	<view name="Color Overlay">
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
 		<screen index="0">
 			<bounds left="0" top="0" right="3" bottom="4" />
 		</screen>
-		<collection name="Overlay">
+		<collection name="Color Overlay">
 			<element ref="overlay" blend="multiply">
 				<bounds left="0" top="0" right="3" bottom="4" />
 			</element>
 		</collection>
-		<collection name="Lamps">
-			<element name="lamp_credit1" ref="lamp_credit1">
-				<bounds x="0.2" y="4.01" width="0.55" height="0.55" />
-			</element>
-			<element name="serve_led" ref="serve_led">
-				<bounds x="1.4" y="4.01" width="0.24" height="0.24" />
-			</element>
-			<element name="lamp_credit2" ref="lamp_credit2">
-				<bounds x="2.25" y="4.01" width="0.55" height="0.55" />
-			</element>
+
+		<collection name="Control Panel" visible="no">
+			<element ref="white"><bounds x="0" y="4.015" width="3" height="0.48" /></element>
+
+			<element ref="text_serve"><bounds x="1" y="4.15" width="1" height="0.06" /></element> <!-- actually, serve button is above player 2 start, but that would take up much vertical space -->
+			<element name="serve_led" ref="serve_led"><bounds x="1.465" y="4.220" width="0.07" height="0.07" /></element>
+			<element ref="nothing" inputtag="IN0" inputmask="0x10"><bounds x="1.435" y="4.190" width="0.13" height="0.13" /></element>
+
+			<element name="lamp_credit1" ref="lamp_credit1"><bounds x="0.75" y="4.08" width="0.35" height="0.35" /></element>
+			<element ref="nothing" inputtag="IN0" inputmask="0x04"><bounds x="0.75" y="4.08" width="0.35" height="0.35" /></element>
+			<element name="lamp_credit2" ref="lamp_credit2"><bounds x="1.90" y="4.08" width="0.35" height="0.35" /></element>
+			<element ref="nothing" inputtag="IN0" inputmask="0x08"><bounds x="1.90" y="4.08" width="0.35" height="0.35" /></element>
 		</collection>
+
 	</view>
 </mamelayout>

@@ -281,7 +281,7 @@ namespace netlist::devices
 			for (auto & net : nl_state.nets())
 			{
 				nl_state.log().verbose("processing {1}", net->name());
-				if (!net->is_rail_net() && !nl_state.core_terms(*net).empty())
+				if (!net->is_rail_net() && !net->core_terms_empty())
 				{
 					nl_state.log().verbose("   ==> not a rail net");
 					// Must be an analog net
@@ -346,12 +346,14 @@ namespace netlist::devices
 		{
 			// ignore empty nets. FIXME: print a warning message
 			nl_state.log().verbose("Net {}", n.name());
-			if (!nl_state.core_terms(n).empty())
+			auto terminals(n.core_terms_copy());
+
+			if (!terminals.empty())
 			{
 				// add the net
 				groupspre.back().push_back(&n);
 				// process all terminals connected to this net
-				for (auto &term : nl_state.core_terms(n))
+				for (detail::core_terminal_t * term : terminals)
 				{
 					nl_state.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
 					// only process analog terminals
@@ -406,7 +408,7 @@ namespace netlist::devices
 					state().log().error(ME_SOLVER_CONSISTENCY_RAIL_NET(n->name()));
 					num_errors++;
 				}
-				for (const auto &t : state().core_terms(*n))
+				for (detail::core_terminal_t * t : n->core_terms_copy())
 				{
 					if (!t->has_net())
 					{
@@ -471,7 +473,7 @@ namespace netlist::devices
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());
-				for (const auto &t : state().core_terms(*n))
+				for (const detail::core_terminal_t *t : n->core_terms_copy())
 				{
 					log().verbose("   {1}", t->name());
 				}

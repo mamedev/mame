@@ -146,8 +146,8 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.h",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
 	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
@@ -206,7 +206,6 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
-	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/includes/mw8080bw.h",
 	MAME_DIR .. "src/mame/audio/mw8080bw.h",
@@ -276,7 +275,7 @@ files{
 	MAME_DIR .. "src/mame/audio/cclimber.h",
 
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
-	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+	MAME_DIR .. "src/mame/audio/nl_zac1b11142.h",
 	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
 	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/zaccaria.cpp",
@@ -305,13 +304,9 @@ files{
 	MAME_DIR .. "src/mame/video/vicdual-97269pb.cpp",
 	MAME_DIR .. "src/mame/video/vicdual-97269pb.h",
 	MAME_DIR .. "src/mame/audio/carnival.cpp",
-	MAME_DIR .. "src/mame/audio/carnival.h",
 	MAME_DIR .. "src/mame/audio/depthch.cpp",
-	MAME_DIR .. "src/mame/audio/depthch.h",
 	MAME_DIR .. "src/mame/audio/invinco.cpp",
-	MAME_DIR .. "src/mame/audio/invinco.h",
 	MAME_DIR .. "src/mame/audio/pulsar.cpp",
-	MAME_DIR .. "src/mame/audio/pulsar.h",
 
 	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
 	MAME_DIR .. "src/mame/machine/segacrpt_device.h",
@@ -343,6 +338,7 @@ files{
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
 
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
+	MAME_DIR .. "src/mame/drivers/segas16b_isgsm.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",

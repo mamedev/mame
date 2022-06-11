@@ -12,8 +12,11 @@
 
 #pragma once
 
-
 #include "ui/menu.h"
+
+#include <functional>
+#include <string>
+#include <vector>
 
 
 namespace ui {
@@ -28,6 +31,7 @@ public:
 	menu_selector(
 			mame_ui_manager &mui,
 			render_container &container,
+			std::string &&title,
 			std::vector<std::string> &&sel,
 			int initial,
 			std::function<void (int)> &&handler);
@@ -38,21 +42,22 @@ protected:
 	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
-	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
+	enum { VISIBLE_SEARCH_ITEMS = 200 };
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
 	void find_matches(const char *str);
 
+	std::string const              m_title;
 	std::string                    m_search;
 	std::vector<std::string>       m_str_items;
 	std::function<void (int)>      m_handler;
 	std::vector<std::u32string>    m_ucs_items;
 	int                            m_initial;
-	std::string                    *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	std::string                    *m_searchlist[VISIBLE_SEARCH_ITEMS + 1];
 };
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_SELECTOR_H */
+#endif // MAME_FRONTEND_UI_SELECTOR_H

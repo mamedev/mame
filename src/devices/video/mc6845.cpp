@@ -1050,6 +1050,14 @@ void mc6845_device::assert_light_pen_input()
 }
 
 
+// Microbee requires precise supplied light-pen address
+void mc6845_device::assert_light_pen_input(u16 ma)
+{
+	m_light_pen_addr = ma;
+	m_light_pen_latched = true;
+}
+
+
 void mc6845_device::set_hpixels_per_column(int hpixels_per_column)
 {
 	/* validate arguments */

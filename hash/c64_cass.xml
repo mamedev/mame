@@ -14420,16 +14420,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side 1"/>
+			<feature name="part_id" value="Side 1: Loader"/>
 			<dataarea name="cass" size="744558">
 				<rom name="Super_Cycle_Side_1.tap" size="744558" crc="28797050" sha1="c3474c15d99f4b70d0356a6aa3a07541449944cc"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2: Tracks"/>
 			<dataarea name="cass" size="982820">
 				<rom name="Super_Cycle_Side_2.tap" size="982820" crc="51cf183c" sha1="3c23e7d9a9f35b316d9881b51f952b2b06f91b07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcycleu" cloneof="suprcycle">
+		<description>Super Cycle (U.S. Gold)</description>
+		<year>1986</year>
+		<publisher>U.S Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Loader"/>
+			<dataarea name="cass" size="744558">
+				<rom name="Super_Cycle_Side_1.tap" size="744558" crc="623875de" sha1="b38be7e70db5491af29a488f040912c9178051e7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Tracks"/>
+			<dataarea name="cass" size="982820">
+				<rom name="Super_Cycle_Side_2.tap" size="982820" crc="0dc52cf6" sha1="be092b6934cd3b3ac357e4368c715e65046e950a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprdogf">
+		<description>Super Dogfight</description>
+		<year>1983</year>
+		<publisher>Terminal Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="923130">
+				<rom name="Super_Dogfight.tap" size="923130" crc="9c8b2f0a" sha1="4249c9fe874b660fc4f9182b407cc88b66241573"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="848294">
+				<rom name="Super_Dogfight_a1.tap" size="848294" crc="c75fef4e" sha1="08012fe9d62170d03a0968f9e8a40fe246bf8933"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14466,6 +14504,57 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="suprhero">
+		<description>Super Hero</description>
+		<year>1988</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="748297">
+				<rom name="Super_Hero.tap" size="748297" crc="2eaa2900" sha1="70970ea1e9acc66589ed2c26e1597aea6e85816c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="754561">
+				<rom name="Super_Hero_a1.tap" size="754561" crc="f2f29017" sha1="23c0a4b282183b3b0449d21e5e7461fcf2cf1c18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprhuey2">
+		<description>Super Huey II</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1314203">
+				<rom name="Super_Huey_II.tap" size="1314203" crc="88abfc8c" sha1="ecc9dc274b287511cb898c723e28be6b671fa673"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprhuey">
+		<description>Super Huey UH-1X</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="alt_title" value="Super Huey"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1090873">
+				<rom name="Super_Huey_UH-1X_Side_1.tap" size="1090873" crc="69a21e2e" sha1="3a8b34b2d4e5b0eca378bb4cade5f82f4747fa3b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1005055">
+				<rom name="Super_Huey_UH-1X_Side_2.tap" size="1005055" crc="01d6bf48" sha1="0395a6caeacad06b1ed02acfcdf06bd16043d514"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprleag">
 		<description>Super League</description>
 		<year>1990</year>
@@ -14484,6 +14573,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="suproswa">
+		<description>Super Oswald</description>
+		<year>1990</year>
+		<publisher>Silverrock Productions</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="712283">
+				<rom name="Super_Oswald.tap" size="712283" crc="37c4624b" sha1="e51dcbd5aba3b2d2f1d830895b74312c90c977af"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="712282">
+				<rom name="Super_Oswald_a1.tap" size="712282" crc="764cffd0" sha1="e82f5e74241fb03158f449e7d96a10385be3ae61"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprseymr">
 		<description>Super Seymour Saves the Planet</description>
 		<year>1992</year>
@@ -14492,6 +14599,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="670971">
 				<rom name="Super_Seymour_Saves_the_Planet.tap" size="670971" crc="8e30950e" sha1="3065aa6a01d1104c6709991a4cf0ff1afcb89d44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprskra">
+		<description>Super Skramble</description>
+		<year>1983</year>
+		<publisher>Terminal Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="463460">
+				<rom name="Super_Skramble.tap" size="463460" crc="bb80c0ad" sha1="8557c955bbb476df159b86a6e66a668cb5ba435a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="462854">
+				<rom name="Super_Skramble_a1.tap" size="462854" crc="1c96886d" sha1="caa66507fb0df985d0f3203ad6629b3316c8f6b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssprint">
+		<description>Super Sprint</description>
+		<year>1987</year>
+		<publisher>Electric Dreams</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="787424">
+				<rom name="Super_Sprint.tap" size="787424" crc="95e6ed71" sha1="c418929904150e75d7d5b417b50f786eb5dc8310"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstuntmn">
+		<description>Super Stunt Man</description>
+		<year>1988</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="882040">
+				<rom name="Super_Stunt_Man.tap" size="882040" crc="3154f85b" sha1="bc79df8f03137870fdfadf614a7fbba3992a5643"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="873224">
+				<rom name="Super_Stunt_Man_a1.tap" size="873224" crc="fea26af8" sha1="12a61621b005a7a464d0436684ba5771ed51537e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14514,6 +14669,57 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="suprtruxe" cloneof="suprtrux">
+		<description>Super Trux (Elite Systems)</description>
+		<year>1989</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="688688">
+				<rom name="Super_Trux.tap" size="688688" crc="a7898810" sha1="c37cdb215a52e440d5af30fc78683b53ea8f64be"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="688688">
+				<rom name="Super_Trux_a1.tap" size="688688" crc="e114f678" sha1="26000e004be57af4da89ec30a1780d93e1a73e8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbml">
+		<description>Super Wonder Boy</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="alt_title" value="Wonder Boy in Monster Land"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="2379670">
+				<rom name="Super_Wonder_Boy_Side_1.tap" size="2379670" crc="8284062d" sha1="a8358a988d948aa467fcde566afc203f1b5d33fe"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1651916">
+				<rom name="Super_Wonder_Boy_Side_2.tap" size="1651916" crc="2d0eb27b" sha1="5735eb2783c66c76e5ce4d86da436a75750b73d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szaxxon">
+		<description>Super Zaxxon</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="479497">
+				<rom name="Super_Zaxxon.tap" size="479497" crc="bc301c0a" sha1="44dbf41dd9585c01adf4ab896bc8f53f1c2b5644"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprkid">
 		<description>Superkid in Space</description>
 		<year>1991</year>
@@ -14526,15 +14732,41 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ssicehoc">
+		<description>Superstar Ice Hockey</description>
+		<year>1987</year>
+		<publisher>Databyte</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="870439">
+				<rom name="Superstar_Ice_Hockey.tap" size="870439" crc="50fe0265" sha1="b1b8b9eb6e38827eb1a31bacb36700e07cc7f9af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspingpo">
+		<description>Superstar Ping Pong</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="475176">
+				<rom name="Superstar_Ping_Pong.tap" size="475176" crc="964908ca" sha1="9aad327508dd44eed22f2b596817449af58d536b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sweep">
 		<description>Sweep</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="400020">
 				<rom name="sweep (c64) (side a).tap" size="400020" crc="5c9225bf" sha1="d1c27f0d9833b91b5fc506087c83d49578f93257"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="388837">
 				<rom name="sweep (c64) (side b).tap" size="388837" crc="ab92b874" sha1="0a24b3db81b5ffd378dbb50e82f13daf4a645072"/>

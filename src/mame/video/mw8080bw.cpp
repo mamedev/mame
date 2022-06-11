@@ -353,7 +353,7 @@ WRITE_LINE_MEMBER(mw8080bw_state::screen_vblank_phantom2)
 
 // the flip screen circuit is just a couple of relays on the monitor PCB
 
-uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t invaders_state::screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x = 0;
 	uint8_t y = MW8080BW_VCOUNTER_START_NO_VBLANK;

@@ -100,6 +100,8 @@ namespace netlist::devices {
 
 		NETLIB_HANDLERI(clk)
 		{
+			const netlist_sig_t J(m_J());
+			const netlist_sig_t K(m_K());
 			const netlist_sig_t t(m_Q.net().Q());
 			/*
 			 *  J K  Q1 Q2 F t   Q
@@ -112,12 +114,12 @@ namespace netlist::devices {
 			 *  1 0   0  0 1 1   1
 			 *  1 1   1  0 0 1   0
 			 */
-			if ((m_J() & m_K()) ^ 1)
+			if ((J & K) ^ 1)
 				m_clk.inactivate();
-			newstate(((t ^ 1) & m_J()) | (t & (m_K() ^ 1)));
+			newstate(((t ^ 1) & J) | (t & (K ^ 1)));
 		}
 
-		void newstate(const netlist_sig_t state)
+		void newstate(const netlist_sig_t state) noexcept
 		{
 			m_Q.push(state, D::delay::value(state));
 			m_QQ.push(state ^ 1, D::delay::value(state ^ 1));

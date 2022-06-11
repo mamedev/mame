@@ -447,6 +447,18 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
+	<software name="elksdp1">
+		<description>ElkSD Plus 1</description>
+		<year>2020</year>
+		<publisher>Ramtop</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="elksdp1" />
+			<dataarea name="rom" size="16384">
+				<rom name="eswmmfs-1.44.rom" size="16384" crc="d7f1d4cd" sha1="52e39cc694e1a42e4a94dcd1c3a44aea02aed8ac"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="peg4001" cloneof="peg400">
 		<description>Pegasus 400 v1.01</description>
 		<year>1987</year>

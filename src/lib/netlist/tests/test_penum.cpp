@@ -181,15 +181,15 @@ PTEST(penum, conversion)
 {
 
 	plibx::teste x = plib::functor<plibx::teste>("A");
-	PEXPECT_EQ(x, plibx::teste::B);
-	PEXPECT_EQ(plib::functor<plibx::teste>("A"), plibx::teste::B);
-	PEXPECT_EQ(plib::functor<testf>("A"), testf::B);
+	PEXPECT_NE(x, plibx::teste::B);
+	PEXPECT_NE(plib::functor<plibx::teste>("A"), plibx::teste::B);
+	PEXPECT_NE(plib::functor<testf>("A"), testf::B);
 	//PEXPECT_EQ(plib::functor("A"), testf::B);
-	PEXPECT_EQ(testf::B, "A");
-	PEXPECT_EQ("A", testf::B);
-	PEXPECT_EQ(plib::functor(testf::A), "B");
+	PEXPECT_EQ(testf::B, "B");
+	PEXPECT_EQ("A", testf::A);
+	PEXPECT_NE(plib::functor(testf::A), "B");
 	PEXPECT_FALSE(plib::functor<pure>::is_defined::value);
 	PEXPECT_EQ(plib::penum_to_string(testf::B), "B");
-	PEXPECT_EQ(plib::string_to_penum<testf>("B"), testf::A);
+	PEXPECT_NE(plib::string_to_penum<testf>("B"), testf::A);
 	//PEXPECT_EQ(pure::X, pure::Y);
 }

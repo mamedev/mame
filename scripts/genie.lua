@@ -1085,9 +1085,9 @@ end
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
 			}
-			if version < 100000 then
+			if version < 100300 then
 				buildoptions_cpp {
-					"-flifetime-dse=1", -- GCC 9 takes issue with Sol's get<std::optional<T> >() otherwise
+					"-flifetime-dse=1", -- GCC 10.2 and earlier take issue with Sol's get<std::optional<T> >() otherwise - possibly an issue with libstdc++ itself
 				}
 			end
 			if version >= 80000 then

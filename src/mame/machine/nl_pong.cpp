@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-  Netlist (pong) included from pong.c
+  Netlist (pong) included from pong.cpp
 
 ***************************************************************************/
 
@@ -14,7 +14,7 @@
 
 #define FAST_CLOCK  (1)
 
-NETLIST_START(pongf)
+NETLIST_START(pong)
 
 	SOLVER(Solver, 5000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers

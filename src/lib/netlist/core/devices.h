@@ -136,6 +136,9 @@ namespace netlist::devices
 
 	// -----------------------------------------------------------------------------
 	// nld_nc_pin
+	//
+	// FIXME: This needs to optimized
+	//        The input can be in de-activated state.
 	// -----------------------------------------------------------------------------
 
 	NETLIB_OBJECT(nc_pin)
