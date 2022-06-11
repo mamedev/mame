@@ -11,6 +11,14 @@
 #include "igs022.h"
 #include <sstream>
 
+#define LOG_DMA      (1U << 1)
+#define LOG_STACK    (1U << 2)
+#define LOG_CMD_6D   (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_STACK | LOG_CMD_6D)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, IGS022, tag, owner, clock)
 	, m_sharedprotram(*this, "sharedprotram")
@@ -65,7 +73,7 @@ void igs022_device::device_reset()
 // From IGS022 ROM to shared protection RAM
 void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 {
-	logerror("%s: IGS022 DMA src %04x, dst %04x, size %04x, mode %04x\n", machine().describe_context(), src, dst, size, mode);
+	LOGMASKED(LOG_DMA, "%s: IGS022 DMA src %04x, dst %04x, size %04x, mode %04x\n", machine().describe_context(), src, dst, size, mode);
 
 	/*
 	P_SRC  = 0x300290 (offset from prot rom base)
@@ -83,7 +91,8 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	const u16 param = mode >> 8;
 
 	// the initial auto-DMA on killbld/slqz2/lhzb2 has 0x10 set, drgw3 has 0x18 set, not sure how they affect the operation.
-	if (mode & 0x00f8) logerror("%s: IGS022 DMA mode bits %04x set\n", machine().describe_context(), mode & 0x00f8);
+	if (mode & 0x00f8)
+		logerror("%s: IGS022 unknown DMA mode bits %04x set\n", machine().describe_context(), mode & 0x00f8);
 
 	mode &= 0x7; // what are the other bits?
 
@@ -128,7 +137,7 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 				if ((x & 0x300) == 0x200) extraxor |= 0x5300; // 'S'
 				if ((x & 0x300) == 0x300) extraxor |= 0x2000; // ' '
 
-				logerror("%s: IGS022 DMA mode 4 -> %06x | %04x (%04x)\n", machine().describe_context(), (dst + x) * 2, dat, (u16)(dat - extraxor));
+				LOGMASKED(LOG_DMA, "%s: IGS022 DMA mode 4 -> %06x | %04x (%04x)\n", machine().describe_context(), (dst + x) * 2, dat, (u16)(dat - extraxor));
 
 				dat -= extraxor;
 				break;
@@ -253,7 +262,7 @@ void igs022_device::handle_command()
 
 			push_stack(data);
 
-			logerror("%s: IGS022 command %04x: PUSH {288, 28a} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
+			LOGMASKED(LOG_STACK, "%s: IGS022 command %04x: PUSH {288, 28a} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
 
 			m_sharedprotram[0x202 / 2] = 0x23; // this mode complete?
 			break;
@@ -270,7 +279,7 @@ void igs022_device::handle_command()
 			m_sharedprotram[0x28c / 2] = (data >> 16) & 0xffff;
 			m_sharedprotram[0x28e / 2] = data & 0xffff;
 
-			logerror("%s: IGS022 command %04x: POP {28c, 28e} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
+			LOGMASKED(LOG_STACK, "%s: IGS022 command %04x: POP {28c, 28e} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
 
 			m_sharedprotram[0x202 / 2] = 0x56; // this mode complete?
 			break;
@@ -281,7 +290,7 @@ void igs022_device::handle_command()
 
 		case 0x4f: // DMA from protection ROM (memcpy with encryption / scrambling)
 		{
-			logerror("%s: IGS022 command %04x: DMA\n", machine().describe_context(), cmd);
+			LOGMASKED(LOG_DMA, "%s: IGS022 command %04x: DMA\n", machine().describe_context(), cmd);
 
 			const u16 src  = m_sharedprotram[0x290 / 2] >> 1; // External mcu data is 8 bit and addressed as such
 			const u32 dst  = m_sharedprotram[0x292 / 2];
@@ -311,7 +320,7 @@ void igs022_device::handle_command_6d()
 	const u32 p1 = (m_sharedprotram[0x298 / 2] << 16) | m_sharedprotram[0x29a / 2];
 	const u32 p2 = (m_sharedprotram[0x29c / 2] << 16) | m_sharedprotram[0x29e / 2];
 
-	std::stringstream stream;
+	std::ostringstream stream;
 	util::stream_format(stream, "%s: IGS022 command 006d: ASIC RAM %04x %04x %04x %04x ~ ", machine().describe_context(),
 		(p1 >> 16) & 0xffff, (p1 >> 0) & 0xffff, (p2 >> 16) & 0xffff, (p2 >> 0) & 0xffff
 	);
@@ -392,7 +401,7 @@ void igs022_device::handle_command_6d()
 		}
 	}
 
-	logerror("%s", stream.str());
+	LOGMASKED(LOG_CMD_6D, "%s", stream.str());
 	m_sharedprotram[0x202 / 2] = 0x7c; // this mode complete?
 }
 

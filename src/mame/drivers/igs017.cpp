@@ -67,6 +67,19 @@ Notes:
 #include "igspoker.lh"
 #include "igsslot.lh"
 
+#define LOG_PROT_STRING     (1U << 1)
+#define LOG_PROT_BITSWAP    (1U << 2)
+#define LOG_PROT_INCDEC     (1U << 3)
+#define LOG_PROT_INC        (1U << 4)
+#define LOG_PROT_SCRAMBLE   (1U << 5)
+#define LOG_PROT_REMAP      (1U << 6)
+#define LOG_PROT_IGS022     (1U << 7)
+#define LOG_PROT_IGS029     (1U << 8)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PROT_STRING | LOG_PROT_BITSWAP | LOG_PROT_INCDEC | LOG_PROT_INC | LOG_PROT_SCRAMBLE | LOG_PROT_REMAP | LOG_PROT_IGS022 | LOG_PROT_IGS029)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 /***************************************************************************
 
     ---- IGS Multiplexer ----
@@ -210,7 +223,7 @@ void igs_string_device::device_reset()
 u8 igs_string_device::result_r()
 {
 	const u8 res = bitswap<8>(m_word, 5, 2, 9, 7, 10, 13, 12, 15);
-	logerror("%s: read bitswap - word %04x -> %02x\n", machine().describe_context(), m_word, res);
+	LOGMASKED(LOG_PROT_STRING, "%s: read bitswap - word %04x -> %02x\n", machine().describe_context(), m_word, res);
 	return res;
 }
 
@@ -243,7 +256,8 @@ void igs_string_device::do_bitswap_w(offs_t offset, u8 data)
 	const u16 xor0 = BIT(data, offset & 7);
 	m_word |= bit0 ^ xor0;
 
-	logerror("%s: exec bitswap on port %02x = %02x - bit0 %x, xor0 %x, word %04x -> %04x\n", machine().describe_context(), offset, data, bit0, xor0, x, m_word);
+	LOGMASKED(LOG_PROT_STRING, "%s: exec bitswap on port %02x = %02x - bit0 %x, xor0 %x, word %04x -> %04x\n", machine().describe_context(),
+		offset, data, bit0, xor0, x, m_word);
 }
 
 u8 igs_string_device::advance_string_offs_r(address_space &space)
@@ -256,8 +270,8 @@ u8 igs_string_device::advance_string_offs_r(address_space &space)
 
 	const u16 next_string_word  =   (m_string_word & (0xff << (8 - shift))) | (next_string_byte << shift);
 
-	logerror("%s: advance string offs %02x -> %02x, string data = %02x, string word %04x -> %04x\n",
-		machine().describe_context(), m_string_offs, next_string_offs, next_string_byte, m_string_word, next_string_word);
+	LOGMASKED(LOG_PROT_STRING, "%s: advance string offs %02x -> %02x, string data = %02x, string word %04x -> %04x\n", machine().describe_context(),
+		m_string_offs, next_string_offs, next_string_byte, m_string_word, next_string_word);
 
 	m_string_offs = next_string_offs;
 	m_string_word = next_string_word;
@@ -375,14 +389,14 @@ void igs_bitswap_device::device_reset()
 u8 igs_bitswap_device::result_r()
 {
 	u8 res = bitswap<8>(m_val, 5, 2, 9, 7, 10, 13, 12, 15);
-	logerror("%s: read bitswap - val %04x -> %02x\n", machine().describe_context(), m_val, res);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: read bitswap - val %04x -> %02x\n", machine().describe_context(), m_val, res);
 	return res;
 }
 
 void igs_bitswap_device::word_w(u8 data)
 {
 	m_word = (m_word << 8) | data;
-	logerror("%s: word = %02x\n", machine().describe_context(), m_word);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: word = %02x\n", machine().describe_context(), m_word);
 }
 
 void igs_bitswap_device::mode_f_w(u8 data)
@@ -393,7 +407,7 @@ void igs_bitswap_device::mode_f_w(u8 data)
 	if ((m_word & 0x000f) != 0x0006)    m_mf |= 0x02;
 	if ((m_word & 0x00f0) != 0x0090)    m_mf |= 0x01;
 
-	logerror("%s: mode_f = %x (word = %04x)\n", machine().describe_context(), m_mf, m_word);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: mode_f = %x (word = %04x)\n", machine().describe_context(), m_mf, m_word);
 }
 
 void igs_bitswap_device::mode_3_w(u8 data)
@@ -402,7 +416,7 @@ void igs_bitswap_device::mode_3_w(u8 data)
 	if ((m_word & 0x000f) != 0x0003)    m_m3 |= 0x02;
 	if ((m_word & 0x00f0) != 0x0050)    m_m3 |= 0x01;
 
-	logerror("%s: mode_3 = %x (word = %04x)\n", machine().describe_context(), m_m3, m_word);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: mode_3 = %x (word = %04x)\n", machine().describe_context(), m_m3, m_word);
 }
 
 void igs_bitswap_device::do_bitswap_w(offs_t offset, u8 data)
@@ -427,13 +441,13 @@ void igs_bitswap_device::do_bitswap_w(offs_t offset, u8 data)
 	u16 xor0 = BIT(data, offset & 7);
 	m_val |= bit0 ^ xor0;
 
-	logerror("%s: exec bitswap on port %02x = %02x - mode_3 %02x, mode_f %02x, bit0 %x, xor0 %x, val %04x -> %04x\n", machine().describe_context(), offset, data, m_m3, m_mf, bit0, xor0, x, m_val);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: exec bitswap on port %02x = %02x - mode_3 %02x, mode_f %02x, bit0 %x, xor0 %x, val %04x -> %04x\n", machine().describe_context(), offset, data, m_m3, m_mf, bit0, xor0, x, m_val);
 	return;
 }
 
 void igs_bitswap_device::reset_w(u8 data)
 {
-	logerror("%s: reset bitswap - val %04x -> 0\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_BITSWAP, "%s: reset bitswap - val %04x -> 0\n", machine().describe_context(), m_val);
 	m_val = 0;
 }
 
@@ -480,26 +494,26 @@ u8 igs_incdec_device::result_r()
 				(BIT(m_val, 2) << 4) |
 				(BIT(m_val, 1) << 2) ;
 
-	logerror("%s: value read, %02x -> %02x\n", machine().describe_context(), m_val, res);
+	LOGMASKED(LOG_PROT_INCDEC, "%s: value read, %02x -> %02x\n", machine().describe_context(), m_val, res);
 	return res;
 }
 
 void igs_incdec_device::reset_w(u8 data)
 {
 	m_val = 0x00;
-	logerror("%s: reset -> %02x\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_INCDEC, "%s: reset -> %02x\n", machine().describe_context(), m_val);
 }
 
 void igs_incdec_device::inc_w(u8 data)
 {
 	m_val++;
-	logerror("%s: inc -> %02x\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_INCDEC, "%s: inc -> %02x\n", machine().describe_context(), m_val);
 }
 
 void igs_incdec_device::dec_w(u8 data)
 {
 	m_val--;
-	logerror("%s: dec -> %02x\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_INCDEC, "%s: dec -> %02x\n", machine().describe_context(), m_val);
 }
 
 DEFINE_DEVICE_TYPE(IGS_INCDEC, igs_incdec_device, "igs_incdec", "IGS Inc/Dec Protection")
@@ -545,20 +559,20 @@ u8 igs_inc_device::result_r()
 {
 	const u8 res = (BIT(~m_val, 0) | (BIT(m_val, 1) & BIT(m_val, 2))) << 5;
 
-	logerror("%s: value read, %02x -> %02x\n", machine().describe_context(), m_val, res);
+	LOGMASKED(LOG_PROT_INC, "%s: value read, %02x -> %02x\n", machine().describe_context(), m_val, res);
 	return res;
 }
 
 void igs_inc_device::reset_w(u8 data)
 {
 	m_val = 0x00;
-	logerror("%s: reset -> %02x\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_INC, "%s: reset -> %02x\n", machine().describe_context(), m_val);
 }
 
 void igs_inc_device::inc_w(u8 data)
 {
 	m_val++;
-	logerror("%s: inc -> %02x\n", machine().describe_context(), m_val);
+	LOGMASKED(LOG_PROT_INC, "%s: inc -> %02x\n", machine().describe_context(), m_val);
 }
 
 DEFINE_DEVICE_TYPE(IGS_INC, igs_inc_device, "igs_inc", "IGS Inc Protection")
@@ -739,11 +753,10 @@ private:
 	{
 		if (!BIT(m_igs022_latch, Bit) && BIT(data, Bit)) // 0 -> 1 executes
 		{
-//          logerror("%s: IGS022 execute\n", machine().describe_context());
 			m_igs022->handle_command();
 
-			u8 new_scramble_data = (m_scramble_data + 1) & 0x7f;
-			logerror("%s: Scrambled data %02x -> %02x\n", machine().describe_context(), m_scramble_data, new_scramble_data);
+			const u8 new_scramble_data = (m_scramble_data + 1) & 0x7f;
+			LOGMASKED(LOG_PROT_IGS022, "%s: IGS022 scrambled data %02x -> %02x\n", machine().describe_context(), m_scramble_data, new_scramble_data);
 			m_scramble_data = new_scramble_data;
 		}
 
@@ -1957,7 +1970,7 @@ void igs017_state::incdec_remap_addr_w(offs_t offset, u8 data)
 			prg_space.unmap_write(m_remap_addr + 0x3, m_remap_addr + 0x3);
 			prg_space.unmap_read (m_remap_addr + 0x5, m_remap_addr + 0x5);
 
-			logerror("%s: incdec protection unmapped from %04x\n", machine().describe_context(), m_remap_addr);
+			LOGMASKED(LOG_PROT_REMAP, "%s: incdec protection unmapped from %04x\n", machine().describe_context(), m_remap_addr);
 		}
 
 		m_remap_addr = (m_remap_addr & 0xff00) | data;
@@ -1973,7 +1986,7 @@ void igs017_state::incdec_remap_addr_w(offs_t offset, u8 data)
 		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::inc_w)));
 		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (*m_igs_incdec, FUNC(igs_incdec_device::result_r)));
 
-		logerror("%s: incdec protection remapped at %04x\n", machine().describe_context(), m_remap_addr);
+		LOGMASKED(LOG_PROT_REMAP, "%s: incdec protection remapped at %04x\n", machine().describe_context(), m_remap_addr);
 	}
 }
 
@@ -2205,7 +2218,7 @@ void igs017_state::tarzan_dsw_sound_w(u8 data)
 	m_oki->set_rom_bank(BIT(data, 7));
 //  popmessage("DSW %02X", data);
 	if (data & ~0x87)
-		logerror("%s: warning, unknown bits written in dsw_w = %02x\n", machine().describe_context(), data);
+		logerror("%s: warning, unknown bits written in dsw_sound_w = %02x\n", machine().describe_context(), data);
 }
 
 void igs017_state::tarzan_mux_map(address_map &map)
@@ -2225,16 +2238,16 @@ void igs017_state::tarzan_mux_map(address_map &map)
 // Sound banking and DSW are accessed through it. It also performs some game specific calculations.
 void igs017_state::mgcs_igs029_run()
 {
-	logerror("%s: running igs029 command ", machine().describe_context());
+	LOGMASKED(LOG_PROT_IGS029, "%s: running igs029 command ", machine().describe_context());
 	for (int i = 0; i < m_igs029_send_len; i++)
-		logerror("%02x ", m_igs029_send_buf[i]);
+		LOGMASKED(LOG_PROT_IGS029, "%02x ", m_igs029_send_buf[i]);
 
 	if (m_igs029_send_buf[0] == 0x05 && m_igs029_send_buf[1] == 0x5a) // 'Z'
 	{
 		u8 data = m_igs029_send_buf[2];
 		u8 port = m_igs029_send_buf[3];
 
-		logerror("PORT %02x = %02x\n", port, data);
+		LOGMASKED(LOG_PROT_IGS029, "PORT %02x = %02x\n", port, data);
 
 		switch (port)
 		{
@@ -2269,7 +2282,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x55) // 'U'
 	{
-		logerror("MIN BET?\n");
+		LOGMASKED(LOG_PROT_IGS029, "MIN BET?\n");
 
 		// No inputs. Returns 1 long
 
@@ -2284,7 +2297,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x39) // '9'
 	{
-		logerror("READ DSW\n");
+		LOGMASKED(LOG_PROT_IGS029, "READ DSW\n");
 
 		u8 ret = 0xff;
 		if      (!BIT(m_dsw_select, 0)) ret &= m_io_dsw[0]->read();
@@ -2297,7 +2310,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x2c) // ','
 	{
-		logerror("?? (2C)\n"); // ??
+		LOGMASKED(LOG_PROT_IGS029, "?? (2C)\n"); // ??
 
 		// 4 inputs. Returns 1 long
 
@@ -2312,7 +2325,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x15)
 	{
-		logerror("SET LONG\n");
+		LOGMASKED(LOG_PROT_IGS029, "SET LONG\n");
 
 		m_igs029_mgcs_long = (m_igs029_send_buf[2] << 24) | (m_igs029_send_buf[3] << 16) | (m_igs029_send_buf[4] << 8) | m_igs029_send_buf[5];
 
@@ -2321,7 +2334,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x04)
 	{
-		logerror("GET LONG\n");
+		LOGMASKED(LOG_PROT_IGS029, "GET LONG\n");
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  0) & 0xff;
@@ -2332,7 +2345,7 @@ void igs017_state::mgcs_igs029_run()
 	}
 	else
 	{
-		logerror("UNKNOWN\n");
+		LOGMASKED(LOG_PROT_IGS029, "UNKNOWN\n");
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
@@ -2359,10 +2372,10 @@ void igs017_state::mgcs_keys_hopper_igs029_w(u8 data)
 			if (m_igs029_send_len < sizeof(m_igs029_send_buf))
 				m_igs029_send_buf[m_igs029_send_len++] = m_igs029_send_data;
 
-			logerror("%s: igs029 send", machine().describe_context());
+			LOGMASKED(LOG_PROT_IGS029, "%s: igs029 send", machine().describe_context());
 			for (int i = 0; i < m_igs029_send_len; i++)
-				logerror(" %02x", m_igs029_send_buf[i]);
-			logerror("\n");
+				LOGMASKED(LOG_PROT_IGS029, " %02x", m_igs029_send_buf[i]);
+			LOGMASKED(LOG_PROT_IGS029, "\n");
 
 			if (m_igs029_send_buf[0] == m_igs029_send_len)
 				mgcs_igs029_run();
@@ -2371,10 +2384,10 @@ void igs017_state::mgcs_keys_hopper_igs029_w(u8 data)
 		if (m_igs029_recv_len)
 		{
 			// RECV
-			logerror("%s: igs029 recv", machine().describe_context());
+			LOGMASKED(LOG_PROT_IGS029, "%s: igs029 recv", machine().describe_context());
 			for (int i = 0; i < m_igs029_recv_len; i++)
-				logerror(" %02x", m_igs029_recv_buf[i]);
-			logerror("\n");
+				LOGMASKED(LOG_PROT_IGS029, " %02x", m_igs029_recv_buf[i]);
+			LOGMASKED(LOG_PROT_IGS029, "\n");
 
 			if (m_igs029_recv_len)
 				--m_igs029_recv_len;
@@ -2390,27 +2403,27 @@ void igs017_state::mgcs_keys_hopper_igs029_w(u8 data)
 void igs017_state::mgcs_scramble_data_w(u8 data)
 {
 	m_scramble_data = data;
-	logerror("%s: writing scrambled data %02x to igs_mux\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: writing scrambled data %02x to igs_mux\n", machine().describe_context(), data);
 }
 
 u8 igs017_state::mgcs_scramble_data_r()
 {
 	u8 ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3 );
-	logerror("%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
 u8 igs017_state::mgcs_igs029_data_r()
 {
 	u8 ret = m_igs029_recv_data;
-	logerror("%s: reading IGS029 data %02x from igs_mux\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_PROT_IGS029, "%s: reading IGS029 data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void igs017_state::mgcs_igs029_data_w(u8 data)
 {
 	m_igs029_send_data = data;
-	logerror("%s: writing %02x to igs_mux\n", machine().describe_context(), data & 0xff);
+	LOGMASKED(LOG_PROT_IGS029, "%s: writing %02x to igs_mux\n", machine().describe_context(), data & 0xff);
 }
 
 u8 igs017_state::mgcs_keys_joy_r()
@@ -2532,7 +2545,7 @@ void igs017_state::mgdh_keys_hopper_w(u8 data)
 	m_hopper->motor_w(BIT(data, 0));
 
 	if (m_input_select & ~0xfd)
-		logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), data);
+		logerror("%s: warning, unknown bits written in keys_hopper_w = %02x\n", machine().describe_context(), data);
 }
 
 void igs017_state::mgdh_counter_w(u8 data)
@@ -2541,7 +2554,7 @@ void igs017_state::mgdh_counter_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 7)); // coin in
 
 	if (data & ~0xc0)
-		logerror("%s: warning, unknown bits written to igs_mux = %02x\n", machine().describe_context(), data);
+		logerror("%s: warning, unknown bits written in counter_w = %02x\n", machine().describe_context(), data);
 }
 
 void igs017_state::mgdha_mux_map(address_map &map)
@@ -2661,15 +2674,12 @@ void igs017_state::lhzb2_keys_hopper_w(u8 data)
 	m_hopper->motor_w(                        BIT(data, 5));   // hopper
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));   // coin out counter
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));   // coin in  counter
-
-//  if (data & 0x00)
-//      logerror("%s: warning, unknown bits written in keys_hopper_w = %04x\n", machine().describe_context(), data);
 }
 
 u8 igs017_state::lhzb2_scramble_data_r()
 {
 	u8 ret = bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7);
-	logerror("%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -2739,7 +2749,7 @@ void igs017_state::lhzb2a_remap_addr_w(address_space &space, u16 data)
 	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (*this, FUNC(igs017_state::lhzb2a_input_r)));
 	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(*this, FUNC(igs017_state::lhzb2a_remap_addr_w)));
 
-	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_remap_addr);
+	LOGMASKED(LOG_PROT_REMAP, "%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_remap_addr);
 }
 
 void igs017_state::lhzb2a_keys_hopper_w(offs_t offset, u16 data, u16 mem_mask)
@@ -2756,7 +2766,7 @@ void igs017_state::lhzb2a_keys_hopper_w(offs_t offset, u16 data, u16 mem_mask)
 		m_oki->set_rom_bank(BIT(data, 7));
 
 		if (data & 0xfe00)
-			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
+			logerror("%s: warning, unknown bits written in keys_hopper_w = %04x\n", machine().describe_context(), data);
 	}
 }
 
@@ -2823,7 +2833,7 @@ void igs017_state::slqz2_sound_hopper_w(u8 data)
 u8 igs017_state::slqz2_scramble_data_r()
 {
 	u8 ret = m_scramble_data;
-	logerror("%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
