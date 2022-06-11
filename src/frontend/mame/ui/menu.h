@@ -23,7 +23,9 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 
@@ -48,6 +50,16 @@ public:
 	};
 
 	virtual ~menu();
+
+	// setting menu heading
+	template <typename... T>
+	void set_heading(T &&... args)
+	{
+		if (!m_heading)
+			m_heading.emplace(std::forward<T>(args)...);
+		else
+			m_heading->assign(std::forward<T>(args)...);
+	}
 
 	// append a new item to the end of the menu
 	void item_append(const std::string &text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(std::string(text), std::string(), flags, ref, type); }
@@ -348,13 +360,13 @@ private:
 	// to be implemented in derived classes
 	virtual void handle(event const *ev) = 0;
 
-	// push a new menu onto the stack
-	static void stack_push(std::unique_ptr<menu> &&menu) { menu->m_global_state.stack_push(std::move(menu)); }
-
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= m_items.size(); }
+
+	// push a new menu onto the stack
+	static void stack_push(std::unique_ptr<menu> &&menu) { menu->m_global_state.stack_push(std::move(menu)); }
 
 	static global_state &get_global_state(mame_ui_manager &ui);
 
@@ -369,7 +381,9 @@ private:
 	render_container        &m_container;           // render_container we render to
 	std::unique_ptr<menu>   m_parent;               // pointer to parent menu in the stack
 
+	std::optional<std::string> m_heading;           // menu heading
 	std::vector<menu_item>  m_items;                // array of items
+	bool                    m_rebuilding;           // ensure items are only added during rebuild
 
 	uint32_t                m_process_flags;        // event processing options
 	int                     m_selected;             // which item is selected

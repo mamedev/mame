@@ -32,6 +32,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 	menu(mui, container),
 	m_plugins(mame_machine_manager::instance()->lua()->get_menu())
 {
+	set_heading(_("Plugin Options"));
 }
 
 void menu_plugin::populate(float &customtop, float &custombottom)

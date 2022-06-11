@@ -40,6 +40,7 @@ menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &con
 {
 	// The warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
+	set_heading(_("File Manager"));
 }
 
 
@@ -150,7 +151,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	if (m_warnings.empty() || !missing_mandatory)
-		item_append(m_warnings.empty() ? _("Reset Machine") : _("Start Machine"), 0, (void *)1);
+		item_append(m_warnings.empty() ? _("Reset System") : _("Start System"), 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }

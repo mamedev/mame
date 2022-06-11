@@ -286,10 +286,10 @@ std::vector<dir_entry> impl::root_dir::contents()
 			std::string fname = read_file_name(bdir.rodata()+off+3);
 			bool system = ref == 0 && id == 0 && bdir.r32b(off+0xb) == 0x2e535953;
 			if(system)
-				res.emplace_back(dir_entry(fname, dir_entry_type::system_file, 0));
+				res.emplace_back(dir_entry(std::move(fname), dir_entry_type::system_file, 0));
 
 			else if(m_fs.ref_valid(ref))
-				res.emplace_back(dir_entry(fname, dir_entry_type::file, id));
+				res.emplace_back(dir_entry(std::move(fname), dir_entry_type::file, id));
 
 			id++;
 		}
