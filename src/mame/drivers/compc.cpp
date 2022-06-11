@@ -32,9 +32,10 @@ Options: 8087 FPU
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
-#include "machine/pckeybrd.h"
 #include "softlist_dev.h"
 
 
@@ -45,19 +46,18 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
-		m_keyboard(*this, "pc_keyboard")
+		m_dsw0(*this, "DSW0")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
-	required_device<pc_keyboard_device> m_keyboard;
+	required_ioport m_dsw0;
 
 	void machine_reset() override;
 
-	void pioiii_w(offs_t offset, u8 data);
-	u8 pioiii_r(offs_t offset);
-	void pio_w(offs_t offset, u8 data);
-	u8 pio_r(offs_t offset);
+	u8 pioiii_portc_r();
+	void pioiii_portc_w(u8 data);
+	u8 pio_portc_r();
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
@@ -66,99 +66,48 @@ public:
 	void compc_map(address_map &map);
 	void compciii_io(address_map &map);
 private:
-	u8 m_portb = 0, m_dips = 0;
+	u8 m_dips = 0;
 };
 
 void compc_state::machine_reset()
 {
-	m_portb = 0;
 	m_dips = 0;
 }
 
-void compc_state::pio_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-		case 1:
-			m_portb = data;
-			m_mb->m_pit8253->write_gate2(BIT(data, 0));
-			m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-			m_keyboard->enable(BIT(data, 6));
-			if(data & 0x80)
-				m_mb->m_pic8259->ir1_w(0);
-			break;
-	}
-}
 
-
-u8 compc_state::pio_r(offs_t offset)
+u8 compc_state::pio_portc_r()
 {
-	int data = 0;
-	switch (offset)
+	u8 data;
+	if(BIT(m_mb->pc_ppi_portb_r(), 3))
 	{
-		case 0:
-			data = m_keyboard->read();
-			break;
-		case 1:
-			data = m_portb;
-			break;
-		case 2:
-			if(BIT(m_portb, 3))
-			{
-				/* read hi nibble of S2 */
-				data = (ioport("DSW0")->read() >> 4) & 0x0f;
-			}
-			else
-			{
-				/* read lo nibble of S2 */
-				data = ioport("DSW0")->read() & 0x0f;
-			}
-			if(m_mb->pit_out2())
-				data |= 0x20;
-			break;
+		/* read hi nibble of S2 */
+		data = (m_dsw0->read() >> 4) & 0x0f;
 	}
+	else
+	{
+		/* read lo nibble of S2 */
+		data = m_dsw0->read() & 0x0f;
+	}
+	if(m_mb->pit_out2())
+		data |= 0x20;
 	return data;
 }
 
-void compc_state::pioiii_w(offs_t offset, u8 data)
+void compc_state::pioiii_portc_w(u8 data)
 {
-	switch (offset)
-	{
-		case 1:
-			m_portb = data;
-			m_mb->m_pit8253->write_gate2(BIT(data, 0));
-			m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-			m_keyboard->enable(BIT(data, 6));
-			if(data & 0x80)
-				m_mb->m_pic8259->ir1_w(0);
-			break;
-		case 2:
-			m_dips = (data & ~0x30) | ioport("DSW0")->read();
-			break;
-	}
+	m_dips = (data & ~0x30) | m_dsw0->read();
 }
 
 
-u8 compc_state::pioiii_r(offs_t offset)
+u8 compc_state::pioiii_portc_r()
 {
-	int data = 0;
-	switch (offset)
-	{
-		case 0:
-			data = m_keyboard->read();
-			break;
-		case 1:
-			data = m_portb;
-			break;
-		case 2:
-			if(!BIT(m_portb, 2))
-				data = (m_dips >> 4) & 0x0f;
-			else
-				data = m_dips & 0x0f;
-			if(m_mb->pit_out2())
-				data |= 0x30;
-			break;
-	}
+	u8 data;
+	if(!BIT(m_mb->pc_ppi_portb_r(), 2))
+		data = (m_dips >> 4) & 0x0f;
+	else
+		data = m_dips & 0x0f;
+	if(m_mb->pit_out2())
+		data |= 0x30;
 	return data;
 }
 
@@ -206,14 +155,14 @@ void compc_state::compc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(FUNC(compc_state::pio_r), FUNC(compc_state::pio_w));
+	map(0x0062, 0x0062).r(FUNC(compc_state::pio_portc_r));
 }
 
 void compc_state::compciii_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
+	map(0x0062, 0x0062).rw(FUNC(compc_state::pioiii_portc_r), FUNC(compc_state::pioiii_portc_w));
 }
 
 void compc_state::compc(machine_config &config)
@@ -226,6 +175,8 @@ void compc_state::compc(machine_config &config)
 	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_mb->kbdclk_callback().set("keyboard", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbddata_callback().set("keyboard", FUNC(pc_kbdc_device::data_write_from_mb));
 	config.device_remove("mb:pit8253");
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
@@ -241,8 +192,9 @@ void compc_state::compc(machine_config &config)
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
 
-	PC_KEYB(config, m_keyboard);
-	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "keyboard", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
