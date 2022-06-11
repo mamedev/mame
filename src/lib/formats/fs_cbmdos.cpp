@@ -109,7 +109,7 @@ private:
 // methods
 bool validate_filename(std::string_view name);
 std::string_view strtrimright_cbm(std::string_view str);
-template<size_t N> std::string_view strtrimright_cbm(char str[N]);
+template<size_t N> std::string_view strtrimright_cbm(const char(&str)[N]);
 
 };
 
@@ -251,7 +251,7 @@ std::string_view strtrimright_cbm(std::string_view str)
 //-------------------------------------------------
 
 template<size_t N>
-std::string_view strtrimright_cbm(char str[N])
+std::string_view strtrimright_cbm(const char (&str)[N])
 {
 	std::string_view sv(str, std::size(str));
 	return strtrimright_cbm(sv);
