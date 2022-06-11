@@ -101,7 +101,6 @@ public:
 	void invadpt2(machine_config &config);
 	void lupin3a(machine_config &config);
 	void indianbt(machine_config &config);
-	void invasion(machine_config &config);
 	void starw1(machine_config &config);
 	void cosmo(machine_config &config);
 	void spcewars(machine_config &config);
@@ -229,7 +228,6 @@ private:
 	void indianbt_io_map(address_map &map);
 	void indianbtbr_io_map(address_map &map);
 	void invadpt2_io_map(address_map &map);
-	void invasion_io_map(address_map &map);
 	void lrescue_io_map(address_map &map);
 	void lrescuem2_io_map(address_map &map);
 	void lupin3_io_map(address_map &map);
@@ -284,6 +282,25 @@ private:
 
 	uint8_t m_port_1_last = 0;
 	uint8_t m_fleet_step = 0;
+};
+
+
+/*******************************************************/
+/* Invasion (Sidam)                                    */
+/*******************************************************/
+
+class invasion_state : public invaders_state
+{
+public:
+	invasion_state(machine_config const &mconfig, device_type type, char const *tag) :
+		invaders_state(mconfig, type, tag)
+	{
+	}
+
+	void invasion(machine_config &config);
+
+private:
+	void io_map(address_map &map);
 };
 
 
