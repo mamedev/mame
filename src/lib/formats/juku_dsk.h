@@ -2,7 +2,7 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Juku E5101
+    Juku E5101/E5104
 
     Disk image format
 

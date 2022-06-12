@@ -1,29 +1,29 @@
 // license: BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders: Dirk Best, Märt Põder
 /***************************************************************************
 
-    Juku E5101
+    Juku E5101/E5104
 
     Hardware:
-    - КР580ВМ80A
+    - КР580ВМ80A (called КР580ИК80A until 1986)
     - КР580ИР82
-    - КР580ВА86
-    - КР580ВА87
+    - КР580ВА86 x3
+    - КР580ВА87 x3
     - КР580ВИ53 x3
     - КР580ВК38
     - КР580ВН59
     - КР580ВВ51A x2
     - КР580ВВ55A x2
+    - КР1818ВГ93 (on all E5104 production models)
 
     Note:
     - In the monitor, enter A to start BASIC and T to boot from disk/network
 
     TODO:
-    - Display mode 384x200
-    - Work out how the floppy interface really works
-    - Sound
-    - Tape?
+    - Work out how the floppy interface really works?
+    - Tape? (split up to E5101 test batch as tape only?)
     - Network?
+    - Ramdisk?
 
 ***************************************************************************/
 
@@ -40,11 +40,16 @@
 #include "formats/juku_dsk.h"
 #include "softlist_dev.h"
 #include "screen.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
+#include "osdcore.h" // osd_printf_*
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+namespace {
 
 class juku_state : public driver_device
 {
@@ -61,7 +66,9 @@ public:
 		m_floppy(*this, "fdc:%u", 0U),
 		m_key_encoder(*this, "keyenc"),
 		m_keys(*this, "COL.%u", 0U),
-		m_key_special(*this, "SPECIAL")
+		m_key_special(*this, "SPECIAL"),
+		m_screen(*this, "screen"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	void juku(machine_config &config);
@@ -82,6 +89,8 @@ private:
 	required_device<ttl74148_device> m_key_encoder;
 	required_ioport_array<16> m_keys;
 	required_ioport m_key_special;
+	required_device<screen_device> m_screen;
+	required_device<speaker_sound_device> m_speaker;
 
 	void mem_map(address_map &map);
 	void bank_map(address_map &map);
@@ -90,15 +99,35 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
+	uint8_t m_prev_porta;
 	uint8_t m_prev_portc;
 
+	int m_screen_x;
+	int m_screen_y;
+	void screen_cmd_a_w(uint8_t data);
+	void screen_data_a_w(uint8_t data);
+	void screen_cmd_b_w(uint8_t data);
+	void screen_data_b_w(uint8_t data);
+	void screen_scan_sequence(int pos, uint8_t data);
+	void screen_mode(int x, int y);
+	int m_screen_cur_seq[5];
+	static constexpr int screen_320_240_seq[5] = { 0x24, 0x8, 0x72, 0x0, 0x25 };
+	static constexpr int screen_384_200_seq[5] = { 0x16, 0x4, 0x12, 0x1, 0x45 };
+	static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
+	static constexpr const int *screen_mode_sequences[3] = { screen_320_240_seq, screen_384_200_seq, screen_256_192_seq };
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool m_beep_state;
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void update_speaker();
+	static constexpr double speaker_levels[3] = { 0, 0.67, 1 };
 
 	static void floppy_formats(format_registration &fr);
 	void fdc_drq_w(int state);
 	void fdc_cmd_w(uint8_t data);
 	uint8_t fdc_data_r();
 	void fdc_data_w(uint8_t data);
+	uint8_t m_fdc_cur_cmd;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 };
@@ -132,17 +161,20 @@ void juku_state::bank_map(address_map &map)
 
 void juku_state::io_map(address_map &map)
 {
-	map(0x00, 0x01).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x04, 0x07).rw(m_pio[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_sio[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0c, 0x0f).rw(m_pio[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x14, 0x17).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x18, 0x1b).rw(m_pit[2], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x1c, 0x1f).rw(m_fdc, FUNC(kr1818vg93_device::read), FUNC(kr1818vg93_device::write));
 	map(0x1c, 0x1c).w(FUNC(juku_state::fdc_cmd_w));
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
-//  map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x11,0x11).w(FUNC(juku_state::screen_cmd_a_w));
+	map(0x12,0x12).w(FUNC(juku_state::screen_data_a_w));
+	map(0x15,0x15).w(FUNC(juku_state::screen_cmd_b_w));
+	map(0x16,0x16).w(FUNC(juku_state::screen_data_b_w));
 }
 
 
@@ -302,11 +334,57 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
+void juku_state::screen_cmd_a_w(uint8_t data) { m_pit[0]->write(0x11, data); screen_scan_sequence(0, data); }
+void juku_state::screen_data_a_w(uint8_t data) { m_pit[0]->write(0x12, data); screen_scan_sequence(1, data); }
+void juku_state::screen_cmd_b_w(uint8_t data) { m_pit[1]->write(0x15, data); m_screen_cur_seq[2] == -1 ? screen_scan_sequence(2, data) : screen_scan_sequence(3, data); }
+void juku_state::screen_data_b_w(uint8_t data) { m_pit[1]->write(0x16, data); screen_scan_sequence(4, data); }
+
+void juku_state::screen_scan_sequence(int pos, uint8_t data)
+{
+	m_screen_cur_seq[pos] = (int)data;
+
+	for (int i=0; i<3; i++)
+		if (memcmp(screen_mode_sequences[i], m_screen_cur_seq, pos*sizeof(int)) == 0) {
+			if (pos == 4)
+				switch (i) {
+				case 0:
+					screen_mode(320, 240);
+					break;
+				case 1:
+					screen_mode(384, 200);
+					break;
+				case 2:
+					screen_mode(256, 192);
+					break;
+				}
+			else return;
+		}
+
+	for (int i=0; i<5; i++)
+		m_screen_cur_seq[i]=-1;
+}
+
+void juku_state::screen_mode(int x, int y)
+{
+	if (m_screen_x == x && m_screen_y == y)
+		return;
+
+	m_screen_x = x, m_screen_y = y;
+	rectangle v = m_screen->visible_area();
+	v.max_x = x - 1;
+	v.max_y = y - 1;
+
+	m_screen->configure(x, y, v, m_screen->frame_period().attoseconds());
+}
+
 uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
-		for (int x = 0; x < 320; x++)
-			bitmap.pix(y, x) = BIT(m_ram[0xd800 + (y * (320 / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
+	for (int y = 0; y < m_screen_y; y++)
+	{
+		uint32_t *dest = &bitmap.pix(y);
+		for (int x = 0; x < m_screen_x; x++)
+			*dest++ = BIT(m_ram[0xd800 + (y * (m_screen_x / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
+	}
 
 	return 0;
 }
@@ -330,21 +408,23 @@ static void juku_floppies(device_slot_interface &device)
 
 void juku_state::fdc_drq_w(int state)
 {
+	// clear HALT state of CPU when data is ready to read
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 void juku_state::fdc_cmd_w(uint8_t data)
 {
-	if (BIT(data, 7))
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_fdc_cur_cmd != data)
+		m_fdc_cur_cmd = data;
 
 	m_fdc->cmd_w(data);
 }
 
 uint8_t juku_state::fdc_data_r()
 {
-	if (m_fdc->drq_r() == 0)
+	// on read commands (100xxxxx, 11000xxx, 11100xxx) and fdc reports busy
+	if ( ((m_fdc_cur_cmd >> 5) == 0x4 || (m_fdc_cur_cmd >> 5) == 0x6 || (m_fdc_cur_cmd >> 3) == 0x1c) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )
 	{
 		// cpu tries to read data without drq active. halt it and reset the
 		// pc back to the beginning of the instruction
@@ -359,7 +439,32 @@ uint8_t juku_state::fdc_data_r()
 
 void juku_state::fdc_data_w(uint8_t data)
 {
+	// on write commands (101xxxxx, 11110xxx) and fdc reports busy
+	if ( ((m_fdc_cur_cmd >> 5) == 0x5 || (m_fdc_cur_cmd >> 3) == 0x1e) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )
+	{
+		// cpu tries to write data without drq, halt it and reset pc
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, m_maincpu->pc() - 2);
+
+		return;
+	}
+
 	m_fdc->data_w(data);
+}
+
+//**************************************************************************
+//  SOUND
+//**************************************************************************
+
+void juku_state::update_speaker()
+{
+	m_speaker->level_w(m_beep_state == 0 ? 0 : BIT(m_prev_porta, 4)+1);
+}
+
+WRITE_LINE_MEMBER(juku_state::speaker_w)
+{
+	m_beep_state = state;
+	update_speaker();
 }
 
 
@@ -380,7 +485,11 @@ void juku_state::pio0_porta_w(uint8_t data)
 
 	m_key_encoder->update();
 
-//  logerror("porta_w %02x\n", data);
+	if (BIT(data, 4) != BIT(m_prev_porta, 4))
+		update_speaker();
+
+	if (m_prev_porta != data)
+		m_prev_porta = data;
 }
 
 uint8_t juku_state::pio0_portb_r()
@@ -404,7 +513,7 @@ uint8_t juku_state::pio0_portb_r()
 void juku_state::pio0_portc_w(uint8_t data)
 {
 	// 7-------  (cas?) pof
-	// -6------  (cas?) stop
+	// -6------  (cas?) stop / floppy side select
 	// --5-----  (cas?) rn / floppy drive select
 	// ---4----  (cas?) ff / floppy?
 	// ----3---  (cas?) play
@@ -413,19 +522,22 @@ void juku_state::pio0_portc_w(uint8_t data)
 
 	for (int i = 2; i < 8; i++)
 		if (BIT(data, i) !=  BIT(m_prev_portc, i))
-			logerror("pio0: c%d = %d\n", i, BIT(data, i));
+			osd_printf_verbose("pio0: c%d = %d\n", i, BIT(data, i));
 
 	floppy_image_device *floppy = m_floppy[BIT(data, 5)]->get_device();
 	m_fdc->set_floppy(floppy);
 
-	// the motor is always running for now
-	floppy->mon_w(0);
-
-//  m_floppy[0]->get_device()->ss_w(BIT(data, 6));
+	if (floppy)
+	{
+		// the motor is always running for now
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 6));
+	}
 
 	m_bank->set_bank(data & 0x03);
 
-	m_prev_portc = data;
+	if (m_prev_portc != data)
+		m_prev_portc = data;
 }
 
 void juku_state::machine_start()
@@ -441,6 +553,12 @@ void juku_state::machine_start()
 	// register for save states
 	save_pointer(NAME(m_ram), 0x10000);
 	save_item(NAME(m_prev_portc));
+	save_item(NAME(m_prev_porta));
+	save_item(NAME(m_beep_state));
+	save_item(NAME(m_fdc_cur_cmd));
+	save_item(NAME(m_screen_cur_seq));
+	save_item(NAME(m_screen_x));
+	save_item(NAME(m_screen_y));
 }
 
 void juku_state::machine_reset()
@@ -448,6 +566,13 @@ void juku_state::machine_reset()
 	m_bank->set_bank(0);
 	m_key_encoder->enable_input_w(0);
 	m_prev_portc = 0;
+	m_prev_porta = 0;
+	m_beep_state = 0;
+	m_fdc_cur_cmd = 0;
+	m_screen_x = 320;
+	m_screen_y = 240;
+	for (int i=0; i<5; i++)
+		m_screen_cur_seq[i]=-1;
 }
 
 
@@ -473,25 +598,40 @@ void juku_state::juku(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	// КР580ВИ53
+	// КР580ВИ53 (#1)
 	PIT8253(config, m_pit[0], 0);
 	m_pit[0]->set_clk<0>(16_MHz_XTAL/16);
+	m_pit[0]->set_clk<1>(16_MHz_XTAL/16);
+	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
+
 	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate1));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate2));
-	m_pit[0]->set_clk<1>(16_MHz_XTAL/16);
-	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
-	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1));
+
+	// КР580ВИ53 (#2)
+	PIT8253(config, m_pit[1], 0);
+
+	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // H SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
-	// КР580ВИ53
-	PIT8253(config, m_pit[1], 0);
-	m_pit[1]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_gate1));
+	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
-	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	// КР580ВИ53
+	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VERT RTR
+
+	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC BEL
+	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
+
+	// КР580ВИ53 (#3)
 	PIT8253(config, m_pit[2], 0);
+
+	m_pit[2]->set_clk<0>(16_MHz_XTAL/13);
+	m_pit[2]->set_clk<1>(16_MHz_XTAL/8);
+	m_pit[2]->set_clk<2>(16_MHz_XTAL/13);
+
+	//m_pit[1]->out_handler<0>().append(...); // BAUD RATE
+	m_pit[2]->out_handler<1>().append(FUNC(juku_state::speaker_w)); // SOUND
+	//m_pit[1]->out_handler<2>().append(...); // SYNC BAUD RATE
 
 	// КР580ВВ55A
 	I8255A(config, m_pio[0]);
@@ -512,17 +652,23 @@ void juku_state::juku(machine_config &config)
 	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
-	screen.set_screen_update(FUNC(juku_state::screen_update));
+	// Электроника МС 6105.4 (60 Hz)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen_x = 320, m_screen_y = 240;
+	m_screen->set_size(m_screen_x, m_screen_y);
+	m_screen->set_visarea(0, m_screen_x-1, 0, m_screen_y-1);
+	m_screen->set_screen_update(FUNC(juku_state::screen_update));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1);
+	m_speaker->set_levels(3, speaker_levels);
 
 	TTL74148(config, m_key_encoder, 0);
 
-	KR1818VG93(config, m_fdc, 1000000);
-//  m_fdc->intrq_wr_callback().set(FUNC(juku_state::fdc_intrq_w));
+	// КР1818ВГ93
+	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->drq_wr_callback().set(FUNC(juku_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "525qd", juku_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "525qd", juku_state::floppy_formats);
@@ -547,10 +693,12 @@ ROM_START( juku )
 	ROM_LOAD("bas3.bin", 0x1800, 0x0800, CRC(d4ffbf67) SHA1(bced7ff2420f630dbd4cd1c0c83481ed874869f1))
 ROM_END
 
+} // Anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME      FLAGS
-COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "Estron", "Juku E5101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "EKTA",	"Juku E5101", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
