@@ -2,7 +2,10 @@
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
-Atari Poolshark Driver
+    Atari Pool Shark Driver
+
+    NOTE: While more revisions of Pool Shark are suspected to exist, as yet
+          no boards have been found.
 
 ***************************************************************************/
 
@@ -245,19 +248,19 @@ void poolshrk_state::poolshrk(machine_config &config)
 
 ROM_START( poolshrk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "7329.k1", 0x7000, 0x800, CRC(88152245) SHA1(c7c5e43ea488a197e92a1dc2231578f8ed86c98d) )
-	ROM_LOAD( "7330.l1", 0x7800, 0x800, CRC(fb41d3e9) SHA1(c17994179362da13acfcd36a28f45e328428c031) )
+	ROM_LOAD( "007329.k1", 0x7000, 0x800, CRC(88152245) SHA1(c7c5e43ea488a197e92a1dc2231578f8ed86c98d) )
+	ROM_LOAD( "007330.l1", 0x7800, 0x800, CRC(fb41d3e9) SHA1(c17994179362da13acfcd36a28f45e328428c031) )
 
 	ROM_REGION( 0x400, "gfx1", 0 )   /* sprites */
-	ROM_LOAD( "7325.j5", 0x0000, 0x200, CRC(fae87eed) SHA1(8891d0ea60f72f826d71dc6b064a2ba81b298914) )
-	ROM_LOAD( "7326.h5", 0x0200, 0x200, CRC(05ec9762) SHA1(6119c4529334c98a0a42ca13a98a8661fc594d80) )
+	ROM_LOAD( "007325.j5", 0x0000, 0x200, CRC(fae87eed) SHA1(8891d0ea60f72f826d71dc6b064a2ba81b298914) )
+	ROM_LOAD( "007326.h5", 0x0200, 0x200, CRC(05ec9762) SHA1(6119c4529334c98a0a42ca13a98a8661fc594d80) )
 
 	ROM_REGION( 0x200, "gfx2", 0 )   /* tiles */
-	ROM_LOAD( "7328.n6", 0x0000, 0x200, CRC(64bcbf3a) SHA1(a4e3ce6b4734234359e3ef784a771e40580c2a2a) )
+	ROM_LOAD( "007328.n6", 0x0000, 0x200, CRC(64bcbf3a) SHA1(a4e3ce6b4734234359e3ef784a771e40580c2a2a) )
 
 	ROM_REGION( 0x20, "proms", 0 )                   /* line offsets */
-	ROM_LOAD( "7327.k6", 0x0000, 0x020, CRC(f74cef5b) SHA1(f470bf5b193dae4b44e89bc4c4476cf8d98e7cfd) )
+	ROM_LOAD( "007327.k6", 0x0000, 0x020, CRC(f74cef5b) SHA1(f470bf5b193dae4b44e89bc4c4476cf8d98e7cfd) )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Pool Shark", MACHINE_SUPPORTS_SAVE )

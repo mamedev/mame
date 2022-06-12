@@ -307,10 +307,10 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_DIPNAME( 0xc0, 0x80, "Extended Play" ) PORT_DIPLOCATION("SW2:8,7")
+	PORT_DIPSETTING( 0x00, "Never" )
 	PORT_DIPSETTING( 0x40, "1500 points" )
 	PORT_DIPSETTING( 0x80, "2500 points" )
 	PORT_DIPSETTING( 0xc0, "3500 points" )
-	PORT_DIPSETTING( 0x00, "never" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_TILT )
@@ -324,20 +324,20 @@ static INPUT_PORTS_START( destroyr )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")
-	PORT_DIPSETTING( 0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING( 0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPNAME( 0x0c, 0x08, "Play Time" ) PORT_DIPLOCATION("SW:2,1")
 	PORT_DIPSETTING( 0x00, "50 seconds" )
 	PORT_DIPSETTING( 0x04, "75 seconds" )
 	PORT_DIPSETTING( 0x08, "100 seconds" )
 	PORT_DIPSETTING( 0x0c, "125 seconds" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING( 0x30, DEF_STR( German ) )
-	PORT_DIPSETTING( 0x20, DEF_STR( French ) )
-	PORT_DIPSETTING( 0x10, DEF_STR( Spanish ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( English ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( Spanish ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( French ) )
+	PORT_DIPSETTING( 0x30, DEF_STR( German ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -518,7 +518,8 @@ void destroyr_state::destroyr(machine_config &config)
 
 ROM_START( destroyr )
 	ROM_REGION( 0x8000, "maincpu", 0 )  /* program code */
-	ROM_LOAD( "030138.rom",0x7000, 0x0800, NO_DUMP ) // optional add-on translation rom
+	ROM_LOAD_NIB_HIGH( "030138-01.e3", 0x7000, 0x0400, NO_DUMP ) // optional add-on translation rom
+	ROM_LOAD_NIB_LOW(  "030137-01.d2", 0x7000, 0x0400, NO_DUMP ) // optional add-on translation rom
 	ROM_LOAD( "030146-01.c3", 0x7800, 0x0800, CRC(e560c712) SHA1(0505ab57eee5421b4ff4e87d14505e02b18fd54c) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )     /* alpha numerics */
@@ -541,7 +542,8 @@ ROM_END
 
 ROM_START( destroyr1 )
 	ROM_REGION( 0x8000, "maincpu", 0 )  /* program code */
-	ROM_LOAD( "030138.rom",0x7000, 0x0800, NO_DUMP ) // optional add-on translation rom
+	ROM_LOAD_NIB_HIGH( "030138-01.e3", 0x7000, 0x0400, NO_DUMP ) // optional add-on translation rom
+	ROM_LOAD_NIB_LOW(  "030137-01.d2", 0x7000, 0x0400, NO_DUMP ) // optional add-on translation rom
 	ROM_LOAD_NIB_HIGH( "030142-01.f3", 0x7800, 0x0400, CRC(9e9a08d3) SHA1(eb31bab1537caf43ab8c3d23a6c9cc2009fcb98e) )
 	ROM_LOAD_NIB_LOW ( "030141-01.e2", 0x7800, 0x0400, CRC(c924fbce) SHA1(53aa9a3c4c6e90fb94500ddfa6c2ae3076eee2ef) )
 	ROM_LOAD_NIB_HIGH( "030144-01.j3", 0x7c00, 0x0400, CRC(0c7135c6) SHA1(6a0180353a0a6f34639dadc23179f6323aae8d62) )

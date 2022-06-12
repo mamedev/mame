@@ -18,6 +18,9 @@
         * the monitor "overdrive" effect is not simulated when you
             get hit by enemy fire
 
+    NOTE: While more revisions of Star Wars are suspected to exist,
+          as yet no boards have been found.
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -347,12 +350,12 @@ void starwars_state::esb(machine_config &config)
 
 ROM_START( starwars )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021.214.1f", 0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) ) /* ROM 0 bank pages 0 and 1 */
+	ROM_LOAD( "136021-214.1f", 0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) ) /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(              0x10000, 0x2000 )
-	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
-	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
-	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
-	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+	ROM_LOAD( "136021-102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
+	ROM_LOAD( "136021-203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
+	ROM_LOAD( "136021-104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
+	ROM_LOAD( "136021-206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	ROM_REGION( 0x1000, "vectorrom", 0 )
 	ROM_LOAD( "136021-105.1l", 0x0000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
@@ -369,20 +372,20 @@ ROM_START( starwars )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD_NIB_LOW ( "136021-113.7l", 0x0000, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 0 */
+	ROM_LOAD_NIB_HIGH( "136021-112.7k", 0x0000, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 1 */
+	ROM_LOAD_NIB_LOW ( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 2 */
+	ROM_LOAD_NIB_HIGH( "136021-110.7h", 0x0400, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 3 */
 ROM_END
 
 ROM_START( starwars1 )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021.114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
+	ROM_LOAD( "136021-114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(              0x10000, 0x2000 )
-	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
-	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
-	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
-	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+	ROM_LOAD( "136021-102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
+	ROM_LOAD( "136021-203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
+	ROM_LOAD( "136021-104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
+	ROM_LOAD( "136021-206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	ROM_REGION( 0x1000, "vectorrom", 0 )
 	ROM_LOAD( "136021-105.1l", 0x0000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
@@ -399,10 +402,10 @@ ROM_START( starwars1 )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0)
-	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD_NIB_LOW ( "136021-113.7l", 0x0000, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 0 */
+	ROM_LOAD_NIB_HIGH( "136021-112.7k", 0x0000, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 1 */
+	ROM_LOAD_NIB_LOW ( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 2 */
+	ROM_LOAD_NIB_HIGH( "136021-110.7h", 0x0400, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 3 */
 ROM_END
 
 ROM_START( starwarso )
@@ -429,10 +432,10 @@ ROM_START( starwarso )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD_NIB_LOW ( "136021-113.7l", 0x0000, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 0 */
+	ROM_LOAD_NIB_HIGH( "136021-112.7k", 0x0000, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 1 */
+	ROM_LOAD_NIB_LOW ( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 2 */
+	ROM_LOAD_NIB_HIGH( "136021-110.7h", 0x0400, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 3 */
 ROM_END
 
 
@@ -459,10 +462,10 @@ ROM_START( tomcatsw )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD_NIB_LOW ( "136021-113.7l", 0x0000, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 0 */
+	ROM_LOAD_NIB_HIGH( "136021-112.7k", 0x0000, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 1 */
+	ROM_LOAD_NIB_LOW ( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 2 */
+	ROM_LOAD_NIB_HIGH( "136021-110.7h", 0x0400, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 3 */
 ROM_END
 
 
@@ -496,10 +499,10 @@ ROM_START( esb )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136031-110.7h", 0x0000, 0x0400, CRC(b8d0f69d) SHA1(c196f1a592bd1ac482a81e23efa224d9dfaefc0a) ) /* PROM 0 */
-	ROM_LOAD( "136031-109.7j", 0x0400, 0x0400, CRC(6a2a4d98) SHA1(cefca71f025f92a193c5a7d8b5ab8be10db2fd44) ) /* PROM 1 */
-	ROM_LOAD( "136031-108.7k", 0x0800, 0x0400, CRC(6a76138f) SHA1(9ef7af898a3e29d03f35045901023615a6a55205) ) /* PROM 2 */
-	ROM_LOAD( "136031-107.7l", 0x0c00, 0x0400, CRC(afbf6e01) SHA1(0a6438e6c106d98e5d67a019751e1584324f5e5c) ) /* PROM 3 */
+	ROM_LOAD_NIB_LOW ( "136031-110.7h", 0x0000, 0x0400, CRC(b8d0f69d) SHA1(c196f1a592bd1ac482a81e23efa224d9dfaefc0a) ) /* PROM 0 */
+	ROM_LOAD_NIB_HIGH( "136031-109.7j", 0x0000, 0x0400, CRC(6a2a4d98) SHA1(cefca71f025f92a193c5a7d8b5ab8be10db2fd44) ) /* PROM 1 */
+	ROM_LOAD_NIB_LOW ( "136031-108.7k", 0x0400, 0x0400, CRC(6a76138f) SHA1(9ef7af898a3e29d03f35045901023615a6a55205) ) /* PROM 2 */
+	ROM_LOAD_NIB_HIGH( "136031-107.7l", 0x0400, 0x0400, CRC(afbf6e01) SHA1(0a6438e6c106d98e5d67a019751e1584324f5e5c) ) /* PROM 3 */
 ROM_END
 
 
@@ -546,9 +549,9 @@ void starwars_state::init_esb()
  *
  *************************************/
 
-GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 1)", 0 ) // newest
-GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 2)", 0 )
-GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
+GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Rev. C?)", 0 ) // newest
+GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Rev. B, alt)", 0 )
+GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Rev. B)", 0 ) // oldest
 // is there an even older starwars set with 136021-106.1m ?
 
 GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )

@@ -417,10 +417,10 @@ ROM_START( indy4 )
 	ROM_LOAD( "003187.f7",     0x0000, 0x0020, CRC(01dca5b9) SHA1(0e3fbefc5df993b5a6a724aee258653897954255) ) // Car Motion
 
 	ROM_REGION( 0x0020, "checkpoint", ROMREGION_ERASE00 )
-	ROM_LOAD( "005502.e5",     0x0000, 0x0020, CRC(e30ea877) SHA1(86f1f2c2e6e8472f7019f17bac723cb36faf098a) ) // Check Points
+	ROM_LOAD( "005502-01.e5",     0x0000, 0x0020, CRC(e30ea877) SHA1(86f1f2c2e6e8472f7019f17bac723cb36faf098a) ) // Check Points
 
 	ROM_REGION( 0x0200, "racetrack", ROMREGION_ERASE00 )
-	ROM_LOAD( "005503.f4",     0x0000, 0x0200, CRC(1aafbe72) SHA1(c59829eccfe5a6014acad9682c401ca3f32fdfc9) ) // Race Track
+	ROM_LOAD( "005503-01.f4",     0x0000, 0x0200, CRC(1aafbe72) SHA1(c59829eccfe5a6014acad9682c401ca3f32fdfc9) ) // Race Track
 ROM_END
 
 
