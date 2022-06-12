@@ -1247,7 +1247,6 @@ void r4000_base_device::cp0_cache(u32 const op)
 	case 0x07: // index load tag (SD)
 		if (SCACHE)
 		{
-			// Get physical address and extract tag
 			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 physical_address = ADDR(m_r[RSREG], s16(op));
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
@@ -1257,10 +1256,8 @@ void r4000_base_device::cp0_cache(u32 const op)
 			u32 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
 			if (index < m_scache_tag_size)
 			{
-				u32 const tag = m_scache_tag[index];
-
-				// Decode entry and marshal each field to the TagLo register
 				// TODO: Load the ECC register here
+				u32 const tag = m_scache_tag[index];
 				u32 const cs = (tag & SCACHE_CS) >> 22;
 				u32 const stag = tag & SCACHE_STAG;
 				u32 const pidx = (tag & SCACHE_PIDX) >> 19;
@@ -1279,7 +1276,6 @@ void r4000_base_device::cp0_cache(u32 const op)
 	case 0x0b: // index store tag (SD)
 		if (SCACHE)
 		{
-			// Get virtual and physical addresses
 			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
 			u64 physical_address = virtual_address;
@@ -1287,11 +1283,9 @@ void r4000_base_device::cp0_cache(u32 const op)
 			if (t == ERROR || t == MISS)
 				return;
 
-			// Prepare index for tag
 			u64 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
 			if (index < m_scache_tag_size)
 			{
-				// Assemble and set tag entry
 				// TODO: Calculate ECC bits here
 				u64 const tag_lo = m_cp0[CP0_TagLo];
 				u32 const cs = (tag_lo & TAGLO_CS) >> 10;
