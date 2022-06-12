@@ -399,8 +399,8 @@ char fs::fat_image::directory_separator() const
 std::vector<meta_description> fs::fat_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED",	false, [](const meta_value &m) { return m.as_string().size() <= 11; }, "Volume name, up to 11 characters"));
-	results.emplace_back(meta_description(meta_name::oem_name, meta_type::string, "",		false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters"));
+	results.emplace_back(meta_name::name, "UNTITLED",	false, [](const meta_value &m) { return m.as_string().size() <= 11; }, "Volume name, up to 11 characters");
+	results.emplace_back(meta_name::oem_name, "",		false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
 	return results;
 }
 
@@ -412,10 +412,10 @@ std::vector<meta_description> fs::fat_image::volume_meta_description() const
 std::vector<meta_description> fs::fat_image::file_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
-	results.emplace_back(meta_description(meta_name::creation_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
-	results.emplace_back(meta_description(meta_name::modification_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Modification time"));
-	results.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
+	results.emplace_back(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time");
+	results.emplace_back(meta_name::modification_date, util::arbitrary_datetime::now(), false, nullptr, "Modification time");
+	results.emplace_back(meta_name::length, 0, true, nullptr, "Size of the file in bytes");
 	return results;
 }
 
@@ -427,9 +427,9 @@ std::vector<meta_description> fs::fat_image::file_meta_description() const
 std::vector<meta_description> fs::fat_image::directory_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
-	results.emplace_back(meta_description(meta_name::creation_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
-	results.emplace_back(meta_description(meta_name::modification_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Modification time"));
+	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
+	results.emplace_back(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time");
+	results.emplace_back(meta_name::modification_date, util::arbitrary_datetime::now(), false, nullptr, "Modification time");
 	return results;
 }
 
