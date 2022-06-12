@@ -25,12 +25,13 @@ Cirqus Voltaire                50062  Hold QWER hit 1         QWER
 The Champion Pub               50063  Hold QWER hit 1         QWER
 Monster Bash                   50065  Hold QWER hit 1         QWER
 Cactus Canyon                  50066  Hold QWER hit 1         QWER
+Phantom Haus                   90001   (not a pinball, not working)
 Safe Cracker                   90003  Hold QWE hit 1          QWE (timed game)
 Ticket Tac Toe                 90005  Hold X hit 1            (n/a)
-Phantom Haus                   unknown   (not emulated)
 
 ToDo:
 - Mechanical sounds
+- Phantom Haus: This is a "payout machine" - it gives tokens as prizes - not a pinball.
 
 *********************************************************************************************/
 
@@ -75,6 +76,7 @@ public:
 	void init_mb();
 	void init_nbaf();
 	void init_ngg();
+	void init_ph();
 	void init_sc();
 	void init_ss();
 	void init_totan();
@@ -480,6 +482,14 @@ void wpc_95_state::init_ngg()
 	m_pic->set_serial("561 123456 12345 123");
 	m_lamp->set_names(lamps_ngg);
 	m_out->set_names(outputs_ngg);
+	init();
+}
+
+void wpc_95_state::init_ph()
+{
+	m_pic->set_serial("901 100031 64739 123");
+	//m_lamp->set_names(lamps_ph); // TODO
+	//m_out->set_names(outputs_ph); // TODO
 	init();
 }
 
@@ -2853,6 +2863,21 @@ ROM_START(ngg_p06)
 	ROM_LOAD16_BYTE("nggsndl1.s6", 0x800000, 0x100000, CRC(b1b8b514) SHA1(e16651bcb2eae747987dc3c13a5dc20a33c0a1f8))
 ROM_END
 
+/*-----------------------
+/  Phantom Haus #?
+/-----------------------*/
+ROM_START(ph_04)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("g11_040.rom", 0x00000, 0x80000, CRC(8473f464) SHA1(829f2c0c772639e56f747d4274ad98967290bd43))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("s2_030.rom",  0x000000, 0x080000, CRC(bbeb510c) SHA1(05088b6fa89cd203099189c31d132cd062ab8357))
+	ROM_RELOAD(0x000000+0x100000,  0x080000)
+	ROM_LOAD16_BYTE("phs3_02.rom", 0x200000, 0x100000, CRC(710568a7) SHA1(8c7c28bacc2777722a54bee32375240c9a7441d8))
+	ROM_LOAD16_BYTE("phs4_02.rom", 0x400000, 0x100000, CRC(390df0f2) SHA1(fdf1bb96e26c0245d04be610e1a84cd4e03059ff))
+	ROM_LOAD16_BYTE("phs5_02.rom", 0x600000, 0x100000, CRC(b524513a) SHA1(5e372e409b4d1fc5bcda55af5dc2cbf1dc66e56b))
+ROM_END
+
 /*---------------------
 /  Safe Cracker #90003
 /---------------------*/
@@ -3142,6 +3167,7 @@ GAME(1997,  nbaf_23,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,  
 GAME(1997,  ngg_13,     0,          wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (1.3)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1997,  ngg_p06,    ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (p0.6)",                  MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1997,  ngg_10,     ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (1.0)",                   MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1996,  ph_04,      0,          wpc_95, ngg,    wpc_95_state,   init_ph,     ROT0, "Williams",             "Phantom Haus (0.4)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1998,  sc_18,      0,          wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1998,  sc_18n,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8N)",                    MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8 German sound)",        MACHINE_IS_SKELETON_MECHANICAL )

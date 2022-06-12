@@ -64,19 +64,19 @@ bool mgt_format::supports_save() const
 	return true;
 }
 
-int mgt_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mgt_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
 		return 0;
 
 	if(/*size == 737280 || */ size == 819200)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool mgt_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mgt_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -104,7 +104,7 @@ bool mgt_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool mgt_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mgt_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -128,4 +128,4 @@ bool mgt_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_MGT_FORMAT = &floppy_image_format_creator<mgt_format>;
+const mgt_format FLOPPY_MGT_FORMAT;

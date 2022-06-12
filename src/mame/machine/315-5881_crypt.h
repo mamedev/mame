@@ -43,7 +43,7 @@ protected:
 
 private:
 
-	bool first_read;
+	bool first_read = false;
 
 	enum {
 //        BUFFER_SIZE = 32768, LINE_SIZE = 512,
@@ -51,25 +51,25 @@ private:
 		FLAG_COMPRESSED = 0x20000
 	};
 
-	uint32_t key;
+	uint32_t key = 0;
 
 	std::unique_ptr<uint8_t[]> buffer;
 	std::unique_ptr<uint8_t[]> line_buffer;
 	std::unique_ptr<uint8_t[]> line_buffer_prev;
-	uint32_t prot_cur_address;
-	uint16_t subkey, dec_hist;
-	uint32_t dec_header;
+	uint32_t prot_cur_address = 0;
+	uint16_t subkey = 0, dec_hist = 0;
+	uint32_t dec_header = 0;
 
-	bool enc_ready;
+	bool enc_ready = 0;
 
-	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit, buffer_bit2;
-	uint8_t buffer2[2];
-	uint16_t buffer2a;
+	int buffer_pos = 0, line_buffer_pos = 0, line_buffer_size = 0, buffer_bit = 0, buffer_bit2 = 0;
+	uint8_t buffer2[2]{};
+	uint16_t buffer2a = 0;
 
-	int block_size;
-	int block_pos;
-	int block_numlines;
-	int done_compression;
+	int block_size = 0;
+	int block_pos = 0;
+	int block_numlines = 0;
+	int done_compression = 0;
 
 	struct sbox {
 		uint8_t table[64];

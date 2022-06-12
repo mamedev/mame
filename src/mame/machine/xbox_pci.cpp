@@ -722,7 +722,7 @@ void mcpx_ohci_device::device_start()
 			m_interrupt_handler(state);
 		}
 	);
-	timer = timer_alloc(0);
+	timer = timer_alloc(FUNC(mcpx_ohci_device::usb_update), this);
 	ohci_usb->set_timer(timer);
 	ohci_usb->start();
 	for (int i=0;i < connecteds_count;i++)
@@ -757,10 +757,10 @@ void mcpx_ohci_device::device_config_complete()
 	}
 }
 
-void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mcpx_ohci_device::usb_update)
 {
 	if (ohci_usb)
-		ohci_usb->timer(timer, id, param);
+		ohci_usb->timer(param);
 }
 
 uint32_t mcpx_ohci_device::ohci_r(offs_t offset)
@@ -874,7 +874,7 @@ void mcpx_apu_device::device_start()
 	memset(apust.voices_position_end, 0, sizeof(apust.voices_position_end));
 	memset(apust.voices_position_increment, 0, sizeof(apust.voices_position_increment));
 	apust.space = &cpu->space();
-	apust.timer = timer_alloc(0);
+	apust.timer = timer_alloc(FUNC(mcpx_apu_device::audio_update), this);
 	apust.timer->enable(false);
 }
 
@@ -883,30 +883,25 @@ void mcpx_apu_device::device_reset()
 	pci_device::device_reset();
 }
 
-void mcpx_apu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
 {
-	int cmd;
-	int bb, b, v;
-	uint64_t bv;
-	uint32_t phys;
-
 	// this works only for outr2
 	// value at 0x810 is modified by the firmware that has been loaded on the gp dsp
-	cmd = apust.space->read_dword(apust.gpdsp_address + 0x800 + 0x10);
+	int cmd = apust.space->read_dword(apust.gpdsp_address + 0x800 + 0x10);
 	if (cmd == 3)
 		apust.space->write_dword(apust.gpdsp_address + 0x800 + 0x10, 0);
 	/*else
 	logerror("Audio_APU: unexpected value at address %d\n",apust.gpdsp_address+0x800+0x10);*/
 	// check all the 256 possible voices
-	for (b = 0; b < 4; b++) {
-		bv = 1;
-		for (bb = 0; bb < 64; bb++) {
+	for (int b = 0; b < 4; b++) {
+		uint64_t bv = 1;
+		for (int bb = 0; bb < 64; bb++) {
 			if (apust.voices_active[b] & bv) {
-				v = bb + (b << 6);
+				int v = bb + (b << 6);
 				apust.voices_position[v] += apust.voices_position_increment[v];
 				while (apust.voices_position[v] >= apust.voices_position_end[v])
 					apust.voices_position[v] = apust.voices_position_start[v] + apust.voices_position[v] - apust.voices_position_end[v] - 1000;
-				phys = apust.voicedata_address + 0x80 * v;
+				uint32_t phys = apust.voicedata_address + 0x80 * v;
 				apust.space->write_dword(phys + 0x58, apust.voices_position[v] / 1000);
 			}
 			bv = bv << 1;

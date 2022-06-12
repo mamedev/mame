@@ -277,16 +277,16 @@ INPUT_PORTS_END
 
 void intv_state::intv_mem(address_map &map)
 {
-	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
-	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x0000, 0x003f).rw(FUNC(intv_state::stic_r), FUNC(intv_state::stic_w));
+	map(0x0100, 0x01ef).rw(FUNC(intv_state::ram8_r), FUNC(intv_state::ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
-	map(0x0200, 0x035f).rw(FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0200, 0x035f).rw(FUNC(intv_state::ram16_r), FUNC(intv_state::ram16_w));
 	map(0x0400, 0x04ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom04));
 	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
 	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
 	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
-	map(0x3800, 0x39ff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM,     8-bits wide
-	map(0x3a00, 0x3bff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM Alias, 8-bits wide
+	map(0x3800, 0x39ff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));     // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));     // GRAM Alias, 8-bits wide
 	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
 	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
 	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
@@ -304,17 +304,17 @@ void intv_state::intv_mem(address_map &map)
 
 void intv_state::intvoice_mem(address_map &map)
 {
-	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0000, 0x003f).rw(FUNC(intv_state::stic_r), FUNC(intv_state::stic_w));
 	map(0x0080, 0x0081).rw("voice", FUNC(intv_voice_device::read_speech), FUNC(intv_voice_device::write_speech)); // Intellivoice
-	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x0100, 0x01ef).rw(FUNC(intv_state::ram8_r), FUNC(intv_state::ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
-	map(0x0200, 0x035f).rw(FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0200, 0x035f).rw(FUNC(intv_state::ram16_r), FUNC(intv_state::ram16_w));
 	map(0x0400, 0x04ff).r("voice", FUNC(intv_voice_device::read_rom04));
 	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
 	map(0x2000, 0x2fff).r("voice", FUNC(intv_voice_device::read_rom20));
 	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
-	map(0x3800, 0x39ff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM,     8-bits wide
-	map(0x3a00, 0x3bff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM Alias, 8-bits wide
+	map(0x3800, 0x39ff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));     // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));     // GRAM Alias, 8-bits wide
 	map(0x4000, 0x47ff).r("voice", FUNC(intv_voice_device::read_rom40));
 	map(0x4800, 0x4fff).r("voice", FUNC(intv_voice_device::read_rom48));
 	map(0x5000, 0x5fff).r("voice", FUNC(intv_voice_device::read_rom50));
@@ -332,16 +332,16 @@ void intv_state::intvoice_mem(address_map &map)
 
 void intv_state::intv2_mem(address_map &map)
 {
-	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
-	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x0000, 0x003f).rw(FUNC(intv_state::stic_r), FUNC(intv_state::stic_w));
+	map(0x0100, 0x01ef).rw(FUNC(intv_state::ram8_r), FUNC(intv_state::ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
-	map(0x0200, 0x035f).rw(FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0200, 0x035f).rw(FUNC(intv_state::ram16_r), FUNC(intv_state::ram16_w));
 	map(0x0400, 0x04ff).rom().region("maincpu", 0x400 << 1);    // Exec ROM, 10-bits wide
 	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
 	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
 	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
-	map(0x3800, 0x39ff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w)); // GRAM,     8-bits wide
-	map(0x3a00, 0x3bff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w)); // GRAM Alias, 8-bits wide
+	map(0x3800, 0x39ff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w)); // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w)); // GRAM Alias, 8-bits wide
 	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
 	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
 	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
@@ -359,19 +359,19 @@ void intv_state::intv2_mem(address_map &map)
 
 void intv_state::intvecs_mem(address_map &map)
 {
-	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0000, 0x003f).rw(FUNC(intv_state::stic_r), FUNC(intv_state::stic_w));
 	map(0x0080, 0x0081).rw("speech", FUNC(sp0256_device::spb640_r), FUNC(sp0256_device::spb640_w)); /* Intellivoice */
 	// map(0x00e0, 0x00e3).rw(FUNC(intv_state::intv_ecs_uart_r), FUNC(intv_state::intv_ecs_uart_w));
 	map(0x00f0, 0x00ff).rw("ecs", FUNC(intv_ecs_device::read_ay), FUNC(intv_ecs_device::write_ay)); /* ecs psg */
-	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x0100, 0x01ef).rw(FUNC(intv_state::ram8_r), FUNC(intv_state::ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
-	map(0x0200, 0x035f).rw(FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0200, 0x035f).rw(FUNC(intv_state::ram16_r), FUNC(intv_state::ram16_w));
 	map(0x0400, 0x04ff).r("ecs", FUNC(intv_ecs_device::read_rom04));
 	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000<<1); /* Exec ROM, 10-bits wide */
 	map(0x2000, 0x2fff).rw("ecs", FUNC(intv_ecs_device::read_rom20), FUNC(intv_ecs_device::write_rom20));
 	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); /* GROM,     8-bits wide */
-	map(0x3800, 0x39ff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM,     8-bits wide */
-	map(0x3a00, 0x3bff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM Alias,     8-bits wide */
+	map(0x3800, 0x39ff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));       /* GRAM,     8-bits wide */
+	map(0x3a00, 0x3bff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));       /* GRAM Alias,     8-bits wide */
 	map(0x4000, 0x47ff).rw("ecs", FUNC(intv_ecs_device::read_ram), FUNC(intv_ecs_device::write_ram));
 	map(0x4800, 0x4fff).r("ecs", FUNC(intv_ecs_device::read_rom48));
 	map(0x5000, 0x5fff).r("ecs", FUNC(intv_ecs_device::read_rom50));
@@ -389,16 +389,16 @@ void intv_state::intvecs_mem(address_map &map)
 
 void intv_state::intvkbd_mem(address_map &map)
 {
-	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
-	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x0000, 0x003f).rw(FUNC(intv_state::stic_r), FUNC(intv_state::stic_w));
+	map(0x0100, 0x01ef).rw(FUNC(intv_state::ram8_r), FUNC(intv_state::ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
-	map(0x0200, 0x035f).rw(FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0200, 0x035f).rw(FUNC(intv_state::ram16_r), FUNC(intv_state::ram16_w));
 	map(0x0400, 0x04ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom04));
 	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000<<1); /* Exec ROM, 10-bits wide */
 	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
 	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); /* GROM,     8-bits wide */
-	map(0x3800, 0x39ff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM,     8-bits wide */
-	map(0x3a00, 0x3bff).rw(FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM Alias,     8-bits wide */
+	map(0x3800, 0x39ff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));       /* GRAM,     8-bits wide */
+	map(0x3a00, 0x3bff).rw(FUNC(intv_state::gram_r), FUNC(intv_state::gram_w));       /* GRAM Alias,     8-bits wide */
 	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
 	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
 	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
@@ -424,37 +424,19 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_INTV_INTERRUPT2_COMPLETE:
-		intv_interrupt2_complete(param);
-		break;
-	case TIMER_INTV_INTERRUPT_COMPLETE:
-		intv_interrupt_complete(param);
-		break;
-	case TIMER_INTV_BTB_FILL:
-		intv_btb_fill(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in intv_state::device_timer");
-	}
-}
-
 
 /* This is needed because MAME core does not allow PULSE_LINE.
     The time interval is not critical, although it should be below 1000. */
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
+TIMER_CALLBACK_MEMBER(intv_state::interrupt2_complete)
 {
 	m_keyboard->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
+INTERRUPT_GEN_MEMBER(intv_state::interrupt2)
 {
 	m_keyboard->set_input_line(0, ASSERT_LINE);
-	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
+	m_int2_complete_timer->adjust(m_keyboard->cycles_to_attotime(100));
 }
 
 void intv_state::intv(machine_config &config)
@@ -462,7 +444,7 @@ void intv_state::intv(machine_config &config)
 	/* basic machine hardware */
 	cp1610_cpu_device &maincpu(CP1610(config, m_maincpu, XTAL(3'579'545)/4));        /* Colorburst/4 */
 	maincpu.set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
-	maincpu.set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
+	maincpu.set_vblank_int("screen", FUNC(intv_state::interrupt));
 	maincpu.iab().set(FUNC(intv_state::iab_r));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -541,7 +523,7 @@ void intv_state::intvkbd(machine_config &config)
 
 	M6502(config, m_keyboard, XTAL(7'159'090)/8);
 	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
-	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
+	m_keyboard->set_vblank_int("screen", FUNC(intv_state::interrupt2));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -658,12 +640,12 @@ void intv_state::init_intvkbd()
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
-CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY               FULLNAME, FLAGS */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",              "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel Electronics", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

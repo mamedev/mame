@@ -252,16 +252,16 @@ private:
 	[[maybe_unused]] uint8_t pc1640_port278_r(offs_t offset);
 
 	struct {
-		uint8_t x,y; //byte clipping needed
+		uint8_t x = 0, y = 0; //byte clipping needed
 	} m_mouse;
 
 	// 64 system status register?
-	uint8_t m_port60;
-	uint8_t m_port61;
-	uint8_t m_port62;
-	uint8_t m_port65;
+	uint8_t m_port60 = 0;
+	uint8_t m_port61 = 0;
+	uint8_t m_port62 = 0;
+	uint8_t m_port65 = 0;
 
-	uint8_t m_dipstate;
+	uint8_t m_dipstate = 0;
 	static void cfg_com(device_t *device);
 	static void cfg_fdc(device_t *device);
 
@@ -651,22 +651,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 INPUT_PORTS_END
 
-// static const gfx_layout pc200_charlayout =
-// {
-	// 8, 16,                  /* 8 x 16 characters */
-	// 2048,                   /* 2048 characters */
-	// 1,                  /* 1 bits per pixel */
-	// { 0 },                  /* no bitplanes */
-	// /* x offsets */
-	// { 0, 1, 2, 3, 4, 5, 6, 7 },
-	// /* y offsets */
-	// { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	// 8*16                    /* every char takes 16 bytes */
-// };
-
-// static GFXDECODE_START( pc200 )
-	// GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
-// GFXDECODE_END
 
 void amstrad_pc_state::cfg_com(device_t *device)
 {

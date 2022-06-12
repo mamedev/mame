@@ -231,10 +231,10 @@ protected:
 
 	output_finder<4> m_leds;
 
-	uint8_t m_c0;
-	uint8_t m_c4;
-	uint8_t m_c6;
-	uint8_t m_c8;
+	uint8_t m_c0 = 0;
+	uint8_t m_c4 = 0;
+	uint8_t m_c6 = 0;
+	uint8_t m_c8 = 0;
 };
 
 
@@ -271,9 +271,9 @@ private:
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
 
-	uint8_t m_vblank_vector;
-	uint8_t m_timer0_vector;
-	uint8_t m_timer1_vector;
+	uint8_t m_vblank_vector = 0;
+	uint8_t m_timer0_vector = 0;
+	uint8_t m_timer1_vector = 0;
 };
 
 
@@ -308,7 +308,6 @@ protected:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(gocowboy_int);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_1khz);
 
 	void coin_counter_w(uint8_t data);
 	void leds_w(uint8_t data);
@@ -1161,17 +1160,6 @@ void sammymdl_state::tdoboon_map(address_map &map)
 
 ***************************************************************************/
 
-static const gfx_layout sigmab98_16x16x4_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6, 4*9,4*8, 4*11,4*10, 4*13,4*12, 4*15,4*14 },
-	{ STEP16(0,16*4) },
-	16*16*4
-};
-
 static const gfx_layout sigmab98_16x16x8_layout =
 {
 	16,16,
@@ -1184,13 +1172,13 @@ static const gfx_layout sigmab98_16x16x8_layout =
 };
 
 static GFXDECODE_START( gfx_sigmab98 )
-	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x100/16  )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb,  0, 0x100/16  )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x100/256 )
 GFXDECODE_END
 
 // Larger palette
 static GFXDECODE_START( gfx_lufykzku )
-	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x1000/16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb,  0, 0x1000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x1000/16 )
 GFXDECODE_END
 
@@ -1569,13 +1557,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_state::gocowboy_int)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_state::timer_1khz)
-{
-	// FIXME: this is an internally generated timer interrupt
-	m_kp69->ir_w<11>(1);
-	m_kp69->ir_w<11>(0);
-}
-
 void sammymdl_state::sammymdl(machine_config &config)
 {
 	KL5C80A12(config, m_maincpu, XTAL(20'000'000));    // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
@@ -1636,7 +1617,6 @@ void sammymdl_state::gocowboy(machine_config &config)
 	m_maincpu->out_p4_callback().set(FUNC(sammymdl_state::gocowboy_leds_w));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sammymdl_state::gocowboy_int), "screen", 0, 1);
-	TIMER(config, "1khztimer").configure_periodic(FUNC(sammymdl_state::timer_1khz), attotime::from_msec(1));
 
 	config.device_remove("hopper");
 	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
@@ -1661,7 +1641,6 @@ void sammymdl_state::itazuram(machine_config &config)
 	sammymdl(config);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sammymdl_state::gocowboy_int), "screen", 0, 1);
-	TIMER(config, "1khztimer").configure_periodic(FUNC(sammymdl_state::timer_1khz), attotime::from_msec(1));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::itazuram_map);
 

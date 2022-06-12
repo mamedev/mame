@@ -78,13 +78,13 @@ private:
 	required_ioport_array<3> m_dsw;
 	required_ioport m_jumpers;
 
-	u8 m_port00;
-	u8 m_keylatch;
-	u8 m_attrlatch;
-	u8 m_scroll;
+	u8 m_port00 = 0;
+	u8 m_keylatch = 0;
+	u8 m_attrlatch = 0;
+	u8 m_scroll = 0;
 	std::unique_ptr<u16[]> m_vram;
 
-	emu_timer *m_baud_clock;
+	emu_timer *m_baud_clock = nullptr;
 };
 
 void microterm_f8_state::machine_start()
@@ -93,7 +93,7 @@ void microterm_f8_state::machine_start()
 	m_attrlatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
-	m_baud_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microterm_f8_state::baud_clock), this));
+	m_baud_clock = timer_alloc(FUNC(microterm_f8_state::baud_clock), this);
 	m_baud_clock->adjust(attotime::zero, 0);
 
 	save_item(NAME(m_port00));

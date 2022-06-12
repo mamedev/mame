@@ -26,14 +26,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
-private:
-	enum {
-		ID_MOTOROFF = 0,
-	};
+	TIMER_CALLBACK_MEMBER(motor_off);
 
+private:
 	enum {
 		S0_BYTE   = 0x80,
 		S0_END    = 0x10,

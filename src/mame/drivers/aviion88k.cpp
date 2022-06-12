@@ -121,11 +121,11 @@ private:
 
 	memory_view m_mbus;
 
-	u32 m_ucs;
+	u32 m_ucs = 0;
 
-	emu_timer *m_pit[4];
+	emu_timer *m_pit[4]{};
 
-	u32 m_pit_cmd[4];
+	u32 m_pit_cmd[4]{};
 	u32 m_pit_cnt[4] = {};
 };
 
@@ -134,7 +134,7 @@ void aviion88k_state::machine_start()
 	m_leds.resolve();
 
 	for (emu_timer *&pit : m_pit)
-		pit = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aviion88k_state::pit_timer), this));
+		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }
 
 void aviion88k_state::machine_reset()

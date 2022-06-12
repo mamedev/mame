@@ -234,9 +234,9 @@ static GFXDECODE_START( gfx_powerins )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerinsc )
-	GFXDECODE_ENTRY( "bgtile",  0x280000, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "bgtile",  0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
-	GFXDECODE_ENTRY( "sprites", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "bgtile",  0x280000, gfx_8x8x4_packed_lsb,               0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( "bgtile",  0,        gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "sprites", 0,        gfx_8x8x4_col_2x2_group_packed_lsb, 0x400, 0x40 ) // [2] Sprites, TODO: wrong decode and ROM loading
 GFXDECODE_END
 
 /***************************************************************************
@@ -248,17 +248,6 @@ GFXDECODE_END
 MACHINE_START_MEMBER(powerins_state, powerinsa)
 {
 	m_okibank[0]->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
-}
-
-void powerins_state::init_powerinsc()
-{
-	u8 *bgtile = memregion("bgtile")->base();
-
-	for (int i = 0; i < 0x300000; i++)
-	{
-		u8 x = bgtile[i];
-		bgtile[i] = bitswap(x, 3, 2, 1, 0, 7, 6, 5, 4);
-	}
 }
 
 void powerins_state::powerins(machine_config &config)
@@ -788,7 +777,7 @@ ROM_START( powerinsc )
 	ROM_LOAD16_BYTE( "15.040.u81", 0x400001, 0x80000,  CRC(035316d3) SHA1(c1c6f243213f05a53f0fc4f3df530895c34355a9) )
 	ROM_LOAD16_BYTE( "25.040.u94", 0x500000, 0x80000,  CRC(a250dea8) SHA1(6b4c5ad35f4f4cdab516118a21c58617044c3208) )
 	ROM_LOAD16_BYTE( "14.040.u96", 0x500001, 0x80000,  CRC(dd976689) SHA1(ba7e80a94e6c6bb7a5b569fb5440e774cd89b79d) )
-	ROM_LOAD16_BYTE( "24.040.u95", 0x600000, 0x80000,  CRC(dd976689) SHA1(ba7e80a94e6c6bb7a5b569fb5440e774cd89b79d) )
+	ROM_LOAD16_BYTE( "24.040.u95", 0x600000, 0x80000,  CRC(851008f4) SHA1(cd6e5d8e6807fc3224022ca53f02f390e1232b06) )
 	ROM_LOAD16_BYTE( "13.040.u89", 0x600001, 0x80000,  CRC(867262d6) SHA1(bf0b13a5bb818741150d09be44968779c55c5b96) )
 	ROM_LOAD16_BYTE( "23.040.u96", 0x700000, 0x80000,  CRC(625c5b7b) SHA1(ddac164cd92459bdce5905b31eccded9b1c06086) )
 	ROM_LOAD16_BYTE( "12.040.u92", 0x700001, 0x80000,  CRC(08c4e478) SHA1(172dd9532a9240014afb4817b61a3e8122be8f0c) )
@@ -813,4 +802,4 @@ GAME( 1993, powerinspu, powerins, powerins,  powerinj, powerins_state, empty_ini
 GAME( 1993, powerinspj, powerins, powerins,  powerinj, powerins_state, empty_init,     ROT0, "Atlus",   "Gouketsuji Ichizoku (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
 GAME( 1993, powerinsa,  powerins, powerinsa, powerins, powerins_state, empty_init,     ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, powerinsb,  powerins, powerinsb, powerins, powerins_state, empty_init,     ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsc,  powerins, powerinsc, powerins, powerins_state, init_powerinsc, ROT0, "bootleg", "Power Instinct (USA, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
+GAME( 1993, powerinsc,  powerins, powerinsc, powerins, powerins_state, empty_init,     ROT0, "bootleg", "Power Instinct (USA, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented

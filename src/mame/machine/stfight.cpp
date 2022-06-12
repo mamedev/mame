@@ -72,7 +72,7 @@ void stfight_state::machine_start()
 	m_main_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_main_bank->set_entry(0);
 
-	m_int1_timer = timer_alloc(TIMER_STFIGHT_INTERRUPT_1);
+	m_int1_timer = timer_alloc(FUNC(stfight_state::rst08_tick), this);
 
 	save_item(NAME(m_coin_state));
 	save_item(NAME(m_fm_data));
@@ -109,17 +109,9 @@ void stfight_state::stfight_bank_w(uint8_t data)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(stfight_state::rst08_tick)
 {
-	switch (id)
-	{
-	case TIMER_STFIGHT_INTERRUPT_1:
-		// Do a RST08
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in stfight_state::device_timer");
-	}
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
 }
 
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)

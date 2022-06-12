@@ -383,7 +383,7 @@ private:
 	required_device<tmp68301_device> m_maincpu;
 	required_ioport_array<10> m_key;
 
-	u16 m_kiwame_row_select;
+	u16 m_kiwame_row_select = 0;
 };
 
 class zombraid_state : public seta_state

@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"

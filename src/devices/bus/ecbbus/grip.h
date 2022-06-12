@@ -100,9 +100,6 @@ private:
 	uint8_t m_ppi_pa;         // PPI port A data
 	uint8_t m_ppi_pc;         // PPI port C data
 
-	// timers
-	emu_timer *m_kb_timer;
-
 	void vol0_w(uint8_t data);
 	void vol1_w(uint8_t data);
 	void flash_w(uint8_t data);

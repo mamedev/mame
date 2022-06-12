@@ -54,8 +54,8 @@ private:
 	required_device<netlist_mame_logic_input_device> m_sound_shoot;
 	required_device<netlist_mame_logic_input_device> m_sound_hit;
 
-	int m_sound_enable;
-	tilemap_t *m_bg_tilemap;
+	int m_sound_enable = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t in0_r(offs_t offset);
 	uint8_t in1_r(offs_t offset);

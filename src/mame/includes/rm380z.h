@@ -82,14 +82,14 @@ private:
 	void config_videomode();
 	void check_scroll_register();
 
-	int writenum;
+	int writenum = 0;
 
-	uint8_t m_port0;
-	uint8_t m_port0_mask;
-	uint8_t m_port0_kbd;
-	uint8_t m_port1;
-	uint8_t m_fbfd;
-	uint8_t m_fbfe;
+	uint8_t m_port0 = 0;
+	uint8_t m_port0_mask = 0;
+	uint8_t m_port0_kbd = 0;
+	uint8_t m_port1 = 0;
+	uint8_t m_fbfd = 0;
+	uint8_t m_fbfe = 0;
 
 	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
@@ -98,16 +98,16 @@ private:
 	uint8_t   m_vramattribs[RM380Z_SCREENSIZE];
 	uint8_t   m_vram[RM380Z_SCREENSIZE];
 
-	int m_rasterlineCtr;
-	emu_timer* m_vblankTimer;
+	int m_rasterlineCtr = 0;
+	emu_timer* m_vblankTimer = nullptr;
 
-	int m_old_fbfd;
-	int m_old_old_fbfd;
+	int m_old_fbfd = 0;
+	int m_old_old_fbfd = 0;
 
-	int m_videomode;
-	int m_old_videomode;
+	int m_videomode = 0;
+	int m_old_videomode = 0;
 
-	emu_timer *m_static_vblank_timer;
+	emu_timer *m_static_vblank_timer = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;

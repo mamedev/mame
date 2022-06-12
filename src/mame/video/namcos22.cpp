@@ -2572,7 +2572,7 @@ void namcos22_state::video_start()
 	m_is_ss22 = (m_iomcu == nullptr);
 	init_tables();
 
-	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::posirq_callback),this));
+	m_posirq_timer = timer_alloc(FUNC(namcos22_state::posirq_callback), this);
 
 	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos22_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);

@@ -5,8 +5,8 @@ license:CC0
 -->
 
 <softwarelist name="tx0_ptp" description="TX-0 Paper Tape Reader images">
-	<!-- The "NEWCODE" compatibility tag is used for programs written or reassembled after 1960, using the revised instruction code.
-	     The encoding of "OLDCODE" programs is incompatible with the tx0_8kw system. These two categories may receive separate lists in the future.
+	<!-- The "8N" compatibility tag is used for programs written or reassembled after 1960, using the revised instruction code.
+	     The encoding of "64" and "8O" programs is incompatible with the tx0_8kw system. These two categories may receive separate lists in the future.
 	-->
 
 	<software name="munching">
@@ -14,7 +14,7 @@ license:CC0
 		<year>196?</year>
 		<publisher>MIT</publisher>
 		<info name="usage" value="Press read in switch, then restart after loader halts at 17777. Use TAC switches to vary display pattern."/>
-		<sharedfeat name="compatibility" value="NEWCODE"/>
+		<sharedfeat name="compatibility" value="8N"/>
 		<part name="ptp" interface="tx0_ptp">
 			<feature name="blocks_used" value="20-52, 17756-17777"/>
 			<dataarea name="ptap" size="327">
@@ -30,13 +30,58 @@ license:CC0
 		<info name="author" value="John T. Gilmore, Jr."/>
 		<info name="usage" value="Create file for punch device. Press read in switch, then restart after loader halts at 7777."/>
 		<!-- For detailed usage instructions, see memorandum M-5001-1. -->
-		<sharedfeat name="compatibility" value="OLDCODE"/>
+		<sharedfeat name="compatibility" value="64,8O"/>
 		<part name="ptp" interface="tx0_ptp">
 			<!-- Reconstructed from assembly listing dated "3 FEB" in handwriting, together with the standard tape input routine from M-5001-1.
 			     This version is independent of UT-3, but does require that the aforementioned input routine remain in memory. -->
 			<feature name="blocks_used" value="6547-7610, 7741-7777"/>
 			<dataarea name="ptap" size="1821">
 				<rom name="punchy.bin" size="1821" crc="3a0ead7e" sha1="6fb6f072251712cab2e614d1a80a626b9a27f1f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ut3">
+		<description>Utility Tape 3</description>
+		<year>1958</year>
+		<publisher>MIT</publisher>
+		<info name="author" value="Charles Woodward"/>
+		<info name="usage" value="Press read in switch, then wait for loader to finish before typing commands."/>
+		<!-- Commands recognized: addr(ess), word, surp(ise), goto, pntv(ertical), pnth(orizontal), punc(h), inpu(t).
+		     Subcommands recognized: cons(tants), inst(ructions).
+		     The Trace tape optionally replaces pntv and pnth with new commands trac(e) and begi(n).
+		     For detailed usage instructions, see memorandum M-5001-1. Note that the 'slash' character is |, not /. -->
+		<sharedfeat name="compatibility" value="64,8O"/>
+		<part name="ptp1" interface="tx0_ptp">
+			<!-- Reconstructed from assembly listing dated "27 Feb 1958" in handwriting. The opcodes for 'rfa', 'rfl' and 'rfr'
+			     are uncertain; it has been assumed that these are the "start PETR running" OPRs described in 6M-4789-1. -->
+			<feature name="part_id" value="UT3"/>
+			<feature name="blocks_used" value="5540-7611, 7622-7777"/>
+			<dataarea name="ptap" size="3381">
+				<rom name="ut3.bin" size="3381" crc="b287f67f" sha1="40ec0c15873dae9b139af3c6dc756268fa87f63d" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="ptp2" interface="tx0_ptp">
+			<!-- Reconstructed from undated assembly listing. -->
+			<feature name="part_id" value="Trace"/>
+			<feature name="blocks_used" value="6657-7160, 7316-7331"/>
+			<dataarea name="ptap" size="642">
+				<rom name="trace.bin" size="642" crc="b8850e4b" sha1="4345f24aeea472d5c357641d8a868e8326a015bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ut3tra" cloneof="ut3">
+		<description>Utility Tape 3 ('tra' modification)</description>
+		<year>1959?</year>
+		<publisher>MIT</publisher>
+		<!-- Reconstructed from patches in appendix to UT3 assembly listing. This modification both supports and requires the new 'tra' instruction. -->
+		<info name="usage" value="Press read in switch, then wait for loader to finish before typing commands."/>
+		<sharedfeat name="compatibility" value="8O"/>
+		<part name="ptp" interface="tx0_ptp">
+			<feature name="blocks_used" value="5540-7611, 7622-7777"/>
+			<dataarea name="ptap" size="3381">
+				<rom name="ut3_tra.bin" size="3381" crc="a71f37a6" sha1="c60575cfe2cf0451660c846a927ad05747693ff5"/>
 			</dataarea>
 		</part>
 	</software>

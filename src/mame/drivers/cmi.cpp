@@ -224,15 +224,10 @@ public:
 	{
 	}
 
-	void set_interrupt(int cpunum, int level, int state);
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	static const device_timer_id TIMER_MAP_SWITCH = 0;
-	static const device_timer_id TIMER_HBLANK = 1;
-	static const device_timer_id TIMER_JAM_TIMEOUT = 2;
+	void set_interrupt(int cpunum, int level, int state);
 
 	void init_cmi2x();
 
@@ -252,8 +247,8 @@ public:
 	template<int cpunum> uint8_t perr_r(offs_t offset);
 	template<int cpunum> void perr_w(offs_t offset, uint8_t data);
 
-	uint16_t m_aic_ad565_in[16];
-	uint8_t m_aic_mux_latch;
+	uint16_t m_aic_ad565_in[16]{};
+	uint8_t m_aic_mux_latch = 0;
 
 	uint8_t aic_ad574_r();
 	template<int Dac> void aic_dac_w(uint8_t data);
@@ -335,7 +330,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_irqa_w );
-	DECLARE_READ_LINE_MEMBER( cmi02_pia2_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_cb2_w );
 
 	uint8_t cmi07_r();
@@ -403,22 +397,24 @@ protected:
 	required_device<address_map_bank_device> m_cpu1_periphs;
 	required_device<address_map_bank_device> m_cpu2_periphs;
 
-	address_space *m_cpu1space;
-	address_space *m_cpu2space;
+	address_space *m_cpu1space = nullptr;
+	address_space *m_cpu2space = nullptr;
 
 private:
-	emu_timer *m_map_switch_timer;
-	emu_timer *m_hblank_timer;
-	emu_timer *m_jam_timeout_timer;
+	emu_timer *m_map_switch_timer = nullptr;
+	emu_timer *m_hblank_timer = nullptr;
+	emu_timer *m_jam_timeout_timer = nullptr;
 
-	uint8_t m_video_data;
+	uint8_t m_video_data = 0;
 
 	// Memory
+	TIMER_CALLBACK_MEMBER(switch_map);
+	TIMER_CALLBACK_MEMBER(jam_timeout);
 	bool map_is_active(int cpunum, int map, uint8_t *map_info);
 	void update_address_space(int cpunum, uint8_t mapinfo);
 
 	// Video
-	void hblank();
+	TIMER_CALLBACK_MEMBER(hblank);
 	template <int Y, int X, bool ByteSize> void update_video_pos();
 
 	// Floppy
@@ -427,52 +423,52 @@ private:
 	void fdc_dma_transfer();
 
 	// Q133 CPU Card
-	uint8_t *m_q133_rom;
+	uint8_t *m_q133_rom = nullptr;
 
-	uint16_t  m_int_state[2];
-	uint8_t   m_lp_int;
-	uint8_t   m_hp_int;
+	uint16_t  m_int_state[2]{};
+	uint8_t   m_lp_int = 0;
+	uint8_t   m_hp_int = 0;
 	std::unique_ptr<uint8_t[]>    m_shared_ram;
 	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	uint8_t   m_map_sel[16];
+	uint8_t   m_map_sel[16]{};
 	std::unique_ptr<uint8_t[]>    m_map_ram[2];
 	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
-	uint8_t   m_map_ram_latch;
-	int     m_cpu_active_space[2];
-	int     m_cpu_map_switch[2];
-	uint8_t m_curr_mapinfo[2];
-	uint8_t m_irq_address[2][2];
-	int     m_m6809_bs_hack_cnt[2];
+	uint8_t   m_map_ram_latch = 0;
+	int     m_cpu_active_space[2]{};
+	int     m_cpu_map_switch[2]{};
+	uint8_t m_curr_mapinfo[2]{};
+	uint8_t m_irq_address[2][2]{};
+	int     m_m6809_bs_hack_cnt[2]{};
 
 	/* Q219 lightpen/graphics card */
 	std::unique_ptr<uint8_t[]>    m_video_ram;
-	uint16_t  m_x_pos;
-	uint8_t   m_y_pos;
-	uint16_t  m_lp_x;
-	uint8_t   m_lp_y;
-	uint8_t   m_q219_b_touch;
+	uint16_t  m_x_pos = 0;
+	uint8_t   m_y_pos = 0;
+	uint16_t  m_lp_x = 0;
+	uint8_t   m_lp_y = 0;
+	uint8_t   m_q219_b_touch = 0;
 
 	/* QFC9 floppy disk controller card */
-	uint8_t * m_qfc9_region_ptr;
-	int       m_fdc_drq;
-	uint8_t   m_fdc_addr;
-	uint8_t   m_fdc_ctrl;
-	uint8_t   m_fdc_status;
-	PAIR      m_fdc_dma_addr;
-	PAIR      m_fdc_dma_cnt;
+	uint8_t * m_qfc9_region_ptr = 0;
+	int       m_fdc_drq = 0;
+	uint8_t   m_fdc_addr = 0;
+	uint8_t   m_fdc_ctrl = 0;
+	uint8_t   m_fdc_status = 0;
+	PAIR      m_fdc_dma_addr{};
+	PAIR      m_fdc_dma_cnt{};
 
 	/* CMI-07 */
-	uint8_t   m_cmi07_ctrl;
-	bool      m_cmi07_base_enable[2];
-	uint16_t  m_cmi07_base_addr;
+	uint8_t   m_cmi07_ctrl = 0;
+	bool      m_cmi07_base_enable[2]{};
+	uint16_t  m_cmi07_base_addr = 0;
 
-	uint8_t   m_msm5832_addr;
+	uint8_t   m_msm5832_addr = 0;
 
 	// Master card (CMI-02)
-	int       m_cmi02_ptm_irq;
-	uint8_t   m_cmi02_pia_chsel;
+	int       m_cmi02_ptm_irq = 0;
+	uint8_t   m_cmi02_pia_chsel = 0;
 };
 
 /**************************************
@@ -515,7 +511,7 @@ uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-void cmi_state::hblank()
+TIMER_CALLBACK_MEMBER(cmi_state::hblank)
 {
 	int v = m_screen->vpos();
 
@@ -965,30 +961,20 @@ template<int cpunum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
 }
 
-void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cmi_state::switch_map)
 {
-	switch (id)
-	{
-		case TIMER_MAP_SWITCH:
-		{
-			m_cpu_active_space[param] = m_cpu_map_switch[param];
-			uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
-							 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
-							 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
-			update_address_space(param, map_info);
-			m_map_switch_timer->adjust(attotime::never);
-			break;
-		}
+	m_cpu_active_space[param] = m_cpu_map_switch[param];
+	uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
+					 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
+					 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
+	update_address_space(param, map_info);
+	m_map_switch_timer->adjust(attotime::never);
+}
 
-		case TIMER_HBLANK:
-			hblank();
-			break;
-
-		case TIMER_JAM_TIMEOUT:
-			m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_jam_timeout_timer->adjust(attotime::never);
-			break;
-	}
+TIMER_CALLBACK_MEMBER(cmi_state::jam_timeout)
+{
+	m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_jam_timeout_timer->adjust(attotime::never);
 }
 
 uint8_t cmi_state::atomic_r()
@@ -1356,7 +1342,7 @@ void cmi_state::dma_fdc_rom()
 	/* Active low */
 	m_fdc_status &= ~FDC_STATUS_DRIVER_LOAD;
 
-	int i;
+	int i = 0;
 	for (i = 0; i < NUM_Q256_CARDS; ++i)
 	{
 		p_info = m_map_ram[i][(map << PAGE_SHIFT) | page];
@@ -1452,7 +1438,7 @@ void cmi_state::fdc_dma_transfer()
 	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
 	int phys_page = 0;
 
-	int i;
+	int i = 0;
 	for (i = 0; i < NUM_Q256_CARDS; ++i)
 	{
 		phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];
@@ -1581,12 +1567,6 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_irqa_w )
 {
 	LOG("%s: cmi02_pia2_irqa_w: %d\n", machine().describe_context(), state);
 	set_interrupt(CPU_2, IRQ_ADINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-READ_LINE_MEMBER( cmi_state::cmi02_pia2_ca1_r )
-{
-	LOG("%s: cmi02_pia2_ca1_r: %d\n", machine().describe_context(), 0);
-	return 0;
 }
 
 WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_cb2_w )
@@ -2073,9 +2053,9 @@ void cmi_state::machine_start()
 	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
-	m_map_switch_timer = timer_alloc(TIMER_MAP_SWITCH);
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_jam_timeout_timer = timer_alloc(TIMER_JAM_TIMEOUT);
+	m_map_switch_timer = timer_alloc(FUNC(cmi_state::switch_map), this);
+	m_hblank_timer = timer_alloc(FUNC(cmi_state::hblank), this);
+	m_jam_timeout_timer = timer_alloc(FUNC(cmi_state::jam_timeout), this);
 
 	m_map_switch_timer->adjust(attotime::never);
 	m_hblank_timer->adjust(attotime::never);
@@ -2197,7 +2177,7 @@ void cmi_state::cmi2x(machine_config &config)
 
 	PIA6821(config, m_cmi02_pia[1]); // pia_cmi02_2_config
 	m_cmi02_pia[1]->irqa_handler().set(FUNC(cmi_state::cmi02_pia2_irqa_w));
-	m_cmi02_pia[1]->readca1_handler().set(FUNC(cmi_state::cmi02_pia2_ca1_r));
+	m_cmi02_pia[1]->ca1_w(0);
 	m_cmi02_pia[1]->cb2_handler().set(FUNC(cmi_state::cmi02_pia2_cb2_w));
 
 	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK);

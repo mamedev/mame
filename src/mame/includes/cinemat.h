@@ -196,10 +196,10 @@ protected:
 	void demon_sound_ports(address_map &map);
 
 private:
-	u8 m_sound_fifo[16];
-	u8 m_sound_fifo_in;
-	u8 m_sound_fifo_out;
-	u8 m_last_portb_write;
+	u8 m_sound_fifo[16]{};
+	u8 m_sound_fifo_in = 0U;
+	u8 m_sound_fifo_out = 0U;
+	u8 m_last_portb_write = 0U;
 };
 
 
@@ -226,8 +226,8 @@ protected:
 	void io_map_qb3(address_map &map);
 
 private:
-	int m_qb3_lastx;
-	int m_qb3_lasty;
+	int m_qb3_lastx = 0;
+	int m_qb3_lasty = 0;
 };
 
 #endif // MAME_INCLUDES_CINEMAT_H

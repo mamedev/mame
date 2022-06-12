@@ -178,16 +178,9 @@ void nbmj9195_state::update_pixel(int vram, int x, int y)
 	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
-void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nbmj9195_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb19010_busyflag = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in nbmj9195_state::device_timer");
-	}
+	m_nb19010_busyflag = 1;
 }
 
 void nbmj9195_state::gfxdraw(int vram)
@@ -371,7 +364,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj9195_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_videoram[0] = make_unique_clear<uint16_t[]>(width * height);
@@ -411,7 +404,7 @@ void nbmj9195_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj9195_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);

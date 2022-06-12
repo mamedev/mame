@@ -115,7 +115,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-		<software name="exodus">
+	<software name="exodus">
 		<description>Exodus</description>
 		<year>1993</year>
 		<publisher>Apex Developments</publisher>

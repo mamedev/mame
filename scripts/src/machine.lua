@@ -1976,6 +1976,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ldv4200hle.h,MACHINES["LDV4200HLE"] = true
+---------------------------------------------------
+
+if (MACHINES["LDV4200HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ldv4200hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldv4200hle.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ldp1000.h,MACHINES["LDP1000"] = true
 ---------------------------------------------------
 
@@ -2725,6 +2737,22 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrc5074.h",
 		MAME_DIR .. "src/devices/machine/gt64xxx.cpp",
 		MAME_DIR .. "src/devices/machine/gt64xxx.h",
+		MAME_DIR .. "src/devices/machine/sis5513_ide.cpp",
+		MAME_DIR .. "src/devices/machine/sis5513_ide.h",
+		MAME_DIR .. "src/devices/machine/sis630_host.cpp",
+		MAME_DIR .. "src/devices/machine/sis630_host.h",
+		MAME_DIR .. "src/devices/machine/sis630_gui.cpp",
+		MAME_DIR .. "src/devices/machine/sis630_gui.h",
+		MAME_DIR .. "src/devices/machine/sis7001_usb.cpp",
+		MAME_DIR .. "src/devices/machine/sis7001_usb.h",
+		MAME_DIR .. "src/devices/machine/sis7018_audio.cpp",
+		MAME_DIR .. "src/devices/machine/sis7018_audio.h",
+		MAME_DIR .. "src/devices/machine/sis900_eth.cpp",
+		MAME_DIR .. "src/devices/machine/sis900_eth.h",
+		MAME_DIR .. "src/devices/machine/sis950_lpc.cpp",
+		MAME_DIR .. "src/devices/machine/sis950_lpc.h",
+		MAME_DIR .. "src/devices/machine/sis950_smbus.cpp",
+		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
 	}
@@ -4932,5 +4960,16 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
 		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
+---------------------------------------------------
+if (MACHINES["NS32382"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32382.cpp",
+		MAME_DIR .. "src/devices/machine/ns32382.h",
 	}
 end

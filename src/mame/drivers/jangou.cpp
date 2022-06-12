@@ -74,17 +74,17 @@ protected:
 private:
 	/* sound-related */
 	// Jangou CVSD Sound
-	emu_timer    *m_cvsd_bit_timer;
-	uint8_t        m_cvsd_shiftreg;
-	int          m_cvsd_shift_cnt;
+	emu_timer    *m_cvsd_bit_timer = nullptr;
+	uint8_t        m_cvsd_shiftreg = 0;
+	int          m_cvsd_shift_cnt = 0;
 	// Jangou Lady ADPCM Sound
-	uint8_t        m_adpcm_byte;
-	int          m_msm5205_vclk_toggle;
+	uint8_t        m_adpcm_byte = 0;
+	int          m_msm5205_vclk_toggle = 0;
 
 	/* misc */
-	uint8_t        m_mux_data;
-	uint8_t        m_nsc_latch;
-	uint8_t        m_z80_latch;
+	uint8_t        m_mux_data = 0;
+	uint8_t        m_nsc_latch = 0;
+	uint8_t        m_z80_latch = 0;
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
@@ -914,7 +914,7 @@ void jangou_state::machine_start()
 	save_item(NAME(m_cvsd_shift_cnt));
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	m_cvsd_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jangou_state::cvsd_bit_timer_callback), this));
+	m_cvsd_bit_timer = timer_alloc(FUNC(jangou_state::cvsd_bit_timer_callback), this);
 	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 

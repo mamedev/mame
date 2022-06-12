@@ -11,13 +11,6 @@ class warpwarp_sound_device : public device_t, public device_sound_interface
 public:
 	warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	enum
-	{
-		TIMER_SOUND_VOLUME_DECAY,
-		TIMER_MUSIC_VOLUME_DECAY
-	};
-
-
 	void sound_w(u8 data);
 	void music1_w(u8 data);
 	void music2_w(u8 data);
@@ -29,14 +22,15 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(sound_decay_tick);
+	TIMER_CALLBACK_MEMBER(music_decay_tick);
 
 private:
 	// internal state
 	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
-	u32 m_clock_16h;
-	u32 m_clock_1v;
+	u32 m_clock_16h = 0;
+	u32 m_clock_1v = 0;
 	int m_sound_latch;
 	int m_music1_latch;
 	int m_music2_latch;

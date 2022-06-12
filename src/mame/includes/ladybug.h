@@ -120,12 +120,12 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ladybug_video_device> m_video;
 
-	tilemap_t   *m_grid_tilemap;
+	tilemap_t   *m_grid_tilemap = nullptr;
 
-	uint8_t m_grid_color;
-	uint8_t m_0x30;
-	uint8_t m_0x38;
-	uint8_t m_weird_value[8];
+	uint8_t m_grid_color = 0U;
+	uint8_t m_0x30 = 0U;
+	uint8_t m_0x38 = 0U;
+	uint8_t m_weird_value[8]{};
 };
 
 // add stars from zerohour, uses grid layer

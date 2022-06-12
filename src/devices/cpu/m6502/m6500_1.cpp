@@ -58,14 +58,14 @@
     appear to include the addition of an onboard power-on reset.  It
     is unknown what other differences these devices have.
 
-	TODO:
-	- For some reason most if not all Amiga MCU programs accesses arbitrary
+    TODO:
+    - For some reason most if not all Amiga MCU programs accesses arbitrary
       zero page 0x90-0xff with a back-to-back cmp($00, x) opcode at
       PC=c06-c08 with the actual result discarded. X can be any value in
-	  the 0x90-0xff range, depending on the last user keypress row source
+      the 0x90-0xff range, depending on the last user keypress row source
       e.g. 0xdf-0xe0 for 'A', 0xef-0xf0 for 'Q', 0xfb-0xfc for function
-	  keys.
-	  This can be extremely verbose in the logging facility so we currently
+      keys.
+      This can be extremely verbose in the logging facility so we currently
       nop it out for the time being.
 
 ***************************************************************************/

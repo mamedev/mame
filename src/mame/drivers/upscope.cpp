@@ -52,8 +52,8 @@ private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
-	uint8_t m_nvram_address_latch;
-	uint8_t m_nvram_data_latch;
+	uint8_t m_nvram_address_latch = 0;
+	uint8_t m_nvram_data_latch = 0;
 
 	uint8_t upscope_cia_0_portb_r();
 	void upscope_cia_0_portb_w(uint8_t data);

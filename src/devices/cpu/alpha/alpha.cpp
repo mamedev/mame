@@ -26,8 +26,6 @@
 #include "alpha.h"
 #include "common.h"
 
-#include "debugger.h"
-
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_GENERAL   (1U << 0)

@@ -116,18 +116,18 @@ private:
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 
-	u32 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_mask, m_ram_size, m_rom_size;
+	u32 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
+	u32 m_ram_mask = 0, m_ram_size = 0, m_rom_size = 0;
 
-	emu_timer *m_vbl_timer, *m_cursor_timer, *m_6015_timer;
+	emu_timer *m_vbl_timer = nullptr, *m_cursor_timer = nullptr, *m_6015_timer = nullptr;
 
-	uint16_t m_cursor_line;
-	uint16_t m_dafb_int_status;
-	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	uint8_t m_dafb_mode;
-	uint32_t m_dafb_base, m_dafb_stride;
-	uint32_t m_dafb_colors[3], m_dafb_count, m_dafb_clutoffs, m_dafb_montype, m_dafb_vbltime;
-	uint32_t m_dafb_palette[256];
+	uint16_t m_cursor_line = 0;
+	uint16_t m_dafb_int_status = 0;
+	int m_dafb_scsi1_drq = 0, m_dafb_scsi2_drq = 0;
+	uint8_t m_dafb_mode = 0;
+	uint32_t m_dafb_base = 0, m_dafb_stride = 0;
+	uint32_t m_dafb_colors[3]{}, m_dafb_count = 0, m_dafb_clutoffs = 0, m_dafb_montype = 0, m_dafb_vbltime = 0;
+	uint32_t m_dafb_palette[256]{};
 
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
@@ -136,18 +136,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-	int m_via2_ca1_hack, m_nubus_irq_state;
+	int m_via2_ca1_hack = 0, m_nubus_irq_state = 0;
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	int m_adb_irq_pending;
+	int m_adb_irq_pending = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
 
-	floppy_image_device *m_cur_floppy;
-	int m_hdsel;
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_hdsel = 0;
 
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -167,11 +167,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
-	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca2_data;
+	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
+	int m_irq_count = 0, m_ca2_data = 0;
 
 	uint32_t rom_switch_r(offs_t offset);
-	bool m_overlay;
+	bool m_overlay = 0;
 
 	uint16_t mac_scc_r(offs_t offset)
 	{
@@ -247,8 +247,33 @@ void macquadra_state::machine_start()
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca2_data = 0;
 
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_cursor_line));
+	save_item(NAME(m_dafb_int_status));
+	save_item(NAME(m_dafb_scsi1_drq));
+	save_item(NAME(m_dafb_scsi2_drq));
+	save_item(NAME(m_dafb_mode));
+	save_item(NAME(m_dafb_base));
+	save_item(NAME(m_dafb_stride));
+	save_item(NAME(m_dafb_colors));
+	save_item(NAME(m_dafb_count));
+	save_item(NAME(m_dafb_clutoffs));
+	save_item(NAME(m_dafb_montype));
+	save_item(NAME(m_dafb_vbltime));
+	save_item(NAME(m_dafb_palette));
+	save_item(NAME(m_via2_ca1_hack));
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_ca2_data));
+	save_item(NAME(m_overlay));
 }
 
 void macquadra_state::machine_reset()
@@ -351,8 +376,8 @@ TIMER_CALLBACK_MEMBER(macquadra_state::dafb_cursor_tick)
 
 void macquadra_state::video_start() // DAFB
 {
-	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_vbl_tick),this));
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_cursor_tick),this));
+	m_vbl_timer = timer_alloc(FUNC(macquadra_state::dafb_vbl_tick), this);
+	m_cursor_timer = timer_alloc(FUNC(macquadra_state::dafb_cursor_tick), this);
 
 	m_vbl_timer->adjust(attotime::never);
 	m_cursor_timer->adjust(attotime::never);
@@ -1038,4 +1063,4 @@ ROM_START( macqd700 )
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
-COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

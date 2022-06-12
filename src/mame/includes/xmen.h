@@ -40,9 +40,9 @@ public:
 
 private:
 	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_layerpri[3];
+	int        m_layer_colorbase[3]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[3]{};
 
 	/* for xmen6p */
 	std::unique_ptr<bitmap_ind16> m_screen_right;
@@ -53,7 +53,7 @@ private:
 	bool       m_xmen6p_tilemap_select;
 
 	/* misc */
-	uint8_t    m_vblank_irq_mask;
+	uint8_t    m_vblank_irq_mask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

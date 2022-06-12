@@ -202,12 +202,12 @@ private:
 	void update_fft();
 	void apply_fft(uint32_t buf_index);
 
-	float m_audio_buf[TOTAL_BUFFERS][TOTAL_CHANNELS][FFT_LENGTH];
-	float m_fft_buf[TOTAL_CHANNELS][FFT_LENGTH];
-	int m_audio_fill_index;
-	int m_audio_count[TOTAL_CHANNELS];
+	float m_audio_buf[TOTAL_BUFFERS][TOTAL_CHANNELS][FFT_LENGTH]{};
+	float m_fft_buf[TOTAL_CHANNELS][FFT_LENGTH]{};
+	int m_audio_fill_index = 0;
+	int m_audio_count[TOTAL_CHANNELS]{};
 
-	int m_bars[TOTAL_CHANNELS][TOTAL_BARS];
+	int m_bars[TOTAL_CHANNELS][TOTAL_BARS]{};
 };
 
 firebeat_extend_spectrum_analyzer_device::firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -368,7 +368,7 @@ struct IBUTTON_SUBKEY
 
 struct IBUTTON
 {
-	IBUTTON_SUBKEY subkey[3];
+	IBUTTON_SUBKEY subkey[3]{};
 };
 
 /*****************************************************************************/
@@ -429,10 +429,10 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
 
-	int m_cabinet_info;
+	int m_cabinet_info = 0;
 
-	uint8_t m_extend_board_irq_enable;
-	uint8_t m_extend_board_irq_active;
+	uint8_t m_extend_board_irq_enable = 0;
+	uint8_t m_extend_board_irq_active = 0;
 
 	required_device<ppc4xx_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_work_ram;
@@ -464,9 +464,9 @@ private:
 //  void comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	IBUTTON m_ibutton;
-	int m_ibutton_state;
-	int m_ibutton_read_subkey_ptr;
-	uint8_t m_ibutton_subkey_data[0x40];
+	int m_ibutton_state = 0;
+	int m_ibutton_read_subkey_ptr = 0;
+	uint8_t m_ibutton_subkey_data[0x40]{};
 
 	required_device<pc16552_device> m_duart_com;
 
@@ -474,7 +474,7 @@ private:
 
 	required_ioport_array<4> m_io_inputs;
 
-	uint8_t m_control;
+	uint8_t m_control = 0;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -517,12 +517,12 @@ private:
 	uint16_t firebeat_waveram_r(offs_t offset);
 	void firebeat_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	emu_timer *m_dma_timer;
-	bool m_sync_ata_irq;
+	emu_timer *m_dma_timer = nullptr;
+	bool m_sync_ata_irq = false;
 
-	uint32_t m_spu_ata_dma;
-	int m_spu_ata_dmarq;
-	uint32_t m_wave_bank;
+	uint32_t m_spu_ata_dma = 0;
+	int m_spu_ata_dmarq = 0;
+	uint32_t m_wave_bank = 0;
 
 	required_device<m68000_device> m_audiocpu;
 	required_device<cy7c131_device> m_dpram;
@@ -1216,7 +1216,7 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 void firebeat_spu_state::machine_start()
 {
 	firebeat_state::machine_start();
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
+	m_dma_timer = timer_alloc(FUNC(firebeat_spu_state::spu_dma_callback), this);
 }
 
 void firebeat_spu_state::machine_reset()
@@ -1814,7 +1814,7 @@ void firebeat_kbm_state::init_kbm_overseas()
 void firebeat_kbm_state::init_keyboard()
 {
 	// set keyboard timer
-//  m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
+//  m_keyboard_timer = timer_alloc(FUNC(firebeat_state::keyboard_timer_callback), this);
 //  m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 

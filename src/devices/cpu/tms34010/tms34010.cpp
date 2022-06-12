@@ -16,7 +16,6 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_GENERAL      (1U << 0)
@@ -741,7 +740,7 @@ void tms340x0_device::device_start()
 	}
 
 	/* allocate a scanline timer and set it to go off at the start */
-	m_scantimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms340x0_device::scanline_callback), this));
+	m_scantimer = timer_alloc(FUNC(tms340x0_device::scanline_callback), this);
 	m_scantimer->adjust(attotime::zero);
 
 	save_item(NAME(m_pc));

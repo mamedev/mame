@@ -69,6 +69,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set(m_fiqs, FUNC(input_merger_device::in_w<0>));
 	m_ula->pirq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_ula->prst_handler().set(FUNC(bbc_tube_a500_device::prst_w));
 
 	ACORN_MEMC(config, m_memc, 24_MHz_XTAL / 3, m_vidc);
 	m_memc->set_addrmap(0, &bbc_tube_a500_device::a500_map);
@@ -138,6 +139,11 @@ void bbc_tube_a500_device::device_start()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_a500_device::prst_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_a500_device::host_r(offs_t offset)
 {

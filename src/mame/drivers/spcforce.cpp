@@ -40,6 +40,7 @@ TODO:
 
 #include "cpu/i8085/i8085.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -54,7 +55,6 @@ void spcforce_state::machine_start()
 	save_item(NAME(m_sn1_ready));
 	save_item(NAME(m_sn2_ready));
 	save_item(NAME(m_sn3_ready));
-	save_item(NAME(m_irq_mask));
 }
 
 void spcforce_state::sn76496_latch_w(uint8_t data)
@@ -113,11 +113,6 @@ void spcforce_state::misc_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	m_lamps[1] = BIT(data, 2); // 2P start lamp
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
-}
-
-WRITE_LINE_MEMBER(spcforce_state::irq_mask_w)
-{
-	m_irq_mask = state;
 }
 
 WRITE_LINE_MEMBER(spcforce_state::unknown_w)
@@ -274,19 +269,12 @@ void spcforce_state::spcforce_palette(palette_device &palette) const
 }
 
 
-INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
-{
-	if(m_irq_mask)
-		device.execute().set_input_line(3, HOLD_LINE);
-}
-
 void spcforce_state::spcforce(machine_config &config)
 {
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	I8085A(config, m_maincpu, 8000000 * 2);        /* 4.00 MHz??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spcforce_state::spcforce_map);
-	m_maincpu->set_vblank_int("screen", FUNC(spcforce_state::vblank_irq));
 
 	I8035(config, m_audiocpu, 6144000);        /* divisor ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::spcforce_sound_map);
@@ -298,8 +286,10 @@ void spcforce_state::spcforce(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_w));
-	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::irq_mask_w));
+	m_mainlatch->q_out_cb<6>().set("vblirq", FUNC(input_merger_device::in_w<1>));
 	m_mainlatch->q_out_cb<7>().set(FUNC(spcforce_state::unknown_w));
+
+	INPUT_MERGER_ALL_HIGH(config, "vblirq").output_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -309,6 +299,7 @@ void spcforce_state::spcforce(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(spcforce_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set("vblirq", FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spcforce);
 	PALETTE(config, m_palette, FUNC(spcforce_state::spcforce_palette), std::size(COLORTABLE_SOURCE));
@@ -335,7 +326,7 @@ void spcforce_state::meteors(machine_config &config)
 {
 	spcforce(config);
 	m_mainlatch->q_out_cb<3>().set_nop();
-	m_mainlatch->q_out_cb<5>().set(FUNC(spcforce_state::irq_mask_w)); // ??
+	m_mainlatch->q_out_cb<5>().set("vblirq", FUNC(input_merger_device::in_w<1>)); // ??
 	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::flip_screen_w)); // irq mask isn't here, gets written too early causing the game to not boot, see startup code
 }
 

@@ -36,8 +36,8 @@ protected:
 	virtual void device_start() override;
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	void field_interrupts();
@@ -55,7 +55,8 @@ private:
 	uint8_t m_cur_xram_page;
 
 	/* update timer: called every second */
-	emu_timer *m_update_timer;
+	emu_timer *m_begin_update_timer = nullptr;
+	emu_timer *m_end_update_timer = nullptr;
 
 	/* SQW timer: called every periodic clock half-period */
 	emu_timer *m_SQW_timer;

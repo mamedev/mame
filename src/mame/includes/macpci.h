@@ -102,25 +102,25 @@ private:
 
 	};
 
-	model_t m_model;
+	model_t m_model{};
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer = nullptr;
 
 	// RBV and friends (V8, etc)
-	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
-	uint32_t m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
-	uint32_t m_rbv_palette[256];
-	uint8_t m_sonora_vctl[8];
-	emu_timer *m_vbl_timer, *m_cursor_timer;
-	uint16_t m_cursor_line;
-	uint16_t m_dafb_int_status;
-	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	uint8_t m_dafb_mode;
-	uint32_t m_dafb_base, m_dafb_stride;
+	uint8_t m_rbv_regs[256]{}, m_rbv_ier = 0, m_rbv_ifr = 0, m_rbv_type = 0, m_rbv_montype = 0, m_rbv_vbltime = 0;
+	uint32_t m_rbv_colors[3]{}, m_rbv_count = 0, m_rbv_clutoffs = 0, m_rbv_immed10wr = 0;
+	uint32_t m_rbv_palette[256]{};
+	uint8_t m_sonora_vctl[8]{};
+	emu_timer *m_vbl_timer = nullptr, *m_cursor_timer = nullptr;
+	uint16_t m_cursor_line = 0;
+	uint16_t m_dafb_int_status = 0;
+	int m_dafb_scsi1_drq = 0, m_dafb_scsi2_drq = 0;
+	uint8_t m_dafb_mode = 0;
+	uint32_t m_dafb_base = 0, m_dafb_stride = 0;
 
 	// this is shared among all video setups with vram
-	uint32_t *m_vram;
+	uint32_t *m_vram = nullptr;
 
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -148,12 +148,12 @@ private:
 	void cdmcu_mem(address_map &map);
 	void cdmcu_data(address_map &map);
 	// wait states for accessing the VIA
-	int m_via_cycles;
+	int m_via_cycles = 0;
 
 	// hack
-	uint16_t m_unk1_test;
+	uint16_t m_unk1_test = 0;
 
-	emu_timer *m_scanline_timer;
+	emu_timer *m_scanline_timer = nullptr;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	uint8_t mac_via_in_a();

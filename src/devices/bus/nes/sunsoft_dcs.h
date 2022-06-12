@@ -137,13 +137,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
-	static constexpr device_timer_id TIMER_PROTECT = 0;
+	TIMER_CALLBACK_MEMBER(protect_tick);
 
+private:
 	int m_timer_on, m_exrom_enable;
 	required_device<nes_ntb_slot_device> m_subslot;
 

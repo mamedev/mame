@@ -63,32 +63,32 @@ private:
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	output_finder<> m_led;
 
-	uint8_t m_control;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_control = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bitmap_ind16 m_tmpbitmap;
 
-	uint8_t m_mobsc0;
-	uint8_t m_mobsc1;
-	uint8_t m_lineh[13];
-	uint8_t m_shl0st;
-	uint8_t m_shl1st;
-	uint8_t m_vstrlo;
-	uint8_t m_linesh;
-	uint8_t m_shl0pc;
-	uint8_t m_shl1pc;
-	uint8_t m_linec[13];
-	uint8_t m_shl0v;
-	uint8_t m_shl1v;
-	uint8_t m_mobjh;
-	uint8_t m_linev[13];
-	uint8_t m_shl0vs;
-	uint8_t m_shl1vs;
-	uint8_t m_mobvs;
-	uint8_t m_linevs[13];
-	uint8_t m_shel0h;
-	uint8_t m_mobst;
-	uint8_t m_shel1h;
-	uint8_t m_mobjv;
+	uint8_t m_mobsc0 = 0;
+	uint8_t m_mobsc1 = 0;
+	uint8_t m_lineh[13]{};
+	uint8_t m_shl0st = 0;
+	uint8_t m_shl1st = 0;
+	uint8_t m_vstrlo = 0;
+	uint8_t m_linesh = 0;
+	uint8_t m_shl0pc = 0;
+	uint8_t m_shl1pc = 0;
+	uint8_t m_linec[13]{};
+	uint8_t m_shl0v = 0;
+	uint8_t m_shl1v = 0;
+	uint8_t m_mobjh = 0;
+	uint8_t m_linev[13]{};
+	uint8_t m_shl0vs = 0;
+	uint8_t m_shl1vs = 0;
+	uint8_t m_mobvs = 0;
+	uint8_t m_linevs[13]{};
+	uint8_t m_shel0h = 0;
+	uint8_t m_mobst = 0;
+	uint8_t m_shel1h = 0;
+	uint8_t m_mobjv = 0;
 };
 
 #endif // MAME_INCLUDES_TUNHUNT_H

@@ -119,28 +119,28 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_vram_sel;
-	uint8_t m_mio_sel;
+	uint8_t m_vram_sel = 0;
+	uint8_t m_mio_sel = 0;
 	std::unique_ptr<uint8_t[]> m_p7_pal;
-	uint8_t m_bank_reg;
-	uint8_t m_cursor_blink;
-	uint8_t m_plane_reg;
-	uint8_t m_attr_data;
-	uint8_t m_attr_wrap;
-	uint8_t m_attr_latch;
-	uint8_t m_pal_sel;
-	uint8_t m_x_width;
-	uint8_t m_gfx_mode;
-	uint8_t m_nmi_mask;
-	uint8_t m_nmi_enable_reg;
-	uint8_t m_nmi_trap;
-	uint8_t m_nmi_reset;
-	uint8_t m_screen_type;
+	uint8_t m_bank_reg = 0;
+	uint8_t m_cursor_blink = 0;
+	uint8_t m_plane_reg = 0;
+	uint8_t m_attr_data = 0;
+	uint8_t m_attr_wrap = 0;
+	uint8_t m_attr_latch = 0;
+	uint8_t m_pal_sel = 0;
+	uint8_t m_x_width = 0;
+	uint8_t m_gfx_mode = 0;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_nmi_enable_reg = 0;
+	uint8_t m_nmi_trap = 0;
+	uint8_t m_nmi_reset = 0;
+	uint8_t m_screen_type = 0;
 	void pasopia_nmi_trap();
-	uint8_t m_mux_data;
-	u8 m_porta_2;
-	bool m_spr_sw;
-	emu_timer *m_pio_timer;
+	uint8_t m_mux_data = 0;
+	u8 m_porta_2 = 0;
+	bool m_spr_sw = false;
+	emu_timer *m_pio_timer = nullptr;
 	void fdc_irq(bool state);
 	void draw_cg4_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count);
 	void draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x);
@@ -918,14 +918,14 @@ ROM_END
 void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia7_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia7_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 

@@ -93,10 +93,10 @@ const char *apd_format::extensions() const
 	return "apd";
 }
 
-int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
-	if (io.length(size))
+	if (io.length(size) || !size)
 		return 0;
 
 	std::vector<uint8_t> img(size);
@@ -129,13 +129,13 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 
 	if (!memcmp(&img[0], APD_HEADER, sizeof(APD_HEADER))) {
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;
 }
 
-bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -210,4 +210,4 @@ bool apd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_APD_FORMAT = &floppy_image_format_creator<apd_format>;
+const apd_format FLOPPY_APD_FORMAT;

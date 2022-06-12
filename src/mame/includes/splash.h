@@ -55,18 +55,18 @@ protected:
 	optional_shared_ptr<uint16_t> m_bitmap_mode;
 
 	// driver init configuration
-	int m_bitmap_type;
-	int m_sprite_attr2_shift;
+	int m_bitmap_type = 0;
+	int m_sprite_attr2_shift = 0;
 
-	tilemap_t *m_bg_tilemap[2];
+	tilemap_t *m_bg_tilemap[2]{};
 
 	// splash specific
-	int m_adpcm_data;
+	int m_adpcm_data = 0;
 
 	//roldfrog specific
-	int m_ret;
-	int m_vblank_irq;
-	int m_sound_irq;
+	int m_ret = 0;
+	int m_vblank_irq = 0;
+	int m_sound_irq = 0;
 
 	// common
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -162,13 +162,13 @@ private:
 	uint8_t m_funystrp_val;
 	uint8_t m_funystrp_ff3cc7_val;
 	uint8_t m_funystrp_ff3cc8_val;
-	int m_msm_data1;
-	int m_msm_data2;
-	int m_msm_toggle1;
-	int m_msm_toggle2;
-	int m_msm_source;
-	int m_snd_interrupt_enable1;
-	int m_snd_interrupt_enable2;
+	int m_msm_data1 = 0;
+	int m_msm_data2 = 0;
+	int m_msm_toggle1 = 0;
+	int m_msm_toggle2 = 0;
+	int m_msm_source = 0;
+	int m_snd_interrupt_enable1 = 0;
+	int m_snd_interrupt_enable2 = 0;
 };
 
 #endif // MAME_INCLUDES_SPLASH_H

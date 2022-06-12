@@ -43,15 +43,12 @@ private:
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	void soundtrigger_w(uint8_t data);
 	void misc_outputs_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 	void spcforce_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	void spcforce_map(address_map &map);
 	void spcforce_sound_map(address_map &map);
@@ -68,12 +65,11 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	output_finder<2> m_lamps;
 
-	int m_sn76496_latch;
-	int m_sn76496_select;
-	int m_sn1_ready;
-	int m_sn2_ready;
-	int m_sn3_ready;
-	uint8_t m_irq_mask;
+	int m_sn76496_latch = 0;
+	int m_sn76496_select = 0;
+	int m_sn1_ready = 0;
+	int m_sn2_ready = 0;
+	int m_sn3_ready = 0;
 };
 
 #endif // MAME_INCLUDES_SPCFORCE_H

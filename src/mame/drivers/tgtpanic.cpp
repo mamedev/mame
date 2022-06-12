@@ -33,7 +33,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_ram;
 
-	uint8_t m_color;
+	uint8_t m_color = 0;
 
 	void color_w(uint8_t data);
 

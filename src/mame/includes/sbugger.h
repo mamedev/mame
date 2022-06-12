@@ -28,7 +28,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram_attr;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void videoram_attr_w(offs_t offset, uint8_t data);

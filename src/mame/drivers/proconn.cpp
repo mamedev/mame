@@ -139,7 +139,7 @@ private:
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
 
-	int m_meter;
+	int m_meter = 0;
 	virtual void machine_reset() override;
 	void meter_w(uint8_t data);
 	void serial_transmit(offs_t offset, uint16_t data);

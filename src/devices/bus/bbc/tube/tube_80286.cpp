@@ -39,7 +39,7 @@ void bbc_tube_80286_device::tube_80286_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x50, 0x50).r(FUNC(bbc_tube_80286_device::disable_boot_rom));
-	map(0x60, 0x60).w(FUNC(bbc_tube_80286_device::irq_latch_w));
+	map(0x60, 0x60).lw8(NAME([this](uint8_t data) { m_irq_latch = data; }));
 	map(0x80, 0x8f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
 }
 
@@ -67,12 +67,14 @@ void bbc_tube_80286_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_i80286, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_i80286, INPUT_LINE_INT0);
+	m_ula->prst_handler().set(FUNC(bbc_tube_80286_device::prst_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1M");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
+	SOFTWARE_LIST(config, "pc_disk_list").set_compatible("ibm5150");
 }
 
 //-------------------------------------------------
@@ -93,12 +95,13 @@ const tiny_rom_entry *bbc_tube_80286_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_tube_80286_device::bbc_tube_80286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_80286, tag, owner, clock),
-		device_bbc_tube_interface(mconfig, *this),
-		m_i80286(*this, "i80286"),
-		m_ula(*this, "ula"),
-		m_ram(*this, "ram"),
-		m_bootstrap(*this, "bootstrap")
+	: device_t(mconfig, BBC_TUBE_80286, tag, owner, clock)
+	, device_bbc_tube_interface(mconfig, *this)
+	, m_i80286(*this, "i80286")
+	, m_ula(*this, "ula")
+	, m_ram(*this, "ram")
+	, m_bootstrap(*this, "bootstrap")
+	, m_irq_latch(0)
 {
 }
 
@@ -108,7 +111,6 @@ bbc_tube_80286_device::bbc_tube_80286_device(const machine_config &mconfig, cons
 
 void bbc_tube_80286_device::device_start()
 {
-	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -117,8 +119,6 @@ void bbc_tube_80286_device::device_start()
 
 void bbc_tube_80286_device::device_reset()
 {
-	m_ula->reset();
-
 	address_space &program = m_i80286->space(AS_PROGRAM);
 
 	program.install_rom(0xc0000, 0xc3fff, 0x3c000, m_bootstrap->base());
@@ -128,6 +128,13 @@ void bbc_tube_80286_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_80286_device::prst_w)
+{
+	device_reset();
+
+	m_i80286->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_80286_device::host_r(offs_t offset)
 {
@@ -145,11 +152,6 @@ uint8_t bbc_tube_80286_device::disable_boot_rom()
 		m_i80286->space(AS_PROGRAM).install_ram(0xc0000, 0xfffff, m_ram->pointer() + 0xc0000);
 
 	return 0xff;
-}
-
-void bbc_tube_80286_device::irq_latch_w(uint8_t data)
-{
-	m_irq_latch = data;
 }
 
 //-------------------------------------------------

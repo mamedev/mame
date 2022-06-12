@@ -74,20 +74,20 @@ private:
 
 	required_region_ptr<u8> m_sprite_region;
 	std::unique_ptr<u8[]>   m_sprite_gfx;
-	offs_t                  m_sprite_gfx_mask;
+	offs_t                  m_sprite_gfx_mask = 0;
 
 	required_memory_bank m_audiobank;
 	required_memory_bank_array<2> m_okibank;
 
-	int m_spritelist;
+	int m_spritelist = 0;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tmp_tilemap_composebitmap;
 	bitmap_ind16 m_tmp_tilemap_renderbitmap;
-	tilemap_t *m_tilemap[4];
-	u8 m_device_read_ptr;
-	u8 m_device_status;
-	const struct prot_data* m_device_data;
-	u8 m_device_value;
+	tilemap_t *m_tilemap[4]{};
+	u8 m_device_read_ptr = 0;
+	u8 m_device_status = 0;
+	const struct prot_data* m_device_data = nullptr;
+	u8 m_device_value = 0;
 
 	u8 sound_command_pending_r();
 	void sound_nmi_disable_w(u8 data);

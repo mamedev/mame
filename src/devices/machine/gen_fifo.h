@@ -197,7 +197,9 @@ private:
 	bool m_empty_triggered, m_full_triggered;
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_empty);
+	TIMER_CALLBACK_MEMBER(sync_full);
 };
 
 class generic_fifo_u32_device : public generic_fifo_device_base<u32>

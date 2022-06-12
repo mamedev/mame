@@ -66,10 +66,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	enum
-	{
-		TIMER_NMI
-	};
+	TIMER_CALLBACK_MEMBER(audio_nmi);
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -78,25 +75,26 @@ protected:
 	optional_shared_ptr<uint16_t> m_tmnt2_1c0800;
 
 	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_layerpri[3];
-	int        m_sorted_layer[3];   // this might not be necessary, but tmnt2 uses it in a strange way...
+	int        m_layer_colorbase[3]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[3]{};
+	int        m_sorted_layer[3]{};   // this might not be necessary, but tmnt2 uses it in a strange way...
 
-	tilemap_t  *m_roz_tilemap;
-	int        m_glfgreat_pixel;
-	int        m_blswhstl_rombank;
-	int        m_tmnt_priorityflag;
-	int        m_lastdim;
-	int        m_lasten;
-	int        m_dim_c;
-	int        m_dim_v; /* lgtnfght, ssriders, tmnt2 only */
+	tilemap_t  *m_roz_tilemap = nullptr;
+	int        m_glfgreat_pixel = 0;
+	int        m_blswhstl_rombank = 0;
+	int        m_tmnt_priorityflag = 0;
+	int        m_lastdim = 0;
+	int        m_lasten = 0;
+	int        m_dim_c = 0;
+	int        m_dim_v = 0; /* lgtnfght, ssriders, tmnt2 only */
 
 	/* misc */
-	int        m_tmnt_soundlatch;
-	int        m_toggle;
-	int        m_last;
-	uint16_t     m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
+	emu_timer *m_audio_nmi_timer = nullptr;
+	int        m_tmnt_soundlatch = 0;
+	int        m_toggle = 0;
+	int        m_last = 0;
+	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -118,7 +116,7 @@ protected:
 	/* memory buffers */
 	int16_t      m_sampledata[0x40000];
 
-	uint8_t      m_irq5_mask;
+	uint8_t      m_irq5_mask = 0;
 	uint16_t k052109_word_noA12_r(offs_t offset);
 	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void punkshot_k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -203,8 +201,6 @@ protected:
 	void tmnt_audio_map(address_map &map);
 	void tmntucbl_audio_map(address_map &map);
 	void tmnt_main_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class glfgreat_state : public tmnt_state
@@ -233,10 +229,10 @@ private:
 
 	required_ioport_array<4> m_analog_controller;
 
-	uint8_t    m_controller_select;
-	int        m_roz_rom_bank;
-	int        m_roz_char_bank;
-	int        m_roz_rom_mode;
+	uint8_t    m_controller_select = 0;
+	int        m_roz_rom_bank = 0;
+	int        m_roz_char_bank = 0;
+	int        m_roz_rom_mode = 0;
 };
 
 class prmrsocr_state : public tmnt_state
@@ -265,8 +261,8 @@ private:
 	void prmrsocr_audio_map(address_map &map);
 	void prmrsocr_main_map(address_map &map);
 
-	int        m_sprite_bank;
-	int        m_roz_char_bank;
+	int        m_sprite_bank = 0;
+	int        m_roz_char_bank = 0;
 };
 
 #endif // MAME_INCLUDES_TMNT_H

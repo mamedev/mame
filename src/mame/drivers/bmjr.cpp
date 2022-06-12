@@ -51,11 +51,11 @@ private:
 	void xor_display_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
-	bool m_tape_switch;
-	u8 m_xor_display;
-	u8 m_key_mux;
-	u16 m_casscnt;
-	bool m_cassold, m_cassbit;
+	bool m_tape_switch = 0;
+	u8 m_xor_display = 0U;
+	u8 m_key_mux = 0U;
+	u16 m_casscnt = 0U;
+	bool m_cassold = 0, m_cassbit = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

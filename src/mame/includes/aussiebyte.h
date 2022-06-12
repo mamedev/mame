@@ -116,7 +116,7 @@ private:
 	void mem_map(address_map &map);
 
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs);
-	bool m_port15 = 0; // rom switched in (0), out (1)
+	bool m_port15 = false; // rom switched in (0), out (1)
 	u8 m_port17 = 0U;
 	u8 m_port17_rdy = 0U;
 	u8 m_port19 = 0U;
@@ -128,7 +128,7 @@ private:
 	u16 m_cnt = 0U;
 	u16 m_alpha_address = 0U;
 	u16 m_graph_address = 0U;
-	bool m_centronics_busy = 0;
+	bool m_centronics_busy = false;
 	std::unique_ptr<u8[]> m_vram; // video ram, 64k dynamic
 	std::unique_ptr<u8[]> m_aram; // attribute ram, 2k static
 	std::unique_ptr<u8[]> m_ram;  // main ram, 256k dynamic

@@ -113,7 +113,7 @@ void ncr53c7xx_device::device_start()
 	m_host_read.resolve_safe(0);
 	m_host_write.resolve_safe();
 
-	m_tm = timer_alloc(0);
+	m_tm = timer_alloc(FUNC(ncr53c7xx_device::step_timer), this);
 
 	// The SCRIPTS processor runs at ~2 MIPS so approximate this
 	set_unscaled_clock(2000000);
@@ -292,7 +292,8 @@ uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				ret = m_dstat;
-				m_dstat = 0;
+				// DFE isn't cleared on read
+				m_dstat &= DSTAT_DFE;
 				update_irqs();
 			}
 			if (ACCESSING_BITS_8_15)
@@ -756,11 +757,11 @@ void ncr53c7xx_device::recv_byte()
 
 
 //-------------------------------------------------
-//  device_timer - callback to step the SCSI
+//  step_timer - callback to step the SCSI
 //  state machine
 //-------------------------------------------------
 
-void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ncr53c7xx_device::step_timer)
 {
 	step(true);
 }

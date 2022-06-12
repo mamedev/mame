@@ -77,10 +77,10 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	emu_timer  *m_interrupt_timer;
+	emu_timer  *m_interrupt_timer = nullptr;
 
 	/* input-related */
-	uint8_t      m_controller_select;
+	uint8_t      m_controller_select = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -134,7 +134,7 @@ TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
 
 void beaminv_state::create_interrupt_timer()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beaminv_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(beaminv_state::interrupt_callback), this);
 }
 
 

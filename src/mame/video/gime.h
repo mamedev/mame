@@ -37,13 +37,13 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
-	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
+	bool spare_chip_select_enabled() { return m_gime_registers[0] & 0x04 ? true : false; }
 
 	// the GIME seems to intercept writes to $FF22 (not precisely sure how)
 	void pia_write(offs_t offset, uint8_t data);
 
 	// updates the cart ROM
-	void update_cart_rom(void);
+	void update_cart_rom();
 
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() repeatedly and after all row
@@ -64,17 +64,16 @@ protected:
 	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
 
 	// device-level overrides
-	virtual void device_start(void) override;
-	virtual void device_reset(void) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void device_pre_save(void) override;
-	virtual void device_post_load(void) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// other overrides
-	virtual void new_frame(void) override;
-	virtual void horizontal_sync_changed(bool line) override;
-	virtual void enter_bottom_border(void) override;
+	virtual TIMER_CALLBACK_MEMBER(new_frame) override;
+	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
+	virtual void enter_bottom_border() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
 	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
@@ -126,9 +125,6 @@ protected:
 		GIME_TIMER_279NSEC
 	};
 
-	// timer constants
-	static const device_timer_id TIMER_GIME_CLOCK = 4;
-
 	// statics
 	static const uint8_t hires_font[128][12];
 
@@ -177,25 +173,18 @@ protected:
 	pixel_t                     m_rgb_palette[64];
 	uint8_t                     m_dummy_bank[0x2000];
 
-	// timer constants
-	static const device_timer_id TIMER_FRAME = 0;
-	static const device_timer_id TIMER_HSYNC_OFF = 1;
-	static const device_timer_id TIMER_HSYNC_ON = 2;
-	static const device_timer_id TIMER_FSYNC_OFF = 3;
-	static const device_timer_id TIMER_FSYNC_ON = 4;
-
 	// read/write
 	uint8_t read_gime_register(offs_t offset);
 	uint8_t read_mmu_register(offs_t offset);
 	uint8_t read_palette_register(offs_t offset);
-	uint8_t read_floating_bus(void);
+	uint8_t read_floating_bus();
 	void write_gime_register(offs_t offset, uint8_t data);
 	void write_mmu_register(offs_t offset, uint8_t data);
 	void write_palette_register(offs_t offset, uint8_t data);
 	void write_sam_register(offs_t offset);
 
 	// memory
-	void update_memory(void);
+	void update_memory();
 	void update_memory(int bank);
 	uint8_t *memory_pointer(uint32_t address);
 
@@ -223,21 +212,21 @@ protected:
 	}
 
 	// timer
-	timer_type_t timer_type(void);
-	const char *timer_type_string(void);
-	void reset_timer(void);
-	void timer_elapsed(void);
+	timer_type_t timer_type();
+	const char *timer_type_string();
+	void reset_timer();
+	TIMER_CALLBACK_MEMBER(timer_elapsed);
 
 	// video
 	bool update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *palette);
-	void update_geometry(void);
-	void update_rgb_palette(void);
-	void update_composite_palette(void);
+	void update_geometry();
+	void update_rgb_palette();
+	void update_composite_palette();
 	void update_border(uint16_t physical_scanline);
 	pixel_t get_composite_color(int color);
 	pixel_t get_rgb_color(int color);
-	offs_t get_video_base(void);
-	uint16_t get_lines_per_row(void);
+	offs_t get_video_base();
+	uint16_t get_lines_per_row();
 	uint32_t get_data_mc6847(uint32_t video_position, uint8_t *data, uint8_t *mode);
 	uint32_t get_data_without_attributes(uint32_t video_position, uint8_t *data, uint8_t *mode);
 	uint32_t get_data_with_attributes(uint32_t video_position, uint8_t *data, uint8_t *mode);

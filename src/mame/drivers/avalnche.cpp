@@ -40,6 +40,11 @@
 #include "avalnche.lh"
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(avalnche_state::nmi_16v)
+{
+	m_maincpu->pulse_input_line(m6502_device::NMI_LINE, attotime::zero);
+}
+
 /*************************************
  *
  *  Video update
@@ -216,7 +221,8 @@ void avalnche_state::avalnche_base(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* clock input is the "2H" signal divided by two */
 	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(avalnche_state::nmi_line_pulse), attotime::from_hz(8*60));
+
+	TIMER(config, "16v").configure_scanline(FUNC(avalnche_state::nmi_16v), "screen", 32, 32); // 8 interrupts per frame
 
 	F9334(config, m_latch); // F8
 	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
@@ -225,7 +231,7 @@ void avalnche_state::avalnche_base(machine_config &config)
 	m_latch->q_out_cb<7>().set_output("led2"); // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 10);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

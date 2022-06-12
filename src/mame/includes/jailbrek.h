@@ -50,11 +50,11 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t      *m_bg_tilemap;
+	tilemap_t      *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t        m_irq_enable;
-	uint8_t        m_nmi_enable;
+	uint8_t        m_irq_enable = 0U;
+	uint8_t        m_nmi_enable = 0U;
 	void ctrl_w(uint8_t data);
 	void coin_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

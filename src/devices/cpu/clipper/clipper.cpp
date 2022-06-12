@@ -14,7 +14,6 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "clipper.h"
 #include "clipperd.h"
 

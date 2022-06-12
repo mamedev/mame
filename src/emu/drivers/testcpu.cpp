@@ -38,7 +38,7 @@ public:
 	}
 
 	// timer callback; used to wrest control of the system
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override
+	TIMER_CALLBACK_MEMBER(timer_tick)
 	{
 		static const u32 sample_instructions[] =
 		{
@@ -101,7 +101,7 @@ public:
 		m_cpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 		// set a timer to go off right away
-		timer_set(attotime::zero);
+		timer_alloc(FUNC(timer_tick), this)->adjust(attotime::zero);
 	}
 
 	// dump the current CPU state

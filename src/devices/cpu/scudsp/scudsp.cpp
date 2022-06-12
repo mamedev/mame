@@ -94,8 +94,6 @@
 #include "scudsp.h"
 #include "scudspdasm.h"
 
-#include "debugger.h"
-
 
 DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 

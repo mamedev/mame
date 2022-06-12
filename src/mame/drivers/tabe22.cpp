@@ -90,7 +90,7 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 	void palette(palette_device &palette) const;
 
-	bool m_screen_light;
+	bool m_screen_light = false;
 };
 
 

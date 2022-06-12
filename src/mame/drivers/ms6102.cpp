@@ -104,7 +104,7 @@ private:
 	void crtc_w(offs_t offset, u8 data);
 
 	u8 misc_status_r();
-	u16 m_dmaaddr;
+	u16 m_dmaaddr = 0;
 
 	void kbd_uart_clock_w(u8 data);
 

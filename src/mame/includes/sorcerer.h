@@ -37,14 +37,14 @@ class sorcerer_state : public driver_device
 
 	struct cass_data_t {
 		struct {
-			int length;     // time cassette level is at input.level
-			int level;      // cassette level
-			int bit;        // bit being read
+			int length = 0;     // time cassette level is at input.level
+			int level = 0;      // cassette level
+			int bit = 0;        // bit being read
 		} input;
 		struct {
-			int length;     // time cassette level is at output.level
-			int level;      // cassette level
-			int bit;        // bit to output
+			int length = 0;     // time cassette level is at output.level
+			int level = 0;      // cassette level
+			int bit = 0;        // bit to output
 		} output;
 	};
 
@@ -85,12 +85,6 @@ public:
 	void sorcererb(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_SERIAL,
-		TIMER_CASSETTE,
-	};
-
 	u8 portfd_r();
 	u8 portfe_r();
 	void portfd_w(u8 data);
@@ -111,10 +105,9 @@ protected:
 
 	u8 m_portfe = 0U;
 	u8 m_keyboard_line = 0U;
-	emu_timer *m_serial_timer;
-	emu_timer *m_cassette_timer;
+	emu_timer *m_serial_timer = nullptr;
+	emu_timer *m_cassette_timer = nullptr;
 	cass_data_t m_cass_data;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_pcg;
@@ -145,8 +138,8 @@ protected:
 	memory_passthrough_handler m_rom_shadow_tap;
 
 private:
-	u8 m_port48;
-	u8 m_port34;
+	u8 m_port48 = 0;
+	u8 m_port34 = 0;
 	u8 port34_r();
 	u8 port48_r();
 	void port34_w(u8 data);
@@ -180,9 +173,9 @@ private:
 	void intrq2_w(bool state);
 	void drq2_w(bool state);
 	u8 m_port2c = 0U;
-	bool m_wait = 0;
-	bool m_drq_off = 0;
-	bool m_intrq_off = 0;
+	bool m_wait = false;
+	bool m_drq_off = false;
+	bool m_intrq_off = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	optional_device<micropolis_device> m_fdc;

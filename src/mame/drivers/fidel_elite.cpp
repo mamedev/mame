@@ -101,8 +101,7 @@ public:
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
-		m_inputs(*this, "IN.%u", 0),
-		m_rotate(false)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
@@ -143,7 +142,7 @@ protected:
 	u8 ppi_portb_r();
 	void ppi_portc_w(u8 data);
 
-	bool m_rotate;
+	bool m_rotate = false;
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;

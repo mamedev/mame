@@ -275,6 +275,7 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "io_we.h"
 #include "lark.h"
 #include "laserd.h"
+#include "midi_emr.h"
 #include "midimax.h"
 #include "nexus.h"
 //#include "prisma3.h"
@@ -335,6 +336,8 @@ void archimedes_exp_devices(device_slot_interface &device)
 	device.option_add("lark", ARC_LARK);                  // Wild Vision/Computer Concepts Lark A16
 	device.option_add("lbp4", ARC_LBP4);                  // Computer Concepts LaserDirect LBP-4
 	device.option_add("midi_aka16", ARC_MIDI_AKA16);      // Acorn AKA16 MIDI Podule
+	device.option_add("midi2", ARC_MIDI2_EMR);            // EMR MIDI 2 Interface
+	device.option_add("midi4", ARC_MIDI4_EMR);            // EMR MIDI 4 Interface
 	device.option_add("midimax", ARC_MIDIMAX);            // Wild Vision MidiMax
 	device.option_add("midimax2", ARC_MIDIMAX2);          // Wild Vision MidiMax 2
 	device.option_add("nexus_a500", ARC_NEXUS_A500);      // SJ Research Nexus Interface (A500)

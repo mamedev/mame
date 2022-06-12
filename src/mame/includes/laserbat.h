@@ -34,8 +34,6 @@ public:
 	void laserbat_map(address_map &map);
 
 protected:
-	enum { TIMER_SCANLINE };
-
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag, uint8_t eff2_mask)
 		: driver_device(mconfig, type, tag)
 		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
@@ -76,8 +74,6 @@ protected:
 	virtual void machine_start() override;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// video functions
 	TIMER_CALLBACK_MEMBER(video_line);
 
@@ -105,12 +101,12 @@ protected:
 	uint8_t const                           m_eff2_mask;
 
 	// control lines
-	uint8_t         m_input_mux;
-	bool            m_mpx_p_1_2;
+	uint8_t         m_input_mux = 0;
+	bool            m_mpx_p_1_2 = 0;
 
 	// RAM used by TTL video hardware, writable by CPU
-	uint8_t         m_bg_ram[0x400];        // background tilemap
-	uint8_t         m_eff_ram[0x400];       // per-scanline effects (A8 not wired meaning only half is usable)
+	uint8_t         m_bg_ram[0x400]{};        // background tilemap
+	uint8_t         m_eff_ram[0x400]{};       // per-scanline effects (A8 not wired meaning only half is usable)
 	bool            m_mpx_bkeff = false;    // select between writing background and effects memory
 
 	// signals affecting the TTL-generated 32x32 sprite

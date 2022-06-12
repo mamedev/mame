@@ -75,15 +75,15 @@ private:
 	required_shared_ptr<uint8_t> m_hvc;
 
 	// input
-	uint8_t m_gear;
-	uint8_t m_track;
-	int32_t m_steering_buf;
-	int32_t m_steering_val;
-	uint8_t m_crash_en;
-	uint8_t m_crash_data;
-	uint8_t m_crash_data_en;  // IC D8
-	uint8_t m_ac_line;
-	int32_t m_last_steering_val;
+	uint8_t m_gear = 0;
+	uint8_t m_track = 0;
+	int32_t m_steering_buf = 0;
+	int32_t m_steering_val = 0;
+	uint8_t m_crash_en = 0;
+	uint8_t m_crash_data = 0;
+	uint8_t m_crash_data_en = 0;  // IC D8
+	uint8_t m_ac_line = 0;
+	int32_t m_last_steering_val = 0;
 	required_ioport m_steer, m_gears, m_in0;
 	required_ioport_array<3> m_dsw;
 

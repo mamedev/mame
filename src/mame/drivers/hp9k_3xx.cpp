@@ -134,8 +134,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line(M68K_IRQ_6, state); };
 	DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line(M68K_IRQ_7, state); };
 
-	bool m_bus_error;
-	emu_timer *m_bus_error_timer;
+	bool m_bus_error = false;
+	emu_timer *m_bus_error_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(bus_error_timeout);
 };
 
@@ -233,7 +233,7 @@ void hp9k3xx_state::machine_reset()
 
 void hp9k3xx_state::machine_start()
 {
-	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9k3xx_state::bus_error_timeout), this));
+	m_bus_error_timer = timer_alloc(FUNC(hp9k3xx_state::bus_error_timeout), this);
 	m_bus_error = false;
 	save_item(NAME(m_bus_error));
 }

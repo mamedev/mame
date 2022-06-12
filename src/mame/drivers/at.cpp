@@ -1858,7 +1858,6 @@ ROM_START( pccm209 )
 	ROM_CONTINUE( 0x10001, 0x08000 )
 ROM_END
 
-
 // ID: unknown - ASI 100B0, identified as “HAM 12 TI 286 Motherboard ZERO WAIT” - Chipset: Texas Instruments TACT82301PB, TACT82302PB, TACT82303PB (cf. at386sx)
 // CPU: xxx, FPU: IIT 2C87-12 - RAM: 1MB in DIP, 4xSIPP30 - OSC: 24.000MHz, 14.31818 - ISA8: 3, ISA16: 5
 ROM_START( asi100b0 ) // BIOS-String: D286-1112-040990-K0
@@ -1913,7 +1912,13 @@ ROM_END
 // BIOS-String: S286-6181-101590-K0
 ROM_START( pccm205 )
 	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD16_BYTE( "m205.bin", 0x10000, 0x8000, CRC(6f7bc8d6) SHA1(14062505b316e0d4409fb4e502651e09fea0a4c1) )
+	// 0: v2.25, 17 January, 1991 (C) 1990 PC Chips INC.
+	ROM_SYSTEM_BIOS(0, "v225", "PC Chips v2.25")
+	ROMX_LOAD( "m205.bin", 0x10000, 0x8000, CRC(6f7bc8d6) SHA1(14062505b316e0d4409fb4e502651e09fea0a4c1), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROM_CONTINUE( 0x10001, 0x8000)
+	// 1: v2.23, 29 December, 1990 (C) 1990 EVER-SUCCESS SYSTEMS LTD.
+	ROM_SYSTEM_BIOS(1, "v223", "Ever-Success Systems v2.23")
+	ROMX_LOAD( "m205_odd.bin", 0x10000, 0x8000, CRC(3a8ed558) SHA1(0648a2f1674bb07a175b983f107bb72c38ac1e61), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_CONTINUE( 0x10001, 0x8000)
 ROM_END
 
@@ -6032,7 +6037,7 @@ COMP( 198?, ev1806,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at
 COMP( 198?, ev1815,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Everex Systems", "EV-1815", MACHINE_NOT_WORKING ) // continuous beeps (RAM not detected?)
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
 COMP( 199?, headg2,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with Headland G2 chipset", MACHINE_NOT_WORKING )
-COMP( 19??, ht12a,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "unknown",     "unknown 286 AT clones (HT12/A chipset)", MACHINE_NOT_WORKING )
+COMP( 19??, ht12a,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "unknown 286 AT clones (HT12/A chipset)", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "PC/XT-286 5162", MACHINE_NOT_WORKING )
 COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
@@ -6042,11 +6047,11 @@ COMP( 198?, icldrsm40, ibm5170, 0,       neat,      0,     at_state,     init_at
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 199?, kma202f,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>",   "KMA-202F-12R (Winbond chipset)", MACHINE_NOT_WORKING )
 COMP( 19??, kt216wb5,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "KT Technology", "KT216WB5-HI Rev.2", MACHINE_NOT_WORKING )
-COMP( 198?, lm103s,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "LM-103S", MACHINE_NOT_WORKING )
+COMP( 198?, lm103s,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "LM-103S", MACHINE_NOT_WORKING )
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 198?, magb233,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B233", MACHINE_NOT_WORKING )
 COMP( 198?, magb236,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B236", MACHINE_NOT_WORKING )
-COMP( 19??, mat286,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "MAT286 Rev.D", MACHINE_NOT_WORKING )
+COMP( 19??, mat286,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "MAT286 Rev.D", MACHINE_NOT_WORKING )
 COMP( 199?, mb1212c,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Biostar",     "MB-1212C", MACHINE_NOT_WORKING )
 COMP( 199?, mba009,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "HLB-286 MBA-009", MACHINE_NOT_WORKING )
 COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )

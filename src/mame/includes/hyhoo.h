@@ -17,29 +17,24 @@ public:
 	void hyhoo2(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_clut;
 
-	int m_blitter_destx;
-	int m_blitter_desty;
-	int m_blitter_sizex;
-	int m_blitter_sizey;
-	int m_blitter_src_addr;
-	int m_blitter_direction_x;
-	int m_blitter_direction_y;
-	int m_gfxrom;
-	int m_dispflag;
-	int m_highcolorflag;
-	int m_flipscreen;
-	bitmap_rgb32 m_tmpbitmap;
-	emu_timer *m_blitter_timer;
+	int m_blitter_destx = 0;
+	int m_blitter_desty = 0;
+	int m_blitter_sizex = 0;
+	int m_blitter_sizey = 0;
+	int m_blitter_src_addr = 0;
+	int m_blitter_direction_x = 0;
+	int m_blitter_direction_y = 0;
+	int m_gfxrom = 0;
+	int m_dispflag = 0;
+	int m_highcolorflag = 0;
+	int m_flipscreen = 0;
+	bitmap_rgb32 m_tmpbitmap{};
+	emu_timer *m_blitter_timer = nullptr;
 
 	void hyhoo_blitter_w(offs_t offset, uint8_t data);
 	void hyhoo_romsel_w(uint8_t data);
@@ -52,5 +47,5 @@ private:
 	void hyhoo_io_map(address_map &map);
 	void hyhoo_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };

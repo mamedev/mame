@@ -74,15 +74,15 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_fontram;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t   *m_ram_0000;
-	uint8_t   *m_ram_c000;
-	uint8_t   m_temp_attr;
-	emu_timer *m_video_timer;
+	uint8_t   *m_ram_0000 = nullptr;
+	uint8_t   *m_ram_c000 = nullptr;
+	uint8_t   m_temp_attr = 0;
+	emu_timer *m_video_timer = nullptr;
 
 	/* PIA 0 (UD12) */
-	uint8_t   m_pia0_porta;
-	uint8_t   m_pia0_portb;
-	int     m_pia0_cb2;         /* 60/50 */
+	uint8_t   m_pia0_porta = 0;
+	uint8_t   m_pia0_portb = 0;
+	int     m_pia0_cb2 = 0;         /* 60/50 */
 
 	/* PIA 1 (UD8) */
 
@@ -504,7 +504,7 @@ void osbexec_state::init_osbexec()
 	m_vram = make_unique_clear<uint8_t[]>(0x2000);
 	m_fontram = make_unique_clear<uint8_t[]>(0x1000);
 
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osbexec_state::osbexec_video_callback),this));
+	m_video_timer = timer_alloc(FUNC(osbexec_state::osbexec_video_callback), this);
 }
 
 

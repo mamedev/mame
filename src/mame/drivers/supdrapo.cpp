@@ -97,7 +97,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_char_bank;
 
-	uint8_t m_wdog;
+	uint8_t m_wdog = 0;
 
 	uint8_t rng_r();
 	void wdog8000_w(uint8_t data);

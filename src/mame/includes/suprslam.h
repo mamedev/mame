@@ -50,12 +50,12 @@ private:
 	required_shared_ptr<uint16_t> m_screen_vregs;
 
 	/* video-related */
-	tilemap_t     *m_screen_tilemap;
-	tilemap_t     *m_bg_tilemap;
-	uint16_t      m_screen_bank;
-	uint16_t      m_bg_bank;
+	tilemap_t     *m_screen_tilemap = nullptr;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	uint16_t      m_screen_bank = 0;
+	uint16_t      m_bg_bank = 0;
 	uint32_t  suprslam_tile_callback( uint32_t code );
-	uint8_t       m_spr_ctrl;
+	uint8_t       m_spr_ctrl = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

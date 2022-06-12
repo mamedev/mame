@@ -217,7 +217,7 @@ void m24_keyboard_device::device_start()
 {
 	m_out_data.resolve_safe();
 	m_out_data(1);
-	m_reset_timer = timer_alloc();
+	m_reset_timer = timer_alloc(FUNC(m24_keyboard_device::reset_mcu), this);
 }
 
 void m24_keyboard_device::device_reset()
@@ -225,7 +225,7 @@ void m24_keyboard_device::device_reset()
 	m_kbcdata = true;
 }
 
-void m24_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m24_keyboard_device::reset_mcu)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_out_data(1);

@@ -174,10 +174,10 @@ private:
 	/* ASIC */
 	struct
 	{
-		uint32_t src_addr;
-		uint32_t dst_addr;
-		uint32_t ctrl;
-		uint32_t count;
+		uint32_t src_addr = 0;
+		uint32_t dst_addr = 0;
+		uint32_t ctrl = 0;
+		uint32_t count = 0;
 	} m_dma_ch[3];
 
 
@@ -186,10 +186,10 @@ private:
 
 	struct
 	{
-		uint16_t bdma_internal_addr;
-		uint16_t bdma_external_addr;
-		uint16_t bdma_control;
-		uint16_t bdma_word_count;
+		uint16_t bdma_internal_addr = 0;
+		uint16_t bdma_external_addr = 0;
+		uint16_t bdma_control = 0;
+		uint16_t bdma_word_count = 0;
 	} m_adsp_regs;
 
 
@@ -199,21 +199,21 @@ private:
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
-		uint32_t init_enable;
+		uint32_t init_enable = 0;
 	} m_voodoo_pci_regs[2];
 
 
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
 		/* Memory-mapped */
-		uint32_t as_regs[0x200]; // was 19, increased to 0x200 for coverity 315123, needed for zr36120_r/w, to stop crash at start.
+		uint32_t as_regs[0x200]{}; // was 19, increased to 0x200 for coverity 315123, needed for zr36120_r/w, to stop crash at start.
 	} m_zr36120;
 
 

@@ -12,11 +12,6 @@
 class nbmj8688_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -83,27 +78,27 @@ private:
 	optional_device<hd61830_device> m_lcdc1;
 
 	// defined in video_start
-	int m_gfxmode;
+	int m_gfxmode = 0;
 
-	int m_scrolly;
-	int m_blitter_destx;
-	int m_blitter_desty;
-	int m_blitter_sizex;
-	int m_blitter_sizey;
-	int m_blitter_direction_x;
-	int m_blitter_direction_y;
-	int m_blitter_src_addr;
-	int m_gfxrom;
-	int m_dispflag;
-	int m_gfxflag2;
-	int m_gfxflag3;
-	int m_flipscreen;
-	int m_screen_refresh;
+	int m_scrolly = 0;
+	int m_blitter_destx = 0;
+	int m_blitter_desty = 0;
+	int m_blitter_sizex = 0;
+	int m_blitter_sizey = 0;
+	int m_blitter_direction_x = 0;
+	int m_blitter_direction_y = 0;
+	int m_blitter_src_addr = 0;
+	int m_gfxrom = 0;
+	int m_dispflag = 0;
+	int m_gfxflag2 = 0;
+	int m_gfxflag3 = 0;
+	int m_flipscreen = 0;
+	int m_screen_refresh = 0;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	std::unique_ptr<uint16_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_clut;
-	int m_flipscreen_old;
-	emu_timer *m_blitter_timer;
+	int m_flipscreen_old = 0;
+	emu_timer *m_blitter_timer = nullptr;
 
 	// common
 	uint8_t ff_r();
@@ -158,7 +153,7 @@ private:
 	void secolove_map(address_map &map);
 	void seiha_io_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };
 
 #endif // MAME_INCLUDES_NBMJ8688_H

@@ -94,7 +94,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(scanline_interrupt_check);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -137,11 +137,6 @@ private:
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
 	bool m_ch00rom_enabled;
-
-	enum
-	{
-		TIMER_SCANLINE_INTERRUPT
-	};
 
 	/* ULA context */
 
@@ -256,12 +251,12 @@ void accomm_state::machine_start()
 
 void accomm_state::video_start()
 {
-	int i;
-	for( i = 0; i < 256; i++ ) {
+	for( int i = 0; i < 256; i++ ) {
 		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE_INTERRUPT);
+
+	m_scanline_timer = timer_alloc(FUNC(accomm_state::scanline_interrupt_check), this);
 	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 
@@ -481,24 +476,21 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void accomm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(accomm_state::scanline_interrupt_check)
 {
-	if (id == TIMER_SCANLINE_INTERRUPT)
+	switch (m_screen->vpos())
 	{
-		switch (m_screen->vpos())
-		{
-		case 99:
-			interrupt_handler( INT_SET, INT_RTC );
-			break;
-		case 249:
-		case 255:
-			if ( m_screen->vpos() == m_ula.screen_dispend )
-				interrupt_handler( INT_SET, INT_DISPLAY_END );
-			break;
-		case 311:
-			m_ula.screen_addr = m_ula.screen_start;
-			break;
-		}
+	case 99:
+		interrupt_handler( INT_SET, INT_RTC );
+		break;
+	case 249:
+	case 255:
+		if ( m_screen->vpos() == m_ula.screen_dispend )
+			interrupt_handler( INT_SET, INT_DISPLAY_END );
+		break;
+	case 311:
+		m_ula.screen_addr = m_ula.screen_start;
+		break;
 	}
 }
 

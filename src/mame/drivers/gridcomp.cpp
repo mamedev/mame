@@ -158,10 +158,10 @@ private:
 	void grid1101_map(address_map &map);
 	void grid1121_map(address_map &map);
 
-	bool m_kbd_ready;
-	uint16_t m_kbd_data;
+	bool m_kbd_ready = false;
+	uint16_t m_kbd_data = 0;
 
-	uint16_t *m_videoram;
+	uint16_t *m_videoram = nullptr;
 };
 
 

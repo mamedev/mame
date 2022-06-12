@@ -65,20 +65,16 @@ public:
 	void positron(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_FUSE
-	};
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(fuse_update); // TODO: Does nothing
 
 	// disassembly override
 	offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	emu_timer *m_fuse_timer;
-	bool m_fuse_timer_running;
+	emu_timer *m_fuse_timer = nullptr;
+	bool m_fuse_timer_running = false;
 
 	void positron_map(address_map &map);
 	void positron_fetch(address_map &map);
@@ -89,11 +85,11 @@ private:
 
 	// sockets for upto 8 x SC67476, only 2 actually fitted in this machine
 	struct mmu {
-		uint16_t access_reg[1024];
-		uint8_t key_value[8];
-		uint8_t access_key;
-		uint8_t operate_key;
-		uint8_t active_key;
+		uint16_t access_reg[1024]{};
+		uint8_t key_value[8]{};
+		uint8_t access_key = 0;
+		uint8_t operate_key = 0;
+		uint8_t active_key = 0;
 		bool sbit;
 	} m_mmu;
 
@@ -101,8 +97,7 @@ private:
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	bool m_irq_ack;
+	bool m_irq_ack = 0;
 
 	required_device<mc6809_device> m_maincpu;
 	required_device<address_map_bank_device> m_mmu_bankdev;
@@ -114,7 +109,7 @@ private:
 
 	memory_passthrough_handler m_mmu_shadow_tap;
 
-	uint8_t m_prev_opcode;
+	uint8_t m_prev_opcode = 0;
 };
 
 
@@ -126,7 +121,7 @@ void positron_state::machine_start()
 	// select task 0
 	m_mmu.active_key = 0;
 
-	m_fuse_timer = timer_alloc(TIMER_FUSE);
+	m_fuse_timer = timer_alloc(FUNC(positron_state::fuse_update), this);
 	m_fuse_timer->adjust(attotime::never);
 	m_fuse_timer_running = false;
 	m_irq_ack = false;
@@ -181,18 +176,11 @@ void positron_state::machine_reset()
 }
 
 
-void positron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(positron_state::fuse_update)
 {
-	switch (id)
-	{
-	case TIMER_FUSE:
-		//m_mmu.active_key = m_mmu.operate_key;
-		//m_mmu.sbit = false;
-		m_fuse_timer->adjust(attotime::never);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in positron_state::device_timer");
-	}
+	//m_mmu.active_key = m_mmu.operate_key;
+	//m_mmu.sbit = false;
+	m_fuse_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -382,14 +370,6 @@ void positron_state::ram_w(offs_t offset, uint8_t data)
 }
 
 
-IRQ_CALLBACK_MEMBER(positron_state::irq_callback)
-{
-	m_irq_ack = true;
-
-	return 0;
-}
-
-
 static INPUT_PORTS_START(positron)
 	PORT_START("COL0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
@@ -492,12 +472,12 @@ static INPUT_PORTS_START(positron)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL10") // Graphics Encoding
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REP")                PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENC")                PORT_CODE(KEYCODE_PGDN)
 
@@ -839,11 +819,11 @@ offs_t positron_state::os9_dasm_override(std::ostream &stream, offs_t pc, const 
 
 void positron_state::positron(machine_config &config)
 {
-	MC6809(config, m_maincpu, 24_MHz_XTAL / 24);
+	MC6809(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &positron_state::positron_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &positron_state::positron_fetch);
 	m_maincpu->set_dasm_override(FUNC(positron_state::os9_dasm_override));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(positron_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(NAME([this](device_t&, int) -> int { m_irq_ack = true; return 0; }));
 
 	ADDRESS_MAP_BANK(config, m_mmu_bankdev); // SC67476
 	m_mmu_bankdev->set_addrmap(0, &positron_state::mmu_map);

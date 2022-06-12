@@ -171,11 +171,11 @@ private:
 	void bankswitch(uint8_t data);
 
 	// ROM cassette
-	int m_rom_sel;
-	uint32_t m_rom_addr;
+	int m_rom_sel = 0;
+	uint32_t m_rom_addr = 0U;
 
 	/* peripheral state */
-	int m_iosel;                /* serial interface select */
+	int m_iosel = 0;                /* serial interface select */
 	void pc8201_io(address_map &map);
 	void pc8201_mem(address_map &map);
 };

@@ -31,7 +31,7 @@ public:
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmap;
-	u16   m_color;
+	u16   m_color = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -81,9 +81,9 @@ sk1100_link_cable_device::sk1100_link_cable_device(const machine_config &mconfig
 
 void sk1100_link_cable_device::device_start()
 {
-	m_timer_poll = timer_alloc(TIMER_POLL);
-	m_timer_send = timer_alloc(TIMER_SEND);
-	m_timer_read = timer_alloc(TIMER_READ);
+	m_timer_poll = timer_alloc(FUNC(sk1100_link_cable_device::update_queue), this);
+	m_timer_send = timer_alloc(FUNC(sk1100_link_cable_device::send_tick), this);
+	m_timer_read = timer_alloc(FUNC(sk1100_link_cable_device::read_tick), this);
 
 	/* register for state saving */
 	save_item(NAME(m_data));
@@ -103,7 +103,7 @@ void sk1100_link_cable_device::device_start()
 
 void sk1100_link_cable_device::device_reset()
 {
-	queue();
+	update_queue(0);
 }
 
 
@@ -116,29 +116,7 @@ void sk1100_link_cable_device::device_add_mconfig(machine_config &config)
 	BITBANGER(config, m_stream, 0);
 }
 
-
-void sk1100_link_cable_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_POLL:
-		queue();
-		break;
-
-	case TIMER_SEND:
-		m_stream->output(u8(param));
-		break;
-
-	case TIMER_READ:
-		m_update_received_data = true;
-		break;
-
-	default:
-		break;
-	}
-}
-
-void sk1100_link_cable_device::queue()
+TIMER_CALLBACK_MEMBER(sk1100_link_cable_device::update_queue)
 {
 	if (m_input_index == m_input_count)
 	{
@@ -149,6 +127,16 @@ void sk1100_link_cable_device::queue()
 			m_timer_poll->adjust(attotime::from_hz(XTAL(10'738'635)/3));
 		}
 	}
+}
+
+TIMER_CALLBACK_MEMBER(sk1100_link_cable_device::send_tick)
+{
+	m_stream->output(u8(param));
+}
+
+TIMER_CALLBACK_MEMBER(sk1100_link_cable_device::read_tick)
+{
+	m_update_received_data = true;
 }
 
 void sk1100_link_cable_device::set_data_read()
@@ -162,7 +150,7 @@ void sk1100_link_cable_device::set_data_read()
 			// there is no way to read what was sent from peer as feed bit.
 			m_fault = BIT(byte, 0); // sent from peer as data bit
 			m_busy = BIT(byte, 1); // sent from peer as reset bit
-			queue();
+			update_queue(0);
 		}
 		// Set to read next byte only after the end of this timeslice.
 		m_update_received_data = false;

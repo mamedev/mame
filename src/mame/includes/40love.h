@@ -36,7 +36,11 @@ public:
 	{ }
 
 	virtual void driver_init() override;
+	void common(machine_config &config);
+	void _40love(machine_config &config);
+	void undoukai(machine_config &config);
 
+private:
 	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );
@@ -44,15 +48,10 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void common(machine_config &config);
-	void _40love(machine_config &config);
-	void undoukai(machine_config &config);
-
 	void _40love_map(address_map &map);
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);
 
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -93,27 +92,27 @@ private:
 	optional_shared_ptr<uint8_t> m_mcu_ram;
 
 	/* video-related */
-	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap1;
-	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap2;
-	tilemap_t     *m_bg_tilemap;
-	uint8_t       m_flipscreen;
-	uint8_t       m_pix_redraw;
-	uint8_t       m_xoffset;
-	std::unique_ptr<uint8_t[]>       m_pixram1;
-	std::unique_ptr<uint8_t[]>       m_pixram2;
-	bitmap_ind16    *m_pixel_bitmap1;
-	bitmap_ind16    *m_pixel_bitmap2;
-	int         m_pixram_sel;
-	bool        m_color_bank;
-	bool        m_screen_disable;
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap1{};
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap2{};
+	tilemap_t     *m_bg_tilemap = 0;
+	uint8_t       m_flipscreen = 0U;
+	uint8_t       m_pix_redraw = 0U;
+	uint8_t       m_xoffset = 0U;
+	std::unique_ptr<uint8_t[]>       m_pixram1{};
+	std::unique_ptr<uint8_t[]>       m_pixram2{};
+	bitmap_ind16    *m_pixel_bitmap1 = 0;
+	bitmap_ind16    *m_pixel_bitmap2 = 0;
+	int         m_pixram_sel = 0;
+	bool        m_color_bank = 0;
+	bool        m_screen_disable = 0;
 
 	/* misc */
-	int         m_pix_color[4];
-	int         m_vol_ctrl[16];
-	uint8_t       m_snd_ctrl0;
-	uint8_t       m_snd_ctrl1;
-	uint8_t       m_snd_ctrl2;
-	uint8_t       m_snd_ctrl3;
+	int         m_pix_color[4]{};
+	int         m_vol_ctrl[16]{};
+	uint8_t       m_snd_ctrl0 = 0U;
+	uint8_t       m_snd_ctrl1 = 0U;
+	uint8_t       m_snd_ctrl2 = 0U;
+	uint8_t       m_snd_ctrl3 = 0U;
 };
 
 #endif // MAME_INCLUDES_40LOVE_H

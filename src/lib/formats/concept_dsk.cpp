@@ -87,18 +87,18 @@ void cc525dsdd_format::find_size(util::random_read &io, uint8_t &track_count, ui
 	track_count = head_count = sector_count = 0;
 }
 
-int cc525dsdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int cc525dsdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	if (track_count)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -125,7 +125,7 @@ bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -154,4 +154,4 @@ bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_CONCEPT_525DSDD_FORMAT = &floppy_image_format_creator<cc525dsdd_format>;
+const cc525dsdd_format FLOPPY_CONCEPT_525DSDD_FORMAT;

@@ -117,8 +117,8 @@ private:
 	required_shared_ptr<uint16_t> m_vregs;
 
 	std::vector<uint16_t> m_vram_rearranged;
-	int m_tilemap_base[4];
-	tilemap_t    *m_bg_tilemap[4];
+	int m_tilemap_base[4]{};
+	tilemap_t    *m_bg_tilemap[4]{};
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

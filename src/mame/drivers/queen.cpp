@@ -48,8 +48,8 @@ public:
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
+	uint8_t m_mtxc_config_reg[256]{};
+	uint8_t m_piix4_config_reg[4][256]{};
 
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -165,19 +165,18 @@ void queen_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint3
 
 uint8_t queen_state::piix4_config_r(int function, int reg)
 {
-	if ((function >= 4) && (function <= 7))
-	{
-		return 0; // BIOS performs a brute-force scan for devices
-	}
-
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return m_piix4_config_reg[function][reg];
+	if ((function < 4) && (reg < 256))
+		return m_piix4_config_reg[function][reg];
+	else
+		return 0; // BIOS performs a brute-force scan for devices
 }
 
 void queen_state::piix4_config_w(int function, int reg, uint8_t data)
 {
 //  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
+	if ((function < 4) && (reg < 256))
+		m_piix4_config_reg[function][reg] = data;
 }
 
 uint32_t queen_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)

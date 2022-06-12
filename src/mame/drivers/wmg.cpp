@@ -104,6 +104,7 @@ private:
 	u8 wmg_pia_0_r(offs_t offset);
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
+	void wmg_blitter_w(offs_t, u8);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
@@ -157,13 +158,13 @@ void wmg_state::wmg_banked_map(address_map &map)
 	map(0x0401, 0x0401).w(FUNC(wmg_state::wmg_sound_reset_w));
 	map(0x0804, 0x0807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
 	map(0x080c, 0x080f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0900, 0x09ff).w(FUNC(wmg_state::wmg_vram_select_w));
-	map(0x0a00, 0x0a07).w(FUNC(wmg_state::blitter_w));
+	map(0x0900, 0x09ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
+	map(0x0a00, 0x0a07).w(FUNC(wmg_state::wmg_blitter_w));
 	map(0x0b00, 0x0bff).r(FUNC(wmg_state::video_counter_r));
 	map(0x0bff, 0x0bff).w(FUNC(wmg_state::watchdog_reset_w));
 	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
-	map(0x1000, 0x4fff).rom().region("maincpu", 0x68000); // Defender roms
-/* These next one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
+	map(0x1000, 0x4fff).rom().region("maincpu", 0x58000); // Defender roms
+	// This one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead.
 	map(0xd000, 0xefff).ram().share("nvram");
 }
 
@@ -335,6 +336,16 @@ void wmg_state::wmg_nvram_w(offs_t offset, u8 data)
 
 /*************************************
  *
+ *  Blitter
+ *
+ *************************************/
+void wmg_state::wmg_blitter_w(offs_t offset, u8 data)
+{
+	blitter_w(m_maincpu->space(AS_PROGRAM), offset, data);
+}
+
+/*************************************
+ *
  *  Bankswitching
  *
  *************************************/
@@ -421,9 +432,9 @@ void wmg_state::machine_start()
 	uint8_t *cpu = memregion("maincpu")->base();
 	uint8_t *snd = memregion("soundcpu")->base();
 	m_mainbank->configure_entry(0, m_videoram);
-	m_mainbank->configure_entries(1, 8, &cpu[0x10000], 0x10000);  // Gfx etc
-	m_codebank->configure_entries(0, 8, &cpu[0x1d000], 0x10000);  // Code
-	m_soundbank->configure_entries(0, 8, &snd[0x10000], 0x1000);  // Sound
+	m_mainbank->configure_entries(1, 8, &cpu[0x00000], 0x10000);  // Gfx etc
+	m_codebank->configure_entries(0, 8, &cpu[0x0d000], 0x10000);  // Code
+	m_soundbank->configure_entries(0, 8, &snd[0x00000], 0x1000);  // Sound
 
 	save_item(NAME(m_wmg_c400));
 	save_item(NAME(m_wmg_d000));
@@ -562,23 +573,23 @@ void wmg_state::wmg(machine_config &config)
  *
  *************************************/
 ROM_START( wmg )
-	ROM_REGION( 0x90000, "maincpu", 0 )
-	ROM_LOAD( "wmg.cpu", 0x10000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "wmg.cpu", 0x00000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
 
 	/* This little HACK! lets the menu boot up.
 	It patches a jump to some new code, which sets a few memory locations, and sets the stack pointer.
 	Then it jumps back to continue the main run. */
 
-	ROM_COPY( "maincpu", 0x1e0da, 0x1f800, 0x0001b )
-	ROM_FILL( 0x1f81b, 1, 0x7e )
-	ROM_FILL( 0x1f81c, 1, 0xe0 )
-	ROM_FILL( 0x1f81d, 1, 0xba )
-	ROM_FILL( 0x1e0b7, 1, 0x7e )
-	ROM_FILL( 0x1e0b8, 1, 0xf8 )
-	ROM_FILL( 0x1e0b9, 1, 0x00 )
+	ROM_COPY( "maincpu", 0xe0da, 0xf800, 0x0001b )
+	ROM_FILL( 0xf81b, 1, 0x7e )
+	ROM_FILL( 0xf81c, 1, 0xe0 )
+	ROM_FILL( 0xf81d, 1, 0xba )
+	ROM_FILL( 0xe0b7, 1, 0x7e )
+	ROM_FILL( 0xe0b8, 1, 0xf8 )
+	ROM_FILL( 0xe0b9, 1, 0x00 )
 
-	ROM_REGION( 0x18000, "soundcpu", 0 )
-	ROM_LOAD( "wmg.snd",         0x10000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )
+	ROM_REGION( 0x8000, "soundcpu", 0 )
+	ROM_LOAD( "wmg.snd",         0x0000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder.4",       0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )

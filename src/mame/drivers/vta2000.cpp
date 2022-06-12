@@ -2,13 +2,15 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        VTA-2000 Terminal
+VTA-2000 Terminal
+Made at Ukrainian SSR, Vinnitsa Terminal Plant
+(info from https://prog.world/dataart-has-opened-the-website-of-the-it-museum/ )
 
-            board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
+Board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
 
-        BDP-15 board only
+BDP-15 board only
 
-        29/11/2010 Skeleton driver.
+2010-11-29 Skeleton driver.
 
 Better known on the net as BTA2000-15m.
 It is a green-screen terminal, using RS232, and supposedly VT100 compatible.
@@ -28,6 +30,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class vta2000_state : public driver_device
 {
@@ -45,6 +48,7 @@ public:
 private:
 	void output_00(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	uint8_t m_framecnt = 0;
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -100,10 +104,9 @@ void vta2000_state::machine_reset()
 uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static uint8_t framecnt=0; // FIXME: static variable
 	uint16_t sy=0,ma=0;
 
-	framecnt++;
+	m_framecnt++;
 
 	for (uint8_t y = 0; y < 25; y++)
 	{
@@ -133,7 +136,7 @@ uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind1
 					fg = 2; // highlight
 				else
 					fg = 1;
-				if ((BIT(attr, 1)) && (BIT(framecnt, 5)))
+				if ((BIT(attr, 1)) && (BIT(m_framecnt, 5)))
 					gfx = 0; // blink
 				if ((BIT(attr, 5)) && (ra == 10))
 				{
@@ -232,7 +235,7 @@ ROM_START( vta2000 )
 	ROM_LOAD( "bdp-15_14.rom", 0x0000, 0x2000, CRC(a1dc4f8e) SHA1(873fd211f44713b713d73163de2d8b5db83d2143) )
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

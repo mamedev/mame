@@ -17,9 +17,6 @@ Hardware notes:
 - 8 tri-color leds (like academy, always 6 red and 2 green?)
 - magnetic chessboard with 64 leds, piezo
 
-TODO:
-- dump/add the standard Monte Carlo IV
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -56,6 +53,7 @@ public:
 	{ }
 
 	void montec(machine_config &config);
+	void montec4(machine_config &config);
 	void montec4le(machine_config &config);
 
 protected:
@@ -179,7 +177,7 @@ INPUT_PORTS_END
 
 void montec_state::montec(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 8_MHz_XTAL / 2); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &montec_state::montec_mem);
 
@@ -200,7 +198,7 @@ void montec_state::montec(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board); // internal
 	m_board->set_delay(attotime::from_msec(300));
 
-	/* video hardware */
+	// video hardware
 	PCF2112(config, m_lcd[0], 50); // frequency guessed
 	m_lcd[0]->write_segs().set(FUNC(montec_state::lcd_output_w<0>));
 	PCF2112(config, m_lcd[1], 50); // "
@@ -209,23 +207,27 @@ void montec_state::montec(machine_config &config)
 	PWM_DISPLAY(config, m_led_pwm).set_size(4, 4);
 	config.set_default_layout(layout_mephisto_montec);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void montec_state::montec4le(machine_config &config)
+void montec_state::montec4(machine_config &config)
 {
 	montec(config);
+	m_board->set_delay(attotime::from_msec(150));
+}
 
-	/* basic machine hardware */
+void montec_state::montec4le(machine_config &config)
+{
+	montec4(config);
+
+	// basic machine hardware
 	M65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &montec_state::montec_mem);
 
 	const attotime irq_period = attotime::from_hz(8_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(montec_state::irq0_line_assert), irq_period);
-
-	m_board->set_delay(attotime::from_msec(150));
 }
 
 
@@ -245,6 +247,11 @@ ROM_START( monteca )
 ROM_END
 
 
+ROM_START( montec4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mc4.bin", 0x8000, 0x8000, CRC(b231be57) SHA1(8bb39db6a3f476090574ef6c681a241a96cfbd5c) )
+ROM_END
+
 ROM_START( montec4le )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("mc4le.bin", 0x8000, 0x8000, CRC(c4887694) SHA1(7f482d2a40fcb3125266e7a5407da315b4f9b49c) )
@@ -262,4 +269,5 @@ ROM_END
 CONS( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, montec4le,  0,        0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

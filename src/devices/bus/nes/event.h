@@ -22,17 +22,17 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void set_prg() override;
 	virtual void set_chr() override;
 
+	TIMER_CALLBACK_MEMBER(event_tick);
+
 	required_ioport m_dsw;
 
 	int m_nwc_init;
 
-	static constexpr device_timer_id TIMER_EVENT = 0;
 	emu_timer *event_timer;
 
 	u32 m_timer_count;
@@ -51,22 +51,21 @@ public:
 	virtual void write_l(offs_t offset, u8 data) override;
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+	TIMER_CALLBACK_MEMBER(event_tick);
 
 	required_ioport m_dsw;
 
 	bool m_tqrom_mode;
 
-	static constexpr device_timer_id TIMER_EVENT = 0;
 	emu_timer *event_timer;
 
 	u32 m_timer_count;

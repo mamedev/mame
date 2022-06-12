@@ -29,7 +29,7 @@ const char *swd_format::extensions() const
 	return "swd";
 }
 
-int swd_format::get_image_offset(const format &f, int head, int track)
+int swd_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }
@@ -47,4 +47,4 @@ const swd_format::format swd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_SWD_FORMAT = &floppy_image_format_creator<swd_format>;
+const swd_format FLOPPY_SWD_FORMAT;

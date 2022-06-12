@@ -32,22 +32,23 @@ public:
 	void set_gi_count(int _count);
 
 protected:
-	uint8_t state[6], gi;
-	bool first_after_led;
-	attotime previous_gi_update;
-	int gi_count;
-	uint32_t gi_time[5];
-	emu_timer *timer;
-	const char *const *names;
-	handler_t handler_cb;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	TIMER_CALLBACK_MEMBER(update_outputs);
+
+	void gi_update();
 
 	void send_output(int sid, int state);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	void gi_update();
+	uint8_t state[6]{}, gi = 0;
+	bool first_after_led = false;
+	attotime previous_gi_update;
+	int gi_count = 0;
+	uint32_t gi_time[5];
+	emu_timer *timer = nullptr;
+	const char *const *names;
+	handler_t handler_cb;
 };
 
 DECLARE_DEVICE_TYPE(WPC_OUT, wpc_out_device)

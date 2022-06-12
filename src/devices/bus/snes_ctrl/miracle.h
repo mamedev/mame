@@ -31,15 +31,12 @@ public:
 	snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	static constexpr device_timer_id TIMER_STROBE_ON = 0;
-
 	static constexpr int XMIT_RING_SIZE = 64;
 	static constexpr int RECV_RING_SIZE = 64;
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -53,6 +50,8 @@ protected:
 	void write_strobe(uint8_t data) override;
 
 	void xmit_char(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(strobe_tick);
 
 	required_device<midi_port_device> m_midiin, m_midiout;
 

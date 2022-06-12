@@ -59,8 +59,8 @@ private:
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
-	u8 m_bank;
-	u8 m_inp_mux;
+	u8 m_bank = 0;
+	u8 m_inp_mux = 0;
 
 	// I/O handlers
 	void bank_w(u8 data);
@@ -71,10 +71,6 @@ private:
 
 void talkingfb_state::machine_start()
 {
-	// zerofill
-	m_bank = 0;
-	m_inp_mux = 0;
-
 	// register for savestates
 	save_item(NAME(m_bank));
 	save_item(NAME(m_inp_mux));

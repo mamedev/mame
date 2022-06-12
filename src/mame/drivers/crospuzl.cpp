@@ -66,10 +66,10 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<pcf8583_device> m_rtc;
 
-	uint8_t    m_FlashCmd;
-	uint8_t    m_FlashPrevCommand;
-	uint32_t   m_FlashAddr;
-	uint8_t    m_FlashShift;
+	uint8_t    m_FlashCmd = 0;
+	uint8_t    m_FlashPrevCommand = 0;
+	uint32_t   m_FlashAddr = 0;
+	uint8_t    m_FlashShift = 0;
 
 //  void Banksw_w(uint32_t data);
 	uint8_t FlashCmd_r();
@@ -81,8 +81,8 @@ private:
 	void crospuzl_mem(address_map &map);
 
 	// PIO
-	uint32_t m_PIO;
-	uint32_t m_ddr;
+	uint32_t m_PIO = 0;
+	uint32_t m_ddr = 0;
 	uint32_t PIOlddr_r();
 	void PIOlddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t PIOldat_r();

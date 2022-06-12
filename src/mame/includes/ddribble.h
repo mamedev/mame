@@ -48,13 +48,13 @@ private:
 	required_memory_bank m_vlmbank;
 
 	// video-related
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_vregs[2][5];
-	uint8_t m_charbank[2];
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_vregs[2][5]{};
+	uint8_t m_charbank[2]{};
 
 	// misc
-	uint8_t  m_int_enable[2];
+	uint8_t  m_int_enable[2]{};
 
 	// devices
 	required_device<cpu_device> m_maincpu;

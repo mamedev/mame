@@ -68,7 +68,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-	uint8_t m_input_mask;
+	uint8_t m_input_mask = 0;
 };
 
 

@@ -180,8 +180,9 @@
   Known games on this or similar hardware:
 
   - [DUMPED]  4 en Línea (Compumatic)
+  - [DUMPED]  Dardos (Oper Coin)
   - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
-  - [DUMPED]  Sport Dart TV (Compumatic / Desarrollos y Recambios S.L.)
+  - [DUMPED]  Sport Darts TV (Compumatic / Desarrollos y Recambios S.L.)
   - [MISSING] Dart Queen (Compumatic / Daryde)
 
 **************************************************************************
@@ -191,6 +192,7 @@
   - Proper UM487F device emulation.
   - Interlaced video mode.
   - Sound.
+  - k7_olym accesses i2c device with an id of 0xeb. Device is unknown.
   - More work...
 
 *************************************************************************/
@@ -249,9 +251,9 @@ private:
 	void k7_out0_w(uint8_t data);
 	void k7_out1_w(uint8_t data);
 
-	uint8_t m_irq_count;
-	uint8_t m_serial_flags;
-	uint8_t m_serial_data[2];
+	uint8_t m_irq_count = 0;
+	uint8_t m_serial_flags = 0;
+	uint8_t m_serial_data[2]{};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -556,14 +558,6 @@ INPUT_PORTS_END
 
 
 /****************************************
-*      Graphics Decode Information      *
-****************************************/
-
-//static GFXDECODE_START( 4enlinea )
-//GFXDECODE_END
-
-
-/****************************************
 *          Machine Start/Reset          *
 ****************************************/
 
@@ -700,6 +694,20 @@ ROM_START( 4enlineb )
 	ROM_LOAD( "cuatro_en_linea_gal16v8a.ic04", 0x0000, 0x0117, CRC(1edaf06c) SHA1(51e44c2e6b54991330d6ef945e98fa2c8a49408d) )
 ROM_END
 
+/*
+  Dardos
+  Oper Coin. 1991.
+  Running in 487 System I.
+*/
+ROM_START( dardos )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "diana_iv_video_27-1-92.bin",  0x0000, 0x8000, CRC(f23b5313) SHA1(488cf9bedce7b0c7b474bd93da70181c81fa300b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "diana_iv_master_27-1-92.bin", 0x0000, 0x8000, CRC(4b2c868a) SHA1(91120a32fac9c5a6e7746d2e2587921f7d42eaa3) )
+ROM_END
+
+
 /* Kursaal K7 Olympic Darts PCB
     __________________________________________________      SUBBOARD CM3080
     |           ________  __   ______  ______________ |     ________________
@@ -773,9 +781,10 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS            INIT        ROT   COMPANY                                      FULLNAME                       FLAGS
+//    YEAR  NAME       PARENT    MACHINE    INPUT     CLASS            INIT        ROT    COMPANY                                      FULLNAME                            FLAGS
 GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
 GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
+GAME( 1992, dardos,    0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Oper Coin",                                 "Dardos",                      MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Darts T.V.",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

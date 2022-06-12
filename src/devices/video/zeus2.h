@@ -147,6 +147,7 @@ public:
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
+	emu_timer *vblank_off_timer;
 	int yoffs;
 	int texel_width;
 	float zbase;

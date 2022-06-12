@@ -60,7 +60,7 @@ private:
 	required_shared_ptr<uint16_t> m_tileram;
 	required_shared_ptr<uint16_t> m_lineram;
 	optional_region_ptr<uint8_t>  m_clut;
-	tilemap_t *                 m_tilemap;
+	tilemap_t *                 m_tilemap = nullptr;
 	pen_t                       m_transparent_color;
 	int                         m_xoffset;
 };

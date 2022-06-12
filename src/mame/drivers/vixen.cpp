@@ -153,7 +153,7 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<8> m_key;
 
-	address_space *m_program;
+	address_space *m_program = nullptr;
 
 	void update_interrupt();
 
@@ -164,7 +164,7 @@ private:
 	int m_cmd_d0 = 0;
 	int m_cmd_d1 = 0;
 
-	bool m_fdint = 0;
+	bool m_fdint = false;
 	int m_vsync = 0;
 
 	int m_srq = 1;
@@ -180,8 +180,8 @@ private:
 	int m_enb_ring_int = 0;
 
 	// video state
-	bool m_alt = 0;
-	bool m_256 = 0;
+	bool m_alt = false;
+	bool m_256 = false;
 };
 
 

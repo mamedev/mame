@@ -103,46 +103,46 @@ namespace netlist::devices {
 		, E(*this, "E")
 		, F(*this, "F")
 		{
-			register_subalias("CLRQ", "A.CLRQ");
+			register_sub_alias("CLRQ", "A.CLRQ");
 			connect("A.CLRQ", "B.CLRQ");
 			connect("A.CLRQ", "C.CLRQ");
 			connect("A.CLRQ", "D.CLRQ");
 			connect("A.CLRQ", "E.CLRQ");
 			connect("A.CLRQ", "F.CLRQ");
 
-			register_subalias("CLK", "A.CLK");
+			register_sub_alias("CLK", "A.CLK");
 			connect("A.CLK", "B.CLK");
 			connect("A.CLK", "C.CLK");
 			connect("A.CLK", "D.CLK");
 			connect("A.CLK", "E.CLK");
 			connect("A.CLK", "F.CLK");
 
-			register_subalias("D1", "A.D");
-			register_subalias("Q1", "A.Q");
+			register_sub_alias("D1", "A.D");
+			register_sub_alias("Q1", "A.Q");
 
-			register_subalias("D2", "B.D");
-			register_subalias("Q2", "B.Q");
+			register_sub_alias("D2", "B.D");
+			register_sub_alias("Q2", "B.Q");
 
-			register_subalias("D3", "C.D");
-			register_subalias("Q3", "C.Q");
+			register_sub_alias("D3", "C.D");
+			register_sub_alias("Q3", "C.Q");
 
-			register_subalias("D4", "D.D");
-			register_subalias("Q4", "D.Q");
+			register_sub_alias("D4", "D.D");
+			register_sub_alias("Q4", "D.Q");
 
-			register_subalias("D5", "E.D");
-			register_subalias("Q5", "E.Q");
+			register_sub_alias("D5", "E.D");
+			register_sub_alias("Q5", "E.Q");
 
-			register_subalias("D6", "F.D");
-			register_subalias("Q6", "F.Q");
+			register_sub_alias("D6", "F.D");
+			register_sub_alias("Q6", "F.Q");
 
-			register_subalias("GND", "A.GND");
+			register_sub_alias("GND", "A.GND");
 			connect("A.GND", "B.GND");
 			connect("A.GND", "C.GND");
 			connect("A.GND", "D.GND");
 			connect("A.GND", "E.GND");
 			connect("A.GND", "F.GND");
 
-			register_subalias("VCC", "A.VCC");
+			register_sub_alias("VCC", "A.VCC");
 			connect("A.VCC", "B.VCC");
 			connect("A.VCC", "C.VCC");
 			connect("A.VCC", "D.VCC");

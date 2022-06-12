@@ -44,11 +44,11 @@ private:
 	TIMER_CALLBACK_MEMBER(halt_clear_callback);
 	TIMER_CALLBACK_MEMBER(reset_clear_callback);
 
-	bool m_is_running;
-	emu_timer *m_halt_assert_timer;
-	emu_timer *m_halt_clear_timer;
-	emu_timer *m_reset_assert_timer;
-	emu_timer *m_reset_clear_timer;
+	bool m_is_running = false;
+	emu_timer *m_halt_assert_timer = nullptr;
+	emu_timer *m_halt_clear_timer = nullptr;
+	emu_timer *m_reset_assert_timer = nullptr;
+	emu_timer *m_reset_clear_timer = nullptr;
 };
 
 #endif // MAME_MACHINE_CEDAR_MAGNET_BOARD_H

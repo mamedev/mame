@@ -61,7 +61,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	// Character generator
-	const uint8_t *m_chargen;
+	const uint8_t *m_chargen = nullptr;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

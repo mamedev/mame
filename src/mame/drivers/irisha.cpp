@@ -63,12 +63,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_sg1_line;
-	bool m_keypressed;
-	uint8_t m_keyboard_cnt;
-	uint8_t m_ppi_porta;
-	uint8_t m_ppi_portc;
-	emu_timer *m_key_timer;
+	bool m_sg1_line = false;
+	bool m_keypressed = false;
+	uint8_t m_keyboard_cnt = 0;
+	uint8_t m_ppi_porta = 0;
+	uint8_t m_ppi_portc = 0;
+	emu_timer *m_key_timer = nullptr;
 	void update_speaker();
 	void machine_start() override;
 	void machine_reset() override;
@@ -355,7 +355,7 @@ uint8_t irisha_state::keyboard_r()
 
 void irisha_state::machine_start()
 {
-	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer = timer_alloc(FUNC(irisha_state::irisha_key), this);
 	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
 	save_item(NAME(m_sg1_line));
 	save_item(NAME(m_keypressed));

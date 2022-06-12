@@ -15,11 +15,11 @@ Atari Tank 8 driver
 
 
 
-void tank8_state::set_collision(int index)
+TIMER_CALLBACK_MEMBER(tank8_state::set_collision)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	m_collision_index = index;
+	m_collision_index = param;
 }
 
 

@@ -77,7 +77,7 @@ private:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	int        m_flip_screen;
-	emu_timer *m_irq_off_timer;
+	emu_timer *m_irq_off_timer = nullptr;
 
 	/* devices */
 	required_device<f9334_device> m_latch;

@@ -135,9 +135,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 
-	uint8_t m_attrram[0x800];
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_banksel;
+	uint8_t m_attrram[0x800]{};
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_banksel = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);

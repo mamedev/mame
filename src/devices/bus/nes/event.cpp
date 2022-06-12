@@ -61,7 +61,7 @@ void nes_event_device::device_start()
 {
 	nes_sxrom_device::device_start();
 
-	event_timer = timer_alloc(TIMER_EVENT);
+	event_timer = timer_alloc(FUNC(nes_event_device::event_tick), this);
 	event_timer->adjust(attotime::never);
 
 	save_item(NAME(m_nwc_init));
@@ -87,7 +87,7 @@ void nes_event2_device::device_start()
 {
 	mmc3_start();
 
-	event_timer = timer_alloc(TIMER_EVENT);
+	event_timer = timer_alloc(FUNC(nes_event2_device::event_tick), this);
 	event_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_tqrom_mode));
@@ -98,8 +98,6 @@ void nes_event2_device::device_start()
 
 void nes_event2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_tqrom_mode = false;
 	mmc3_common_initialize(0x07, 0x7f, 0);
 
@@ -250,12 +248,12 @@ void nes_event2_device::write_m(offs_t offset, u8 data)
 		m_prgram[offset % m_prgram.size()] = data;
 }
 
-void nes_event2_device::set_chr(u8 chr, int chr_base, int chr_mask)
+void nes_event2_device::chr_cb(int start, int bank, int source)
 {
 	if (m_tqrom_mode)
-		nes_tqrom_device::set_chr(chr, chr_base, chr_mask);
+		nes_tqrom_device::chr_cb(start, bank, source);
 	else
-		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+		nes_txrom_device::chr_cb(start, bank, source);
 }
 
 
@@ -298,12 +296,12 @@ ioport_constructor nes_event2_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  event_tick - tick the event timer
 //-------------------------------------------------
 
-void nes_event_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_event_device::event_tick)
 {
-	if (id == TIMER_EVENT && m_timer_on)
+	if (m_timer_on)
 	{
 		if (++m_timer_count >= (0x10 | m_dsw->read()) << 25)
 		{
@@ -313,8 +311,8 @@ void nes_event_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-void nes_event2_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_event2_device::event_tick)
 {
-	if (id == TIMER_EVENT && m_timer_enabled)
+	if (m_timer_enabled)
 		m_timer_count++;
 }

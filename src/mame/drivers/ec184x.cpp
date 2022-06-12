@@ -70,8 +70,8 @@ private:
 
 	struct
 	{
-		uint8_t enable[4];
-		int boards;
+		uint8_t enable[4]{};
+		int boards = 0;
 	} m_memory;
 };
 

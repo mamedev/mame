@@ -303,7 +303,7 @@ private:
 	bool write_dest_byte(u8 usedata);
 
 	// blitter timers
-	emu_timer *m_blitter_end_timer;
+	emu_timer *m_blitter_end_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(blitter_end);
 
 	// decompressor functions
@@ -352,7 +352,7 @@ void gunpey_state::video_start()
 	m_vram = std::make_unique<u8[]>(0x400000);
 	std::fill_n(&m_vram[0], 0x400000, 0xff);
 
-	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
+	m_blitter_end_timer = timer_alloc(FUNC(gunpey_state::blitter_end), this);
 
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vreg_addr));

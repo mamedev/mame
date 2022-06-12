@@ -264,7 +264,7 @@ void jailbrek_state::machine_reset()
 void jailbrek_state::jailbrek(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, MASTER_CLOCK/12);
+	KONAMI1(config, m_maincpu, MASTER_CLOCK/12); // the bootleg uses a standard M6809 with separate decryption logic
 	m_maincpu->set_addrmap(AS_PROGRAM, &jailbrek_state::jailbrek_map);
 	m_maincpu->set_periodic_int(FUNC(jailbrek_state::interrupt_nmi), attotime::from_hz(500)); /* ? */
 
@@ -357,41 +357,69 @@ ROM_START( manhatan )
 	ROM_CONTINUE( 0x0000, 0x2000 )
 ROM_END
 
-/*
-    Jail Break Bootleg Chip Locations Map (Not to scale)
 
-      |--------------------------------------------|
-      |                                            |
-    A |                                            |
-      |                                            |
-    B |                                            |
-      |                                            |
-    C |                                            |
-      |                                            |
-    D |                                            |
-      |                                            |
-    E |-|                                          |
-        |                                          |
-      |-|                                          |
-    F |                                            |
-      |     <=- Edge Connector                     |
-    G |                                            |
-      |-|                                          |
-        |                                          |
-    H |-|                                          |
-      |                                            |
-    I |                                            |
-      |                                            |
-    J |                                            |
-      |                                            |
-    K |                                            |
-      |                                            |
-    L |                                            |
-      |                                            |
-      |--------------------------------------------|
-         1  2  3  4  5  6  7  8  9  1  1  1  1  1
-                                    0  1  2  3  4
-*/
+/***************************************************************************
+
+Jail Break Bootleg
+Hardware Info by Guru
+
+PCB Number: A3001
+Note none of the Jail Break bootleg PCBs have numbers/letters along the edge of the PCB.
+These have been added so that chip locations can be documented.
+  |--------------------------------------------------------------------------------------------------------------|
+A |VOL    LM324     LS32    LS04    LS157          PAL16R4  LS669   LS669    LS32    LS86    LS04   LS109        |
+  |                                                                                                              |
+B |C1182H                   LS32    LS374   LS670   LS374   LS86    LS109    LS08    LS10    LS74   LS04    18MHz|
+  |                                                                                                              |
+C |                 LS00    LS283   LS174   LS670   LS374   LS86    LS374    LS92    LS11    LS107  LS74    LS32 |
+  |                                                                                                              |
+D |                 LS07    LS138   DSW3  82S129.D6 LS257   LS244   LS374    LS86    LS161   LS161          LS04 |
+  |                                                                                                              |
+E |1      LS253     DSW1    LS174   LS367 82S129.E6 LS257   LS374   LS374    LS85    LS161   LS257  6264    LS161|
+  |8                                                                                                             |
+F |W      LS253     DSW2    LS244   LS14     5.F6           LS374   LS374    LS374   LS161   LS257  6264    LS161|
+  |A                       |--------------|                                                                      |
+G |Y      LS253     LS08   |    VLM5030   |  4.G6           6264   PAL16R6   LS374   LS161   LS257  6264    LS08 |
+  |                        |--------------|                                                                      |
+H |       LS253     76489 3.579545  LS175    3.H6   LS10    LS367   LS32     LS283   LS161   LS257  6264    LS32 |
+  |                          MHz                                                                                 |
+I |      82S123.I2  LS374   LS367   LS139    2.I6           LS244   LS367    LS283   LS32    LS257  LS273   LS257|
+  |                                                                                                              |
+J |      82S123.J2  LS373           LS138   DIP28           LS244   LS367    LS245   LS04    LS139  LS174   LS257|
+  |                                                                                                              |
+K | LS74   LS86     LS244  PAL16L8  LS245    1.K6          PAL16L8  LS367    LS273   LS74    LS367  LS157   LS04 |
+  |                                |-------------|                                                               |
+L | LS74   LS04     LS245   LS273  |   MC6809    |  LS74    LS367   6116     LS245   LS174   LS125  LS175   LS21 |
+  |                                |-------------|                                                               |
+  |--------------------------------------------------------------------------------------------------------------|
+     1       2       3       4       5       6       7       8       9       10      11      12      13      14
+
+Notes: (All ICs shown)
+      6809 - Clock input 1.5000MHz [18/12]
+   VLM5030 - Sanyo VLM5030 Speech IC. Clock input 3.579545MHz
+     76489 - Texas Instruments SN76489A Digital Complex Sound Generator. Clock input 1.5000MHz [18/12]
+     HSync - 15.6609kHz
+     VSync - 57.5772Hz
+      1.K6 - 27C256 (main program)
+      2.I6 - 27C128 (speech data for VLM5030)
+      3.H6 - 27C256 (background character data)
+      4.G6 - 27C256 (sprite data)
+      5.F6 - 27C256 (sprite data)
+ 82S123.I2 - 32x8-bit bipolar PROM (blue color PROM)
+ 82S123.J2 - 32x8-bit bipolar PROM (red and green color PROM)
+ 82S129.D6 - 256x4-bit bipolar PROM (character lookup table)
+ 82S129.E6 - 256x4-bit bipolar PROM (sprite lookup table)
+      6264 - 8kBx8-bit SRAM
+      6116 - 2kBx8-bit SRAM
+    C1182H - NEC uPC1182H Audio Power Amplifier
+     LM324 - LM324 Quad Operational Amplifier
+     DIP28 - Unpopulated DIP28 position (no socket)
+PAL16R6.G9 - sprites not shown when removed
+PAL16R4.A7 - black screen when removed, coin/start works and game plays blind
+PAL16L8.K8 - no boot when removed, only static startup garbage shown
+PAL16L8.K4 - no boot when removed, only static startup garbage shown
+
+***************************************************************************/
 
 ROM_START( jailbrekb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -413,11 +441,11 @@ ROM_START( jailbrekb )
 	ROM_REGION( 0x2000, "vlm", 0 ) /* speech rom */
 	ROM_LOAD( "2.i6",    0x0000, 0x2000, CRC(d91d15e3) SHA1(475fe50aafbf8f2fb79880ef0e2c25158eda5270) )
 
-	ROM_REGION( 0x0004, "plds", 0 )
-	ROM_LOAD( "k4.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
-	ROM_LOAD( "a7.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16R4 */
-	ROM_LOAD( "g9.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16R6 */
-	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal16l8.k4", 0x000, 0x104, CRC(96e993c6) SHA1(bd6fd8a039fbf8c890c5ce6cea0fcc7649719b51) )
+	ROM_LOAD( "pal16r4.a7", 0x200, 0x104, CRC(3d074375) SHA1(8b2c8143e3540e265213a2d521e350ab71e1b26b) )
+	ROM_LOAD( "pal16r6.g9", 0x400, 0x104, CRC(b6c4f22d) SHA1(d445b1c806dd1bcbdd07c9fa8c5483e0d03496aa) )
+	ROM_LOAD( "pal16l8.k8", 0x600, 0x104, CRC(38783f49) SHA1(101621b378bb9b5faad7d8e3acdbaa42b5045d45) )
 ROM_END
 
 GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )

@@ -21,8 +21,6 @@
 #include "emu.h"
 #include "bq4847.h"
 
-#include "fileio.h"
-
 #define LOG_WARN         (1U<<1)    // Warnings
 #define LOG_CLOCK        (1U<<2)    // Clock operation
 #define LOG_REG          (1U<<3)    // Register write
@@ -452,9 +450,9 @@ void bq4847_device::update_int()
 
 void bq4847_device::device_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::update_callback), this));
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::periodic_callback), this));
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::watchdog_callback), this));
+	m_update_timer = timer_alloc(FUNC(bq4847_device::update_callback), this);
+	m_periodic_timer = timer_alloc(FUNC(bq4847_device::periodic_callback), this);
+	m_watchdog_timer = timer_alloc(FUNC(bq4847_device::watchdog_callback), this);
 
 	m_int_handler.resolve_safe();
 	m_wdo_handler.resolve_safe();
@@ -504,12 +502,14 @@ void bq4847_device::nvram_default()
 	}
 }
 
-void bq4847_device::nvram_read(emu_file& file)
+bool bq4847_device::nvram_read(util::read_stream& file)
 {
-	file.read(m_register, std::size(m_register));
+	size_t actual;
+	return !file.read(m_register, std::size(m_register), actual) && actual == std::size(m_register);
 }
 
-void bq4847_device::nvram_write(emu_file& file)
+bool bq4847_device::nvram_write(util::write_stream& file)
 {
-	file.write(m_register, std::size(m_register));
+	size_t actual;
+	return !file.write(m_register, std::size(m_register), actual) && actual == std::size(m_register);
 }

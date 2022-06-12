@@ -146,6 +146,7 @@ TODO:
 
 Thundercade / Twin Formation
 Taito America Corp./Romstar USA/Seta, 1987
+Hardware info by Guru
 
 PCB Layout
 ---------
@@ -194,8 +195,8 @@ Notes:
                     X1-001 (SDIP64)
                     X1-002 (SDIP64)
                     X1-006 (SDIP64)
-                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a 65C02 in disguise,
-                                     possibly with additional ROM or logic acting as a protection chip.
+                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a Ricoh 65c02 with ROM, RAM and
+                                     logic acting as a protection chip.
                                      clocks - pin1 16MHz, pin2 2MHz, pin3 59.1845Hz [VSYNC),
                                      pin63 2MHz, pin62 2MHz
                     X1-003 (SDIP42)
@@ -256,26 +257,93 @@ u75  131                                 u61 004
 ***************************************************************************/
 /***************************************************************************
 
-                                Caliber 50
+Caliber 50 (Athena / Seta, 1989)
+Hardware info by Guru
 
-CPU:   TMP 68000N-8, 65C02
-Other: NEC D4701
 
-UH-001-006        SW2  SW1
-UH-001-007
-UH-001-008                    8464         68000-8
-UH-001-009  X1-002A X1-001A   8464         Uh-002-001=T01
-UH-001-010                    8464            51832
-UH-001-011                    8464            51832
-                                           UH-001-002
-UH-001-012            X1-012               UH-001-003
-UH-001-013                               UH-002-004-T02
-                      X1-011               5116-10
-                                           BAT
-                         16MHz
-             X1-010   65C02      X1-006
-                      UH-001-005 X1-007
-                      4701       X1-004
+PCB Layout
+----------
+
+P0-044B
+|--------------------------------------------------------------|
+| VOL  3404   2063 UH-001-013.12M  UH-001-010.8M UH-001-007.4M |N
+|MB3730 3403        UH-001-012.11M  UH-001-009.6M UH-001-006.2M|M
+|                      UH-001-011.9M  UH-001-008.5M            |L
+|            |------|                     |--------|           |K
+|            |X1-010|                     |X1-002A |           |
+|            |------|                     |--------|           |J
+|                                         |--------|           |H
+|J                  |------| |------|     |X1-001A |        SW2|
+|A                  |X1-011| |X1-012|     |--------|           |G
+|M                  |------| |------|                          |F
+|M        UH-001-005.17E                                    SW1|E
+|A     UPD4701    65C02             8464     8464              |
+|   4584                                8464      8464         |
+|                       16MHz                           |----| |D
+|                                                       | 6  | |
+|                                                       | 8  | |C
+| X2-005(X5)        X1-006                UH-002-001.3B | 0  | |
+|               X1-007    UH-002-004.11B       51832    | 0  | |B
+| SW3     X1-004             LH5116  UH_001_002.7B      | 0  | |
+|                         BAT    UH_001_003.9B 51832    |----| |A
+|--------------------------------------------------------------|
+21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1
+
+Notes:
+         68000 - Toshiba TMP68000N-8 in SDIP64 package. Clock 8.000MHz [16/2]
+         65C02 - Rockwell R65C02P2. Clock 2.000MHz [16/8]
+          8464 - Fujitsu MB8464 8kBx8-bit SRAM
+          2063 - Toshiba TMM2063 8kBx8-bit SRAM
+         51832 - Toshiba TC51832 32kBx8-bit Psuedo SRAM
+        LH5116 - Sharp LH5116 2kBx8-bit SRAM (battery-backed)
+       UPD4701 - NEC uPD4701 Schmitt-Triggered 12-bit Binary X-Y 2-axis Incremental Encoder Counter.
+                 Used for controlling the shooting direction similar to how rotary joysticks work.
+                 The original control is called a 'Loop24 Joystick' and is very specialised.
+                 The joystick name 'Loop24' suggests there are 24 positions.
+                 The joystick has 4 additional wires coming from the bottom; +5V, GND, Loop1, Loop2.
+                 Loop1 connects to JAMMA pin 25 and Loop2 connects to JAMMA pin 26. This is basically a spinner or half of a trackball encoder.
+                 The game uses only 1 axis per player. Player 1 uses inputs Xa, Xb and player 2 uses inputs Ya, Yb
+          4584 - Toshiba TC4584 Hex Schmitt Trigger 4000-series logic chip. This is wired to the JAMMA pins 25 and 26
+                 via a 10k resistor array and is used for inputting the shooting direction into the uPD4701.
+           BAT - CR2032 3V Lithium Battery with solder tags
+         HSync - 15.6250kHz. Measured on X1-007 pin 22
+         VSync - 57.4449Hz. Measured on X1-007 pin 23
+         SW1/2 - 8 position DIP Switch. Note SW1#1 and SW2#7 are hard-wired to ground and do nothing.
+                 The PCB could be modified to enable them but by default the region changing does not work on the real PCB.
+                 In MAME it changes the region when those switches are changed. On the real PCB the region is fixed to
+                 Japan with Seta as the manufacturer. This effectively means SW1#1 and SW2#7 are always ON.
+                 But even though they work in MAME, on the test screen they don't show as 'on' even when toggled in MAME
+                 and the test screen just ignores it.
+        MB3730 - Fujitsu MB3730 Audio Power Amp
+        X1-010 - 16-bit PCM sound chip. Clock input 16.000MHz
+        X2-005 - Custom resistor array used for inputs
+        X1-004 - Seta custom chip marked 'X1-004' in SDIP52 package used for I/O
+        X1-006 - Seta custom chip marked 'X1-006' in SDIP64 package used for palette and pixel mixing functions
+        X1-007 - Seta custom chip marked 'X1-007' in SDIP42 package
+                 RGB and H/V Sync on the JAMMA connector are tied to this chip so likely this is an RGB DAC
+       X1-001A - Seta custom graphics chip \
+       X1-002A - Seta custom graphics chip / these work together to create sprites
+        X1-011 - Seta custom chip used for graphics mixing
+        X1-012 - Seta custom chip used for tilemaps
+          3404 - JRC3404 Dual Operational Amplifier
+          3403 - JRC3403 Quad Operational Amplifier
+           SW3 - Push button switch for reset
+UH-001-005.17E - 23C2001 32 pin 2Mbit mask ROM (65C02 sound program)
+UH-001-012.11M \ 23C4001 32 pin 4Mbit mask ROM (X1-010 samples)
+UH-001-013.12M /
+ UH-002-001.3B \ 23C2000 40 pin 2Mbit mask ROM (main program)
+UH-002-004.11B /
+ UH_001_002.7B \ 27C512 EPROM (main program)
+ UH_001_003.9B /
+ UH-001-006.2M \
+ UH-001-007.4M |
+ UH-001-008.5M | 23C4001 32 pin 4Mbit mask ROM (sprites)
+ UH-001-009.6M /
+ UH-001-010.8M \ 23C4001 32 pin 4Mbit mask ROM (background tiles)
+ UH-001-011.9M /
+
+Note not all ROMs have IC locations but regardless, the locations that are there are under chips
+and can't be seen unless the chip is removed. Therefore all ROMs are named with x,y locations.
 
 ***************************************************************************/
 /***************************************************************************
@@ -630,6 +698,7 @@ BPGH-013.U70    TC538000
 
 Zombie Raid
 Sammy, 1996
+Hardware info by Guru
 
 This is a gun shooting game using Seta/Allumer hardware.
 
@@ -689,6 +758,7 @@ NEC 71054C  ----???
                                 Kamen Rider
 Kamen Riderclub Battleracer
 Banpresto, 1993
+Hardware info by Guru
 
 Runs on Seta/Allumer hardware
 
@@ -748,6 +818,7 @@ X1-010           X1-006
 
 Allumer, 1993
 This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware.
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -882,6 +953,7 @@ Custom chips:   X1-001A X1-002A
 
 Triple Fun
 ??, 19??
+Hardware info by Guru
 
 
 CPU   : TMP68HC000P-16 (68000)
@@ -1006,6 +1078,7 @@ Other   : Allumer
 
 Banpresto, 1992
 This game runs on Seta/Allumer hardware
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1081,6 +1154,7 @@ Custom chips:   X1-001A X1-002A
 
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
+Hardware info by Guru
 
 PCB No: P0-077A (Seta Number)
         BP922   (Banpresto Number)
@@ -1116,6 +1190,7 @@ BP-U-003.U13      8M mask (32 pin, 1M x 8),   read as MX27C8000           Sound
 /***************************************************************************
 Ultra Toukon Densetsu
 Banpresto, 1993
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1212,6 +1287,7 @@ X1-010                           5168-10       68000-16
 
 Pairs Love
 Allumer, 199x
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1249,6 +1325,7 @@ Notes:
 
 Rezon (Taito License)
 Allumer / Taito, 1992
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1324,7 +1401,7 @@ Notes:
 
 Crazy Fight
 Subsino 1996
-Readme by Guru
+Hardware info by Guru
 This game runs on Allumer-based hardware.
 It is a whack-a-mole type game using 6 buttons.
 
@@ -1363,10 +1440,9 @@ Notes:
       6164         - 8kx8 SRAM (SDIP28)
       62256        - 32kx8 SRAM (SDIP28)
       TD62003      - Toshiba TD62003 7-Channel Darlington Sink Driver (DIP16)
-      DIP42        - Unknown DIP42 IC. Note several pins have no connection.
+      DIP42        - Oki ULA. Note several pins have no connection.
                      Pins 6-26 tied to inputs on JAMMA connector.
                      Some other pins tied to logic.
-                     No pins have a clock so this chip is not a MCU.
       J2           - 4 pin connector. Pin 2 tied to DIP42 IC pin 27
                      and pin 3 tied to TD62003 pin 16
       Custom Chips - X1-007
@@ -1490,7 +1566,7 @@ void seta_state::uPD71054_timer_init()
 		uPD71054->max[no] = 0xffff;
 
 	for (int no = 0; no < USED_TIMER_NUM; no++)
-		uPD71054->timer[no] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),this));
+		uPD71054->timer[no] = timer_alloc(FUNC(seta_state::uPD71054_timer_callback), this);
 }
 
 
@@ -2262,7 +2338,7 @@ void seta_state::keroppi_map(address_map &map)
 
 MACHINE_START_MEMBER(seta_state,keroppi)
 {
-	m_keroppi_prize_hop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback), this));
+	m_keroppi_prize_hop_timer = timer_alloc(FUNC(seta_state::keroppi_prize_hop_callback), this);
 
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
@@ -4300,6 +4376,20 @@ static INPUT_PORTS_START( daiohp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+/***************************************************************************
+                       Daioh (prototype, earlier)
+***************************************************************************/
+
+static INPUT_PORTS_START( daiohp2 )
+	PORT_INCLUDE(daiohp)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x8000, "300k and every 800k" )
+	PORT_DIPSETTING(      0xc000, "500k and every 1000k" )
+	PORT_DIPSETTING(      0x4000, "800k and 2000k only" )
+	PORT_DIPSETTING(      0x0000, "1000k Only" )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Dragon Unit
@@ -10208,28 +10298,28 @@ ROM_END
 
 ROM_START( calibr50 )
 	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "uh002001.u45", 0x000000, 0x040000, CRC(eb92e7ed) SHA1(2aee8a7bce549ef7d7b35d1c248ebbdbc906e38d) )
-	ROM_LOAD16_BYTE( "uh002004.u41", 0x000001, 0x040000, CRC(5a0ed31e) SHA1(d6ee7654354ac9f1dc7add1ef9f68a147b6f2953) )
-	ROM_LOAD16_BYTE( "uh001003.9a",  0x080000, 0x010000, CRC(0d30d09f) SHA1(8a48511b628e85b72fda0968d813f4faebd0c418) )
-	ROM_LOAD16_BYTE( "uh001002.7a",  0x080001, 0x010000, CRC(7aecc3f9) SHA1(2454d9c758fa623d4d81a9230871b67d31d16cef) )
+	ROM_LOAD16_BYTE( "uh-002-001.3b",  0x000000, 0x040000, CRC(eb92e7ed) SHA1(2aee8a7bce549ef7d7b35d1c248ebbdbc906e38d) )
+	ROM_LOAD16_BYTE( "uh-002-004.11b", 0x000001, 0x040000, CRC(5a0ed31e) SHA1(d6ee7654354ac9f1dc7add1ef9f68a147b6f2953) )
+	ROM_LOAD16_BYTE( "uh_001_003.9b",  0x080000, 0x010000, CRC(0d30d09f) SHA1(8a48511b628e85b72fda0968d813f4faebd0c418) )
+	ROM_LOAD16_BYTE( "uh_001_002.7b",  0x080001, 0x010000, CRC(7aecc3f9) SHA1(2454d9c758fa623d4d81a9230871b67d31d16cef) )
 
 	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
-	ROM_LOAD( "uh001005.u61", 0x004000, 0x040000, CRC(4a54c085) SHA1(f53ff257ce3d95f945a6befcfb61f1b570f0eafe) )
-	ROM_RELOAD(               0x00c000, 0x040000  )
+	ROM_LOAD( "uh-001-005.17e", 0x004000, 0x040000, CRC(4a54c085) SHA1(f53ff257ce3d95f945a6befcfb61f1b570f0eafe) )
+	ROM_RELOAD(                 0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "uh001006.ux2", 0x000000, 0x080000, CRC(fff52f91) SHA1(fd7807e9a8dd5a88df1fcd13746b44a33adbc0fa) )
-	ROM_LOAD16_BYTE( "uh001007.ux1", 0x000001, 0x080000, CRC(b6c19f71) SHA1(eb8bbaeaf4af07e178100ff16b228b537aa36272) )
-	ROM_LOAD16_BYTE( "uh001008.ux6", 0x100000, 0x080000, CRC(7aae07ef) SHA1(1db666db20efce1efe5b5769b8e3c78bbf508466) )
-	ROM_LOAD16_BYTE( "uh001009.ux0", 0x100001, 0x080000, CRC(f85da2c5) SHA1(d090e49b3a897729c7fb05f9386939448fe1d3d9) )
+	ROM_LOAD16_BYTE( "uh-001-006.2m", 0x000000, 0x080000, CRC(fff52f91) SHA1(fd7807e9a8dd5a88df1fcd13746b44a33adbc0fa) )
+	ROM_LOAD16_BYTE( "uh-001-007.4m", 0x000001, 0x080000, CRC(b6c19f71) SHA1(eb8bbaeaf4af07e178100ff16b228b537aa36272) )
+	ROM_LOAD16_BYTE( "uh-001-008.5m", 0x100000, 0x080000, CRC(7aae07ef) SHA1(1db666db20efce1efe5b5769b8e3c78bbf508466) )
+	ROM_LOAD16_BYTE( "uh-001-009.6m", 0x100001, 0x080000, CRC(f85da2c5) SHA1(d090e49b3a897729c7fb05f9386939448fe1d3d9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "uh001010.u3x", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
-	ROM_LOAD16_BYTE( "uh001011.u50", 0x000001, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
+	ROM_LOAD16_BYTE( "uh-001-010.8m", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
+	ROM_LOAD16_BYTE( "uh-001-011.9m", 0x000001, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "uh001013.u60", 0x000000, 0x080000, CRC(09ec0df6) SHA1(57c68d05074ea4a1e133be2ce6e25c594f04a712) )
-	ROM_LOAD( "uh001012.u46", 0x080000, 0x080000, CRC(bb996547) SHA1(0c8f570ef4454b10a023e0c463001c22a8cf99cd) )
+	ROM_LOAD( "uh-001-013.12m", 0x000000, 0x080000, CRC(09ec0df6) SHA1(57c68d05074ea4a1e133be2ce6e25c594f04a712) )
+	ROM_LOAD( "uh-001-012.11m", 0x080000, 0x080000, CRC(bb996547) SHA1(0c8f570ef4454b10a023e0c463001c22a8cf99cd) )
 ROM_END
 
 ROM_START( arbalest )
@@ -10922,7 +11012,7 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
 	ROM_LOAD16_BYTE( "bg2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
 	ROM_LOAD16_BYTE( "bg2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
-	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(dc8ecfb7) SHA1(a202ff32c74601d5cd0aebdf84a481d36f540403) )
 	ROM_LOAD16_BYTE( "bg2_3.u167", 0x100000, 0x080000, CRC(533ba782) SHA1(b5f62323be95b2def8d1383b400b4ef0d3b3d6cd) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
@@ -12453,7 +12543,7 @@ GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_ini
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
-GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
@@ -12462,7 +12552,7 @@ GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 

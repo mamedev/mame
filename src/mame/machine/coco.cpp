@@ -137,9 +137,9 @@ void coco_state::device_start()
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
 	// timers
-	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
-	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
-	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
+	m_hiresjoy_transition_timer[0] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_hiresjoy_transition_timer[1] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_diecom_lightgun_timer = timer_alloc(FUNC(coco_state::diecom_lightgun_hit), this);
 
 	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
@@ -187,21 +187,18 @@ void coco_state::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer
+//  timer callbacks
 //-------------------------------------------------
 
-void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(coco_state::diecom_lightgun_hit)
 {
-	switch(id)
-	{
-		case TIMER_DIECOM_LIGHTGUN:
-			m_dclg_output_h |= 0x02;
-			[[fallthrough]];
-		case TIMER_HIRES_JOYSTICK_X:
-		case TIMER_HIRES_JOYSTICK_Y:
-			poll_keyboard();
-			break;
-	}
+	m_dclg_output_h |= 0x02;
+	poll_keyboard();
+}
+
+TIMER_CALLBACK_MEMBER(coco_state::joystick_update)
+{
+	poll_keyboard();
 }
 
 
@@ -691,7 +688,7 @@ bool coco_state::poll_joystick(void)
 			{
 				/* conventional joystick */
 				joyval = analog->input(joystick, joystick_axis);
-				joyin_value = (dac_output() <= (joyval / 10));
+				joyin_value = (dac_output() <= (joyval / 16));
 			}
 			break;
 
@@ -1019,10 +1016,23 @@ void coco_state::poll_hires_joystick(void)
 		if (m_hiresjoy_ca && !newvalue)
 		{
 			/* hi to lo */
-			double value = m_joystick.input(joystick_index, axis) / 640.0;
-			value *= is_cocomax3 ? 2500.0 : 4250.0;
-			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
+			double value = m_joystick.input(joystick_index, axis) / 1023.0;
+
+			attotime duration;
+
+			if (is_cocomax3)
+			{
+				value *= 2500.0;
+				value += 400.0;
+				duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
+			}
+			else /* Tandy Hi-Res Joystick Interface */
+			{
+				value *= 5850.0;
+				value += 535.0;
+				duration = attotime::from_usec(value);
+			}
+
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)

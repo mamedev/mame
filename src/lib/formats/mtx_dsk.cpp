@@ -50,4 +50,4 @@ const mtx_format::format mtx_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_MTX_FORMAT = &floppy_image_format_creator<mtx_format>;
+const mtx_format FLOPPY_MTX_FORMAT;

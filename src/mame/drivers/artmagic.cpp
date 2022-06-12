@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 
 void artmagic_state::machine_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+	m_irq_off_timer = timer_alloc(FUNC(artmagic_state::irq_off), this);
 
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_hack_irq));
@@ -119,17 +119,10 @@ void artmagic_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(artmagic_state::irq_off)
 {
-	switch (id)
-	{
-	case TIMER_IRQ_OFF:
-		m_hack_irq = 0;
-		update_irq_state();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in artmagic_state::device_timer");
-	}
+	m_hack_irq = 0;
+	update_irq_state();
 }
 
 

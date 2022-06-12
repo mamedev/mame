@@ -34,17 +34,17 @@ protected:
 
 private:
 	std::unique_ptr<u8[]> m_framebuffer;
-	int m_curline;
-	int m_lineoffset;
+	int m_curline = 0;
+	int m_lineoffset = 0;
 
-	u8 m_pio0_pa_data;
-	u8 m_pio0_pb_data;
-	u8 m_scrollx;
-	u8 m_scrolly;
-	int m_direction;
+	u8 m_pio0_pa_data = 0;
+	u8 m_pio0_pb_data = 0;
+	u8 m_scrollx = 0;
+	u8 m_scrolly = 0;
+	int m_direction = 0;
 
-	u8 m_cd_data;
-	u8 m_cf_data;
+	u8 m_cd_data = 0;
+	u8 m_cf_data = 0;
 
 	u8 pio0_pa_r();
 	void pio0_pa_w(u8 data);

@@ -68,15 +68,15 @@ protected:
 	required_device<ay8910_device> m_aysnd;
 	required_shared_ptr<uint8_t> m_videoreg;
 
-	int m_gfx_type;
+	int m_gfx_type = 0;
 
 	void nmiq_1_w(uint8_t data);
 	void nmiq_2_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 
 private:
-	bool m_nmi_enable[2];
-	tilemap_t *m_background;
+	bool m_nmi_enable[2]{};
+	tilemap_t *m_background = nullptr;
 
 	void ay8910_porta_w(uint8_t data);
 

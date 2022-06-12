@@ -25,11 +25,6 @@
 class nbmj9195_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -79,7 +74,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 
 private:
 	required_device<tmpz84c011_device> m_maincpu;
@@ -91,10 +87,10 @@ private:
 
 	required_region_ptr<uint8_t> m_blit_region;
 
-	int m_inputport;
-	int m_dipswbitsel;
-	int m_outcoin_flag;
-	int m_mscoutm_inputport;
+	int m_inputport = 0;
+	int m_dipswbitsel = 0;
+	int m_outcoin_flag = 0;
+	int m_mscoutm_inputport = 0;
 	int m_scrollx[VRAM_MAX];
 	int m_scrolly[VRAM_MAX];
 	int m_scrollx_raster[VRAM_MAX][SCANLINE_MAX];
@@ -110,18 +106,18 @@ private:
 	int m_flipscreen[VRAM_MAX];
 	int m_clutmode[VRAM_MAX];
 	int m_transparency[VRAM_MAX];
-	int m_clutsel;
-	int m_screen_refresh;
-	int m_gfxflag2;
-	int m_gfxdraw_mode;
-	int m_nb19010_busyctr;
-	int m_nb19010_busyflag;
+	int m_clutsel = 0;
+	int m_screen_refresh = 0;
+	int m_gfxflag2 = 0;
+	int m_gfxdraw_mode = 0;
+	int m_nb19010_busyctr = 0;
+	int m_nb19010_busyflag = 0;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoram[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoworkram[VRAM_MAX];
 	std::unique_ptr<uint8_t[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
-	emu_timer *m_blitter_timer;
+	emu_timer *m_blitter_timer = nullptr;
 
 	void soundbank_w(uint8_t data);
 	void inputportsel_w(uint8_t data);

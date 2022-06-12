@@ -81,12 +81,12 @@ private:
 	uint8_t get_color(uint16_t pma);
 
 	// video state
-	int m_vismac_reg_latch;     // video register latch
-	int m_vismac_color_latch;   // color latch
-	bool m_blink;                // cursor blink
-	int m_frame;
-	bool m_rtc_int;
-	u8 m_out3;
+	int m_vismac_reg_latch = 0;     // video register latch
+	int m_vismac_color_latch = 0;   // color latch
+	bool m_blink = false;                // cursor blink
+	int m_frame = 0;
+	bool m_rtc_int = false;
+	u8 m_out3 = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);

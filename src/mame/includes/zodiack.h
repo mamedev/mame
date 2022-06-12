@@ -33,8 +33,8 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// state
-	uint8_t m_main_nmi_enabled;
-	uint8_t m_sound_nmi_enabled;
+	uint8_t m_main_nmi_enabled = 0;
+	uint8_t m_sound_nmi_enabled = 0;
 
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 	DECLARE_WRITE_LINE_MEMBER(vblank_main_nmi_w);

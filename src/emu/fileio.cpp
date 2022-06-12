@@ -259,7 +259,7 @@ util::hash_collection &emu_file::hashes(std::string_view types)
 	// determine which hashes we need
 	std::string needed;
 	for (char scan : types)
-		if (already_have.find_first_of(scan) == -1)
+		if (already_have.find_first_of(scan) == std::string::npos)
 			needed.push_back(scan);
 
 	// if we need nothing, skip it
@@ -279,15 +279,14 @@ util::hash_collection &emu_file::hashes(std::string_view types)
 		return m_hashes;
 	}
 
-	// read the data if we can
-	const u8 *filedata = (const u8 *)m_file->buffer();
-	if (filedata == nullptr)
+	std::uint64_t length;
+	if (m_file->length(length))
 		return m_hashes;
 
-	// compute the hash
-	std::uint64_t length;
-	if (!m_file->length(length))
-		m_hashes.compute(filedata, length, needed.c_str());
+	// hash the data
+	std::size_t actual;
+	(void)m_hashes.compute(*m_file, 0U, length, actual, needed.c_str()); // FIXME: need better interface to report errors
+
 	return m_hashes;
 }
 
@@ -805,7 +804,7 @@ std::error_condition emu_file::load_zipped_file()
 	m_zipdata.resize(m_ziplength);
 
 	// read the data into our buffer and return
-	auto const ziperr = m_zipfile->decompress(&m_zipdata[0], m_zipdata.size());
+	auto const ziperr = m_zipfile->decompress(m_zipdata.data(), m_zipdata.size());
 	if (ziperr)
 	{
 		m_zipdata.clear();
@@ -813,7 +812,7 @@ std::error_condition emu_file::load_zipped_file()
 	}
 
 	// convert to RAM file
-	std::error_condition const filerr = util::core_file::open_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, m_file);
+	std::error_condition const filerr = util::core_file::open_ram(m_zipdata.data(), m_zipdata.size(), m_openflags, m_file);
 	if (filerr)
 	{
 		m_zipdata.clear();

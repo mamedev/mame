@@ -675,7 +675,7 @@ private:
 
 void mfootb2_state::update_display()
 {
-	m_display->matrix(m_d, (m_r & 0x7f) | (m_d >> 4 & 0x80) | (m_r << 1 & 0x700));
+	m_display->matrix(m_d, (m_r << 1 & 0x700) | (m_d >> 4 & 0x80) | (m_r & 0x7f));
 }
 
 void mfootb2_state::write_d(u16 data)
@@ -715,8 +715,8 @@ static INPUT_PORTS_START( mfootb2 )
 
 	PORT_START("IN.1") // DIO11
 	PORT_CONFNAME( 0x400, 0x000, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(     0x000, "1" )
-	PORT_CONFSETTING(     0x400, "2" )
+	PORT_CONFSETTING(     0x000, "1" ) // PRO 1
+	PORT_CONFSETTING(     0x400, "2" ) // PRO 2
 INPUT_PORTS_END
 
 void mfootb2_state::mfootb2(machine_config &config)
@@ -732,7 +732,7 @@ void mfootb2_state::mfootb2(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	m_display->set_segmask(0x3c7, 0x7f);
-	m_display->set_segmask(0x002, 0xff);
+	m_display->set_segmask(0x002, 0xff); // only one digit has DP
 	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mfootb2);
 
@@ -741,7 +741,7 @@ void mfootb2_state::mfootb2(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -903,7 +903,7 @@ void brainbaf_state::brainbaf(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -1081,7 +1081,7 @@ void horocomp_state::horocomp(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -1572,7 +1572,7 @@ void rdqa_state::rdqa(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -1605,10 +1605,10 @@ CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_in
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel Electronics", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel Electronics", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel Electronics", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel Electronics", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE ) // ***

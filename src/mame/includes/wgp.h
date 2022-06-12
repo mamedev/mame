@@ -47,17 +47,12 @@ public:
 	void init_wgp2();
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT4,
-		TIMER_CPUB_INTERRUPT6
-	};
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
+
+	TIMER_CALLBACK_MEMBER(trigger_cpu_b_int6);
 
 private:
 	void coins_w(u8 data);
@@ -96,20 +91,20 @@ private:
 	required_shared_ptr<u16> m_piv_ctrlram;
 
 	/* video-related */
-	tilemap_t *m_piv_tilemap[3];
-	u16       m_piv_ctrl_reg;
-	u16       m_piv_zoom[3];
-	u16       m_piv_scrollx[3];
-	u16       m_piv_scrolly[3];
-	u16       m_rotate_ctrl[8];
-	int       m_piv_xoffs;
-	int       m_piv_yoffs;
-	u8        m_dislayer[4];
+	tilemap_t *m_piv_tilemap[3]{};
+	u16       m_piv_ctrl_reg = 0;
+	u16       m_piv_zoom[3]{};
+	u16       m_piv_scrollx[3]{};
+	u16       m_piv_scrolly[3]{};
+	u16       m_rotate_ctrl[8]{};
+	int       m_piv_xoffs = 0;
+	int       m_piv_yoffs = 0;
+	u8        m_dislayer[4]{};
 
 	/* misc */
-	u16       m_cpua_ctrl;
-	u16       m_port_sel;
-	emu_timer *m_cpub_int6_timer;
+	u16       m_cpua_ctrl = 0;
+	u16       m_port_sel = 0;
+	emu_timer *m_cpub_int6_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -13,8 +13,8 @@ copyright-holders:Vas Crabb
 	sit15           ???                 *0x10fe29 != 0
 	-->
 
-	<element name="white">
-		<rect><color red="1" green="1" blue="1" /></rect>
+	<element name="black">
+		<rect><color red="0" green="0" blue="0" /></rect>
 	</element>
 
 	<element name="marquee">
@@ -103,27 +103,20 @@ copyright-holders:Vas Crabb
 	</view>
 
 	<view name="Screen 0 Standard (320x224)">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
 	</view>
 
 	<view name="Screen 0 Cropped (304x224)">
-		<element ref="white">
-			<bounds x="8" y="0" width="304" height="240" />
-		</element>
-		<screen index="0" blend="multiply">
-			<bounds x="0" y="0" width="320" height="240" />
-		</screen>
+		<bounds left="0" top="0" right="320" bottom="240" />
+		<screen index="0"><bounds x="0" y="0" width="320" height="240" /></screen>
+		<element ref="black"><bounds x="-1" y="-1" width="9" height="242" /></element>
+		<element ref="black"><bounds x="312" y="-1" width="9" height="242" /></element>
 	</view>
 
 	<view name="Screen 0 Stretched (304x224)">
 		<bounds left="8" top="0" right="312" bottom="228" />
-		<element ref="white">
-			<bounds x="8" y="0" width="304" height="228" />
-		</element>
-		<screen index="0" blend="multiply">
-			<bounds x="0" y="0" width="320" height="228" />
-		</screen>
+		<screen index="0"><bounds x="0" y="0" width="320" height="228" /></screen>
+		<element ref="black"><bounds x="-1" y="-1" width="9" height="230" /></element>
+		<element ref="black"><bounds x="312" y="-1" width="9" height="230" /></element>
 	</view>
 </mamelayout>

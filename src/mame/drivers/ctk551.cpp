@@ -93,7 +93,7 @@ private:
 	output_finder<> m_led_touch;
 	output_finder<> m_led_power;
 
-	ioport_value m_switch;
+	ioport_value m_switch{};
 
 	DECLARE_WRITE_LINE_MEMBER(render_w);
 };

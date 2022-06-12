@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "pdp8.h"
 #include "pdp8dasm.h"
 

@@ -60,6 +60,11 @@ void atari_sound_comm_device::device_start()
 	save_item(NAME(m_sound_to_main_ready));
 	save_item(NAME(m_main_to_sound_data));
 	save_item(NAME(m_sound_to_main_data));
+
+	// allocate timers
+	m_sound_reset_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_sound_reset), this);
+	m_sound_write_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_sound_write), this);
+	m_6502_write_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_6502_write), this);
 }
 
 
@@ -77,37 +82,13 @@ void atari_sound_comm_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer: Handle device-specific timer
-//  calbacks
-//-------------------------------------------------
-
-void atari_sound_comm_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TID_SOUND_RESET:
-			delayed_sound_reset(param);
-			break;
-
-		case TID_SOUND_WRITE:
-			delayed_sound_write(param);
-			break;
-
-		case TID_6502_WRITE:
-			delayed_6502_write(param);
-			break;
-	}
-}
-
-
-//-------------------------------------------------
 //  sound_reset_w: Write handler which resets the
 //  sound CPU in response.
 //-------------------------------------------------
 
 void atari_sound_comm_device::sound_reset_w(u16 data)
 {
-	synchronize(TID_SOUND_RESET);
+	m_sound_reset_timer->adjust(attotime::zero);
 }
 
 
@@ -120,7 +101,7 @@ void atari_sound_comm_device::sound_reset_w(u16 data)
 
 void atari_sound_comm_device::main_command_w(u8 data)
 {
-	synchronize(TID_SOUND_WRITE, data);
+	m_sound_write_timer->adjust(attotime::zero, data);
 }
 
 
@@ -149,7 +130,7 @@ u8 atari_sound_comm_device::main_response_r()
 
 void atari_sound_comm_device::sound_response_w(u8 data)
 {
-	synchronize(TID_6502_WRITE, data);
+	m_6502_write_timer->adjust(attotime::zero, data);
 }
 
 
@@ -175,7 +156,7 @@ u8 atari_sound_comm_device::sound_command_r()
 //  reset command between the two CPUs.
 //-------------------------------------------------
 
-void atari_sound_comm_device::delayed_sound_reset(int param)
+TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_reset)
 {
 	// unhalt and reset the sound CPU
 	if (param == 0)
@@ -199,14 +180,14 @@ void atari_sound_comm_device::delayed_sound_reset(int param)
 //  from the main CPU to the sound CPU.
 //-------------------------------------------------
 
-void atari_sound_comm_device::delayed_sound_write(int data)
+TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_write)
 {
 	// warn if we missed something
 	if (m_main_to_sound_ready)
 		logerror("Missed command from 680x0\n");
 
 	// set up the states and signal an NMI to the sound CPU
-	m_main_to_sound_data = data;
+	m_main_to_sound_data = param;
 	m_main_to_sound_ready = true;
 	m_sound_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
@@ -221,14 +202,14 @@ void atari_sound_comm_device::delayed_sound_write(int data)
 //  from the sound CPU to the main CPU.
 //-------------------------------------------------
 
-void atari_sound_comm_device::delayed_6502_write(int data)
+TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_6502_write)
 {
 	// warn if we missed something
 	if (m_sound_to_main_ready)
 		logerror("Missed result from 6502\n");
 
 	// set up the states and signal the sound interrupt to the main CPU
-	m_sound_to_main_data = data;
+	m_sound_to_main_data = param;
 	m_sound_to_main_ready = true;
 	m_main_int_cb(ASSERT_LINE);
 }

@@ -370,22 +370,6 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	return (uint64_t(r) << 32) | uint64_t(l);
 }
 
-uint64_t naomi_gdrom_board::rev64(uint64_t src)
-{
-	uint64_t ret;
-
-	ret = ((src & 0x00000000000000ffULL) << 56)
-		| ((src & 0x000000000000ff00ULL) << 40)
-		| ((src & 0x0000000000ff0000ULL) << 24)
-		| ((src & 0x00000000ff000000ULL) << 8 )
-		| ((src & 0x000000ff00000000ULL) >> 8 )
-		| ((src & 0x0000ff0000000000ULL) >> 24)
-		| ((src & 0x00ff000000000000ULL) >> 40)
-		| ((src & 0xff00000000000000ULL) >> 56);
-
-	return ret;
-}
-
 uint64_t naomi_gdrom_board::read_to_qword(const uint8_t *region)
 {
 	uint64_t ret = 0;
@@ -960,22 +944,22 @@ void naomi_gdrom_board::device_start()
 		logerror("key is %08x%08x\n", (uint32_t)((key & 0xffffffff00000000ULL)>>32), (uint32_t)(key & 0x00000000ffffffffULL));
 
 		uint8_t buffer[2048];
-		cdrom_file *gdromfile = cdrom_open(machine().rom_load().get_disk_handle(image_tag));
+		cdrom_file *gdromfile = new cdrom_file(machine().rom_load().get_disk_handle(image_tag));
 		// primary volume descriptor
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame
-		cdrom_read_data(gdromfile, (netpic ? 0 : 45000) + 16, buffer, CD_TRACK_MODE1);
+		gdromfile->read_data((netpic ? 0 : 45000) + 16, buffer, cdrom_file::CD_TRACK_MODE1);
 		uint32_t path_table = ((buffer[0x8c+0] << 0) |
 								(buffer[0x8c+1] << 8) |
 								(buffer[0x8c+2] << 16) |
 								(buffer[0x8c+3] << 24));
 		// path table
-		cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
+		gdromfile->read_data(path_table, buffer, cdrom_file::CD_TRACK_MODE1);
 
 		// directory
-		uint8_t dir_sector[2048];
+		uint8_t dir_sector[2048]{};
 		// find data of file
-		uint32_t file_start, file_size;
+		uint32_t file_start = 0, file_size = 0;
 
 		if (netpic == 0) {
 			uint32_t dir = ((buffer[0x2 + 0] << 0) |
@@ -983,12 +967,12 @@ void naomi_gdrom_board::device_start()
 				(buffer[0x2 + 2] << 16) |
 				(buffer[0x2 + 3] << 24));
 
-			cdrom_read_data(gdromfile, dir, dir_sector, CD_TRACK_MODE1);
+			gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 			find_file(name, dir_sector, file_start, file_size);
 
 			if (file_start && (file_size == 0x100)) {
 				// read file
-				cdrom_read_data(gdromfile, file_start, buffer, CD_TRACK_MODE1);
+				gdromfile->read_data(file_start, buffer, cdrom_file::CD_TRACK_MODE1);
 				// get "rom" file name
 				memset(name, '\0', 128);
 				memcpy(name, buffer + 0xc0, FILENAME_LENGTH - 1);
@@ -1004,7 +988,7 @@ void naomi_gdrom_board::device_start()
 						(buffer[i + 4] << 16) |
 						(buffer[i + 5] << 24));
 					memcpy(name, "ROM.BIN", 7);
-					cdrom_read_data(gdromfile, dir, dir_sector, CD_TRACK_MODE1);
+					gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 					break;
 				}
 				i += buffer[i] + 8 + (buffer[i] & 1);
@@ -1024,17 +1008,17 @@ void naomi_gdrom_board::device_start()
 			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, &dimm_des_data[2048 * sec], CD_TRACK_MODE1);
+				gdromfile->read_data(file_start + sec, &dimm_des_data[2048 * sec], cdrom_file::CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
-			des_generate_subkeys(rev64(key), des_subkeys);
+			des_generate_subkeys(swapendian_int64(key), des_subkeys);
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(&dimm_data[i], rev64(des_encrypt_decrypt(true, rev64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
+				write_from_qword(&dimm_data[i], swapendian_int64(des_encrypt_decrypt(true, swapendian_int64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
 		}
 
-		cdrom_close(gdromfile);
+		delete gdromfile;
 
 		if(!dimm_data)
 			throw emu_fatalerror("GDROM: Could not find the file to decrypt.");

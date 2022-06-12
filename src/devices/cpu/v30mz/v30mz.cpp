@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "v30mz.h"
 #include "cpu/nec/necdasm.h"
-#include "debugger.h"
 
 
 enum SREGS { DS1=0, PS, SS, DS0 };

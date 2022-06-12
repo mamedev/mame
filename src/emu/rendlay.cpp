@@ -2109,7 +2109,7 @@ protected:
 		}
 		else if (c.a)
 		{
-			// compute premultiplied colors
+			// compute premultiplied color
 			u32 const a(c.a * 255.0F);
 			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
 			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
@@ -2145,9 +2145,9 @@ public:
 		render_color const c(color(state));
 		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
 		u32 const a(c.a * 255.0F);
-		u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
-		u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
-		u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const r(c.r * (255.0F * 255.0F) * a);
+		u32 const g(c.g * (255.0F * 255.0F) * a);
+		u32 const b(c.b * (255.0F * 255.0F) * a);
 		u32 const inva(255 - a);
 		if (!a)
 			return;
@@ -3109,7 +3109,7 @@ protected:
 		// shift the reels a bit based on this param, allows fine tuning
 		int use_state = (state + m_stateoffset) % max_state_used;
 
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const r = c.r * 255.0f;
 		u32 const g = c.g * 255.0f;
@@ -3261,7 +3261,7 @@ private:
 		// shift the reels a bit based on this param, allows fine tuning
 		int use_state = (state + m_stateoffset) % max_state_used;
 
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const r = c.r * 255.0f;
 		u32 const g = c.g * 255.0f;
@@ -3679,7 +3679,7 @@ void layout_element::component::draw_text(
 		int align,
 		const render_color &color)
 {
-	// compute premultiplied colors
+	// compute premultiplied color
 	u32 const r(color.r * 255.0f);
 	u32 const g(color.g * 255.0f);
 	u32 const b(color.b * 255.0f);

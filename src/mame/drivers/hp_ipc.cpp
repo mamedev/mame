@@ -413,7 +413,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(clear_bus_error);
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -438,7 +439,7 @@ private:
 	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
 
-	emu_timer *m_bus_error_timer;
+	emu_timer *m_bus_error_timer = nullptr;
 
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
@@ -462,11 +463,11 @@ private:
 	required_device<hp_ipc_io_slot_device> m_io_slot_b;
 	required_device_array<hp_ipc_optrom_device , 2> m_rom_slots;
 
-	uint32_t m_mmu[4], m_lowest_ram_addr;
-	uint16_t *m_internal_ram;
-	int m_fc;
+	uint32_t m_mmu[4]{}, m_lowest_ram_addr = 0;
+	uint16_t *m_internal_ram = nullptr;
+	int m_fc = 0;
 
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
 	inline uint32_t get_ram_address(offs_t offset)
 	{
@@ -474,11 +475,11 @@ private:
 	}
 
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
-	bool m_bus_error;
+	bool m_bus_error = false;
 };
 
 
-void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp_ipc_state::clear_bus_error)
 {
 	m_bus_error = false;
 }
@@ -735,7 +736,7 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 
 void hp_ipc_state::machine_start()
 {
-	m_bus_error_timer = timer_alloc(0);
+	m_bus_error_timer = timer_alloc(FUNC(hp_ipc_state::clear_bus_error), this);
 	m_bus_error = false;
 
 	m_bankdev->set_bank(1);

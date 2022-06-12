@@ -48,14 +48,14 @@ private:
 	tilemap_t *m_bg_tilemap;
 
 	std::unique_ptr<uint8_t[]> m_videoram_pg[2];
-	uint8_t m_videoram_pg_index;
-	uint8_t m_palette_bank;
-	uint8_t m_cocktail_mode;
-	uint8_t m_pleiads_protection_question;
-	uint8_t m_survival_protection_value;
-	int m_survival_sid_value;
+	uint8_t m_videoram_pg_index = 0;
+	uint8_t m_palette_bank = 0;
+	uint8_t m_cocktail_mode = 0;
+	uint8_t m_pleiads_protection_question = 0;
+	uint8_t m_survival_protection_value = 0;
+	int m_survival_sid_value = 0;
 	uint8_t m_survival_input_latches[2];
-	uint8_t m_survival_input_readc;
+	uint8_t m_survival_input_readc = 0;
 
 	void phoenix_videoram_w(offs_t offset, uint8_t data);
 	void phoenix_videoreg_w(uint8_t data);

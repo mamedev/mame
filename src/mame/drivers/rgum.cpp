@@ -63,9 +63,9 @@ private:
 	required_device<upd7759_device> m_upd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint8_t m_hbeat;
-	bool m_aysnd_data_next;
-	bool m_aysnd_toggle_enabled;
+	uint8_t m_hbeat = 0;
+	bool m_aysnd_data_next = false;
+	bool m_aysnd_toggle_enabled = false;
 
 	void aysnd_2000_w(uint8_t data);
 	void aysnd_2002_w(uint8_t data);

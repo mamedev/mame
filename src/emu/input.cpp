@@ -860,7 +860,7 @@ std::string input_manager::code_to_token(input_code code) const
 	std::string str(devclass);
 	if (!devindex.empty())
 		str.append("_").append(devindex);
-	if (devcode[0] != 0)
+	if (!devcode.empty())
 		str.append("_").append(devcode);
 	if (modifier != nullptr)
 		str.append("_").append(modifier);

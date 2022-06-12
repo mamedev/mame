@@ -305,16 +305,9 @@ void nbmj8891_state::update_pixel1(int x, int y)
 	m_tmpbitmap1.pix(y, x) = (color == 0x7f) ? 0xff : color;
 }
 
-void nbmj8891_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nbmj8891_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in nbmj8891_state::device_timer");
-	}
+	m_nb1413m3->busyflag_w(1);
 }
 
 void nbmj8891_state::gfxdraw()
@@ -485,7 +478,7 @@ VIDEO_START_MEMBER( nbmj8891_state, _1layer )
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj8891_state::clear_busy_flag), this);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_videoram0 = std::make_unique<uint8_t[]>(width * height);
 	m_palette_ptr = std::make_unique<uint8_t[]>(0x200);
@@ -517,7 +510,7 @@ void nbmj8891_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj8891_state::clear_busy_flag), this);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
 	m_videoram0 = std::make_unique<uint8_t[]>(width * height);

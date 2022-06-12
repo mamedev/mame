@@ -46,7 +46,7 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k210_device::device_start()
 {
-	m_clk1_timer = timer_alloc(0);
+	m_clk1_timer = timer_alloc(FUNC(dmv_k210_device::strobe_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_portb));
@@ -65,10 +65,10 @@ void dmv_k210_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  strobe_tick -
 //-------------------------------------------------
 
-void dmv_k210_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(dmv_k210_device::strobe_tick)
 {
 	m_centronics->write_strobe(CLEAR_LINE);
 }

@@ -38,7 +38,10 @@ z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, const char
 }
 
 z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), device_z88cart_interface(mconfig, *this), m_ram(nullptr)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, device_z88cart_interface(mconfig, *this)
+	, m_ram(nullptr)
 {
 }
 

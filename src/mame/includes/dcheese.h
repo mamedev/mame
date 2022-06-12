@@ -37,16 +37,8 @@ public:
 	void dcheese(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_BLITTER_SCANLINE,
-		TIMER_SIGNAL_IRQ
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_region_ptr<u16> m_palrom;
@@ -56,19 +48,19 @@ private:
 	required_ioport m_2a000e_io;
 
 	/* video-related */
-	u16   m_blitter_color[2];
-	u16   m_blitter_xparam[16];
-	u16   m_blitter_yparam[16];
-	u16   m_blitter_vidparam[32];
+	u16   m_blitter_color[2]{};
+	u16   m_blitter_xparam[16]{};
+	u16   m_blitter_yparam[16]{};
+	u16   m_blitter_vidparam[32]{};
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
-	emu_timer *m_blitter_timer;
-	emu_timer *m_signal_irq_timer;
+	emu_timer *m_blitter_timer = nullptr;
+	emu_timer *m_signal_irq_timer = nullptr;
 
 	/* misc */
-	u8    m_irq_state[5];
-	u8    m_sound_control;
-	u8    m_sound_msb_latch;
+	u8    m_irq_state[5]{};
+	u8    m_sound_control = 0;
+	u8    m_sound_msb_latch = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +82,8 @@ private:
 	void dcheese_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
-	void signal_irq(u8 which);
+	TIMER_CALLBACK_MEMBER(blitter_done);
+	TIMER_CALLBACK_MEMBER(signal_irq);
 	void update_irq_state();
 	uint8_t iack_r(offs_t offset);
 	void update_scanline_irq();

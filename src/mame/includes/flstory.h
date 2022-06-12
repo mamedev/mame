@@ -55,22 +55,22 @@ private:
 	optional_shared_ptr<uint8_t> m_workram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 	std::vector<uint8_t> m_paletteram;
 	std::vector<uint8_t> m_paletteram_ext;
-	uint8_t    m_gfxctrl;
-	uint8_t    m_char_bank;
-	uint8_t    m_palette_bank;
+	uint8_t    m_gfxctrl = 0;
+	uint8_t    m_char_bank = 0;
+	uint8_t    m_palette_bank = 0;
 
 	/* sound-related */
-	uint8_t    m_snd_ctrl0;
-	uint8_t    m_snd_ctrl1;
-	uint8_t    m_snd_ctrl2;
-	uint8_t    m_snd_ctrl3;
+	uint8_t    m_snd_ctrl0 = 0;
+	uint8_t    m_snd_ctrl1 = 0;
+	uint8_t    m_snd_ctrl2 = 0;
+	uint8_t    m_snd_ctrl3 = 0;
 
 	/* protection sims */
-	uint8_t m_from_mcu;
-	int      m_mcu_select;
+	uint8_t m_from_mcu = 0;
+	int      m_mcu_select = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

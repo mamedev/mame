@@ -177,7 +177,7 @@ protected:
 
 	uint32_t    m_par_read_cnt;
 	uint32_t    m_par_cntl;
-	uint8_t m_system_id;
+	uint8_t m_system_id = 0;
 
 	static char const *const SCC_TAG;
 	static char const *const PI1_TAG;

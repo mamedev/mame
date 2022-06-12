@@ -40,7 +40,7 @@ private:
 	void mem_map(address_map &map);
 
 	virtual void machine_reset() override;
-	uint8_t m_resetcnt;
+	uint8_t m_resetcnt = 0U;
 	required_device<cosmac_device> m_maincpu;
 };
 

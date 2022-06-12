@@ -73,14 +73,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
 	u16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 
@@ -105,11 +105,15 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	void set_mirror(u8 data);
 	void set_prg(int prg_base, int prg_mask);
+	void set_chr(int chr_base, int chr_mask);
 	virtual void set_prg() { set_prg(0x00, 0x1f); }
+	virtual void set_chr() { set_chr(0x00, 0x1ff); }
+
 	u16 m_mmc_vrom_bank[8];
 	u8 m_mmc_prg_bank[2];
 	u8 m_prg_flip;
@@ -123,7 +127,6 @@ protected:
 	int m_irq_mode;
 	int m_irq_prescale;
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 

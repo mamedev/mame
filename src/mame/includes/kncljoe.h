@@ -45,14 +45,14 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_tile_bank;
-	int         m_sprite_bank;
-	int        m_flipscreen;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_tile_bank = 0;
+	int         m_sprite_bank = 0;
+	int        m_flipscreen = 0;
 
 	/* misc */
-	uint8_t      m_port1;
-	uint8_t      m_port2;
+	uint8_t      m_port1 = 0U;
+	uint8_t      m_port2 = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -4993,7 +4993,7 @@ EmitDone:
   if (Support::test(options, InstOptions::kReserved)) {
 #ifndef ASMJIT_NO_LOGGING
     if (_logger)
-      EmitterUtils::logInstructionEmitted(this, instId, options, o0, o1, o2, opExt, 0, 0, writer.cursor());
+      EmitterUtils::logInstructionEmitted(this, BaseInst::composeARMInstId(instId, instCC), options, o0, o1, o2, opExt, 0, 0, writer.cursor());
 #endif
   }
 

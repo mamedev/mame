@@ -54,11 +54,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 protected:
-	enum
-	{
-		TIMER_LIGHTGUN_TICK
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -116,7 +111,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);

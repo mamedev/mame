@@ -2,15 +2,15 @@
 // copyright-holders: Miodrag Milanovic
 /***************************************************************************
 
-        Systec Z80
+Systec Z80
 
-        More data :
-            http://www.hd64180-cpm.de/html/systecz80.html
+More info:
+ http://www.hd64180-cpm.de/html/systecz80.html
 
-        30/08/2010 Skeleton driver
+2010-08-30 Skeleton driver
+2011-12-22 connected to a terminal [Robbbert]
 
-        Systec Platine 1
-
+Systec Platine 1
         SYSTEC 155.1L
         EPROM 2764 CP/M LOADER 155 / 9600 Baud
         Z8400APS CPU
@@ -18,8 +18,7 @@
         Z8430APS CTC
         Z8470APS DART
 
-        Systec Platine 2
-
+Systec Platine 2
         SYSTEC 100.3B
         MB8877A FDC Controller
         FDC9229BT SMC 8608
@@ -27,9 +26,6 @@
         Z8420APS PIO
 
         MB8877A Compatible FD1793
-
-        2011-12-22 connected to a terminal [Robbbert]
-
 
 ****************************************************************************/
 

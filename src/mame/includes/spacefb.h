@@ -49,10 +49,13 @@ public:
 	void spacefb_audio(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void spacefb_main_map(address_map &map);
+	void spacefb_main_io_map(address_map &map);
+	void spacefb_audio_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
@@ -61,14 +64,14 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t m_sound_latch;
-	emu_timer *m_interrupt_timer;
+	uint8_t m_sound_latch = 0;
+	emu_timer *m_interrupt_timer = nullptr;
 	std::unique_ptr<uint8_t[]> m_object_present_map;
-	uint8_t m_port_0;
-	uint8_t m_port_2;
-	uint32_t m_star_shift_reg;
-	double m_color_weights_rg[3];
-	double m_color_weights_b[2];
+	uint8_t m_port_0 = 0;
+	uint8_t m_port_2 = 0;
+	uint32_t m_star_shift_reg = 0;
+	double m_color_weights_rg[3]{};
+	double m_color_weights_b[2]{};
 
 	void port_0_w(uint8_t data);
 	void port_1_w(uint8_t data);
@@ -76,10 +79,6 @@ private:
 	uint8_t audio_p2_r();
 	DECLARE_READ_LINE_MEMBER(audio_t0_r);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void start_interrupt_timer();
@@ -92,12 +91,6 @@ private:
 	void draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void spacefb_audio_map(address_map &map);
-	void spacefb_main_io_map(address_map &map);
-	void spacefb_main_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_SPACEFB

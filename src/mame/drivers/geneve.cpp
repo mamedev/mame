@@ -311,7 +311,7 @@ private:
 	required_device<pc_kbdc_device>                                m_kbdconn;
 	required_device<bus::ti99::peb::peribox_device>                m_peribox;
 
-	uint8_t* m_eprom;  // Pointer to the EPROM
+	uint8_t* m_eprom = nullptr;  // Pointer to the EPROM
 
 	// PFM expansion
 	required_device<at29c040_device>     m_pfm512;
@@ -348,17 +348,17 @@ private:
 	virtual void machine_reset() override;
 
 	// Members
-	int  m_inta;
-	int  m_intb;
-	int  m_int2;
-	int  m_keyint;
+	int  m_inta = 0;
+	int  m_intb = 0;
+	int  m_int2 = 0;
+	int  m_keyint = 0;
 
 	int     m_left_button;   // Left mouse button, not wired to the 9938
 	int     m_pfm_prefix;
 	bool    m_pfm_oe;
 
 	// Settings
-	int m_boot_rom;     // Kind of boot ROM (EPROM or PFM512 or PFM512A)
+	int m_boot_rom = 0;     // Kind of boot ROM (EPROM or PFM512 or PFM512A)
 	bool m_sram_exp;
 
 	// Genmod modifications
@@ -496,6 +496,10 @@ void geneve_state::setaddress_debug(bool debug, offs_t address, uint8_t busctrl)
 		// See V9938 specs
 		m_pal->csw_in(m_gatearray->csw_out());
 		m_pal->csr_in(m_gatearray->csr_out());
+
+		// Trigger the 9901 clock when A10=1
+		if ((address & 0x0020) != 0)
+			m_tms9901->update_clock();
 	}
 
 	// Going to the box
@@ -616,6 +620,7 @@ uint8_t geneve_state::memread(offs_t offset)
 
 	// In case we had a debugger read, reset the flag.
 	m_gatearray->set_debug(false);
+	if (m_genmod) m_genmod_decoder->set_debug(false);
 
 	return value;
 }
@@ -723,6 +728,7 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
 
 	// In case we had a debugger write, reset the flag.
 	m_gatearray->set_debug(false);
+	if (m_genmod) m_genmod_decoder->set_debug(false);
 }
 
 /****************************************************************************

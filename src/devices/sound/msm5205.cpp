@@ -99,8 +99,8 @@ void msm5205_device::device_start()
 
 	/* stream system initialize */
 	m_stream = stream_alloc(0, 1, clock());
-	m_vck_timer = timer_alloc(TIMER_VCK);
-	m_capture_timer = timer_alloc(TIMER_ADPCM_CAPTURE);
+	m_vck_timer = timer_alloc(FUNC(msm5205_device::toggle_vck), this);
+	m_capture_timer = timer_alloc(FUNC(msm5205_device::update_adpcm), this);
 
 	/* register for save states */
 	save_item(NAME(m_data));
@@ -172,29 +172,19 @@ void msm5205_device::compute_tables()
 
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
+//  toggle_vck -
 //-------------------------------------------------
 
-void msm5205_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(msm5205_device::toggle_vck)
 {
-	switch (id)
-	{
-		case TIMER_VCK:
-			m_vck = !m_vck;
-			m_vck_cb(m_vck);
-			if (!m_vck)
-				m_capture_timer->adjust(attotime::from_hz(clock()/6)); // 15.6 usec at 384KHz
-			break;
-
-		case TIMER_ADPCM_CAPTURE:
-			update_adpcm();
-			break;
-	}
+	m_vck = !m_vck;
+	m_vck_cb(m_vck);
+	if (!m_vck)
+		m_capture_timer->adjust(attotime::from_hz(clock() / adpcm_capture_divisor()));
 }
 
 // timer callback at VCK low edge on MSM5205 (at rising edge on MSM6585)
-void msm5205_device::update_adpcm()
+TIMER_CALLBACK_MEMBER(msm5205_device::update_adpcm)
 {
 	int val;
 	int new_signal;
@@ -226,7 +216,7 @@ void msm5205_device::update_adpcm()
 	}
 
 	/* update when signal changed */
-	if( m_signal != new_signal)
+	if (m_signal != new_signal)
 	{
 		m_stream->update();
 		m_signal = new_signal;
@@ -374,29 +364,6 @@ void msm5205_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	}
 	else
 		output.fill(0);
-}
-
-
-//-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void msm6585_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TIMER_VCK:
-			m_vck = !m_vck;
-			m_vck_cb(m_vck);
-			if (m_vck)
-				m_capture_timer->adjust(attotime::from_hz(clock()/2)); // 3 usec at 640KHz
-			break;
-
-		case TIMER_ADPCM_CAPTURE:
-			update_adpcm();
-			break;
-	}
 }
 
 

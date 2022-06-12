@@ -31,19 +31,18 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	void sync_time();
 	void save_registers();
 	void set_interrupt(uint8_t mask);
 	void clear_interrupt(uint8_t mask);
 
-	static const device_timer_id TIMER_ID = 0;
+	TIMER_CALLBACK_MEMBER(msec_tick);
 
 	enum
 	{

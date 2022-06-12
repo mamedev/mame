@@ -37,6 +37,9 @@ void btoads_state::machine_start()
 	save_item(NAME(m_sound_to_main_ready));
 	save_item(NAME(m_sound_int_state));
 	save_pointer(NAME(m_nvram_data), 0x2000);
+
+	m_delayed_sound_timer = timer_alloc(FUNC(btoads_state::delayed_sound), this);
+	m_audio_sync_timer = timer_alloc(FUNC(btoads_state::audio_sync), this);
 }
 
 
@@ -66,26 +69,20 @@ uint8_t btoads_state::nvram_r(offs_t offset)
  *
  *************************************/
 
-void btoads_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(btoads_state::delayed_sound)
 {
-	switch (id)
-	{
-		case TIMER_ID_DELAYED_SOUND:
-			m_main_to_sound_data = param;
-			m_main_to_sound_ready = 1;
-			m_audiocpu->signal_interrupt_trigger();
+	m_main_to_sound_data = param;
+	m_main_to_sound_ready = 1;
+	m_audiocpu->signal_interrupt_trigger();
 
-			// use a timer to make long transfers faster
-			timer_set(attotime::from_usec(50), TIMER_ID_NOP);
-			break;
-	}
+	// use a timer to make long transfers faster
+	m_audio_sync_timer->adjust(attotime::from_usec(50));
 }
-
 
 void btoads_state::main_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		synchronize(TIMER_ID_DELAYED_SOUND, data & 0xff);
+		m_delayed_sound_timer->adjust(attotime::zero, data & 0xff);
 }
 
 

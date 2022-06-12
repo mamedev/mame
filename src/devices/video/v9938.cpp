@@ -172,11 +172,11 @@ void v99x8_device::device_config_complete()
 }
 
 
-void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(v99x8_device::update_line)
 {
 	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 
-	update_command ();
+	update_command();
 
 	// set flags
 	if (m_scanline == (m_scanline_start + m_offset_y))
@@ -626,7 +626,7 @@ void v99x8_device::device_start()
 		for (int addr = m_vram_size; addr < 0x30000; addr++) m_vram_space->write_byte(addr, 0xff);
 	}
 
-	m_line_timer = timer_alloc(TIMER_LINE);
+	m_line_timer = timer_alloc(FUNC(v99x8_device::update_line), this);
 
 	palette_init();
 
@@ -2915,13 +2915,11 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 /*************************************************************/
 uint8_t v99x8_device::command_unit_w(uint8_t Op)
 {
-	int SM;
-
 	// V9938 ops only work in SCREENs 5-8
-	if (m_mode<5)
+	if (m_mode<5 || m_mode>8)
 		return(0);
 
-	SM = m_mode-5;         // Screen mode index 0..3
+	int SM = m_mode-5;         // Screen mode index 0..3
 
 	m_mmc.CM = Op>>4;
 	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)

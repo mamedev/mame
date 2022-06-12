@@ -3109,7 +3109,7 @@ void spcenctr_audio_device::device_start()
 	m_lamp.resolve();
 	m_strobe.resolve();
 
-	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spcenctr_audio_device::strobe_callback), this));
+	m_strobe_timer = timer_alloc(FUNC(spcenctr_audio_device::strobe_callback), this);
 
 	m_strobe_enable = 0U;
 

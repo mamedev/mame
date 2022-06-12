@@ -126,7 +126,7 @@ struct dir_entry {
 	dir_entry_type m_type;
 	u64 m_key;
 
-	dir_entry(const std::string &name, dir_entry_type type, u64 key) : m_name(name), m_type(type), m_key(key) {}
+	dir_entry(std::string &&name, dir_entry_type type, u64 key) : m_name(std::move(name)), m_type(type), m_key(key) {}
 };
 
 class fsblk_t {
@@ -311,7 +311,7 @@ public:
 	struct floppy_enumerator {
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) = 0;
+		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
 		virtual void add_raw(const char *name, u32 key, const char *description) = 0;
 	};
 

@@ -54,11 +54,6 @@ public:
 	void init_decode();
 
 private:
-	enum
-	{
-		TIMER_COLLISION
-	};
-
 	uint8_t collision_r();
 	void lockout_w(offs_t offset, uint8_t data);
 	void int_reset_w(uint8_t data);
@@ -83,9 +78,8 @@ private:
 	inline int get_y_pos(int n);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_collision(int index);
+	TIMER_CALLBACK_MEMBER(set_collision);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void tank8_cpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -100,12 +94,12 @@ private:
 	required_shared_ptr<uint8_t> m_pos_d_ram;
 	required_shared_ptr<uint8_t> m_team;
 
-	int m_collision_index;
-	tilemap_t *m_tilemap;
+	int m_collision_index = 0;
+	tilemap_t *m_tilemap = nullptr;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper3;
-	emu_timer *m_collision_timer;
+	emu_timer *m_collision_timer = nullptr;
 };
 
 /*----------- defined in audio/tank8.c -----------*/

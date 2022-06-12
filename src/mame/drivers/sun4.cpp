@@ -545,10 +545,9 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	static const device_timer_id TIMER_0 = 0;
-	static const device_timer_id TIMER_1 = 1;
+	TIMER_CALLBACK_MEMBER(timer0_tick);
+	TIMER_CALLBACK_MEMBER(timer1_tick);
 
 	uint32_t debugger_r(offs_t offset, uint32_t mem_mask = ~0);
 	void debugger_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -838,8 +837,8 @@ void sun4_base_state::machine_start()
 	}
 
 	// allocate timers for the built-in two channel timer
-	m_c0_timer = timer_alloc(TIMER_0);
-	m_c1_timer = timer_alloc(TIMER_1);
+	m_c0_timer = timer_alloc(FUNC(sun4_base_state::timer0_tick), this);
+	m_c1_timer = timer_alloc(FUNC(sun4_base_state::timer1_tick), this);
 	m_c0_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 	m_c1_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 
@@ -1021,47 +1020,43 @@ WRITE_LINE_MEMBER( sun4_base_state::scc2_int )
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void sun4_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sun4_base_state::timer0_tick)
 {
-	switch (id)
+	//logerror("Timer 0 expired\n");
+	m_counter[0] += 1 << 10;
+	if ((m_counter[0] & 0x7fffffff) == (m_counter[1] & 0x7fffffff))
 	{
-		case TIMER_0:
-			//logerror("Timer 0 expired\n");
-			m_counter[0] += 1 << 10;
-			if ((m_counter[0] & 0x7fffffff) == (m_counter[1] & 0x7fffffff))
-			{
-				m_counter[0] = 0x80000000 | (1 << 10);
-				m_counter[1] |= 0x80000000;
-				if ((m_irq_reg & 0x21) == 0x21)
-				{
-					m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
-					//logerror("Taking INT10\n");
-				}
-				else
-				{
-					//logerror("Not taking INT10\n");
-				}
-			}
-			break;
+		m_counter[0] = 0x80000000 | (1 << 10);
+		m_counter[1] |= 0x80000000;
+		if ((m_irq_reg & 0x21) == 0x21)
+		{
+			m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
+			//logerror("Taking INT10\n");
+		}
+		else
+		{
+			//logerror("Not taking INT10\n");
+		}
+	}
+}
 
-		case TIMER_1:
-			//logerror("Timer 1 expired\n");
-			m_counter[2] += 1 << 10;
-			if ((m_counter[2] & 0x7fffffff) == (m_counter[3] & 0x7fffffff))
-			{
-				m_counter[2] = 0x80000000 | (1 << 10);
-				m_counter[3] |= 0x80000000;
-				if ((m_irq_reg & 0x81) == 0x81)
-				{
-					m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
-					//logerror("Taking INT14\n");
-				}
-				else
-				{
-					//logerror("Not taking INT14\n");
-				}
-			}
-			break;
+TIMER_CALLBACK_MEMBER(sun4_base_state::timer1_tick)
+{
+	//logerror("Timer 1 expired\n");
+	m_counter[2] += 1 << 10;
+	if ((m_counter[2] & 0x7fffffff) == (m_counter[3] & 0x7fffffff))
+	{
+		m_counter[2] = 0x80000000 | (1 << 10);
+		m_counter[3] |= 0x80000000;
+		if ((m_irq_reg & 0x81) == 0x81)
+		{
+			m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
+			//logerror("Taking INT14\n");
+		}
+		else
+		{
+			//logerror("Not taking INT14\n");
+		}
 	}
 }
 

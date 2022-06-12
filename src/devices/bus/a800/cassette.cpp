@@ -26,7 +26,6 @@ TODO:
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device, "a8sio_cass", "Atari 8 bit cassette")
-const device_timer_id TIMER_CASSETTE_READ = 1;
 
 void a8sio_cassette_device::device_add_mconfig(machine_config &config)
 {
@@ -60,7 +59,7 @@ void a8sio_cassette_device::device_start()
 	save_item(NAME(m_old_cass_signal));
 	save_item(NAME(m_signal_count));
 
-	m_read_timer = timer_alloc(TIMER_CASSETTE_READ);
+	m_read_timer = timer_alloc(FUNC(a8sio_cassette_device::read_tick), this);
 }
 
 void a8sio_cassette_device::device_reset()
@@ -82,27 +81,22 @@ WRITE_LINE_MEMBER( a8sio_cassette_device::motor_w )
 	}
 }
 
-void a8sio_cassette_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a8sio_cassette_device::read_tick)
 {
-	switch (id)
+	uint8_t cass_signal = m_cassette->input() < 0 ? 0 : 1;
+
+	if (m_signal_count < 20)
 	{
-		case TIMER_CASSETTE_READ:
-			uint8_t cass_signal = m_cassette->input() < 0 ? 0 : 1;
+		m_signal_count++;
+	}
 
-			if (m_signal_count < 20)
-			{
-				m_signal_count++;
-			}
-
-			if (cass_signal != m_old_cass_signal)
-			{
-				//printf("cass_signal: %d, count: %d, data: %d\n", cass_signal, m_signal_count, m_signal_count < 5 ? 1 : 0);
-				// ~4 kHz -> 0
-				// ~5 kHz -> 1
-				m_a8sio->data_in_w((m_signal_count < 5) ? 1 : 0);
-				m_signal_count = 0;
-				m_old_cass_signal = cass_signal;
-			}
-			break;
+	if (cass_signal != m_old_cass_signal)
+	{
+		//printf("cass_signal: %d, count: %d, data: %d\n", cass_signal, m_signal_count, m_signal_count < 5 ? 1 : 0);
+		// ~4 kHz -> 0
+		// ~5 kHz -> 1
+		m_a8sio->data_in_w((m_signal_count < 5) ? 1 : 0);
+		m_signal_count = 0;
+		m_old_cass_signal = cass_signal;
 	}
 }

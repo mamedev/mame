@@ -92,28 +92,28 @@ private:
 	required_device<address_map_bank_device> m_bankd;
 	required_device<vtech_ioexp_slot_device> m_ioexp;
 
-	char m_laser_frame_message[64+1];
-	int m_laser_frame_time;
-	u8 m_laser_latch;
-	uint8_t m_laser_track_x2[2];
-	uint8_t m_laser_fdc_status;
-	uint8_t m_laser_fdc_data[TRKSIZE_FM];
-	int m_laser_data;
-	int m_laser_fdc_edge;
-	int m_laser_fdc_bits;
-	int m_laser_drive;
-	int m_laser_fdc_start;
-	int m_laser_fdc_write;
-	int m_laser_fdc_offs;
-	int m_laser_fdc_latch;
-	int m_level_old;
-	int m_cassette_bit;
-	int m_laser_bg_mode;
-	int m_laser_two_color;
-	u8 m_language;
-	u32 m_cart_size;
+	char m_laser_frame_message[64+1]{};
+	int m_laser_frame_time = 0;
+	u8 m_laser_latch = 0;
+	uint8_t m_laser_track_x2[2]{};
+	uint8_t m_laser_fdc_status = 0;
+	uint8_t m_laser_fdc_data[TRKSIZE_FM]{};
+	int m_laser_data = 0;
+	int m_laser_fdc_edge = 0;
+	int m_laser_fdc_bits = 0;
+	int m_laser_drive = 0;
+	int m_laser_fdc_start = 0;
+	int m_laser_fdc_write = 0;
+	int m_laser_fdc_offs = 0;
+	int m_laser_fdc_latch = 0;
+	int m_level_old = 0;
+	int m_cassette_bit = 0;
+	int m_laser_bg_mode = 0;
+	int m_laser_two_color = 0;
+	u8 m_language = 0;
+	u32 m_cart_size = 0;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 };
 
 #endif // MAME_INCLUDES_VTECH2_H

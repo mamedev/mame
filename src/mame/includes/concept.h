@@ -54,9 +54,9 @@ private:
 	required_device<a2bus_device> m_a2bus;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t m_pending_interrupts;
-	bool m_clock_enable;
-	uint8_t m_clock_address;
+	uint8_t m_pending_interrupts = 0U;
+	bool m_clock_enable = false;
+	uint8_t m_clock_address = 0U;
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;

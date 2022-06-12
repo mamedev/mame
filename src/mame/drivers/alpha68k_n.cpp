@@ -430,11 +430,11 @@ void sstingray_state::sound_map(address_map &map)
 void alpha68k_N_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x11).w("ym1", FUNC(ym2203_device::write));
-	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::data_w));
-	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::address_w));
-	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::data_w));
-	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::address_w));
+	map(0x10, 0x11).w("ym", FUNC(ym2203_device::write));
+	map(0x80, 0x80).w("aysnd1", FUNC(ay8910_device::data_w));
+	map(0x81, 0x81).w("aysnd1", FUNC(ay8910_device::address_w));
+	map(0x90, 0x90).w("aysnd2", FUNC(ay8910_device::data_w));
+	map(0x91, 0x91).w("aysnd2", FUNC(ay8910_device::address_w));
 }
 
 void jongbou_state::sound_map(address_map &map)
@@ -758,16 +758,15 @@ void sstingray_state::sstingry(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sstingry);
 	video_config(config, 0x40, 0, true);
 
-	/* sound hardware */
+	// sound hardware
+	ym2203_device &ym(YM2203(config, "ym", 2'000'000));            // Verified from video by PCB, 24MHz/12?
+	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
-
-	ym2203_device &ym3(YM2203(config, "ym3", 3000000));
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.45);
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
@@ -775,13 +774,13 @@ void sstingray_state::sstingry(machine_config &config)
 void kyros_state::kyros(machine_config &config)
 {
 	base_config(config);
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   /* Verified on bootleg PCB */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   // Verified on original PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyros_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kyros_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(kyros_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
 
-	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); /* Verified on bootleg PCB */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Verified on original PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kyros_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kyros_state::sound_iomap);
 	m_audiocpu->set_vblank_int("screen", FUNC(kyros_state::irq0_line_hold));
@@ -792,17 +791,17 @@ void kyros_state::kyros(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyros);
 
-	/* sound hardware */
-	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
+	// sound hardware
+	ym2203_device &ym(YM2203(config, "ym", 16_MHz_XTAL / 8));            // Verified on original PCB
+	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 16_MHz_XTAL / 8));    // Verified on original PCB
+	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym3(YM2203(config, "ym3", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.6);
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 16_MHz_XTAL / 8));    // Verified on original PCB
+	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
 void jongbou_state::jongbou(machine_config &config)
@@ -1026,7 +1025,7 @@ void sstingray_state::init_sstingry()
 	m_coin_id = 0x22 | (0x22 << 8);
 	m_game_id = 0;
 
-	m_alpha8511_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sstingray_state::alpha8511_sync), this));
+	m_alpha8511_sync_timer = timer_alloc(FUNC(sstingray_state::alpha8511_sync), this);
 	save_item(NAME(m_alpha8511_address));
 	save_item(NAME(m_alpha8511_control));
 	save_item(NAME(m_alpha8511_read_mode));

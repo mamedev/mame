@@ -33,7 +33,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(mcu_run_trigger);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,11 +60,6 @@ private:
 	uint16_t m_poll_addr;
 	uint16_t m_checksumaddress;
 	emu_timer* m_runtimer;
-
-	enum
-	{
-		MCU_RUN_TIMER
-	};
 
 	void mcu_init();
 	void initial_scan_tables();

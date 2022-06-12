@@ -76,7 +76,7 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_tx_tilemap = nullptr;
 };
 
 
@@ -355,8 +355,8 @@ ROM_END
 
 void blktiger_ms_state::init_blktigerm()
 {
-	uint8_t *src = memregion("maincpu")->base();
-	int len = 0x50000;
+	uint8_t *const src = memregion("maincpu")->base();
+	int const len = 0x50000;
 
 	// bitswap data
 	for (int i = 0; i < len; i++)

@@ -57,16 +57,16 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	int m_nvram_enabled;
-	uint8_t m_bitmap_videoram_selected;
-	uint8_t m_bitmap_videoram_address_x;
-	uint8_t m_bitmap_videoram_address_y;
+	int m_nvram_enabled = 0;
+	uint8_t m_bitmap_videoram_selected = 0;
+	uint8_t m_bitmap_videoram_address_x = 0;
+	uint8_t m_bitmap_videoram_address_y = 0;
 	std::unique_ptr<uint8_t[]> m_bitmap_videoram1;
 	std::unique_ptr<uint8_t[]> m_bitmap_videoram2;
-	uint8_t *m_current_bitmap_videoram_accessed;
-	uint8_t *m_current_bitmap_videoram_displayed;
+	uint8_t *m_current_bitmap_videoram_accessed = nullptr;
+	uint8_t *m_current_bitmap_videoram_displayed = nullptr;
 	std::unique_ptr<uint16_t[]>  m_palette_ram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;

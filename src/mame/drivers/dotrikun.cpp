@@ -57,8 +57,8 @@ protected:
 	required_device<timer_device> m_interrupt_timer;
 	required_device<timer_device> m_scanline_off_timer;
 
-	uint8_t m_vram_latch;
-	uint8_t m_color;
+	uint8_t m_vram_latch = 0U;
+	uint8_t m_color = 0U;
 
 	void vram_w(offs_t offset, uint8_t data);
 	void color_w(uint8_t data);

@@ -79,7 +79,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	int m_keyboard_mask;
+	int m_keyboard_mask = 0;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8255_device> m_ppi;
@@ -121,7 +121,7 @@ private:
 
 	required_memory_region m_proms;
 
-	int m_lcd_digit[6];
+	int m_lcd_digit[6]{};
 	output_finder<6> m_digits;
 };
 

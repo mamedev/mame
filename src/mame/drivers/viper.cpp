@@ -130,19 +130,19 @@ Games on this hardware include:
 
 Konami
 Game ID  Year    Game
--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
 GK922    2000    Code One Dispatch
 G????    2001    ParaParaParadise 2nd Mix
-GM941    2001    GTI Club 2
-G?A00    2001    Police 911 (USA) / Police 24/7 (World) / Keisatsukan Shinjuku 24ji (Japan)
+GM941    2000    Driving Party: Racing in Italy (World) / GTI Club: Corso Italiano (Japan) / GTI Club 2 (USA?)
+G?A00    2000    Police 911 (USA) / Police 24/7 (World) / The Keisatsukan: Shinjuku 24-ji (Asia/Japan/Korea)
 GKA13    2001    Silent Scope EX (USA/World) / Sogeki (Japan)
 G?A29    2001    Mocap Boxing
-G?A30    2002    Tsurugi
+G?A30    2002    Blade of Honor (USA) / Tsurugi (World/Japan)
 GMA41    2001    Thrill Drive 2
 G?A45    2001    Boxing Mania
-G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
+G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / The Keisatsukan 2: Zenkoku Daitsuiseki Special (Japan)
 G?B33    2001    Mocap Golf
-G?B41    2001    Jurassic Park 3
+G?B41    2001    Jurassic Park III
 G?B4x    2002    Xtrial Racing
 G?C09    2002    Mahjong Fight Club
 G?C22    2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
@@ -509,15 +509,15 @@ private:
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 
-	int m_cf_card_ide;
-	int m_unk_serial_bit_w;
-	uint16_t m_unk_serial_cmd;
-	uint16_t m_unk_serial_data;
-	uint16_t m_unk_serial_data_r;
-	uint8_t m_unk_serial_regs[0x80];
-	uint64_t m_e00008_data;
-	uint32_t m_sound_buffer_offset;
-	bool m_sound_irq_enabled;
+	int m_cf_card_ide = 0;
+	int m_unk_serial_bit_w = 0;
+	uint16_t m_unk_serial_cmd = 0U;
+	uint16_t m_unk_serial_data = 0U;
+	uint16_t m_unk_serial_data_r = 0U;
+	uint8_t m_unk_serial_regs[0x80]{};
+	uint64_t m_e00008_data = 0U;
+	uint32_t m_sound_buffer_offset = 0U;
+	bool m_sound_irq_enabled = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 
@@ -559,42 +559,42 @@ private:
 
 	struct MPC8240_IRQ
 	{
-		uint32_t vector;
-		int priority;
-		int destination;
-		int active;
-		int pending;
-		int mask;
+		uint32_t vector = 0U;
+		int priority = 0;
+		int destination = 0;
+		int active = 0;
+		int pending = 0;
+		int mask = 0;
 	};
 
 	struct MPC8240_GLOBAL_TIMER
 	{
-		uint32_t base_count;
-		int enable;
-		emu_timer *timer;
+		uint32_t base_count = 0U;
+		int enable = 0;
+		emu_timer *timer = nullptr;
 	};
 
 	struct MPC8240_EPIC
 	{
-		uint32_t iack;
-		uint32_t eicr;
-		uint32_t svr;
+		uint32_t iack = 0U;
+		uint32_t eicr = 0U;
+		uint32_t svr = 0U;
 
-		int active_irq;
+		int active_irq = 0;
 
-		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
+		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS]{};
 
-		uint8_t i2c_adr;
-		int i2c_freq_div, i2c_freq_sample_rate;
-		uint8_t i2c_cr;
-		uint8_t i2c_sr;
-		int i2c_state;
+		uint8_t i2c_adr = 0U;
+		int i2c_freq_div = 0, i2c_freq_sample_rate = 0;
+		uint8_t i2c_cr = 0U;
+		uint8_t i2c_sr = 0U;
+		int i2c_state = 0;
 
-		MPC8240_GLOBAL_TIMER global_timer[4];
+		MPC8240_GLOBAL_TIMER global_timer[4]{};
 
 	};
 
-	MPC8240_EPIC m_epic;
+	MPC8240_EPIC m_epic{};
 
 #if VIPER_DEBUG_EPIC_REGS
 	const char* epic_get_register_name(uint32_t reg);
@@ -615,14 +615,14 @@ private:
 		DS2430_STATE_READ_MEM_ADDRESS
 	};
 
-	uint8_t m_ds2430_data;
-	int m_ds2430_data_count;
-	int m_ds2430_reset;
-	int m_ds2430_state;
-	uint8_t m_ds2430_cmd;
-	uint8_t m_ds2430_addr;
-	uint8_t m_ds2430_unk_status;
-	emu_timer *m_ds2430_timer;
+	uint8_t m_ds2430_data = 0U;
+	int m_ds2430_data_count = 0;
+	int m_ds2430_reset = 0;
+	int m_ds2430_state = 0;
+	uint8_t m_ds2430_cmd = 0U;
+	uint8_t m_ds2430_addr = 0U;
+	uint8_t m_ds2430_unk_status = 0U;
+	emu_timer *m_ds2430_timer = nullptr;
 	int ds2430_insert_cmd_bit(int bit);
 
 	void DS2430_w(int bit);
@@ -1395,10 +1395,10 @@ void viper_state::mpc8240_interrupt(int irq)
 void viper_state::mpc8240_epic_init()
 {
 	memset(&m_epic, 0, sizeof(m_epic));
-	m_epic.global_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	m_epic.global_timer[0].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
+	m_epic.global_timer[1].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
+	m_epic.global_timer[2].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
+	m_epic.global_timer[3].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
 }
 
 void viper_state::mpc8240_epic_reset(void)
@@ -2541,9 +2541,7 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	// FIXME: The driver seems to hang using the voodoo vblank signal
-	// Seems to only work if using negative vsync
-	if (!state)
+	if (state)
 	  mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
@@ -2588,7 +2586,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
 
 void viper_state::machine_start()
 {
-	m_ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
+	m_ds2430_timer = timer_alloc(FUNC(viper_state::ds2430_timer_callback), this);
 	mpc8240_epic_init();
 
 	/* set conservative DRC options */
@@ -3431,21 +3429,21 @@ GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_viperc
 GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
 GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
 GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
-GAME(2001, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UBC)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
+GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
+GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
 GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver AAE)", MACHINE_NOT_WORKING)
-GAME(2001, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver KAE)", MACHINE_NOT_WORKING)
-GAME(2001, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver AAC)", MACHINE_NOT_WORKING)
-GAME(2001, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING)
-GAME(2001, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2001, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2001, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
-GAME(2001, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Keisatsukan Shinjuku 24ji (ver JAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
+GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)

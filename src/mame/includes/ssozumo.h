@@ -66,10 +66,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_sound_nmi_mask;
-	uint8_t m_color_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_sound_nmi_mask = 0;
+	uint8_t m_color_bank = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

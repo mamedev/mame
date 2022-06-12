@@ -533,27 +533,6 @@ void lynx_state::blit_lines()
 	}
 }
 
-void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		blitter_timer(param);
-		break;
-	case TIMER_SHOT:
-		timer_shot(param);
-		break;
-	case TIMER_UART_LOOPBACK:
-		uart_loopback_timer(param);
-		break;
-	case TIMER_UART:
-		uart_timer(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in lynx_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(lynx_state::blitter_timer)
 {
 	m_blitter.busy = false; // blitter finished
@@ -730,7 +709,7 @@ void lynx_state::blitter()
 		}
 	}
 
-	timer_set(m_maincpu->cycles_to_attotime(m_blitter.memory_accesses), TIMER_BLITTER);
+	m_blitter_timer->adjust(m_maincpu->cycles_to_attotime(m_blitter.memory_accesses));
 }
 
 
@@ -1342,7 +1321,7 @@ TIM_BORROWOUT   EQU %00000001
 void lynx_state::timer_init(int which)
 {
 	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
-	m_timer[which].timer = timer_alloc(TIMER_SHOT);
+	m_timer[which].timer = timer_alloc(FUNC(lynx_state::timer_shot), this);
 
 	save_item(NAME(m_timer[which].bakup), which);
 	save_item(NAME(m_timer[which].cntrl1), which);
@@ -1592,14 +1571,14 @@ TIMER_CALLBACK_MEMBER(lynx_state::uart_timer)
 	{
 		m_uart.data_to_send = m_uart.buffer;
 		m_uart.buffer_loaded = false;
-		timer_set(attotime::from_usec(11*16), TIMER_UART);
+		m_uart_timer->adjust(attotime::from_usec(11*16));
 	}
 	else
 	{
 		m_uart.sending = false;
 		m_uart.received = true;
 		m_uart.data_received = m_uart.data_to_send;
-		timer_set(attotime::from_usec(11*16), TIMER_UART_LOOPBACK);
+		m_loopback_timer->adjust(attotime::from_usec(11*16));
 		if (m_uart.RXINTEN())
 		{
 			interrupt_set(4);
@@ -1659,7 +1638,7 @@ void lynx_state::uart_w(offs_t offset, u8 data)
 				m_uart.sending = true;
 				m_uart.data_to_send = data;
 				// timing not accurate, baude rate should be calculated from timer 4 backup value and clock rate
-				timer_set(attotime::from_usec(11*16), TIMER_UART);
+				m_uart_timer->adjust(attotime::from_usec(11*16));
 			}
 			break;
 	}
@@ -2009,6 +1988,10 @@ void lynx_state::machine_start()
 
 	for (int i = 0; i < NR_LYNX_TIMERS; i++)
 		timer_init(i);
+
+	m_blitter_timer = timer_alloc(FUNC(lynx_state::blitter_timer), this);
+	m_loopback_timer = timer_alloc(FUNC(lynx_state::uart_loopback_timer), this);
+	m_uart_timer = timer_alloc(FUNC(lynx_state::uart_timer), this);
 }
 
 

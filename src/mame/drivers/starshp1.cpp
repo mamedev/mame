@@ -11,10 +11,11 @@ Atari Starship 1 driver
 
 #include "emu.h"
 #include "includes/starshp1.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "speaker.h"
 
+#include "speaker.h"
 
 
 
@@ -194,10 +195,7 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_DIPNAME( 0x20, 0x20, "Extended Play" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	// IPT_BUTTON3 is the Speed lever (Throttle)
-	// This is _not_ IPT_TOGGLE, even though it looks like one.
-	// It returns to SLOW unless you hold it down (FAST)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Speed lever - spring-returned to SLOW unless held down for FAST
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")

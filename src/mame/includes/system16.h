@@ -227,76 +227,76 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<sega_16bit_sprite_device> m_sprites;
 
-	uint16_t m_coinctrl;
+	uint16_t m_coinctrl = 0;
 
 	/* game specific */
-	int m_passht4b_io1_val;
-	int m_passht4b_io2_val;
-	int m_passht4b_io3_val;
+	int m_passht4b_io1_val = 0;
+	int m_passht4b_io2_val = 0;
+	int m_passht4b_io3_val = 0;
 
-	int m_beautyb_unkx;
+	int m_beautyb_unkx = 0;
 
-	int m_shinobl_kludge; // TODO: this never gets set, causing unreachable code in get_text_tile_info
+	int m_shinobl_kludge = 0; // TODO: this never gets set, causing unreachable code in get_text_tile_info
 
-	int m_eswat_tilebank0;
+	int m_eswat_tilebank0 = 0;
 
 
 	/* video-related */
-	tilemap_t *m_background[2];
-	tilemap_t *m_foreground[2];
-	tilemap_t *m_text_layer;
-	tilemap_t *m_bg_tilemaps[2];
-	tilemap_t *m_text_tilemap;
-	double m_weights[2][3][6];
+	tilemap_t *m_background[2]{};
+	tilemap_t *m_foreground[2]{};
+	tilemap_t *m_text_layer = nullptr;
+	tilemap_t *m_bg_tilemaps[2]{};
+	tilemap_t *m_text_tilemap = nullptr;
+	double m_weights[2][3][6]{};
 
-	int m_spritebank_type;
-	int m_back_yscroll;
-	int m_fore_yscroll;
-	int m_text_yscroll;
+	int m_spritebank_type = 0;
+	int m_back_yscroll = 0;
+	int m_fore_yscroll = 0;
+	int m_text_yscroll = 0;
 
-	int m_bg1_trans; // alien syn + sys18
+	int m_bg1_trans = 0; // alien syn + sys18
 
-	int m_tile_bank[2];
-	int m_bg_page[2][4];
-	int m_fg_page[2][4];
+	int m_tile_bank[2]{};
+	int m_bg_page[2][4]{};
+	int m_fg_page[2][4]{};
 
-	uint16_t m_datsu_page[4];
+	uint16_t m_datsu_page[4]{};
 
-	int m_old_bg_page[2][4];
-	int m_old_fg_page[2][4];
-	int m_old_tile_bank[2];
+	int m_old_bg_page[2][4]{};
+	int m_old_fg_page[2][4]{};
+	int m_old_tile_bank[2]{};
 
-	int m_bg_scrollx;
-	int m_bg_scrolly;
-	int m_fg_scrollx;
-	int m_fg_scrolly;
-	uint16_t m_tilemapselect;
+	int m_bg_scrollx = 0;
+	int m_bg_scrolly = 0;
+	int m_fg_scrollx = 0;
+	int m_fg_scrolly = 0;
+	uint16_t m_tilemapselect = 0;
 
-	int m_textlayer_lo_min;
-	int m_textlayer_lo_max;
-	int m_textlayer_hi_min;
-	int m_textlayer_hi_max;
+	int m_textlayer_lo_min = 0;
+	int m_textlayer_lo_max = 0;
+	int m_textlayer_hi_min = 0;
+	int m_textlayer_hi_max = 0;
 
-	int m_tilebank_switch;
+	int m_tilebank_switch = 0;
 
 
 	/* sound-related */
-	int m_sample_buffer;
-	int m_sample_select;
+	int m_sample_buffer = 0;
+	int m_sample_select = 0;
 
-	uint8_t *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
+	uint8_t *m_soundbank_ptr = nullptr;     /* Pointer to currently selected portion of ROM */
 
 	/* sys18 */
-	uint8_t *m_sound_bank;
-	uint16_t *m_splittab_bg_x;
-	uint16_t *m_splittab_bg_y;
-	uint16_t *m_splittab_fg_x;
-	uint16_t *m_splittab_fg_y;
-	int     m_sound_info[4*2];
-	int     m_refreshenable;
-	int     m_system18;
+	uint8_t *m_sound_bank = nullptr;
+	uint16_t *m_splittab_bg_x = nullptr;
+	uint16_t *m_splittab_bg_y = nullptr;
+	uint16_t *m_splittab_fg_x = nullptr;
+	uint16_t *m_splittab_fg_y = nullptr;
+	int     m_sound_info[4*2]{};
+	int     m_refreshenable = 0;
+	int     m_system18 = 0;
 
-	uint8_t *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
+	uint8_t *m_decrypted_region = nullptr;  // goldnaxeb1 & bayrouteb1
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

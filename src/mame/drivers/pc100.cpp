@@ -127,19 +127,19 @@ private:
 	void rtc_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irqnmi_w);
 	DECLARE_WRITE_LINE_MEMBER(drqnmi_w);
-	uint16_t m_kanji_addr;
-	uint8_t m_timer_mode;
+	uint16_t m_kanji_addr = 0;
+	uint8_t m_timer_mode = 0;
 
-	uint8_t m_bank_r,m_bank_w,m_key;
-	bool m_nmi_mask, m_irq_state, m_drq_state;
+	uint8_t m_bank_r = 0, m_bank_w = 0, m_key = 0;
+	bool m_nmi_mask = false, m_irq_state = false, m_drq_state = false;
 
 	struct{
-		uint8_t shift;
-		uint16_t mask;
-		uint16_t cmd;
-		uint16_t vstart;
-		uint8_t addr;
-		uint8_t reg[8];
+		uint8_t shift = 0;
+		uint16_t mask = 0;
+		uint16_t cmd = 0;
+		uint16_t vstart = 0;
+		uint8_t addr = 0;
+		uint8_t reg[8]{};
 	}m_crtc;
 	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);

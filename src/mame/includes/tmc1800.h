@@ -49,11 +49,6 @@ protected:
 class tmc1800_state : public tmc1800_base_state
 {
 public:
-	enum
-	{
-		TIMER_SETUP_BEEP
-	};
-
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_vdc(*this, CDP1861_TAG)
@@ -67,8 +62,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
-	void init_tmc1800();
-
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);
 	void tmc1800_io_map(address_map &map);
@@ -77,11 +70,10 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cdp1861_device> m_vdc;
 	/* keyboard state */
-	int m_keylatch;         /* key latch */
+	int m_keylatch = 0;
 };
 
 class osc1000b_state : public tmc1800_base_state
@@ -110,7 +102,7 @@ protected:
 	virtual void machine_reset() override;
 
 	/* keyboard state */
-	int m_keylatch;
+	int m_keylatch = 0;
 };
 
 class tmc2000_state : public tmc1800_base_state
@@ -153,14 +145,14 @@ protected:
 	output_finder<> m_led;
 
 	// memory
-	int m_rac;
-	int m_roc;
+	int m_rac = 0;
+	int m_roc = 0;
 
 	/* video state */
-	uint8_t m_color;
+	uint8_t m_color = 0;
 
 	/* keyboard state */
-	int m_keylatch;
+	int m_keylatch = 0;
 };
 
 class nano_state : public tmc1800_base_state
@@ -174,11 +166,6 @@ public:
 		, m_monitor(*this, "MONITOR")
 		, m_led(*this, "led1")
 	{ }
-
-	enum
-	{
-		TIMER_ID_EF4
-	};
 
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
@@ -195,17 +182,21 @@ public:
 	void nano_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(assert_ef4);
 
 	required_device<cdp1864_device> m_cti;
 	required_ioport m_ny0;
 	required_ioport m_ny1;
 	required_ioport m_monitor;
 	output_finder<> m_led;
+
+	emu_timer *m_ef4_timer = nullptr;
+
 	/* keyboard state */
-	int m_keylatch;         /* key latch */
+	int m_keylatch = 0;
 };
 
 #endif

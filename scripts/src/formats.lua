@@ -1874,6 +1874,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/tim011_dsk.h,FORMATS["TIM011_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "TIM011_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/tim011_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/tim011_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/trd_dsk.h,FORMATS["TRD_DSK"] = true
 --------------------------------------------------
 

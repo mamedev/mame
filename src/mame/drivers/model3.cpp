@@ -131,10 +131,10 @@ Sega Bass Fishing / Get Bass
 Virtua Fighter 3
 Virtua Fighter 3 Team Battle
 Le Mans 24
-Scud Race / Super GT
+Scud Race / Sega Super GT
 Scud Race Plus
-The Lost World
-The Lost World Special
+The Lost World: Jurassic Park
+The Lost World: Jurassic Park Special
 Virtua Striker 2
 Virtua Striker 2 Version '98
 
@@ -1325,33 +1325,33 @@ MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
 	configure_fast_ram();
 
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
-	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
+	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
+	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
 }
 
 void model3_state::model3_init(int step)
@@ -3365,7 +3365,7 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
+ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
@@ -5519,7 +5519,7 @@ ROM_START( fvipers2o )   /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
 ROM_END
 
-ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK */
+ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK, Security board ID# 837-13584-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21214c.17", 0x000006, 0x200000, CRC(8dc0a85c) SHA1(c75088fd0594964a4ed78b80a2585d3d89c85464) )
@@ -6789,8 +6789,8 @@ GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     in
 GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus Twin/DX (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1997, scudplusa,      scud,      scud,      scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
-GAME( 1997, lostwsga,          0,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsgp,   lostwsga,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
+GAME( 1997, lostwsga,          0,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsgp,   lostwsga,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
 GAME( 1997, vs215,           vs2, model3_15,      model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215o,          vs2, model3_15,      model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,          0, model3_15,      scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

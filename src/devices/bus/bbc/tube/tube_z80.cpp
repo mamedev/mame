@@ -80,6 +80,7 @@ void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_z80, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_z80, INPUT_LINE_IRQ0);
+	m_ula->prst_handler().set(FUNC(bbc_tube_z80_device::prst_w));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_z80").set_original("bbc_flop_z80");
@@ -153,6 +154,13 @@ void bbc_tube_z80_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_z80_device::prst_w)
+{
+	device_reset();
+
+	m_z80->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_z80_device::host_r(offs_t offset)
 {

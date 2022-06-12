@@ -20,8 +20,6 @@ class pc_format : public upd765_format
 public:
 	pc_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-
 	virtual const char *name() const override;
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
@@ -30,6 +28,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_PC_FORMAT;
+extern const pc_format FLOPPY_PC_FORMAT;
 
 #endif // MAME_FORMATS_PC_DSK_H

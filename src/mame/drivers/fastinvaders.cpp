@@ -95,29 +95,29 @@ private:
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8257_device> m_dma8257;
 
-	uint8_t m_rest55;
-	uint8_t m_rest65;
-	uint8_t m_trap;
-	uint8_t m_ar;
-	uint8_t m_av;
-	uint8_t m_prom[256];
-	uint8_t m_riga_sup;
-	uint8_t m_scudi;
-	uint8_t m_cannone;
-	uint8_t m_riga_inf;
+	uint8_t m_rest55 = 0;
+	uint8_t m_rest65 = 0;
+	uint8_t m_trap = 0;
+	uint8_t m_ar = 0;
+	uint8_t m_av = 0;
+	uint8_t m_prom[256]{};
+	uint8_t m_riga_sup = 0;
+	uint8_t m_scudi = 0;
+	uint8_t m_cannone = 0;
+	uint8_t m_riga_inf = 0;
 
-	uint8_t m_irq0;
-	uint8_t m_irq1;
-	uint8_t m_irq2;
-	uint8_t m_irq3;
-	uint8_t m_irq4;
-	uint8_t m_irq5;
-	uint8_t m_irq6;
+	uint8_t m_irq0 = 0;
+	uint8_t m_irq1 = 0;
+	uint8_t m_irq2 = 0;
+	uint8_t m_irq3 = 0;
+	uint8_t m_irq4 = 0;
+	uint8_t m_irq5 = 0;
+	uint8_t m_irq6 = 0;
 
-	uint8_t m_start2_value;
-	uint8_t m_dma1;
-	uint8_t m_io_40;
-	uint8_t m_hsync;
+	uint8_t m_start2_value = 0;
+	uint8_t m_dma1 = 0;
+	uint8_t m_io_40 = 0;
+	uint8_t m_hsync = 0;
 };
 
 

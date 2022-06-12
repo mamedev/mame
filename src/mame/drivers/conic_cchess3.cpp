@@ -142,8 +142,8 @@ void cchess3_state::cncchess3(machine_config &config)
 
 ROM_START( cncchess3 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD("c107013-1", 0x2000, 0x1000, CRC(3251a529) SHA1(729b22d7653761ff0951ce1da58fdfcd474a700d) ) // AMI 2332
-	ROM_LOAD("c107013-2", 0x3000, 0x1000, CRC(0f38dcef) SHA1(f8fb7e12b41753fe52dd2eb2edb843211b5ca7c1) ) // "
+	ROM_LOAD("ci07013-1", 0x2000, 0x1000, CRC(3251a529) SHA1(729b22d7653761ff0951ce1da58fdfcd474a700d) ) // AMI 2332
+	ROM_LOAD("ci07013-2", 0x3000, 0x1000, CRC(0f38dcef) SHA1(f8fb7e12b41753fe52dd2eb2edb843211b5ca7c1) ) // "
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("msm5840h-41rs", 0x0000, 0x0800, NO_DUMP )

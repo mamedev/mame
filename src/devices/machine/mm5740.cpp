@@ -79,7 +79,7 @@ void mm5740_device::device_start()
 	m_write_data_ready.resolve_safe();
 
 	// allocate timers
-	m_scan_timer = timer_alloc();
+	m_scan_timer = timer_alloc(FUNC(mm5740_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// state saving
@@ -97,12 +97,12 @@ void mm5740_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  perform_scan - scan the keyboard matrix
 //-------------------------------------------------
 
-void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 {
-	int ako = 0;
+	bool ako = false;
 
 	for (int x = 0; x < 9; x++)
 	{
@@ -116,7 +116,6 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		for (int y = 0; y < 10; y++)
 		{
-
 			if (BIT(data, y))
 			{
 				uint8_t *rom = m_rom->base();
@@ -131,7 +130,7 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 				uint16_t b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
 
-				ako = 1;
+				ako = true;
 
 				if (!BIT(m_x_mask[x], y))
 				{

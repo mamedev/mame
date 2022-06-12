@@ -38,9 +38,9 @@ public:
 	// End the array with {}
 	wd177x_format(const format *formats);
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	virtual bool supports_save() const override;
 
 protected:
@@ -48,18 +48,18 @@ protected:
 
 	const format *formats;
 
-	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track);
-	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
-	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual int get_track_dam_fm(const format &f, int head, int track);
-	virtual int get_track_dam_mfm(const format &f, int head, int track);
+	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) const;
+	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index) const;
+	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const;
+	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
+	virtual int get_image_offset(const format &f, int head, int track) const;
+	virtual int get_track_dam_fm(const format &f, int head, int track) const;
+	virtual int get_track_dam_mfm(const format &f, int head, int track) const;
 
-	int compute_track_size(const format &f) const;
+	static int compute_track_size(const format &f);
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const;
-	virtual void check_compatibility(floppy_image *image, std::vector<int> &candidates);
-	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
+	virtual void check_compatibility(floppy_image *image, std::vector<int> &candidates) const;
+	static void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 };
 
 #endif // MAME_FORMATS_WD177X_DSK_H

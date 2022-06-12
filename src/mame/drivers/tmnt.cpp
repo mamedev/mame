@@ -337,23 +337,16 @@ void tmnt_state::sound_nmi_callback( int param )
 }
 #endif
 
-void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tmnt_state::audio_nmi)
 {
-	switch (id)
-	{
-	case TIMER_NMI:
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tmnt_state::device_timer");
-	}
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void tmnt_state::sound_arm_nmi_w(uint8_t data)
 {
 //  sound_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(attotime::from_usec(50), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
+	m_audio_nmi_timer->adjust(attotime::from_usec(50));  /* kludge until the K053260 is emulated correctly */
 }
 
 
@@ -2000,6 +1993,8 @@ void tmnt_state::machine_start()
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_sorted_layer));
 	save_item(NAME(m_irq5_mask));
+
+	m_audio_nmi_timer = timer_alloc(FUNC(tmnt_state::audio_nmi), this);
 }
 
 MACHINE_RESET_MEMBER(tmnt_state,common)
@@ -2008,6 +2003,7 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 	m_last = 0;
 	m_tmnt_soundlatch = 0;
 	m_irq5_mask = 0;
+	m_audio_nmi_timer->adjust(attotime::never);
 }
 
 void tmnt_state::cuebrick(machine_config &config)
@@ -2358,20 +2354,8 @@ void tmnt_state::blswhstl(machine_config &config)
 
 
 
-static const gfx_layout zoomlayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*64
-};
 static GFXDECODE_START( gfx_glfgreat )
-	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
+	GFXDECODE_ENTRY( "zoom", 0, gfx_16x16x4_packed_lsb, 0x400, 16 )
 GFXDECODE_END
 
 void glfgreat_state::glfgreat(machine_config &config)

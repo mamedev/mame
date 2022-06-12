@@ -27,47 +27,44 @@ void nes_bcbattle_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  scan_tick - periodic scan kludge
 //-------------------------------------------------
 
 // This part is the hacky replacement for the real Barcode unit [shared with SNES implementation]:
 // code periodically checks whether a new code has been scanned and it moves it to the
 // m_current_barcode array
-void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_bcbattle_device::scan_tick)
 {
-	if (id == TIMER_BATTLER)
+	int old = m_new_code;
+	// has something new been scanned?
+	if (old < m_reader->get_pending_code())
 	{
-		int old = m_new_code;
-		// has something new been scanned?
-		if (old < m_reader->get_pending_code())
+		if (m_reader->get_byte_length() == 13)
 		{
-			if (m_reader->get_byte_length() == 13)
-			{
-				for (int i = 0; i < 13; i++)
-					m_current_barcode[i] = m_reader->read_code() + '0';
-			}
-			else if (m_reader->get_byte_length() == 8)
-			{
-				for (int i = 0; i < 5; i++)
-					m_current_barcode[i] = 0x20;
-				for (int i = 5; i < 13; i++)
-					m_current_barcode[i] = m_reader->read_code() + '0';
-			}
-			// read one more, to reset the internal byte counter
-			m_reader->read_code();
-
-			// the string "SUNSOFT" is accepted as well by Barcode World
-			m_current_barcode[13] = 'E';
-			m_current_barcode[14] = 'P';
-			m_current_barcode[15] = 'O';
-			m_current_barcode[16] = 'C';
-			m_current_barcode[17] = 'H';
-			m_current_barcode[18] = 0x0d;
-			m_current_barcode[19] = 0x0a;
-			m_pending_code = 1;
+			for (int i = 0; i < 13; i++)
+				m_current_barcode[i] = m_reader->read_code() + '0';
 		}
-		m_new_code = m_reader->get_pending_code();
+		else if (m_reader->get_byte_length() == 8)
+		{
+			for (int i = 0; i < 5; i++)
+				m_current_barcode[i] = 0x20;
+			for (int i = 5; i < 13; i++)
+				m_current_barcode[i] = m_reader->read_code() + '0';
+		}
+		// read one more, to reset the internal byte counter
+		m_reader->read_code();
+
+		// the string "SUNSOFT" is accepted as well by Barcode World
+		m_current_barcode[13] = 'E';
+		m_current_barcode[14] = 'P';
+		m_current_barcode[15] = 'O';
+		m_current_barcode[16] = 'C';
+		m_current_barcode[17] = 'H';
+		m_current_barcode[18] = 0x0d;
+		m_current_barcode[19] = 0x0a;
+		m_pending_code = 1;
 	}
+	m_new_code = m_reader->get_pending_code();
 }
 
 //**************************************************************************
@@ -96,7 +93,7 @@ void nes_bcbattle_device::device_start()
 	// lacking emulation of the standalone Barcode Battler, we refresh periodically the input from the reader
 	// proper emulation would have the standalone unit acknowledging that a new barcode has been scanned
 	// and sending the proper serial bits, instead of our read_current_bit() function!
-	battler_timer = timer_alloc(TIMER_BATTLER);
+	battler_timer = timer_alloc(FUNC(nes_bcbattle_device::scan_tick), this);
 	battler_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
 
 	save_item(NAME(m_current_barcode));

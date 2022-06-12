@@ -74,10 +74,10 @@ protected:
 	required_memory_bank m_rombank;
 
 	/* video-related */
-	int        m_spritebank;
+	int        m_spritebank = 0;
 
 	/* misc */
-	int        m_last_track[4];
+	int        m_last_track[4]{};
 
 	output_finder<2> m_lamps;
 };

@@ -105,16 +105,16 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	uint16_t m_io_offset;
-	uint16_t m_io_reg[IO_SIZE];
-	uint16_t m_fifo[FIFO_SIZE];
-	uint16_t m_fptr;
+	uint16_t m_io_offset = 0;
+	uint16_t m_io_reg[IO_SIZE]{};
+	uint16_t m_fifo[FIFO_SIZE]{};
+	uint16_t m_fptr = 0;
 
-	uint16_t m_jpeg1;
-	uint16_t m_jpeg2;
-	int m_jpeg_x;
-	int m_jpeg_y;
-	int m_tmp_counter;
+	uint16_t m_jpeg1 = 0;
+	uint16_t m_jpeg2 = 0;
+	int m_jpeg_x = 0;
+	int m_jpeg_y = 0;
+	int m_tmp_counter = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;

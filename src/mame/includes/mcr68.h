@@ -54,6 +54,7 @@ public:
 	void init_archrivlb();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -69,14 +70,15 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<ptm6840_device> m_ptm;
 
-	uint16_t m_control_word;
+	uint16_t m_control_word = 0;
 	uint8_t m_protection_data[5];
 	attotime m_timing_factor;
-	uint8_t m_sprite_clip;
-	int8_t m_sprite_xoffset;
-	timer_expired_delegate m_v493_callback;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_sprite_clip = 0;
+	int8_t m_sprite_xoffset = 0;
+	emu_timer *m_493_on_timer = nullptr;
+	emu_timer *m_493_off_timer = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	void xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blasted_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t spyhunt2_port_0_r();

@@ -1734,7 +1734,7 @@ void sega_32x_device::device_start()
 	}
 
 	m_stream = stream_alloc(2, 2, 48000 * 4);
-	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
+	m_32x_pwm_timer = timer_alloc(FUNC(sega_32x_device::handle_pwm_callback), this);
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
 	m_32x_dram1 = std::make_unique<uint16_t[]>(0x40000/2);

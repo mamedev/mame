@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 
 void tank8_state::video_start()
 {
-	m_collision_timer = timer_alloc(TIMER_COLLISION);
+	m_collision_timer = timer_alloc(FUNC(tank8_state::set_collision), this);
 
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
@@ -162,19 +162,6 @@ void tank8_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		rect &= cliprect;
 
 		bitmap.fill((i << 1) | 0x01, rect);
-	}
-}
-
-
-void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_COLLISION:
-		set_collision(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tank8_state::device_timer");
 	}
 }
 

@@ -62,18 +62,18 @@ private:
 	required_memory_bank m_z80bank;
 
 	/* video-related */
-	int        m_layer_colorbase[4];
-	int        m_sprite_colorbase;
-	int        m_layerpri[4];
-	int        m_cur_alpha;
+	int        m_layer_colorbase[4]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[4]{};
+	int        m_cur_alpha = 0;
 
 	/* misc */
-	uint16_t     m_cur_control2;
-	int32_t      m_strip_0x1a;
-	int        m_suspension_active;
-	int        m_resume_trigger;
-	emu_timer  *m_dmadelay_timer;
-	int        m_frame;
+	uint16_t     m_cur_control2 = 0;
+	int32_t      m_strip_0x1a = 0;
+	int        m_suspension_active = 0;
+	int        m_resume_trigger = 0;
+	emu_timer  *m_dmadelay_timer = nullptr;
+	int        m_frame = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

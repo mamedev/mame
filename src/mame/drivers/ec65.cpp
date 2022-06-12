@@ -35,6 +35,7 @@ EC65K - To be developed from scratch. Similar design to EC65, but 6522
 #include "emupal.h"
 #include "screen.h"
 
+namespace {
 
 class ec65_common : public driver_device
 {
@@ -300,7 +301,8 @@ ROM_START( ec65k )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card
 ROM_END
-/* Driver */
+
+} // Anonymous namespace
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME  FLAGS */
 COMP( 1985, ec65,  0,      0,      ec65,    ec65,  ec65_state,  empty_init, "Elektor", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

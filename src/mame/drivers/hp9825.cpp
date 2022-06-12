@@ -757,7 +757,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 	m_cpu->set_rw_cycles(6 , 6);
 	m_cpu->set_relative_mode(false);
 	m_cpu->set_addrmap(AS_IO , &hp9825_state::cpu_io_map);
-	m_cpu->int_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
+	m_cpu->set_int_cb(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_cpu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	// Needed when 98035 RTC module is connected or time advances at about 1/4 the correct speed (NP misses a lot of 1kHz interrupts)
@@ -1084,8 +1084,8 @@ void hp9825t_state::hp9825t(machine_config &config)
 {
 	hp9825_base(config);
 	m_cpu->set_addrmap(AS_PROGRAM , &hp9825t_state::cpu_mem_map);
-	m_cpu->stm_cb().set(FUNC(hp9825t_state::stm));
-	m_cpu->opcode_cb().set(FUNC(hp9825t_state::opcode_fetch));
+	m_cpu->set_stm_cb(FUNC(hp9825t_state::stm));
+	m_cpu->set_opcode_cb(FUNC(hp9825t_state::opcode_fetch));
 	set_addrmap(0 , &hp9825t_state::ram_mem_map);
 	set_addrmap(1 , &hp9825t_state::rom_mem_map);
 

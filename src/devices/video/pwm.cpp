@@ -98,7 +98,7 @@ void pwm_display_device::device_start()
 	for (auto &bri : m_bri)
 		std::fill(std::begin(bri), std::end(bri), 0.0);
 
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwm_display_device::frame_tick),this));
+	m_frame_timer = timer_alloc(FUNC(pwm_display_device::frame_tick), this);
 	m_sync_time = machine().time();
 
 	// register for savestates

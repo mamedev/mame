@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "machine/x76f041.h"
 
-#include "fileio.h"
-
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) x76f041_device::verboselog( int n_level, const char *s_fmt, ... )
@@ -364,6 +362,9 @@ WRITE_LINE_MEMBER( x76f041_device::write_scl )
 		case STATE_RESET_READ_PASSWORD:
 		case STATE_MASS_PROGRAM:
 		case STATE_MASS_ERASE:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed. Also need to ensure that only valid device-id's and commands
+			// are acknowledged.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -594,6 +595,8 @@ WRITE_LINE_MEMBER( x76f041_device::write_scl )
 
 		case STATE_READ_DATA:
 		case STATE_READ_CONFIGURATION_REGISTERS:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -744,22 +747,26 @@ void x76f041_device::nvram_default()
 	}
 }
 
-void x76f041_device::nvram_read( emu_file &file )
+bool x76f041_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.read( m_write_password, sizeof( m_write_password ) );
-	file.read( m_read_password, sizeof( m_read_password ) );
-	file.read( m_configuration_password, sizeof( m_configuration_password ) );
-	file.read( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.read( m_data, sizeof( m_data ) );
+	size_t actual;
+	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.read( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
+	result = result && !file.read( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
+	result = result && !file.read( m_configuration_password, sizeof( m_configuration_password ), actual ) && actual == sizeof( m_configuration_password );
+	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }
 
-void x76f041_device::nvram_write( emu_file &file )
+bool x76f041_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.write( m_write_password, sizeof( m_write_password ) );
-	file.write( m_read_password, sizeof( m_read_password ) );
-	file.write( m_configuration_password, sizeof( m_configuration_password ) );
-	file.write( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.write( m_data, sizeof( m_data ) );
+	size_t actual;
+	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.write( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
+	result = result && !file.write( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
+	result = result && !file.write( m_configuration_password, sizeof( m_configuration_password ), actual ) && actual == sizeof( m_configuration_password );
+	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }

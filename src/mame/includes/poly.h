@@ -79,6 +79,7 @@ public:
 		, m_dat(*this, "dat")
 		, m_acia(*this, "acia")
 		, m_acia_clock(*this, "acia_clock")
+		, m_protect_timer(nullptr)
 	{
 	}
 
@@ -92,6 +93,11 @@ public:
 	virtual void poly_bank(address_map &map);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void poly_mem(address_map &map);
+
 	uint8_t logical_mem_r(offs_t offset);
 	void logical_mem_w(offs_t offset, uint8_t data);
 	uint8_t vector_r(offs_t offset);
@@ -117,11 +123,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void poly_mem(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<ram_device> m_ram;
@@ -140,8 +141,10 @@ private:
 	required_shared_ptr<uint8_t> m_dat;
 	optional_device<acia6850_device> m_acia;
 	optional_device<clock_device> m_acia_clock;
-	uint8_t m_video_pa = 0U, m_video_pb = 0U;
+	uint8_t m_video_pa = 0U;
+	uint8_t m_video_pb = 0U;
 	uint8_t m_term_data = 0U;
+	emu_timer *m_protect_timer;
 
 	inline offs_t physical(offs_t offset);
 

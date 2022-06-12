@@ -383,17 +383,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout layout8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 static const gfx_layout layout16x16x4 =
 {
 	16,16,
@@ -406,8 +395,8 @@ static const gfx_layout layout16x16x4 =
 };
 
 static GFXDECODE_START( gfx_gundealr )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x4,     0, 16 ) /* colors 0-255 */
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16x4, 256, 16 ) /* colors 256-511 */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0, 16 ) /* colors 0-255 */
+	GFXDECODE_ENTRY( "gfx2", 0, layout16x16x4,        256, 16 ) /* colors 256-511 */
 GFXDECODE_END
 
 

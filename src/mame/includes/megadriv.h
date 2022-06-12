@@ -61,13 +61,14 @@ public:
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 
-struct genesis_z80_vars
-{
-	int z80_is_reset = 0;
-	int z80_has_bus = 0;
-	uint32_t z80_bank_addr = 0;
-	std::unique_ptr<uint8_t[]> z80_prgram;
-};
+	struct genesis_z80_vars
+	{
+		int z80_is_reset = 0;
+		int z80_has_bus = 0;
+		uint32_t z80_bank_addr = 0;
+		std::unique_ptr<uint8_t[]> z80_prgram;
+		emu_timer *z80_run_timer = nullptr;
+	};
 
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;
@@ -164,9 +165,9 @@ public:
 		m_tmss(*this, "tmss")
 	{ }
 
-	ioport_port *m_io_ctrlr;
-	ioport_port *m_io_pad3b[4];
-	ioport_port *m_io_pad6b[2][4];
+	ioport_port *m_io_ctrlr = nullptr;
+	ioport_port *m_io_pad3b[4]{};
+	ioport_port *m_io_pad6b[2][4]{};
 
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;

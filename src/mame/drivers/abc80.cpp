@@ -365,7 +365,7 @@ void abc80_state::kbd_w(u8 data)
 	u8 pio_data = 0x80 | data;
 	m_pio->port_a_write(pio_data);
 
-	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
+	m_keyboard_clear_timer->adjust(attotime::from_msec(50));
 }
 
 
@@ -375,74 +375,74 @@ void abc80_state::kbd_w(u8 data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(abc80_state::scanline_tick)
 {
-	switch (id)
+	draw_scanline(m_bitmap, m_screen->vpos());
+
+	m_pio_astb = !m_pio_astb;
+
+	m_pio->strobe_a(m_pio_astb);
+}
+
+TIMER_CALLBACK_MEMBER(abc80_state::cassette_update)
+{
+	if (!m_motor)
+		return;
+
+	int tape_in = m_cassette->input() > 0;
+
+	if (m_tape_in != tape_in)
+		if (LOG) logerror("%s tape flank %u\n", machine().time().as_string(), tape_in);
+
+	if (m_tape_in_latch && (m_tape_in != tape_in))
 	{
-	case TIMER_ID_SCANLINE:
-		draw_scanline(m_bitmap, m_screen->vpos());
+		if (LOG) logerror("%s set tape in latch\n", machine().time().as_string());
+		m_tape_in_latch = 0;
 
-		m_pio_astb = !m_pio_astb;
-
-		m_pio->strobe_a(m_pio_astb);
-		break;
-
-	case TIMER_ID_CASSETTE:
-		{
-			if (!m_motor) return;
-
-			int tape_in = m_cassette->input() > 0;
-
-			if (m_tape_in != tape_in)
-				if (LOG) logerror("%s tape flank %u\n", machine().time().as_string(), tape_in);
-
-			if (m_tape_in_latch && (m_tape_in != tape_in))
-			{
-				if (LOG) logerror("%s set tape in latch\n", machine().time().as_string());
-				m_tape_in_latch = 0;
-
-				m_pio->port_b_write(m_tape_in_latch << 7);
-			}
-
-			m_tape_in = tape_in;
-		}
-		break;
-
-	case TIMER_ID_BLINK:
-		m_blink = !m_blink;
-		break;
-
-	case TIMER_ID_VSYNC_ON:
-		if (LOG) logerror("%s vsync 1\n", machine().time().as_string());
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
-
-	case TIMER_ID_VSYNC_OFF:
-		if (LOG) logerror("%s vsync 0\n", machine().time().as_string());
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		break;
-
-	case TIMER_ID_FAKE_KEYBOARD_CLEAR:
-		m_pio->port_a_write(m_key_data);
-		m_key_strobe = 0;
-		m_key_data = 0;
-		break;
+		m_pio->port_b_write(m_tape_in_latch << 7);
 	}
+
+	m_tape_in = tape_in;
+}
+
+TIMER_CALLBACK_MEMBER(abc80_state::blink_tick)
+{
+	m_blink = !m_blink;
+}
+
+TIMER_CALLBACK_MEMBER(abc80_state::vsync_on)
+{
+	if (LOG) logerror("%s vsync 1\n", machine().time().as_string());
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(abc80_state::vsync_off)
+{
+	if (LOG) logerror("%s vsync 0\n", machine().time().as_string());
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(abc80_state::clear_keyboard)
+{
+	m_pio->port_a_write(m_key_data);
+	m_key_strobe = 0;
+	m_key_data = 0;
 }
 
 
 //-------------------------------------------------
-//  MACHINE_START( abc80 )
+//  machine_start
 //-------------------------------------------------
 
 void abc80_state::machine_start()
 {
 	// start timers
-	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
+	m_cassette_timer = timer_alloc(FUNC(abc80_state::cassette_update), this);
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_keyboard_clear_timer = timer_alloc(FUNC(abc80_state::clear_keyboard), this);
 
 	// register for state saving
 	save_item(NAME(m_key_data));

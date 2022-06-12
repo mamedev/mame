@@ -83,9 +83,9 @@ private:
 	required_ioport m_j7;
 
 	// memory state
-	uint8_t m_s100;
-	uint8_t m_bank0;
-	uint8_t m_bank1;
+	uint8_t m_s100 = 0;
+	uint8_t m_bank0 = 0;
+	uint8_t m_bank1 = 0;
 };
 
 #endif // MAME_INCLUDES_SUPER6_H

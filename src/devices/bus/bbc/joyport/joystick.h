@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Joystick
+    BBC Master Compact Joystick
 
 **********************************************************************/
 
@@ -34,7 +34,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual uint8_t pb_r() override;
 

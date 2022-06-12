@@ -17,7 +17,7 @@
 #include "sound/dmadac.h"
 
 
-class atari_cage_device : public device_t
+class atari_cage_device : public device_t, public device_mixer_interface
 {
 public:
 	enum

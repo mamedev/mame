@@ -1130,17 +1130,6 @@ static INPUT_PORTS_START( sdtennis )
 	// and the coinage DIP switches are ignored in this case
 INPUT_PORTS_END
 
-static const gfx_layout tile8layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout disco_tile8layout =
 {
 	8,8,
@@ -1187,32 +1176,32 @@ static const gfx_layout bnj_tile16layout =
 };
 
 static GFXDECODE_START( gfx_btime )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,     8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cookrace )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile8layout,     8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_lnc )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bnj )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout,8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout, 8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_zoar )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 8 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,    0, 8 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    0, 8 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 8 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,     0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,     0, 8 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_disco )

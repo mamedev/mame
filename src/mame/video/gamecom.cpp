@@ -24,7 +24,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 	else
 	{
 		uint8_t const *const line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
-		int pal[4];
+		int pal[4]{};
 
 		switch( m_p_ram[SM8521_LCDC] & 0x30 )
 		{
@@ -68,7 +68,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 
 void gamecom_state::video_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_scanline),this));
+	m_scanline_timer = timer_alloc(FUNC(gamecom_state::gamecom_scanline), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0, m_screen->scan_period());
 	m_screen->register_screen_bitmap(m_bitmap);
 

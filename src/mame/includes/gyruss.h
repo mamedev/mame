@@ -52,10 +52,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_tilemap;
-	uint8_t m_master_nmi_mask;
-	uint8_t m_slave_irq_mask;
-	bool m_flipscreen;
+	tilemap_t *m_tilemap = nullptr;
+	uint8_t m_master_nmi_mask = 0U;
+	uint8_t m_slave_irq_mask = 0U;
+	bool m_flipscreen = false;
 
 	void gyruss_irq_clear_w(uint8_t data);
 	void gyruss_sh_irqtrigger_w(uint8_t data);

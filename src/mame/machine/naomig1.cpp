@@ -36,7 +36,7 @@ naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type
 
 void naomi_g1_device::device_start()
 {
-	timer = timer_alloc(G1_TIMER_ID);
+	timer = timer_alloc(FUNC(naomi_g1_device::trigger_gdrom_irq), this);
 	irq_cb.resolve_safe();
 	ext_irq_cb.resolve_safe();
 	reset_out_cb.resolve_safe();
@@ -58,9 +58,8 @@ void naomi_g1_device::device_reset()
 	set_ext_irq(CLEAR_LINE);
 }
 
-void naomi_g1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(naomi_g1_device::trigger_gdrom_irq)
 {
-	timer.adjust(attotime::never);
 	if(!gdst)
 		return;
 	gdst = 0;

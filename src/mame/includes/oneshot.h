@@ -50,18 +50,18 @@ private:
 	optional_ioport_array<2> m_io_lightgun_y;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_mid_tilemap;
-	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_mid_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
 
 	/* misc */
-	int m_gun_x_p1;
-	int m_gun_y_p1;
-	int m_gun_x_p2;
-	int m_gun_y_p2;
-	int m_gun_x_shift;
-	int m_p1_wobble;
-	int m_p2_wobble;
+	int m_gun_x_p1 = 0;
+	int m_gun_y_p1 = 0;
+	int m_gun_x_p2 = 0;
+	int m_gun_y_p2 = 0;
+	int m_gun_x_shift = 0;
+	int m_p1_wobble = 0;
+	int m_p2_wobble = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

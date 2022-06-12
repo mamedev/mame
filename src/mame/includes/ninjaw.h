@@ -61,8 +61,8 @@ private:
 	required_memory_bank m_z80bank;
 
 	/* misc */
-	u16     m_cpua_ctrl;
-	int        m_pandata[4];
+	u16     m_cpua_ctrl = 0;
+	int        m_pandata[4]{};
 
 	void coin_control_w(u8 data);
 	void cpua_ctrl_w(u16 data);

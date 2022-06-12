@@ -74,17 +74,17 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<samples_device> m_samples;
 
-	uint8_t m_last_analog_input[2];
-	uint8_t m_last_analog_output[2];
-	std::unique_ptr<uint8_t[]> m_poly17;
-	uint8_t *m_rand17;
-	emu_timer *m_irq_off;
-	emu_timer *m_irq_timer;
-	emu_timer *m_firq_off;
-	emu_timer *m_firq_timer;
-	uint8_t m_cocktail_flip;
-	std::unique_ptr<uint8_t[]> m_local_videoram;
-	uint8_t m_palettebank_vis;
+	uint8_t m_last_analog_input[2]{};
+	uint8_t m_last_analog_output[2]{};
+	std::unique_ptr<uint8_t[]> m_poly17{};
+	uint8_t *m_rand17 = nullptr;
+	emu_timer *m_irq_off = nullptr;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_firq_off = nullptr;
+	emu_timer *m_firq_timer = nullptr;
+	uint8_t m_cocktail_flip = 0U;
+	std::unique_ptr<uint8_t[]> m_local_videoram{};
+	uint8_t m_palettebank_vis = 0U;
 };
 
 
@@ -108,15 +108,15 @@ public:
 
 private:
 	/* tone variables */
-	uint32_t m_tone_step;
-	uint32_t m_tone_fraction;
-	uint8_t m_tone_volume;
+	uint32_t m_tone_step = 0U;
+	uint32_t m_tone_fraction = 0U;
+	uint8_t m_tone_volume = 0U;
 
 	/* sound streaming variables */
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 	required_device<samples_device> m_samples;
-	double m_freq_to_step;
-	uint8_t m_sound_data[24];
+	double m_freq_to_step = 0;
+	uint8_t m_sound_data[24]{};
 };
 
 DECLARE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device)

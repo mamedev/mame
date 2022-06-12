@@ -27,7 +27,7 @@ public:
 	{ }
 
 	/* video-related */
-	int m_spritebank;
+	int m_spritebank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

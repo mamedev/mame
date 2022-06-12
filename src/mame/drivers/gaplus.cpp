@@ -9,14 +9,14 @@ driver by Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 
 Custom ICs:
 ----------
-11XX     gfx data shifter and mixer (16-bit in, 4-bit out) [1]
-15XX     sound control
-16XX     I/O control
-CUS20    tilemap and sprite address generator
-CUS21    sprite generator
-CUS26    starfield generator
-CUS29    sprite line buffer and sprite/tilemap mixer
-CUS33    timing generator
+11XX     ULA gfx data shifter and mixer (16-bit in, 4-bit out) [1]
+15XX     ULA sound control
+16XX     ULA I/O control
+CUS20    ULA tilemap and sprite address generator
+CUS21    ULA sprite generator
+CUS26    ULA starfield generator
+CUS29    ULA sprite line buffer and sprite/tilemap mixer
+CUS33    ULA timing generator
 CUS34    address decoder
 56XX     I/O
 58XX     I/O
@@ -208,21 +208,6 @@ void gaplus_base_state::machine_reset()
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
 	m_sub_irq_mask = 0;
 	m_subcpu->set_input_line(0, CLEAR_LINE);
-}
-
-void gaplus_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_NAMCOIO0_RUN:
-		namcoio0_run(param);
-		break;
-	case TIMER_NAMCOIO1_RUN:
-		namcoio1_run(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in gaplus_base_state::device_timer");
-	}
 }
 
 TIMER_CALLBACK_MEMBER(gaplus_base_state::namcoio0_run)
@@ -499,8 +484,8 @@ void gaplus_state::out_lamps1(uint8_t data)
 
 void gaplus_base_state::machine_start()
 {
-	m_namcoio0_run_timer = timer_alloc(TIMER_NAMCOIO0_RUN);
-	m_namcoio1_run_timer = timer_alloc(TIMER_NAMCOIO1_RUN);
+	m_namcoio0_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio0_run), this);
+	m_namcoio1_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio1_run), this);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));

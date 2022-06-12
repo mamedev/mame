@@ -83,17 +83,17 @@ private:
 	void pasopia_io(address_map &map);
 	void pasopia_map(address_map &map);
 
-	u8 m_hblank;
-	u16 m_vram_addr;
-	u16 m_vram_latch;
-	u8 m_gfx_mode;
-	u8 m_mux_data;
-	u8 m_porta_2;
-	bool m_video_wl;
-	bool m_ram_bank;
-	bool m_spr_sw;
-	u8 m_dclr;
-	emu_timer *m_pio_timer;
+	u8 m_hblank = 0;
+	u16 m_vram_addr = 0;
+	u16 m_vram_latch = 0;
+	u8 m_gfx_mode = 0;
+	u8 m_mux_data = 0;
+	u8 m_porta_2 = 0;
+	bool m_video_wl = false;
+	bool m_ram_bank = false;
+	bool m_spr_sw = false;
+	u8 m_dclr = 0;
+	emu_timer *m_pio_timer = nullptr;
 	std::unique_ptr<u16[]> m_p_vram;
 
 	required_device<z80_device> m_maincpu;
@@ -218,7 +218,7 @@ void pasopia_state::machine_start()
 {
 	m_p_vram = make_unique_clear<u16[]>(0x4000);
 
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 
 	m_hblank = 0;

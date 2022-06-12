@@ -46,48 +46,27 @@ static const double crazy_coaster_angles[3] = {0, 0.1631, 0.3305};
 
 static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
-
-
-void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_analog)
 {
-	switch (id)
-	{
-	case TIMER_VECTREX_IMAGER_CHANGE_COLOR:
-		vectrex_imager_change_color(param);
-		break;
-	case TIMER_UPDATE_LEVEL:
-		update_level(param);
-		break;
-	case TIMER_VECTREX_IMAGER_EYE:
-		vectrex_imager_eye(param);
-		break;
-	case TIMER_LIGHTPEN_TRIGGER:
-		lightpen_trigger(param);
-		break;
-	case TIMER_VECTREX_REFRESH:
-		vectrex_refresh(param);
-		break;
-	case TIMER_VECTREX_ZERO_INTEGRATORS:
-		vectrex_zero_integrators(param);
-		break;
-	case TIMER_UPDATE_ANALOG:
-		update_vector();
-		m_analog[param] = m_via_out[PORTA];
-		break;
-	case TIMER_UPDATE_BLANK:
-		update_vector();
-		m_blank = param;
-		break;
-	case TIMER_UPDATE_MUX_ENABLE:
-		update_vector();
-		break;
-	case TIMER_UPDATE_RAMP:
-		update_vector();
-		m_ramp = param;
-		break;
-	default:
-		fatalerror("Unknown id in vectrex_base_state::device_timer");
-	}
+	update_vector();
+	m_analog[param] = m_via_out[PORTA];
+}
+
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_blank)
+{
+	update_vector();
+	m_blank = param;
+}
+
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_mux_enable)
+{
+	update_vector();
+}
+
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_ramp)
+{
+	update_vector();
+	m_ramp = param;
 }
 
 
@@ -104,7 +83,7 @@ void vectrex_base_state::configure_imager(bool reset_refresh, const double *imag
 	m_imager_angles = imager_angles;
 }
 
-void vectrex_base_state::vectrex_configuration()
+void vectrex_base_state::screen_configuration()
 {
 	unsigned char cport = m_io_3dconf->read();
 
@@ -116,7 +95,7 @@ void vectrex_base_state::vectrex_configuration()
 		if (m_imager_status == 0)
 			m_imager_status = cport & 0x01;
 
-		vector_add_point_function = cport & 0x02 ? &vectrex_base_state::vectrex_add_point_stereo: &vectrex_base_state::vectrex_add_point;
+		vector_add_point_function = cport & 0x02 ? &vectrex_base_state::add_point_stereo: &vectrex_base_state::add_point;
 
 		switch ((cport >> 2) & 0x07)
 		{
@@ -179,7 +158,7 @@ void vectrex_base_state::vectrex_configuration()
 	}
 	else
 	{
-		vector_add_point_function = &vectrex_base_state::vectrex_add_point;
+		vector_add_point_function = &vectrex_base_state::add_point;
 		m_beam_color = rgb_t::white();
 		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::white();
 	}
@@ -193,13 +172,13 @@ void vectrex_base_state::vectrex_configuration()
 
 *********************************************************************/
 
-WRITE_LINE_MEMBER(vectrex_base_state::vectrex_via_irq)
+WRITE_LINE_MEMBER(vectrex_base_state::via_irq)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 
-uint8_t vectrex_base_state::vectrex_via_pb_r()
+uint8_t vectrex_base_state::via_pb_r()
 {
 	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
@@ -212,7 +191,7 @@ uint8_t vectrex_base_state::vectrex_via_pb_r()
 }
 
 
-uint8_t vectrex_base_state::vectrex_via_pa_r()
+uint8_t vectrex_base_state::via_pa_r()
 {
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
@@ -224,7 +203,7 @@ uint8_t vectrex_base_state::vectrex_via_pa_r()
 }
 
 
-uint8_t raaspec_state::vectrex_s1_via_pb_r()
+uint8_t raaspec_state::s1_via_pb_r()
 {
 	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
@@ -236,7 +215,7 @@ uint8_t raaspec_state::vectrex_s1_via_pb_r()
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_change_color)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::imager_change_color)
 {
 	m_beam_color = param;
 }
@@ -247,46 +226,47 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
 	m_imager_pinlevel = param;
 }
 
-
-TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::imager_eye)
 {
-	int coffset;
-	double rtime = (1.0 / m_imager_freq);
-
 	if (m_imager_status > 0)
 	{
+		const int coffset = param > 1 ? 3: 0;
+		const double rtime = (1.0 / m_imager_freq);
+
 		m_imager_status = param;
-		coffset = param > 1? 3: 0;
-		timer_set(attotime::from_double(rtime * m_imager_angles[0]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset+2]);
-		timer_set(attotime::from_double(rtime * m_imager_angles[1]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset+1]);
-		timer_set(attotime::from_double(rtime * m_imager_angles[2]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset]);
-
-		if (param == 2)
-		{
-			timer_set(attotime::from_double(rtime * 0.50), TIMER_VECTREX_IMAGER_EYE, 1);
-
-			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			m_via6522_0->write_ca1(1);
-			m_via6522_0->write_ca1(0);
-			m_imager_pinlevel |= 0x80;
-			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0);
-		}
+		m_imager_color_timers[0]->adjust(attotime::from_double(rtime * m_imager_angles[0]), m_imager_colors[coffset+2]);
+		m_imager_color_timers[1]->adjust(attotime::from_double(rtime * m_imager_angles[1]), m_imager_colors[coffset+1]);
+		m_imager_color_timers[2]->adjust(attotime::from_double(rtime * m_imager_angles[2]), m_imager_colors[coffset]);
 	}
 }
 
-
-void vectrex_base_state::vectrex_psg_port_w(uint8_t data)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::imager_index)
 {
-	double wavel, ang_acc, tmp;
-	int mcontrol;
+	imager_eye(param);
 
-	mcontrol = data & 0x40; /* IO6 controls the imager motor */
+	if (m_imager_status > 0)
+	{
+		const double rtime = (1.0 / m_imager_freq);
+
+		m_imager_eye_timer->adjust(attotime::from_double(rtime * 0.50), 1);
+
+		/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
+		m_via6522_0->write_ca1(1);
+		m_via6522_0->write_ca1(0);
+		m_imager_pinlevel |= 0x80;
+		m_imager_level_timer->adjust(attotime::from_double(rtime / 360.0));
+	}
+}
+
+void vectrex_base_state::psg_port_w(uint8_t data)
+{
+	uint8_t mcontrol = data & 0x40; /* IO6 controls the imager motor */
 
 	if (!mcontrol && mcontrol ^ m_old_mcontrol)
 	{
 		m_old_mcontrol = mcontrol;
-		tmp = machine().time().as_double();
-		wavel = tmp - m_sl;
+		double tmp = machine().time().as_double();
+		double wavel = tmp - m_sl;
 		m_sl = tmp;
 
 		if (wavel < 1)
@@ -297,15 +277,14 @@ void vectrex_base_state::vectrex_psg_port_w(uint8_t data)
 			   of the whole thing and some constants of the motor's torque/speed curve.
 			   pwl is the negative pulse width and wavel is the whole wavelength. */
 
-			ang_acc = (50.0 - 1.55 * m_imager_freq) / MMI;
+			double ang_acc = (50.0 - 1.55 * m_imager_freq) / MMI;
 			m_imager_freq += ang_acc * m_pwl + DAMPC * m_imager_freq / MMI * wavel;
 
 			if (m_imager_freq > 1)
 			{
-				m_imager_timer->adjust(
-										attotime::from_double(std::min(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
-										2,
-										attotime::from_double(1.0 / m_imager_freq));
+				attotime eye_time = attotime::from_double(std::min(1.0 / m_imager_freq, m_imager_eye_timer->remaining().as_double()));
+				attotime eye_period = attotime::from_double(1.0 / m_imager_freq);
+				m_imager_eye_timer->adjust(eye_time, 2, eye_period);
 			}
 		}
 	}

@@ -82,7 +82,7 @@ void skullxbo_state::machine_start()
 {
 	atarigen_state::machine_start();
 
-	m_scanline_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(skullxbo_state::scanline_interrupt), this));
+	m_scanline_int_timer = timer_alloc(FUNC(skullxbo_state::scanline_interrupt), this);
 
 	save_item(NAME(m_scanline_int_state));
 }

@@ -50,6 +50,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
+#include "machine/ncr5385.h"
 #include "machine/tek410x_kbd.h"
 #include "sound/sn76496.h"
 #include "emupal.h"
@@ -323,7 +324,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
 	// 7bc000-7bdfff: SCSI bus address registers
-	// 7be000-7bffff: SCSI (NCR 5385)
+	map(0x7be000, 0x7be01f).mirror(0x1fe0).rw("scsic", FUNC(ncr5385_device::read), FUNC(ncr5385_device::write)).umask16(0xff00).cswidth(16);
 }
 
 void tek440x_state::fdccpu_map(address_map &map)
@@ -388,7 +389,8 @@ void tek440x_state::tek4404(machine_config &config)
 	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
 
 	//MC146818(config, "calendar", 32.768_MHz_XTAL);
-	//NCR5385(config, "scsic", 40_MHz_XTAL / 4);
+
+	NCR5385(config, "scsic", 40_MHz_XTAL / 4).irq().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));

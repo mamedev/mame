@@ -240,7 +240,7 @@ void apollo_kbd_device::device_start()
 	m_beeper.start(this);
 	m_mouse.start(this);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_kbd_device::kbd_scan_timer), this));
+	m_timer = timer_alloc(FUNC(apollo_kbd_device::kbd_scan_timer), this);
 }
 
 //-------------------------------------------------
@@ -315,7 +315,7 @@ void apollo_kbd_device::beeper::start(apollo_kbd_device *device)
 	m_device = device;
 	LOG2(("start apollo_kbd::beeper"));
 	m_beeper = m_device->m_beep.target();
-	m_timer = m_device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_kbd_device::beeper::beeper_callback), this));
+	m_timer = m_device->timer_alloc(FUNC(apollo_kbd_device::beeper::beeper_callback), this);
 }
 
 void apollo_kbd_device::beeper::reset()

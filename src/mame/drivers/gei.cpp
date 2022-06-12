@@ -1360,6 +1360,11 @@ Alt set included BONE in place of SPRD & a newer SLOT
 These board sets may also be known as the V116 (or V16)
 sets as the alt set also included that name on the labels
 
+To clear remaining credits:
+  Press STAND, DEAL and 3rd DISCARD buttons at the same time.
+  Hold all 3 buttons down for 5 seconds.  The screen will
+   turn RED indicating a successful "CLEAR" occurrred
+
 ****************************************************/
 
 ROM_START( gs4002 )

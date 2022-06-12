@@ -732,8 +732,8 @@ WRITE_LINE_MEMBER( kc_state::keyboard_cb )
 
 void kc_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_state::kc_cassette_timer_callback),this));
-	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_state::kc_cassette_oneshot_timer),this));
+	m_cassette_timer = timer_alloc(FUNC(kc_state::kc_cassette_timer_callback), this);
+	m_cassette_oneshot_timer = timer_alloc(FUNC(kc_state::kc_cassette_oneshot_timer), this);
 
 	m_ram_base = m_ram->pointer();
 }

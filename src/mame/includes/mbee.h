@@ -157,23 +157,23 @@ private:
 	u8 m_features = 0;
 	u16 m_size = 0;
 	u32 m_ramsize = 0;
-	bool m_b7_rtc = 0;
-	bool m_b7_vs = 0;
-	bool m_b2 = 0;
+	bool m_b7_rtc = false;
+	bool m_b7_vs = false;
+	bool m_b2 = false;
 	u8 m_framecnt = 0;
 	u8 m_08 = 0;
 	u8 m_09 = 0;
 	u8 m_0a = 0;
 	u8 m_0b = 0;
 	u8 m_1c = 0;
-	u8 m_newkb_was_pressed[15] = { 0, };
-	u8 m_newkb_q[20] = { 0, };
+	u8 m_newkb_was_pressed[15] = { };
+	u8 m_newkb_q[20] = { };
 	u8 m_newkb_q_pos = 0;
-	u8 m_sy6545_reg[32] = { 0, };
+	u8 m_sy6545_reg[32] = { };
 	u8 m_sy6545_ind = 0;
 	u8 m_fdc_rq = 0;
-	u8 m_bank_array[33] = { 0, };
-	bool m_pak_extended[10] = { 0, };
+	u8 m_bank_array[33] = { };
+	bool m_pak_extended[10] = { };
 	std::unique_ptr<u8[]> m_dummy; // black hole for writes to rom
 	std::unique_ptr<u8[]> m_ram;   // main banked-switch ram, 128/256/pp
 	std::unique_ptr<u8[]> m_vram;  // video ram, all models

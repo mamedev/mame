@@ -592,8 +592,8 @@ protected:
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t m_output_data;
-	uint8_t m_output_latch;
+	uint8_t m_output_data = 0;
+	uint8_t m_output_latch = 0;
 };
 
 
@@ -688,8 +688,8 @@ protected:
 private:
 	output_finder<4> m_digits;
 
-	uint8_t m_led1_value;
-	uint8_t m_led2_value;
+	uint8_t m_led1_value = 0;
+	uint8_t m_led2_value = 0;
 };
 
 
@@ -716,7 +716,7 @@ protected:
 private:
 	output_finder<6> m_lamps;
 
-	uint8_t m_el_value;
+	uint8_t m_el_value = 0;
 };
 
 
@@ -860,9 +860,9 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::vblank_interrupt_callback)
 
 void neogeo_base_state::create_interrupt_timers()
 {
-	m_display_position_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::display_position_interrupt_callback),this));
-	m_display_position_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::display_position_vblank_callback),this));
-	m_vblank_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::vblank_interrupt_callback),this));
+	m_display_position_interrupt_timer = timer_alloc(FUNC(neogeo_base_state::display_position_interrupt_callback), this);
+	m_display_position_vblank_timer = timer_alloc(FUNC(neogeo_base_state::display_position_vblank_callback), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(neogeo_base_state::vblank_interrupt_callback), this);
 }
 
 
@@ -12163,8 +12163,8 @@ GAME( 2002, rotd,       neogeo,   rotd,      neogeo,    mvs_led_state, empty_ini
 GAME( 2002, rotdh,      rotd,     rotd,      neogeo,    mvs_led_state, empty_init, ROT0, "Evoga / Playmore", "Rage of the Dragons (NGH-2640?)", MACHINE_SUPPORTS_SAVE )
 
 // Atlus
-GAME( 2002, matrim,     neogeo,   matrim,    neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / Atlus", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, matrimbl,   matrim,   matrimbl,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, matrim,     neogeo,   matrim,    neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / Atlus", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, matrimbl,   matrim,   matrimbl,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /***** Unlicensed commercial releases *****/
 

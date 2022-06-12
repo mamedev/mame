@@ -84,15 +84,15 @@ private:
 	uint8_t m_rowscrollsplit[5];
 	uint8_t m_rowscrollcfg[2];
 	uint8_t m_ramtilecfg[6];
-	uint8_t m_spriteaddr;
+	uint8_t m_spriteaddr = 0;
 	uint8_t m_spritebase[2];
 
-	uint8_t m_5107;
-	uint8_t m_5108;
-	uint8_t m_5109;
+	uint8_t m_5107 = 0;
+	uint8_t m_5108 = 0;
+	uint8_t m_5109 = 0;
 
-	int m_tilerambase;
-	int m_spriterambase;
+	int m_tilerambase = 0;
+	int m_spriterambase = 0;
 
 	bitmap_ind8 m_prioritybitmap;
 };

@@ -38,17 +38,17 @@ private:
 	required_device<address_map_bank_device> m_bank;
 	const address_space_config      m_space_config;
 
-	uint8_t m_vidctrl;
+	uint8_t m_vidctrl = 0;
 
-	uint8_t m_tile_gfxbase_lo_data;
-	uint8_t m_tile_gfxbase_hi_data;
+	uint8_t m_tile_gfxbase_lo_data = 0;
+	uint8_t m_tile_gfxbase_hi_data = 0;
 
-	uint8_t m_sprite_gfxbase_lo_data;
-	uint8_t m_sprite_gfxbase_hi_data;
+	uint8_t m_sprite_gfxbase_lo_data = 0;
+	uint8_t m_sprite_gfxbase_hi_data = 0;
 
-	uint8_t m_tile_scroll[4*2];
+	uint8_t m_tile_scroll[4*2]{};
 
-	uint8_t m_splitpos[2];
+	uint8_t m_splitpos[2]{};
 
 	uint16_t get_scroll(int which);
 

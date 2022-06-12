@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, hap
+// copyright-holders:hap
 /****************************************************************************************
 
 2018-09-15
@@ -57,7 +57,7 @@ private:
 
 	int m_hopper_motor = 0;
 	int m_hopper_coin = 0;
-	emu_timer *m_hopper_timer;
+	emu_timer *m_hopper_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(hopper_coinout);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -244,7 +244,7 @@ GFXDECODE_END
 
 void video21_state::machine_start()
 {
-	m_hopper_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(video21_state::hopper_coinout),this));
+	m_hopper_timer = timer_alloc(FUNC(video21_state::hopper_coinout), this);
 
 	m_lamps.resolve();
 

@@ -80,7 +80,7 @@ private:
 		uint16_t  retval;
 		uint16_t  muxlatch;   // TX-1
 		int     dbgaddr;
-		int     dbgpc;
+		int     dbgpc = 0;
 
 		uint16_t get_datarom_addr() const;
 		uint16_t get_bb_datarom_addr() const;
@@ -90,8 +90,8 @@ private:
 	class sn74s516_t
 	{
 	public:
-		int16_t   X;
-		int16_t   Y;
+		int16_t   X = 0;
+		int16_t   Y = 0;
 
 		union
 		{
@@ -103,9 +103,9 @@ private:
 			int32_t ZW32;
 		} ZW;
 
-		int     code;
-		int     state;
-		int     ZWfl;
+		int     code = 0;
+		int     state = 0;
+		int     ZWfl = 0;
 
 		void kick(running_machine &machine, math_t &math, uint16_t *data, int ins);
 
@@ -117,29 +117,29 @@ private:
 
 	struct vregs_t
 	{
-		uint16_t  scol;       /* Road colours */
-		uint32_t  slock;      /* Scroll lock */
-		uint8_t   flags;      /* Road flags */
+		uint16_t  scol = 0;       /* Road colours */
+		uint32_t  slock = 0;      /* Scroll lock */
+		uint8_t   flags = 0;      /* Road flags */
 
-		uint32_t  ba_val;     /* Accumulator */
-		uint32_t  ba_inc;
-		uint32_t  bank_mode;
+		uint32_t  ba_val = 0;     /* Accumulator */
+		uint32_t  ba_inc = 0;
+		uint32_t  bank_mode = 0;
 
-		uint16_t  h_val;      /* Accumulator */
-		uint16_t  h_inc;
-		uint16_t  h_init;
+		uint16_t  h_val = 0;      /* Accumulator */
+		uint16_t  h_inc = 0;
+		uint16_t  h_init = 0;
 
-		uint8_t   slin_val;   /* Accumulator */
-		uint8_t   slin_inc;
+		uint8_t   slin_val = 0;   /* Accumulator */
+		uint8_t   slin_inc = 0;
 
 		/* Buggyboy only */
-		uint8_t   wa8;
-		uint8_t   wa4;
+		uint8_t   wa8 = 0;
+		uint8_t   wa4 = 0;
 
-		uint16_t  wave_lfsr;
-		uint8_t   sky;
-		uint16_t  gas;
-		uint8_t   shift;
+		uint16_t  wave_lfsr = 0;
+		uint8_t   sky = 0;
+		uint16_t  gas = 0;
+		uint8_t   shift = 0;
 	};
 
 	math_t m_math;
@@ -163,7 +163,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<tx1_sound_device> m_sound;
 
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 
 	vregs_t m_vregs;
 	std::unique_ptr<uint8_t[]> m_chr_bmp;
@@ -171,7 +171,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_rod_bmp;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
-	bool m_needs_update;
+	bool m_needs_update = false;
 
 	void kick_sn74s516(uint16_t *data, int ins);
 	void tx1_update_state();

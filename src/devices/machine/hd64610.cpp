@@ -18,7 +18,6 @@
 #include "hd64610.h"
 
 #include "coreutil.h"
-#include "fileio.h"
 
 #define VERBOSE 1
 #include "logmacro.h"
@@ -176,7 +175,7 @@ void hd64610_device::device_start()
 	m_out_1hz_cb.resolve_safe();
 
 	// allocate timers
-	m_counter_timer = timer_alloc(TIMER_UPDATE_COUNTER);
+	m_counter_timer = timer_alloc(FUNC(hd64610_device::update_counter), this);
 	m_counter_timer->adjust(attotime::from_hz(clock() / 256), 0, attotime::from_hz(clock() / 256));
 
 	// state saving
@@ -187,37 +186,32 @@ void hd64610_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_counter - update our count registers
 //-------------------------------------------------
 
-void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hd64610_device::update_counter)
 {
-	switch (id)
+	if(m_hline_state || (m_regs[REG_CRB] & CRB_S))
 	{
-	case TIMER_UPDATE_COUNTER:
-		if(m_hline_state || (m_regs[REG_CRB] & CRB_S))
+		m_regs[REG_64HZ]++;
+
+		if (m_regs[REG_64HZ] & 0x80)
 		{
-			m_regs[REG_64HZ]++;
+			// update seconds
+			advance_seconds();
 
-			if (m_regs[REG_64HZ] & 0x80)
-			{
-				// update seconds
-				advance_seconds();
+			// set carry flag
+			m_regs[REG_CRA] |= CRA_CF;
 
-				// set carry flag
-				m_regs[REG_CRA] |= CRA_CF;
-
-				m_regs[REG_64HZ] &= 0x7f;
-			}
-
-			// update 1Hz out
-			m_out_1hz_cb(BIT(m_regs[REG_64HZ], 6));
-
-			// update IRQ
-			check_alarm();
-			set_irq_line();
+			m_regs[REG_64HZ] &= 0x7f;
 		}
-		break;
+
+		// update 1Hz out
+		m_out_1hz_cb(BIT(m_regs[REG_64HZ], 6));
+
+		// update IRQ
+		check_alarm();
+		set_irq_line();
 	}
 }
 
@@ -257,9 +251,10 @@ void hd64610_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_read(emu_file &file)
+bool hd64610_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_regs, 0x10);
+	size_t actual;
+	return !file.read(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 
@@ -268,9 +263,10 @@ void hd64610_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_write(emu_file &file)
+bool hd64610_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_regs, 0x10);
+	size_t actual;
+	return !file.write(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 

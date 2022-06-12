@@ -132,23 +132,23 @@ DEFINE_DEVICE_TYPE(STARTRGN_DECRYPTER, startrgn_decrypter_device, "startrgn_decr
 ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 {
-	_active = false;
+	m_active = false;
 }
 
 void ns10_decrypter_device::activate(int iv)
 {
 	init(iv);
-	_active = true;
+	m_active = true;
 }
 
 void ns10_decrypter_device::deactivate()
 {
-	_active = false;
+	m_active = false;
 }
 
 bool ns10_decrypter_device::is_active()const
 {
-	return _active;
+	return m_active;
 }
 
 ns10_decrypter_device::~ns10_decrypter_device()
@@ -170,41 +170,41 @@ ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &m
 
 uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 {
-	uint16_t plainword = _mask ^ bitswap(cipherword,9,13,15,7,14,8,6,10,11,12,3,5,0,1,4,2);
+	uint16_t plainword = m_mask ^ bitswap(cipherword,9,13,15,7,14,8,6,10,11,12,3,5,0,1,4,2);
 
 	uint16_t nbs =
-		((BIT(_counter, 4)                         ) << 15) ^
+		((BIT(m_counter, 4)                         ) << 15) ^
 		((BIT(cipherword, 2) ^ BIT(cipherword, 5)  ) << 14) ^
 		((BIT(cipherword, 0)                       ) << 13) ^
 		(((BIT(cipherword, 4) | BIT(cipherword, 5))) << 12) ^ // this is the only nonlinear term not involving the counter
-		((BIT(_counter, 0)                         ) << 11) ^
+		((BIT(m_counter, 0)                         ) << 11) ^
 		((BIT(cipherword, 6)                       ) << 10) ^
-		(((BIT(cipherword, 4) & BIT(_counter, 1))  ) <<  8) ^
-		((BIT(_counter, 3)                         ) <<  6) ^
-		(((BIT(cipherword, 3) | BIT(_counter, 7))  ) <<  5) ^
-		((BIT(cipherword, 2) ^ BIT(_counter, 3)    ) <<  4) ^
-		((BIT(_counter, 2)                         ) <<  3) ^
-		(((BIT(cipherword, 7) & BIT(_counter, 7))  ) <<  2) ^
-		((BIT(_counter, 5)                         ) <<  1) ^
-		(((BIT(cipherword, 7) | BIT(_counter, 1))  ) <<  0);
-	_mask = nbs
+		(((BIT(cipherword, 4) & BIT(m_counter, 1))  ) <<  8) ^
+		((BIT(m_counter, 3)                         ) <<  6) ^
+		(((BIT(cipherword, 3) | BIT(m_counter, 7))  ) <<  5) ^
+		((BIT(cipherword, 2) ^ BIT(m_counter, 3)    ) <<  4) ^
+		((BIT(m_counter, 2)                         ) <<  3) ^
+		(((BIT(cipherword, 7) & BIT(m_counter, 7))  ) <<  2) ^
+		((BIT(m_counter, 5)                         ) <<  1) ^
+		(((BIT(cipherword, 7) | BIT(m_counter, 1))  ) <<  0);
+	m_mask = nbs
 			^ bitswap(cipherword, 6,11, 3, 1,13, 5,15,10, 2, 9, 8, 4, 0,12, 7,14)
 			^ bitswap(plainword , 9, 7, 5, 2,14, 4,13, 8, 0,15,10, 1, 3, 6,12,11)
 			^ 0xecbe;
-	++_counter;
+	++m_counter;
 
 	return plainword;
 }
 
 void ns10_type1_decrypter_device::init(int iv)
 {
-	_mask = initSbox[iv];
-	_counter = 0;
+	m_mask = initSbox[iv];
+	m_counter = 0;
 }
 
 void ns10_type1_decrypter_device::device_start()
 {
-	_active = false;
+	m_active = false;
 }
 
 
@@ -215,28 +215,28 @@ const int ns10_type2_decrypter_device::initSbox[16] {0,12,13,6,2,4,9,8,11,1,7,15
 
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const ns10_type2_decrypter_device::ns10_crypto_logic &logic)
 	: ns10_decrypter_device(mconfig, type, tag, owner, clock)
-	, _logic(logic)
+	, m_logic(logic)
 {
 }
 
 uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 {
-	uint16_t plainword = cipherword ^ _mask;
+	uint16_t plainword = cipherword ^ m_mask;
 
-	_previous_cipherwords <<= 16;
-	_previous_cipherwords  ^= cipherword;
-	_previous_plainwords  <<= 16;
-	_previous_plainwords   ^= plainword;
+	m_previous_cipherwords <<= 16;
+	m_previous_cipherwords  ^= cipherword;
+	m_previous_plainwords  <<= 16;
+	m_previous_plainwords   ^= plainword;
 
-	_mask = 0;
+	m_mask = 0;
 	for (int j = 15; j >= 0; --j)
 	{
-		_mask <<= 1;
-		_mask ^= _reducer->gf2_reduce(_logic.eMask[j] & _previous_cipherwords);
-		_mask ^= _reducer->gf2_reduce(_logic.dMask[j] & _previous_plainwords);
+		m_mask <<= 1;
+		m_mask ^= m_reducer->gf2_reduce(m_logic.eMask[j] & m_previous_cipherwords);
+		m_mask ^= m_reducer->gf2_reduce(m_logic.dMask[j] & m_previous_plainwords);
 	}
-	_mask ^= _logic.xMask;
-	_mask ^= _logic.nonlinear_calculation(_previous_cipherwords, _previous_plainwords, *_reducer);
+	m_mask ^= m_logic.xMask;
+	m_mask ^= m_logic.nonlinear_calculation(m_previous_cipherwords, m_previous_plainwords, *m_reducer);
 
 	return plainword;
 }
@@ -245,15 +245,15 @@ void ns10_type2_decrypter_device::init(int iv)
 {
 	// by now, only gamshara requires non-trivial initialization code; data
 	// should be moved to the per-game logic in case any other game do it differently
-	_previous_cipherwords = bitswap(initSbox[iv],3,16,16,2,1,16,16,0,16,16,16,16,16,16,16,16);
-	_previous_plainwords  = 0;
-	_mask                 = 0;
+	m_previous_cipherwords = bitswap(initSbox[iv],3,16,16,2,1,16,16,0,16,16,16,16,16,16,16,16);
+	m_previous_plainwords  = 0;
+	m_mask                 = 0;
 }
 
 void ns10_type2_decrypter_device::device_start()
 {
-	_active = false;
-	_reducer = std::make_unique<gf2_reducer>();
+	m_active = false;
+	m_reducer = std::make_unique<gf2_reducer>();
 }
 
 
@@ -270,17 +270,17 @@ ns10_type2_decrypter_device::gf2_reducer::gf2_reducer()
 		reduction ^= reduction >> 2;
 		reduction ^= reduction >> 1;
 
-		_gf2Reduction[i] = reduction & 1;
+		m_gf2Reduction[i] = reduction & 1;
 	}
 }
 
 int ns10_type2_decrypter_device::gf2_reducer::gf2_reduce(uint64_t num)const
 {
 	return
-		_gf2Reduction[num & 0xffff]         ^
-		_gf2Reduction[(num >> 16) & 0xffff] ^
-		_gf2Reduction[(num >> 32) & 0xffff] ^
-		_gf2Reduction[num >> 48];
+		m_gf2Reduction[num & 0xffff]         ^
+		m_gf2Reduction[(num >> 16) & 0xffff] ^
+		m_gf2Reduction[(num >> 32) & 0xffff] ^
+		m_gf2Reduction[num >> 48];
 }
 
 

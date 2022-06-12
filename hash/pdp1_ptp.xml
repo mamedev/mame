@@ -25,7 +25,7 @@ Hyperspace        Z           /
 Miscellaneous
 ~~~~~~~~~~~~~
 Toggle on/off main star and its gravity: Num-6
-Toggle on/off background stars: Num-4  -->
+Toggle on/off background stars: Num-4 -->
 
 	<software name="spacewar">
 		<description>Spacewar!</description>

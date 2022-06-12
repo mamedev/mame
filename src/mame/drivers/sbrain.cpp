@@ -118,7 +118,7 @@ private:
 	void sub_io_map(address_map &map);
 	void sub_mem_map(address_map &map);
 
-	bool m_busak = 0;
+	bool m_busak = false;
 	u8 m_keydown = 0U;
 	u8 m_porta = 0U;
 	u8 m_portb = 0U;

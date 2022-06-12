@@ -55,4 +55,4 @@ const bw12_format::format bw12_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_BW12_FORMAT = &floppy_image_format_creator<bw12_format>;
+const bw12_format FLOPPY_BW12_FORMAT;

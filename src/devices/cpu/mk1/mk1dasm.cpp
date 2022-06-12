@@ -48,7 +48,7 @@ offs_t mk1_disassembler::disassemble(std::ostream &stream, offs_t pc, const mk1_
 		// Conditional skip
 		const u8 disp = BIT(uop, 0, 4);
 		util::stream_format(stream, "%s %d ; $%03x", s_skips[BIT(uop, 4, 2)], disp, (pc + 1 + disp) & 0xfff);
-		return 1 | SUPPORTED;
+		return 1 | STEP_COND | SUPPORTED;
 	}
 	else if (uop >= 0xb0)
 	{

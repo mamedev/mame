@@ -115,22 +115,22 @@ offs_t v810_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		case 0x26:
 		case 0x27: switch( (opc>>9) &0xf)
 								{
-									case 0x0: util::stream_format(stream,"BV %X",pc+D9(opc));  break;
-									case 0x1: util::stream_format(stream,"BL %X",pc+D9(opc));  break;
-									case 0x2: util::stream_format(stream,"BE %X",pc+D9(opc));  break;
-									case 0x3: util::stream_format(stream,"BNH %X",pc+D9(opc)); break;
-									case 0x4: util::stream_format(stream,"BN %X",pc+D9(opc));  break;
+									case 0x0: util::stream_format(stream,"BV %X",pc+D9(opc));  flags = STEP_COND; break;
+									case 0x1: util::stream_format(stream,"BL %X",pc+D9(opc));  flags = STEP_COND; break;
+									case 0x2: util::stream_format(stream,"BE %X",pc+D9(opc));  flags = STEP_COND; break;
+									case 0x3: util::stream_format(stream,"BNH %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0x4: util::stream_format(stream,"BN %X",pc+D9(opc));  flags = STEP_COND; break;
 									case 0x5: util::stream_format(stream,"BR %X",pc+D9(opc));  break;
-									case 0x6: util::stream_format(stream,"BLT %X",pc+D9(opc)); break;
-									case 0x7: util::stream_format(stream,"BLE %X",pc+D9(opc)); break;
-									case 0x8: util::stream_format(stream,"BNV %X",pc+D9(opc)); break;
-									case 0x9: util::stream_format(stream,"BNL %X",pc+D9(opc)); break;
-									case 0xa: util::stream_format(stream,"BNE %X",pc+D9(opc)); break;
-									case 0xb: util::stream_format(stream,"BH %X",pc+D9(opc));  break;
-									case 0xc: util::stream_format(stream,"BP %X",pc+D9(opc));  break;
+									case 0x6: util::stream_format(stream,"BLT %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0x7: util::stream_format(stream,"BLE %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0x8: util::stream_format(stream,"BNV %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0x9: util::stream_format(stream,"BNL %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0xa: util::stream_format(stream,"BNE %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0xb: util::stream_format(stream,"BH %X",pc+D9(opc));  flags = STEP_COND; break;
+									case 0xc: util::stream_format(stream,"BP %X",pc+D9(opc));  flags = STEP_COND; break;
 									case 0xd: util::stream_format(stream,"NOP"); break;
-									case 0xe: util::stream_format(stream,"BGE %X",pc+D9(opc)); break;
-									case 0xf: util::stream_format(stream,"BGT %X",pc+D9(opc)); break;
+									case 0xe: util::stream_format(stream,"BGE %X",pc+D9(opc)); flags = STEP_COND; break;
+									case 0xf: util::stream_format(stream,"BGT %X",pc+D9(opc)); flags = STEP_COND; break;
 								}
 								size=2;
 								break;

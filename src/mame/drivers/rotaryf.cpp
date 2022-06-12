@@ -52,8 +52,8 @@ private:
 	void portc_w(uint8_t data);
 	void port30_w(uint8_t data);
 
-	bool m_flipscreen;
-	uint8_t m_last;
+	bool m_flipscreen = 0;
+	uint8_t m_last = 0U;
 
 	virtual void machine_start() override;
 

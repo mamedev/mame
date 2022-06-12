@@ -131,7 +131,7 @@ private:
 	bool m_fdc_int = 0;
 	bool m_allow_nmi = 0;
 	u8 m_mode = 0U;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = 0;
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
 	//required_shared_ptr<u8> m_p_vram;

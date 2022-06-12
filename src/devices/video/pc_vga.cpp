@@ -351,7 +351,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.dac.color));
 	save_item(NAME(vga.dac.dirty));
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 }
 
 void svga_device::device_start()
@@ -1698,6 +1698,12 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 	return res;
 }
 
+uint8_t vga_device::seq_reg_read(uint8_t index)
+{
+	logerror("Reading unmapped sequencer read register %02x (SVGA?)\n", index);
+	return 0;
+}
+
 uint8_t vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
@@ -1758,6 +1764,8 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 		case 5:
 			if (vga.sequencer.index < vga.svga_intf.seq_regcount)
 				data = vga.sequencer.data[vga.sequencer.index];
+			else
+				data = seq_reg_read(vga.sequencer.index);
 			break;
 
 		case 6:

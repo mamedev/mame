@@ -93,15 +93,15 @@ private:
 	required_shared_ptr<u16> m_videoram;
 	required_region_ptr<u8> m_chargen;
 
-	u32 m_mmu_reg[4];
-	bool m_from_reset;
+	u32 m_mmu_reg[4]{};
+	bool m_from_reset = false;
 
-	u8 m_floppy_status;
-	u8 m_floppy_control;
-	u8 m_floppy_select;
-	u8 m_fdc_select;
-	u16 m_fdc_dma_count;
-	emu_timer *m_fdc_dma_timer;
+	u8 m_floppy_status = 0;
+	u8 m_floppy_control = 0;
+	u8 m_floppy_select = 0;
+	u8 m_fdc_select = 0;
+	u16 m_fdc_dma_count = 0;
+	emu_timer *m_fdc_dma_timer = nullptr;
 	std::unique_ptr<u8[]> m_fdc_ram;
 };
 
@@ -119,7 +119,7 @@ void fs3216_state::machine_start()
 	m_fdc_select = 0;
 	m_fdc_dma_count = 0;
 
-	m_fdc_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fs3216_state::fdc_dma), this));
+	m_fdc_dma_timer = timer_alloc(FUNC(fs3216_state::fdc_dma), this);
 
 	save_item(NAME(m_mmu_reg));
 	save_item(NAME(m_from_reset));

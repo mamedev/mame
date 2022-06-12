@@ -461,7 +461,7 @@ struct InstInfo {
   //! \name Accessors
   //! \{
 
-  //! Returns common information, see `CommonInfo`.
+  //! Returns common information, see \ref CommonInfo.
   inline const CommonInfo& commonInfo() const noexcept { return _commonInfoTable[_commonInfoIndex]; }
 
   //! Returns instruction flags, see \ref Flags.

@@ -53,16 +53,10 @@ public:
 	void init_triplhnt();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
-	enum
-	{
-		TIMER_HIT
-	};
-
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 
@@ -76,7 +70,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_collision(int code);
+	TIMER_CALLBACK_MEMBER(set_collision);
 
 	void triplhnt_map(address_map &map);
 
@@ -96,15 +90,15 @@ private:
 	required_shared_ptr<uint8_t> m_code_ram;
 	output_finder<> m_lamp;
 
-	uint8_t m_cmos[16];
-	uint8_t m_da_latch;
-	uint8_t m_cmos_latch;
-	uint8_t m_hit_code;
-	int m_sprite_zoom;
-	int m_sprite_bank;
+	uint8_t m_cmos[16]{};
+	uint8_t m_da_latch = 0;
+	uint8_t m_cmos_latch = 0;
+	uint8_t m_hit_code = 0;
+	int m_sprite_zoom = 0;
+	int m_sprite_bank = 0;
 	bitmap_ind16 m_helper;
-	emu_timer *m_hit_timer;
-	tilemap_t* m_bg_tilemap;
+	emu_timer *m_hit_timer = nullptr;
+	tilemap_t* m_bg_tilemap = nullptr;
 };
 
 /*----------- defined in audio/triplhnt.cpp -----------*/

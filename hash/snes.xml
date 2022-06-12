@@ -1904,7 +1904,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="megamnx3up" cloneof="megamnx3">
 		<!-- lostlevels.org -->
-		<!-- Notes: the software matches the final release, but the hardware differs significantly  -->
+		<!-- Notes: the software matches the final release, but the hardware differs significantly -->
 		<description>Mega Man X3 (USA, final prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
@@ -2101,7 +2101,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="mrbloopy">
+	<software name="mrbloopyp" cloneof="mrbloopy">
 		<!-- unknown/auction -->
 		<description>Mr. Bloopy - Saves the World (USA, prototype 19950216)</description>
 		<year>1994</year>
@@ -2410,6 +2410,29 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="pockyp" cloneof="pocky">
+		<!-- 64history.net -->
+		<description>Pocky &amp; Rocky (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [27C040-10]" />
+			<feature name="u2" value="U2 EPROM(J) [27C040-10]" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411" />
+			<feature name="battery" value="BATT CR2032 [empty]" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sample 11-24 2-1.u1" size="524288" crc="342dc7f3" sha1="48237ad874d0ab8b63ca64430edc8dfa358f4872" offset="0x000000" />
+				<rom name="pocky &amp; rocky.u2" size="524288" crc="a6e6325d" sha1="1178c8bd01b139bb1c8539b8d812d9b815aebe60" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersia2p" cloneof="ppersia2">
 		<!-- legrospixel.com -->
 		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro, prototype 19950417)</description>
@@ -2439,6 +2462,30 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="puggsy">
+		<description>Puggsy (prototype)</description>
+		<year>1992?</year>
+		<publisher>Psygnosis?</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [TC574000D-120]" />
+			<feature name="u2" value="U2 EPROM(J) [TC574000D-120]" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pug 0.u1" size="524288" crc="9dfc73b8" sha1="9874c415e0d5d1bedf9f9c37917cf091b2dc4f74" offset="0x000000" />
+				<rom name="pug 1.u2" size="524288" crc="039f4621" sha1="08db807715a917678bd5cc71bbe270a474a055e2" offset="0x080000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rpmp" cloneof="rpm">
 		<!-- Yakushi~Kabuto -->
 		<description>Radical Psycho Machine Racing (USA, prototype 19910814)</description>
@@ -2457,6 +2504,31 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="rpm 08-14-91 0563.u1" size="524288" crc="c739d55d" sha1="b0771c2e3c19869f29677f356c4f0592cdf427d6" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radrexup1" cloneof="radrex">
+		<!-- 64history.net -->
+		<description>Radical Rex (USA, prototype 19940318)</description>
+		<year>1994</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [TC574000D-150]" />
+			<feature name="u2" value="U2 EPROM(J) [TC574000D-150]" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="trex 0 radical rex 3-18.u1" size="524288" crc="e3a0106b" sha1="4dd964dd8134a344f1ecc63601f68c605edf235d" offset="0x000000" />
+				<rom name="trex 1 3-18.u2" size="524288" crc="53628377" sha1="a1064576be32573ae818f77bc37229ab04d6b6d5" offset="0x080000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2693,6 +2765,35 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="prettyfgp" cloneof="prettyfg">
+		<!-- 64history.net -->
+		<description>Seifuku Densetsu Pretty Fighter (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="制服伝説 プリティ・ファイター" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pretty fighter 0.u1" size="524288" crc="cf33d65c" sha1="574f46da653d4c0d165709f84500222f153c03ab" offset="0x000000" />
+				<rom name="pretty fighter 1.u2" size="524288" crc="4a506a62" sha1="7450026953ed6c31c8ceeee4e91e59c89b3ad569" offset="0x080000" />
+				<rom name="pretty fighter 2.u3" size="524288" crc="9cd7d048" sha1="b7715eea34a3c621b510290b31b0df341992f474" offset="0x100000" />
+				<rom name="pretty fighter 3.u4" size="524288" crc="608d39a4" sha1="df48b16061244ce40fe0324e649bad242a00972a" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shooterp">
 		<!-- nintendoplayer.com -->
 		<description>Shooter (USA, prototype)</description>
@@ -2707,6 +2808,35 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
 				<rom name="shooter demo.u1" size="262144" crc="f4aa6642" sha1="5631c3199b96dfd387562a586e4ceb1595cd3d6e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopyp" cloneof="snoopy">
+		<!-- 64history.net -->
+		<description>Snoopy Concert (Japan, prototype)</description>
+		<year>1995</year>
+		<publisher>Mitsui Bussan</publisher>
+		<info name="alt_title" value="スヌーピーコンサート" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD [EP330-12CN]" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="524288" crc="af41b784" sha1="8be0fed792f7ba5b534818607a9693413b465207" offset="0x000000" />
+				<rom name="u2" size="524288" crc="1c6c73fd" sha1="d2e8baef7ef6b87c93700c3c2b0a00d10075dcf8" offset="0x080000" />
+				<rom name="u3" size="524288" crc="3ad432fc" sha1="c9d390d411be45992803642ac24d0083f13145a6" offset="0x100000" />
+				<rom name="snoopy concert japan vers.u4" size="524288" crc="3c265a66" sha1="93bdecbae57d417af1825f7c1fceab3360c8c0b9" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4941,7 +5071,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<!-- Notes: this game has to be redumped without the intro!!!!  -->
+	<!-- Notes: this game has to be redumped without the intro!!!! -->
 	<software name="futarg" cloneof="issdx">
 		<description>Futbol Argentino '96 (Hacked)</description>
 		<year>199?</year>
@@ -20730,7 +20860,7 @@ more investigation needed...
 	</software>
 
 	<software name="parlpar3">
-		<!--  Alt. Title: 京楽 三洋 豊丸 奥村 太陽 Parlor ! パー ラー!3 / Kyouraku - Sanyou - Toyomaru - Okumura - Taiyou - Parlor! Parlor! 3 (Box) -->
+		<!-- Alt. Title: 京楽 三洋 豊丸 奥村 太陽 Parlor ! パー ラー!3 / Kyouraku - Sanyou - Toyomaru - Okumura - Taiyou - Parlor! Parlor! 3 (Box) -->
 		<description>Parlor! Parlor! 3 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Nihon Telenet</publisher>
@@ -32924,7 +33054,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-					<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
+				<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -33484,7 +33614,7 @@ Alternate board (XL-1)
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="" />
-			<!--  Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping -->
+			<!-- Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping -->
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-kx-1.u2"   size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
@@ -34340,7 +34470,7 @@ List of unclassified roms
 				<rom name="accele brid (japan).sfc" size="2097152" crc="4a736c38" sha1="8c9b8623d51d646631c0e5bc592440db4cfd1eab" offset="0x000000" />
 			</dataarea>
 		</part>
-		</software>
+	</software>
 
 	<software name="acenerae">
 		<description>Ace o Nerae! (Jpn)</description>
@@ -37466,6 +37596,18 @@ List of unclassified roms
 	</software>
 
 	<software name="cornbust">
+		<description>Corn Buster</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="corn buster (world) (unl).sfc" size="2097152" crc="c380ff4a" sha1="4cb7ac9c3564bffdc6fc967686c69c838755bc7c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cornbustp" cloneof="cornbust">
 		<description>Corn Buster (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38470,8 +38612,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="dorkeymp">
+		<description>Dorke &amp; Ymp</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dorke &amp; ymp (world) (unl).sfc" size="4194304" crc="c3fa8238" sha1="61de74e32e1625ae318d38508fe865b324dcee93" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- binary built from source -->
-	<software name="dorque1">
+	<software name="dorque1" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 1)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -38484,7 +38638,7 @@ List of unclassified roms
 	</software>
 
 <!-- binary built from source -->
-	<software name="dorque2" cloneof="dorque1">
+	<software name="dorque2" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 2)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -38497,7 +38651,7 @@ List of unclassified roms
 	</software>
 
 <!-- binary built from source -->
-	<software name="dorque3" cloneof="dorque1">
+	<software name="dorque3" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 3)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -43762,6 +43916,18 @@ List of unclassified roms
 	</software>
 
 	<software name="ironcomm">
+		<description>Iron Commando</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="iron commando (world) (unl).sfc" size="2097152" crc="b82e8499" sha1="21a56379dc2c4718dc407d14df47cd9bc8f6d292" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironcommp" cloneof="ironcomm">
 		<description>Iron Commando (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -45558,6 +45724,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="dionp" cloneof="imperium">
+		<description>Kidou Soukou Dion (Japan, prototype)</description>
+		<year>1992</year>
+		<publisher>Vic Tokai</publisher>
+		<info name="alt_title" value="機動装甲ダイオン" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="imperium.00ff.sfc" size="1048576" crc="2c4b9492" sha1="bf4c617f7fd407847ad72cb7f843dee620180e33" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="patlabor">
 		<description>Kidou Keisatsu Patlabor (Jpn)</description>
 		<year>1994</year>
@@ -46609,6 +46788,18 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend (europe).sfc" size="1048576" crc="0cac572f" sha1="bc544f98599073edc8bf61da3c8762e350310f3c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legendpi" cloneof="legend">
+		<description>Legend (Piko reissue)</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="legend (world) (unl).sfc" size="1048576" crc="fa66536d" sha1="fa868ed108891e84b62f27a92e539b8cb741f7f0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49181,6 +49372,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mr nutz (usa) (en,fr).sfc" size="1048576" crc="a99bdd9a" sha1="e803e7c067832c3a2604463e2262728117efeca4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrbloopy">
+		<description>Mr. Bloopy Saves the World</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mr. bloopy saves the world (world) (unl).sfc" size="2097152" crc="235a86d2" sha1="b057da5ee743a8f07063ace28c8b797a6d83e7b3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -54661,7 +54864,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="SHVC-ASFJ-JPN" />
 		<info name="release" value="19941202" />
-		<info name="alt_title" value="制服伝説 プリティ・ファイ ター" />
+		<info name="alt_title" value="制服伝説 プリティ・ファイター" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
@@ -59547,6 +59750,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="noaharkpi" cloneof="noahark">
+		<description>Super Noah's Ark 3D (Piko reissue)</description>
+		<year>2013</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super 3d noah's ark (world) (unl).sfc" size="1048576" crc="2b691ded" sha1="16965ee9b63fe2bcd4b32c6e6bb7c37f18d0c8a6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="snova">
 		<description>Super Nova (USA)</description>
 		<year>1993</year>
@@ -60325,6 +60540,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="super tennis (europe).sfc" size="524288" crc="0e31fdef" sha1="2c2b30c060b022a3fc9b0a7972b0fc7f18ec6007" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprthor">
+		<description>Super Thor Quest</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="super thor quest (world) (unl).sfc" size="262144" crc="8658f479" sha1="1f02984ede26df2594a8c1efbef447b931511f87" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

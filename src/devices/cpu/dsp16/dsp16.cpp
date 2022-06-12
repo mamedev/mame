@@ -80,8 +80,6 @@
 #include "dsp16core.ipp"
 #include "dsp16rc.h"
 
-#include "debugger.h"
-
 #include <functional>
 #include <limits>
 

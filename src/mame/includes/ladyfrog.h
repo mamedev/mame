@@ -47,16 +47,16 @@ private:
 	std::vector<uint8_t> m_paletteram_ext;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_tilebank;
-	int        m_palette_bank;
-	int        m_spritetilebase;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_tilebank = 0;
+	int        m_palette_bank = 0;
+	int        m_spritetilebase = 0;
 
 	/* misc */
-	int        m_sound_nmi_enable;
-	int        m_pending_nmi;
-	int        m_snd_flag;
-	uint8_t      m_snd_data;
+	int        m_sound_nmi_enable = 0;
+	int        m_pending_nmi = 0;
+	int        m_snd_flag = 0;
+	uint8_t      m_snd_data = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

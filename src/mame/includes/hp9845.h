@@ -87,19 +87,19 @@ protected:
 
 	// Text mode video I/F
 	struct video_buffer_t {
-		uint8_t chars[ 80 ];
-		uint8_t attrs[ 80 ];
+		uint8_t chars[ 80 ]{};
+		uint8_t attrs[ 80 ]{};
 		bool full = 0;
 	};
 
 	bitmap_rgb32 m_bitmap;
-	offs_t m_video_mar;
-	uint16_t m_video_word;
-	bool m_video_load_mar;
-	bool m_video_first_mar;
-	bool m_video_byte_idx;
-	bool m_video_buff_idx;
-	bool m_video_blanked;
+	offs_t m_video_mar = 0;
+	uint16_t m_video_word = 0;
+	bool m_video_load_mar = false;
+	bool m_video_first_mar = false;
+	bool m_video_byte_idx = false;
+	bool m_video_buff_idx = false;
+	bool m_video_blanked = false;
 	video_buffer_t m_video_buff[ 2 ];
 
 	// Graphic video
@@ -115,29 +115,29 @@ protected:
 		GV_STAT_WAIT_MEM_2
 	};
 
-	bool m_graphic_sel;
+	bool m_graphic_sel = false;
 	gv_fsm_state_t m_gv_fsm_state;
-	bool m_gv_int_en;
-	bool m_gv_dma_en;
-	uint8_t m_gv_cmd; // U65 (GC)
-	uint16_t m_gv_data_w;     // U29, U45, U28 & U44 (GC)
-	uint16_t m_gv_data_r;     // U59 & U60 (GC)
-	uint16_t m_gv_io_counter; // U1, U2, U14 & U15 (GC)
-	uint16_t m_gv_cursor_x;   // U31 & U23 (GS)
-	uint16_t m_gv_cursor_y;   // U15 & U8 (GS)
-	bool m_gv_cursor_gc;    // U8 (GS)
-	bool m_gv_cursor_fs;    // U8 (GS)
+	bool m_gv_int_en = false;
+	bool m_gv_dma_en = false;
+	uint8_t m_gv_cmd = 0; // U65 (GC)
+	uint16_t m_gv_data_w = 0;     // U29, U45, U28 & U44 (GC)
+	uint16_t m_gv_data_r = 0;     // U59 & U60 (GC)
+	uint16_t m_gv_io_counter = 0; // U1, U2, U14 & U15 (GC)
+	uint16_t m_gv_cursor_x = 0;   // U31 & U23 (GS)
+	uint16_t m_gv_cursor_y = 0;   // U15 & U8 (GS)
+	bool m_gv_cursor_gc = false;    // U8 (GS)
+	bool m_gv_cursor_fs = false;    // U8 (GS)
 
 	// State of keyboard
 	ioport_value m_kb_state[ 4 ];
-	uint8_t m_kb_scancode;
-	uint16_t m_kb_status;
+	uint8_t m_kb_scancode = 0;
+	uint16_t m_kb_status = 0;
 
 	// Printer
-	bool m_prt_irl;
+	bool m_prt_irl = false;
 
 	// SC of slots
-	int m_slot_sc[ 4 ];
+	int m_slot_sc[ 4 ]{};
 };
 
 #endif // MAME_INCLUDES_HP9845_H

@@ -170,7 +170,7 @@ void irobot_state::machine_start()
 	m_statwr = 0;
 
 	/* set an initial timer to go off on scanline 0 */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irobot_state::scanline_callback), this));
+	m_scanline_timer = timer_alloc(FUNC(irobot_state::scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 

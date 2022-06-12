@@ -34,7 +34,7 @@ private:
 };
 
 
-extern const floppy_format_type FLOPPY_THOMSON_525_FORMAT;
-extern const floppy_format_type FLOPPY_THOMSON_35_FORMAT;
+extern const thomson_525_format FLOPPY_THOMSON_525_FORMAT;
+extern const thomson_35_format FLOPPY_THOMSON_35_FORMAT;
 
 #endif // MAME_FORMATS_THOM_DSK_H

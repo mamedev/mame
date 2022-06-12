@@ -5,6 +5,10 @@
     Umi de Poker (c) 1997 World Station Co.,LTD
     Slot Poker Saiyuki (c) 1998 World Station Co.,LTD
 
+    Undumped games running on the same hardware:
+    * Baccara Star (World-One)
+    * Baccarat Special (World-One)
+
     Driver by Angelo Salese.
     Additional work by Roberto Fresca.
 
@@ -71,8 +75,8 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_tilemap[4];
-	int m_scrolly[4];
+	tilemap_t *m_tilemap[4]{};
+	int m_scrolly[4]{};
 };
 
 class saiyukip_state : public umipoker_state
@@ -350,10 +354,10 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )

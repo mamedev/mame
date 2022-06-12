@@ -39,17 +39,16 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void videoram_w(offs_t offset, uint8_t data);
-	void gfxbank_w(uint8_t data);
-	void flipscreen_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(uint8_t data);
 	void star_reset_w(uint8_t data);
-	template <unsigned B> void star_w(uint8_t data);
+	template <unsigned B> DECLARE_WRITE_LINE_MEMBER(star_w);
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -67,8 +66,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<zerohour_stars_device> m_stars;
 
-	tilemap_t   *m_fg_tilemap;
-	int         m_gfxbank;   // redclash only
+	tilemap_t   *m_fg_tilemap = nullptr;
+	int         m_gfxbank = 0;   // redclash only
 };
 
 #endif // MAME_INCLUDES_REDCLASH_H

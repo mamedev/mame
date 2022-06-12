@@ -14,8 +14,6 @@
 #include "emu.h"
 #include "machine/zs01.h"
 
-#include "fileio.h"
-
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char *s_fmt, ... )
@@ -380,6 +378,8 @@ WRITE_LINE_MEMBER( zs01_device::write_scl )
 			break;
 
 		case STATE_LOAD_COMMAND:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed. Also need to ensure that only valid device-id's and commands are acknowledged.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -544,6 +544,8 @@ WRITE_LINE_MEMBER( zs01_device::write_scl )
 			break;
 
 		case STATE_READ_DATA:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -688,20 +690,24 @@ void zs01_device::nvram_default()
 	}
 }
 
-void zs01_device::nvram_read( emu_file &file )
+bool zs01_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.read( m_command_key, sizeof( m_command_key ) );
-	file.read( m_data_key, sizeof( m_data_key ) );
-	file.read( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.read( m_data, sizeof( m_data ) );
+	std::size_t actual;
+	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.read( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
+	result = result && !file.read( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
+	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }
 
-void zs01_device::nvram_write( emu_file &file )
+bool zs01_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.write( m_command_key, sizeof( m_command_key ) );
-	file.write( m_data_key, sizeof( m_data_key ) );
-	file.write( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.write( m_data, sizeof( m_data ) );
+	std::size_t actual;
+	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.write( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
+	result = result && !file.write( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
+	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }

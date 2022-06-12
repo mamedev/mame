@@ -101,7 +101,7 @@ a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, const char *
 
 void a2bus_a2sd_device::device_start()
 {
-	m_shift_timer = timer_alloc(0);
+	m_shift_timer = timer_alloc(FUNC(a2bus_a2sd_device::shift_tick), this);
 
 	save_item(NAME(m_datain));
 	save_item(NAME(m_in_latch));
@@ -119,7 +119,7 @@ void a2bus_a2sd_device::device_reset()
 	m_sdcard->spi_clock_w(CLEAR_LINE);
 }
 
-void a2bus_a2sd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a2bus_a2sd_device::shift_tick)
 {
 	LOGMASKED(LOG_SPI, ">>>>>>> SHIFT %d (%c)\n", m_shift_count, (m_shift_count & 1) ? 'L' : 'S');
 	if (!(m_shift_count & 1))

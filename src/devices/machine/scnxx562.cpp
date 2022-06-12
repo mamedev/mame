@@ -618,9 +618,9 @@ void duscc_channel::device_start()
 	m_cid = (m_uart->m_variant & duscc_device::SET_CMOS) ? 0x7f : 0xff; // TODO: support CMOS rev A = 0xbf
 
 	// Timers
-	duscc_timer = timer_alloc(TIMER_ID);
-	rtxc_timer = timer_alloc(TIMER_ID_RTXC);
-	trxc_timer = timer_alloc(TIMER_ID_TRXC);
+	duscc_timer = timer_alloc(FUNC(duscc_channel::check_zero_detect), this);
+	rtxc_timer = timer_alloc(FUNC(duscc_channel::rtxc_tick), this);
+	trxc_timer = timer_alloc(FUNC(duscc_channel::trxc_tick), this);
 
 	// state saving
 	save_item(NAME(m_cmr1));
@@ -745,95 +745,90 @@ void duscc_channel::device_reset()
 	m_a7 = 0;
 }
 
-void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(duscc_channel::check_zero_detect)
 {
-	switch(id)
+	if (m_ct-- == 0) // Zero detect
 	{
-	case TIMER_ID:
-		if (m_ct-- == 0) // Zero detect
+		m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
+
+		// Generate interrupt?
+		if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == REG_CTCR_ZERO_DET_INT ) &&
+				( (m_uart->m_icr & (m_index == duscc_device::CHANNEL_A ? duscc_device::REG_ICR_CHA : duscc_device::REG_ICR_CHB) ) != 0) )
 		{
-			m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
+			LOG("Zero Detect Interrupt pending\n");
+			m_uart->trigger_interrupt(m_index, INT_EXTCTSTAT);
+		}
 
-			// Generate interrupt?
-			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == REG_CTCR_ZERO_DET_INT ) &&
-					( (m_uart->m_icr & (m_index == duscc_device::CHANNEL_A ? duscc_device::REG_ICR_CHA : duscc_device::REG_ICR_CHB) ) != 0) )
-			{
-				LOG("Zero Detect Interrupt pending\n");
-				m_uart->trigger_interrupt(m_index, INT_EXTCTSTAT);
-			}
+		// Preload or rollover?
+		if (( m_ctcr & REG_CTCR_ZERO_DET_CTL) == 0)
+		{
+			m_ct = m_ctpr;
+		}
+		else
+		{
+			m_ct = 0xffff;
+		}
 
-			// Preload or rollover?
-			if (( m_ctcr & REG_CTCR_ZERO_DET_CTL) == 0)
+		// Is Counter/Timer output on the RTxC pin?
+		if (( m_pcr & REG_PCR_RTXC_MASK) == REG_PCR_RTXC_CNTR_OUT)
+		{
+			if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
 			{
-				m_ct = m_ctpr;
+				m_rtxc = (~m_rtxc) & 1;
 			}
+			else // Pulse!
+			{
+				m_rtxc = 1;
+				rtxc_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+			}
+			if (m_index == duscc_device::CHANNEL_A)
+				m_uart->m_out_rtxca_cb(m_rtxc);
 			else
-			{
-				m_ct = 0xffff;
-			}
-
-			// Is Counter/Timer output on the RTxC pin?
-			if (( m_pcr & REG_PCR_RTXC_MASK) == REG_PCR_RTXC_CNTR_OUT)
-			{
-				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
-				{
-					m_rtxc = (~m_rtxc) & 1;
-				}
-				else // Pulse!
-				{
-					m_rtxc = 1;
-					rtxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_RTXC, attotime::from_hz(clock()));
-				}
-				if (m_index == duscc_device::CHANNEL_A)
-					m_uart->m_out_rtxca_cb(m_rtxc);
-				else
-					m_uart->m_out_rtxcb_cb(m_rtxc);
-			}
-
-			// Is Counter/Timer output on the TRXC pin?
-			if (( m_pcr & REG_PCR_TRXC_MASK) == REG_PCR_TRXC_CNTR_OUT)
-			{
-				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
-				{
-					m_trxc = (~m_trxc) & 1;
-				}
-				else // Pulse!
-				{
-					m_trxc = 1;
-					trxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_TRXC, attotime::from_hz(clock()));
-				}
-				if (m_index == duscc_device::CHANNEL_A)
-					m_uart->m_out_trxca_cb(m_trxc);
-				else
-					m_uart->m_out_trxcb_cb(m_trxc);
-			}
+				m_uart->m_out_rtxcb_cb(m_rtxc);
 		}
-		else
-		{   // clear zero detection bit
-			m_ictsr &= ~REG_ICTSR_ZERO_DET;
+
+		// Is Counter/Timer output on the TRXC pin?
+		if (( m_pcr & REG_PCR_TRXC_MASK) == REG_PCR_TRXC_CNTR_OUT)
+		{
+			if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
+			{
+				m_trxc = (~m_trxc) & 1;
+			}
+			else // Pulse!
+			{
+				m_trxc = 1;
+				trxc_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+			}
+			if (m_index == duscc_device::CHANNEL_A)
+				m_uart->m_out_trxca_cb(m_trxc);
+			else
+				m_uart->m_out_trxcb_cb(m_trxc);
 		}
-		break;
-	case TIMER_ID_RTXC: // Terminate zero detection pulse
-		m_rtxc = 0;
-		rtxc_timer->adjust(attotime::never);
-		if (m_index == duscc_device::CHANNEL_A)
-			m_uart->m_out_rtxca_cb(m_rtxc);
-		else
-			m_uart->m_out_rtxcb_cb(m_rtxc);
-		break;
-	case TIMER_ID_TRXC:  // Terminate zero detection pulse
-		m_trxc = 0;
-		trxc_timer->adjust(attotime::never);
-		if (m_index == duscc_device::CHANNEL_A)
-			m_uart->m_out_trxca_cb(m_trxc);
-		else
-			m_uart->m_out_trxcb_cb(m_trxc);
-		break;
-	default:
-		LOGR("Unhandled Timer ID %d\n", id);
-		break;
 	}
-	//  LOG("%s %d\n", FUNCNAME, id);
+	else
+	{   // clear zero detection bit
+		m_ictsr &= ~REG_ICTSR_ZERO_DET;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(duscc_channel::rtxc_tick)
+{
+	m_rtxc = 0;
+	rtxc_timer->adjust(attotime::never);
+	if (m_index == duscc_device::CHANNEL_A)
+		m_uart->m_out_rtxca_cb(m_rtxc);
+	else
+		m_uart->m_out_rtxcb_cb(m_rtxc);
+}
+
+TIMER_CALLBACK_MEMBER(duscc_channel::trxc_tick)
+{
+	m_trxc = 0;
+	trxc_timer->adjust(attotime::never);
+	if (m_index == duscc_device::CHANNEL_A)
+		m_uart->m_out_trxca_cb(m_trxc);
+	else
+		m_uart->m_out_trxcb_cb(m_trxc);
 }
 
 /*  The DUSCC 16 bit Timer
@@ -2037,7 +2032,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	/* Start. Starts the counteritimer and prescaler. */
 	case REG_CCR_START_TIMER:  LOG("- Start Counter/Timer\n");
 		rate = 100; // TODO: calculate correct rate
-		duscc_timer->adjust(attotime::from_hz(rate), TIMER_ID_RTXC, attotime::from_hz(rate));
+		duscc_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 		break;
 
 	/* Stop. Stops the counter/timer and prescaler. Since the command may be asynchronous with the selected clock source,

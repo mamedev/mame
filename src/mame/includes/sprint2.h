@@ -80,13 +80,13 @@ private:
 	required_ioport m_dsw;
 	output_finder<2> m_gear_sel;
 
-	uint8_t m_steering[2];
-	uint8_t m_gear[2];
-	uint8_t m_game;
-	uint8_t m_dial[2];
-	tilemap_t* m_bg_tilemap;
+	uint8_t m_steering[2]{};
+	uint8_t m_gear[2]{};
+	uint8_t m_game = 0;
+	uint8_t m_dial[2]{};
+	tilemap_t* m_bg_tilemap = nullptr;
 	bitmap_ind16 m_helper;
-	uint8_t m_collision[2];
+	uint8_t m_collision[2]{};
 
 	uint8_t wram_r(offs_t offset);
 	uint8_t dip_r(offs_t offset);

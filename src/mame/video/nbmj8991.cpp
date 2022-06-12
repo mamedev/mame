@@ -163,16 +163,9 @@ void nbmj8991_state::update_pixel(int x, int y)
 	m_tmpbitmap.pix(y, x) = color;
 }
 
-void nbmj8991_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nbmj8991_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in nbmj8991_state::device_timer");
-	}
+	m_nb1413m3->busyflag_w(1);
 }
 
 void nbmj8991_state::gfxdraw()
@@ -286,7 +279,7 @@ void nbmj8991_state::gfxdraw()
 ******************************************************************************/
 void nbmj8991_state::video_start()
 {
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj8991_state::clear_busy_flag), this);
 
 	int width = m_screen->width();
 	int height = m_screen->height();

@@ -240,8 +240,8 @@ void segas32_state::device_start()
 	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vblank_end_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int), this));
-	m_update_sprites_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::update_sprites), this));
+	m_vblank_end_int_timer = timer_alloc(FUNC(segas32_state::end_of_vblank_int), this);
+	m_update_sprites_timer = timer_alloc(FUNC(segas32_state::update_sprites), this);
 
 	/* allocate a copy of spriteram in 32-bit format */
 	m_spriteram_32bit = std::make_unique<uint32_t[]>(0x20000/4);
@@ -274,7 +274,8 @@ void segas32_state::device_start()
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
 	m_solid_0000 = make_unique_clear<uint16_t[]>(512);
-	m_solid_ffff = make_unique_clear<uint16_t[],0xff>(512);
+	m_solid_ffff = std::make_unique<uint16_t[]>(512);
+	std::fill_n(m_solid_ffff.get(), 512, ~uint16_t(0));
 
 	/* allocate background color per line*/
 	m_prev_bgstartx = std::make_unique<int32_t[]>(512);

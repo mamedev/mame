@@ -56,14 +56,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
-private:
-	static constexpr device_timer_id TIMER_CLOCK = 0;
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
+private:
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 

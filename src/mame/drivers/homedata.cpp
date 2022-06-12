@@ -7,7 +7,7 @@ Homedata Games
 driver by Phil Stroffolino and Nicola Salmoria
 
 
-*1987 X77 Mahjong Hourouki Part1 -Seisyun Hen-
+*1987 X77 Mahjong Hourouki Part1 -Seishun Hen-
 *1987 X72 Mahjong Hourouki Gaiden
 *1988 X73 Mahjong Joshi Pro-wres -Give up 5 byou mae-
 *1988 A74 Mahjong Hourouki Okite
@@ -79,7 +79,7 @@ TODO:
 
 
 ----------------------------------------------------------------------------
-Mahjong Hourouki
+Mahjong Hourouki Part1 -Seishun Hen- [麻雀放浪記 青春編]
 (c)1987 Home Data
 
 Board:  A77-PWB-A-(A)
@@ -90,7 +90,7 @@ OSC:    9.000MHz 16.000MHz
 Custom: GX61A01
 
 ----------------------------------------------------------------------------
-Mahjong Hourouki Gaiden
+Mahjong Hourouki Gaiden [麻雀放浪記外伝]
 (c)1987 Home Data
 
 Board:  A77-PWB-A-(A)
@@ -101,7 +101,7 @@ OSC:    9.000MHz 16.000MHz
 Custom: GX61A01
 
 ----------------------------------------------------------------------------
-Mahjong Hourouki Okite
+Mahjong Hourouki Okite [麻雀放浪記掟]
 (c)1988 Homedata
 
 Almost same board as "Mahjong Clinic"
@@ -114,7 +114,7 @@ OSC:    16.000MHz (OSC1) 9.000MHz (OSC2)
 Custom: HOMEDATA GX61A01 102 8728KK (100pin PQFP, location 8C)
 
 ----------------------------------------------------------------------------
-Mahjong Rokumeikan
+Mahjong Rokumeikan [麻雀鹿鳴館]
 (c)1988 Home Data
 
 Board:  A74-PWB-A-(A) (main) A74 PWB-B     (sub)
@@ -126,7 +126,7 @@ Custom: GX61A01
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
-Reikai Doushi (Chinese Exorcist)
+Reikai Doushi (Chinese Exorcist) [霊界導士]
 aka Last Apostle Puppet Show (US)
 (c)1988 HOME DATA
 
@@ -136,7 +136,7 @@ OSC.  : 16.000MHz 9.000MHz
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
-Mahjong Kojinkyouju (Private Teacher)
+Mahjong Kojinkyouju (Private Teacher) [麻雀個人教授]
 (c)1989 HOME DATA
 
 Board:  X73-PWB-A(C)
@@ -147,7 +147,7 @@ OSC:    16.000MHz 9.000MHz
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
-Mahjong Joshi Pro-wres -Give up 5 byou mae-
+Mahjong Joshi Pro-wres -Give up 5 byou mae- [麻雀女子プロレス～ギブUP5秒前～]
 (c)1988 HOME DATA
 
 Board:  X73-PWB-A(C)
@@ -158,7 +158,7 @@ OSC:    16.000MHz 9.000MHz
 ROM:    28 pin mask rom devices are 1mbit, 32 pin are 2mbit.
 
 ----------------------------------------------------------------------------
-Mahjong Vitamin C
+Mahjong Vitamin C [マージャンビタミンC]
 (c)1989 Home Data
 
 Board:  X73-PWB-A(A)
@@ -172,7 +172,7 @@ Custom: GX61A01
 Note: Manual dips are completely wrong, this actually matches pteacher
 
 ----------------------------------------------------------------------------
-Mahjong-yougo no Kisotairyoku
+Mahjong-yougo no Kisotairyoku [麻雀用語の基礎体力]
 (c)1989 Home Data
 
 Board:  X83-PWB-A(A)
@@ -183,7 +183,7 @@ OSC:    9.000MHz 16.000MHz
 Custom: GX61A01
 
 ----------------------------------------------------------------------------
-Mahjong Kinjirareta Asobi
+Mahjong Kinjirareta Asobi [麻雀禁じられたあそび]
 (c)1990 Home Data
 
 Board:  X83-PWB-A(A)
@@ -196,7 +196,7 @@ Custom: GX61A01
 Note: seems likely above 11mhz crystal was a repair
 
 ----------------------------------------------------------------------------
-Mahjong Jogakuen
+Mahjong Jogakuen -Shintai Kensa-hen- [麻雀女学園～身体検査編～]
 (c)19?? Windom
 
 Board:  X83-PWB-A(A)
@@ -208,7 +208,7 @@ Custom: GX61A01
 
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
-Mahjong Lemon Angel
+Mahjong Lemon Angel [マージャンレモネンジェル]
 (c)1990 Homedata
 
 Board:  X83-PWB-A(A)
@@ -220,7 +220,7 @@ OSC:    16.0000MHz (XTAL1) 9.000MHz (XTAL2)
 Custom: HOMEDATA GX61A01 102 8842KK
 
 ----------------------------------------------------------------------------
-Mahjong Ikagadesuka
+Mahjong Ikagadesuka -2-haku 3-ka no Ian-ryokou- [麻雀いかがですか～2泊3日の慰安旅行～]
 (c)1991 Mitchell
 
 Board:  X83-PWB-A(A)
@@ -1101,20 +1101,9 @@ INPUT_PORTS_END
 /**************************************************************************/
 
 
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mrokumei )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0x6000, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x7000, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x6000, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x7000, 0x100 )
 GFXDECODE_END
 
 static const gfx_layout tile_layout =
@@ -1491,20 +1480,9 @@ void homedata_state::cpu2_map(address_map &map)
 
 
 
-static const gfx_layout mirderbychar_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mirderby )
-	GFXDECODE_ENTRY( "gfx1", 0, mirderbychar_layout, 0x0000, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0, mirderbychar_layout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
 GFXDECODE_END
 
 /*   Miracle Derby - Ascot
@@ -2234,7 +2212,7 @@ void homedata_state::init_mirderby()
 }
 
 
-GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seishun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
@@ -2242,7 +2220,7 @@ GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, empty_init,
 GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, lastapos,  0,        reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "The Last Apostle Puppetshow",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi - Chinese Exorcist (Japan)",            MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -91,9 +91,9 @@ private:
 	void kbd_put(uint8_t data);
 	void kgs_memory_remap();
 
-	bool m_kgs_msel, m_kgs_iml;
-	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
-	bool m_ifss_loopback;
+	bool m_kgs_msel = 0, m_kgs_iml = 0;
+	uint8_t m_kgs_datao = 0, m_kgs_datai = 0, m_kgs_ctrl = 0;
+	bool m_ifss_loopback = 0;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

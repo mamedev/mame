@@ -120,11 +120,11 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 
 	/* video-related */
-	bool     m_flipscreen;
-	bool     m_flipchars;
-	uint8_t    m_star_enable;
-	uint16_t   m_star_delay_counter;
-	uint16_t   m_star_shift_reg;
+	bool     m_flipscreen = false;
+	bool     m_flipchars = false;
+	uint8_t    m_star_enable = 0;
+	uint16_t   m_star_delay_counter = 0;
+	uint16_t   m_star_shift_reg = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -748,4 +748,4 @@ ROM_END
 
 GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, warcadia,nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

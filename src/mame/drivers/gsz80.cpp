@@ -15,6 +15,9 @@
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 // State class - derives from driver_device
 class gsz80_state : public driver_device
 {
@@ -28,7 +31,7 @@ public:
 	// This function sets up the machine configuration
 	void gsz80(machine_config &config);
 
-private:
+protected:
 	// address maps for program memory and io memory
 	void gsz80_mem(address_map &map);
 	void gsz80_io(address_map &map);
@@ -95,6 +98,9 @@ ROM_START(gsz80)
 	ROM_LOAD("gsz80.bin",   0x0000, 0x2000, CRC(6f4bc7e5) SHA1(9008fe3b9754ec5537b3ad90f748096602ba008e))
 ROM_END
 
+} // anonymous namespace
+
+
 // This ties everything together
-//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gsz80,       0,        0,      gsz80,    0,       gsz80_state, empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT          CLASS             INIT           COMPANY           FULLNAME                FLAGS
+COMP( 2007, gsz80,          0,        0,        gsz80,         0,             gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )

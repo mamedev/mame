@@ -48,16 +48,11 @@ public:
 	void tugboat(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(trigger_int);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,12 +62,12 @@ private:
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	uint8_t m_hd46505_0_reg[18];
-	uint8_t m_hd46505_1_reg[18];
-	int m_reg0;
-	int m_reg1;
-	int m_ctrl;
-	emu_timer *m_interrupt_timer;
+	uint8_t m_hd46505_0_reg[18]{};
+	uint8_t m_hd46505_1_reg[18]{};
+	int m_reg0 = 0;
+	int m_reg1 = 0;
+	int m_ctrl = 0;
+	emu_timer *m_interrupt_timer = nullptr;
 
 	void hd46505_0_w(offs_t offset, uint8_t data);
 	void hd46505_1_w(offs_t offset, uint8_t data);
@@ -91,7 +86,7 @@ private:
 
 void tugboat_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_interrupt_timer = timer_alloc(FUNC(tugboat_state::trigger_int), this);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_hd46505_0_reg));
@@ -212,17 +207,10 @@ void tugboat_state::ctrl_w(uint8_t data)
 	m_ctrl = data;
 }
 
-void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tugboat_state::trigger_int)
 {
-	switch (id)
-	{
-	case TIMER_INTERRUPT:
-		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_interrupt_timer->adjust(m_screen->frame_period());
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tugboat_state::device_timer");
-	}
+	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 void tugboat_state::machine_reset()
@@ -329,33 +317,11 @@ static INPUT_PORTS_START( noahsark )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_tugboat )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x80, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x80, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 0x00, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x00, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,        0x80, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 0x80, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x1,        0x00, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x3_planar, 0x00, 16 )
 GFXDECODE_END
 
 

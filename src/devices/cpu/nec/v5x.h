@@ -50,7 +50,7 @@ protected:
 	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
 	virtual void interface_post_load() override;
-	virtual void interface_clock_changed() override;
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain) override;
 
 	void v5x_set_input(int inputnum, int state);
 	void v5x_add_mconfig(machine_config &config);

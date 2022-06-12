@@ -74,4 +74,4 @@ const comx35_format::format comx35_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_COMX35_FORMAT = &floppy_image_format_creator<comx35_format>;
+const comx35_format FLOPPY_COMX35_FORMAT;

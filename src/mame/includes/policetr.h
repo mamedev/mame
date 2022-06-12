@@ -92,22 +92,22 @@ protected:
 	required_ioport_array<2> m_gun_x_io;
 	required_ioport_array<2> m_gun_y_io;
 
-	uint32_t m_control_data;
-	uint32_t m_bsmt_data_bank;
-	uint32_t m_bsmt_data_offset;
-	uint32_t *m_speedup_data;
-	uint64_t m_last_cycles;
-	uint32_t m_loop_count;
+	uint32_t m_control_data = 0;
+	uint32_t m_bsmt_data_bank = 0;
+	uint32_t m_bsmt_data_offset = 0;
+	uint32_t *m_speedup_data = nullptr;
+	uint64_t m_last_cycles = 0;
+	uint32_t m_loop_count = 0;
 	offs_t m_speedup_pc;
 	offs_t m_speedup_addr;
 	rectangle m_render_clip;
 	std::unique_ptr<bitmap_ind8> m_dstbitmap;
-	uint16_t m_src_xoffs;
-	uint16_t m_src_yoffs;
-	uint16_t m_dst_xoffs;
-	uint16_t m_dst_yoffs;
-	uint8_t m_video_latch;
-	uint32_t m_srcbitmap_height_mask;
+	uint16_t m_src_xoffs = 0;
+	uint16_t m_src_yoffs = 0;
+	uint16_t m_dst_xoffs = 0;
+	uint16_t m_dst_yoffs = 0;
+	uint8_t m_video_latch = 0;
+	uint32_t m_srcbitmap_height_mask = 0;
 
 	static constexpr uint32_t SRCBITMAP_WIDTH = 4096;
 	static constexpr uint32_t SRCBITMAP_WIDTH_MASK = SRCBITMAP_WIDTH - 1;

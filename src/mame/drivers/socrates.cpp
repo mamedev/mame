@@ -126,12 +126,14 @@ public:
 	void init_vpainter();
 
 protected:
-	enum
-	{
-		TIMER_KBMCU_SIM,
-		TIMER_CLEAR_SPEECH,
-		TIMER_CLEAR_IRQ
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void socrates_mem(address_map &map);
+	void socrates_io(address_map &map);
+	void socrates_rambank_map(address_map &map);
+	void socrates_rombank_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
@@ -174,16 +176,16 @@ protected:
 		uint8_t    count;
 	} m_kb_queue;
 
-	void socrates_palette(palette_device &palete) const;
+	void palette_init(palette_device &palete) const;
 
 	uint8_t common_rom_bank_r(offs_t offset);
 	void common_rom_bank_w(offs_t offset, uint8_t data);
 	uint8_t common_ram_bank_r();
 	void common_ram_bank_w(uint8_t data);
-	uint8_t socrates_cart_r(offs_t offset);
+	uint8_t cart_r(offs_t offset);
 	uint8_t read_f3();
 	void kbmcu_reset(uint8_t data);
-	uint8_t socrates_status_r();
+	uint8_t status_r();
 	void speech_command(uint8_t data);
 	uint8_t keyboard_buffer_read(offs_t offset);
 	void keyboard_buffer_update(uint8_t data);
@@ -193,28 +195,16 @@ protected:
 	uint16_t kbmcu_sim_fifo_peek();
 	void kbmcu_sim_fifo_head_clear();
 	void reset_speech(uint8_t data);
-	void socrates_scroll_w(offs_t offset, uint8_t data);
-	void socrates_sound_w(offs_t offset, uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(kbmcu_sim_cb);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
-	void socrates_update_kb();
-	void socrates_check_kb_latch();
-	static rgb_t socrates_create_color(uint8_t color);
-
-	void socrates_rambank_map(address_map &map);
-	void socrates_rombank_map(address_map &map);
-	void socrates_io(address_map &map);
-	void socrates_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	static rgb_t create_color(uint8_t color);
 };
 
 
@@ -343,10 +333,10 @@ void socrates_state::kbmcu_sim_fifo_head_clear()
 
 void socrates_state::machine_start()
 {
-	m_kbmcu_sim_timer = timer_alloc(TIMER_KBMCU_SIM);
+	m_kbmcu_sim_timer = timer_alloc(FUNC(socrates_state::kbmcu_sim_cb), this);
 	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL(21'477'272)/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
-	m_clear_speech_timer = timer_alloc(TIMER_CLEAR_SPEECH);
-	m_clear_irq_timer = timer_alloc(TIMER_CLEAR_IRQ);
+	m_clear_speech_timer = timer_alloc(FUNC(socrates_state::clear_speech_cb), this);
+	m_clear_irq_timer = timer_alloc(FUNC(socrates_state::clear_irq_cb), this);
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_scroll_offset));
@@ -384,24 +374,6 @@ void socrates_state::machine_reset()
 	m_speech_dummy_read = 0;
 	m_speech_load_address_count = 0;
 	m_speech_load_settings_count = 0;
-}
-
-void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_KBMCU_SIM:
-		kbmcu_sim_cb(param);
-		break;
-	case TIMER_CLEAR_SPEECH:
-		clear_speech_cb(param);
-		break;
-	case TIMER_CLEAR_IRQ:
-		clear_irq_cb(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
-	}
 }
 
 void socrates_state::init_socrates()
@@ -457,7 +429,7 @@ void socrates_state::common_ram_bank_w(uint8_t data)
 	m_rambank2->set_bank(((data>>4) & 0x0c) | ((data>>2) & 0x03));
 }
 
-uint8_t socrates_state::socrates_cart_r(offs_t offset)
+uint8_t socrates_state::cart_r(offs_t offset)
 {
 	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac)); style stuff
 	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
@@ -484,7 +456,7 @@ void socrates_state::kbmcu_reset(uint8_t data) // reset the keyboard MCU, clear 
 	kbmcu_sim_reset();
 }
 
-uint8_t socrates_state::socrates_status_r()// read 0x4x, some sort of status reg
+uint8_t socrates_state::status_r()// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, possibly mcu ready state?
@@ -683,7 +655,7 @@ logerror("write to i/o 0x60 of %x\n",data);
     0x21 - W - msb offset of screen display
     resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
     */
-void socrates_state::socrates_scroll_w(offs_t offset, uint8_t data)
+void socrates_state::scroll_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	m_scroll_offset = (m_scroll_offset&0x100) | data;
@@ -710,7 +682,7 @@ void socrates_state::socrates_scroll_w(offs_t offset, uint8_t data)
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
 #define GAMMA 1.5
 
-rgb_t socrates_state::socrates_create_color(uint8_t color)
+rgb_t socrates_state::create_color(uint8_t color)
 {
 	static constexpr double lumatable[256] = {
 			LUMA_COL_0
@@ -790,10 +762,10 @@ rgb_t socrates_state::socrates_create_color(uint8_t color)
 }
 
 
-void socrates_state::socrates_palette(palette_device &palette) const
+void socrates_state::palette_init(palette_device &palette) const
 {
 	for (int i = 0; i < 256; i++)
-		palette.set_pen_color(i, socrates_create_color(i));
+		palette.set_pen_color(i, create_color(i));
 }
 
 void socrates_state::video_start()
@@ -801,7 +773,7 @@ void socrates_state::video_start()
 	m_scroll_offset = 0;
 }
 
-uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t socrates_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const uint8_t fixedcolors[8] = {
 			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7 };
@@ -837,7 +809,7 @@ uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_in
 
 /* below belongs in audio/socrates.cpp */
 
-void socrates_state::socrates_sound_w(offs_t offset, uint8_t data)
+void socrates_state::sound_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -1003,7 +975,7 @@ void socrates_state::socrates_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(socrates_state::cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
 	map(0x080000, 0x0bffff).r(FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
 }
 
@@ -1019,7 +991,7 @@ void socrates_state::socrates_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
 	map(0x08, 0x08).rw(FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	map(0x10, 0x17).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
+	map(0x10, 0x17).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::sound_w)).mirror(0x8); /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
@@ -1031,9 +1003,9 @@ void socrates_state::socrates_io(address_map &map)
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
+	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::scroll_w)).mirror(0xE);
 	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(FUNC(socrates_state::socrates_status_r), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x40, 0x40).rw(FUNC(socrates_state::status_r), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
 	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
 	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
@@ -1052,7 +1024,7 @@ void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(iqunlimz_state::cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
 	map(0x080000, 0x0bffff).rom().region("maincpu", 0x40000).mirror(0xF00000);// xxxx 10** **** **** **** ****
 }
 
@@ -1068,8 +1040,8 @@ void iqunlimz_state::iqunlimz_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw(FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
 	map(0x08, 0x08).rw(FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
-	map(0x10, 0x17).w(FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
-	map(0x20, 0x21).w(FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
+	map(0x10, 0x17).w(FUNC(iqunlimz_state::sound_w)).mirror(0x08);
+	map(0x20, 0x21).w(FUNC(iqunlimz_state::scroll_w)).mirror(0x0E);
 	// 30: writes an incrementing value here, once per keypress?
 	// 40: some sort of serial select/reset or enable, related to 0x60
 	map(0x50, 0x51).rw(FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
@@ -1494,10 +1466,10 @@ void socrates_state::socrates(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	m_screen->set_visarea(0, 263, 0, 219); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(socrates_state::socrates_palette), 256);
+	PALETTE(config, "palette", FUNC(socrates_state::palette_init), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1521,7 +1493,7 @@ void socrates_state::socrates_pal(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(264, 238); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	m_screen->set_visarea(0, 263, 0, 229); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update));
 
 	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
 }
@@ -1556,7 +1528,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 	m_screen->set_visarea(0, 256-1, 0, 224-1);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(iqunlimz_state::socrates_palette), 256);
+	PALETTE(config, "palette", FUNC(iqunlimz_state::palette_init), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

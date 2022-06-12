@@ -113,8 +113,8 @@ private:
 	required_device<i8751_device> m_mcu;
 	required_ioport_array<3> m_inputs;
 
-	uint8_t m_mcu_rx_from_cpu;
-	bool m_mcu_initial_byte;
+	uint8_t m_mcu_rx_from_cpu = 0U;
+	bool m_mcu_initial_byte = false;
 };
 
 // Quizard 2 language values:

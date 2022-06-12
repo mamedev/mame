@@ -142,13 +142,13 @@ private:
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-	u8 m_kbdclk, m_kbdread, m_kbdport2;
+	u8 m_kbdclk = 0, m_kbdread = 0, m_kbdport2 = 0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
 	required_shared_ptr<u8> m_ram;
-	floppy_image_device *m_curfloppy;
-	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	floppy_image_device *m_curfloppy = nullptr;
+	bool m_fdc_irq = false, m_fdc_drq = false, m_fdc_hld = false;
 };
 
 //**************************************************************************

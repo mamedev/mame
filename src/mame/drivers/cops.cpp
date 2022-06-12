@@ -876,7 +876,7 @@ void cops_state::machine_start()
 {
 	m_digits.resolve();
 
-	m_ld_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cops_state::ld_timer_callback),this));
+	m_ld_timer = timer_alloc(FUNC(cops_state::ld_timer_callback), this);
 
 	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 

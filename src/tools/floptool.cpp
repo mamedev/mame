@@ -139,7 +139,13 @@ static int identify(int argc, char *argv[])
 
 		bool first = true;
 		for(const auto &e : scores) {
-			printf("%-*s %c %3d - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ', e.first, sz2, e.second->m_format->name(), e.second->m_format->description());
+			printf("%-*s %c %c%c%c%c%c - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ',
+				   e.first & 0x10 ? '+' : '.',
+				   e.first & 0x08 ? '+' : '.',
+				   e.first & 0x04 ? '+' : '.',
+				   e.first & 0x02 ? '+' : '.',
+				   e.first & 0x01 ? '+' : '.',
+				   sz2, e.second->m_format->name(), e.second->m_format->description());
 			first = false;
 		}
 	}
@@ -202,7 +208,7 @@ static int flopconvert(int argc, char *argv[])
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Aaving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
 		return 1;
 	}
 
@@ -231,11 +237,11 @@ static int flopcreate(int argc, char *argv[])
 
 	auto dest_format = formats.find_floppy_format_info_by_key(argv[2]);
 	if(!dest_format) {
-		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[3]);
+		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[2]);
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[2]);
 		return 1;
 	}
 
@@ -244,7 +250,7 @@ static int flopcreate(int argc, char *argv[])
 		fprintf(stderr, "Error: Floppy creation format '%s' unknown\n", argv[3]);
 		return 1;
 	}
-	if(!create_fs->m_manager->can_format()) {
+	if(create_fs->m_manager && !create_fs->m_manager->can_format()) {
 		fprintf(stderr, "Error: Floppy creation format '%s' does not support creating new images\n", argv[3]);
 		return 1;
 	}
@@ -277,7 +283,7 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 				if(!meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = fs::meta_value::to_string(m.m_type, meta.get(m.m_name));
+				std::string val = meta.get(m.m_name).to_string();
 				if(slot == 0)
 					val = head + "dir  " + val;
 				entries[id][slot] = val;
@@ -295,7 +301,7 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 				if(!meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = fs::meta_value::to_string(m.m_type, meta.get(m.m_name));
+				std::string val = meta.get(m.m_name).to_string();
 				if(slot == 0)
 					val = head + (c.m_type == fs::dir_entry_type::system_file ? "sys  " : "file ") + val;
 				entries[id][slot] = val;
@@ -317,7 +323,7 @@ static int generic_dir(image_handler &ih)
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
-			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), fs::meta_value::to_string(e.m_type, vmeta.get(e.m_name)));
+			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).to_string());
 		printf("%s\n\n", vinf.c_str());
 	}
 

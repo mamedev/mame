@@ -92,9 +92,9 @@ private:
 	void dac_w(u8 data);
 	u8 keyboard_r(offs_t offset);
 	u32 screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u8 m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
+	u8 m_cass_data[4]{};
+	bool m_cassbit = false;
+	bool m_cassold = false;
 	required_shared_ptr<u8> m_ram;
 	required_shared_ptr<u8> m_vram;
 	required_device<cpu_device> m_maincpu;
@@ -110,7 +110,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	bool m_dac_state;
+	bool m_dac_state = false;
 };
 
 void galeb_state::machine_start()
