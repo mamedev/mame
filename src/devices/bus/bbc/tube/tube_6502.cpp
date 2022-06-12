@@ -87,8 +87,10 @@ ROM_START( tube_6502 )
 	ROM_DEFAULT_BIOS("110")
 	ROM_SYSTEM_BIOS(0, "110", "Tube 1.10")
 	ROMX_LOAD("6502tube_110.rom", 0x0000, 0x1000, CRC(98b5fe42) SHA1(338269d03cf6bfa28e09d1651c273ea53394323b), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "121", "Tube 1.21 (ReCo6502)")
-	ROMX_LOAD("reco6502tube.rom", 0x0000, 0x1000, CRC(75b2a466) SHA1(9ecef24de58a48c3fbe01b12888c3f6a5d24f57f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "120", "Tube 1.20") // built from source, not an actual dump
+	ROMX_LOAD("6502tube_120.rom", 0x0000, 0x1000, CRC(50c36da5) SHA1(80e5f1c03a00cf728917242522befc17b264413f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "121", "Tube 1.21 (ReCo6502)")
+	ROMX_LOAD("reco6502tube.rom", 0x0000, 0x1000, CRC(75b2a466) SHA1(9ecef24de58a48c3fbe01b12888c3f6a5d24f57f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( tube_6502p )
@@ -133,6 +135,7 @@ void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
 	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_ula->prst_handler().set(FUNC(bbc_tube_6502_device::prst_w));
 
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
 
@@ -259,6 +262,13 @@ void bbc_tube_6502_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_6502_device::prst_w)
+{
+	device_reset();
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_6502_device::host_r(offs_t offset)
 {

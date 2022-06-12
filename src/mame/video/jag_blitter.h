@@ -41,7 +41,6 @@ protected:
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_space_config;
@@ -61,8 +60,8 @@ private:
 
 	// timer setups
 	emu_timer *m_command_timer = nullptr;
+	TIMER_CALLBACK_MEMBER(command_run);
 	inline void command_start();
-	inline void command_run();
 	inline void command_done();
 
 	// functional switches

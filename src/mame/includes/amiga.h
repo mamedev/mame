@@ -555,9 +555,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	void custom_chip_reset();
 
 	// interrupts
@@ -662,14 +659,6 @@ private:
 
 	enum
 	{
-		TIMER_SCANLINE,
-		TIMER_AMIGA_IRQ,
-		TIMER_AMIGA_BLITTER,
-		TIMER_SERIAL
-	};
-
-	enum
-	{
 		VPOSR_LOF = 0x8000  // long frame
 	};
 
@@ -731,7 +720,7 @@ private:
 	int m_rs232_cts = 0;
 
 	void serial_adjust();
-	void serial_shift();
+	TIMER_CALLBACK_MEMBER(serial_shift);
 	void rx_write(int level);
 
 	uint32_t amiga_gethvpos();

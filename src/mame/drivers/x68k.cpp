@@ -147,36 +147,16 @@
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
-void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(x68k_state::floppy_tc_tick)
 {
-	switch (id)
-	{
-	case TIMER_X68K_LED:
-		led_callback(param);
-		break;
-	case TIMER_X68K_SCC_ACK:
-		scc_ack(param);
-		break;
-	case TIMER_MD_6BUTTON_PORT1_TIMEOUT:
-		md_6button_port1_timeout(param);
-		break;
-	case TIMER_MD_6BUTTON_PORT2_TIMEOUT:
-		md_6button_port2_timeout(param);
-		break;
-	case TIMER_X68K_BUS_ERROR:
-		bus_error(param);
-		break;
-	case TIMER_X68K_FDC_TC:
-		m_upd72065->tc_w(ASSERT_LINE);
-		m_upd72065->tc_w(CLEAR_LINE);
-		break;
-	case TIMER_X68K_ADPCM:
-		m_hd63450->drq3_w(1);
-		m_hd63450->drq3_w(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in x68k_state::device_timer");
-	}
+	m_upd72065->tc_w(ASSERT_LINE);
+	m_upd72065->tc_w(CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(x68k_state::adpcm_drq_tick)
+{
+	m_hd63450->drq3_w(1);
+	m_hd63450->drq3_w(0);
 }
 
 // LED timer callback
@@ -373,8 +353,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
 
 void x68k_state::md_6button_init()
 {
-	m_mdctrl.io_timeout1 = timer_alloc(TIMER_MD_6BUTTON_PORT1_TIMEOUT);
-	m_mdctrl.io_timeout2 = timer_alloc(TIMER_MD_6BUTTON_PORT2_TIMEOUT);
+	m_mdctrl.io_timeout1 = timer_alloc(FUNC(x68k_state::md_6button_port1_timeout), this);
+	m_mdctrl.io_timeout2 = timer_alloc(FUNC(x68k_state::md_6button_port2_timeout), this);
 }
 
 uint8_t x68k_state::md_6button_r(int port)
@@ -1580,11 +1560,11 @@ void x68k_state::driver_init()
 	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
-	m_led_timer = timer_alloc(TIMER_X68K_LED);
-	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
-	m_adpcm_timer = timer_alloc(TIMER_X68K_ADPCM);
-	m_bus_error_timer = timer_alloc(TIMER_X68K_BUS_ERROR);
+	m_mouse_timer = timer_alloc(FUNC(x68ksupr_state::scc_ack), this);
+	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
+	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
+	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
+	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();

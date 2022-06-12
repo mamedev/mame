@@ -64,8 +64,6 @@ public:
 	uint8_t porta_out_get();
 	uint8_t portb_out_get();
 
-	void timer_end();
-
 protected:
 	class riot6532_port
 	{
@@ -80,10 +78,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
 
+	TIMER_CALLBACK_MEMBER(timer_end);
 
 private:
 	void update_irqstate();
@@ -91,29 +89,24 @@ private:
 	void update_pa7_state();
 	uint8_t get_timer();
 
-	riot6532_port   m_port[2];
+	riot6532_port     m_port[2];
 
-	devcb_read8         m_in_pa_cb;
-	devcb_write8        m_out_pa_cb;
-	devcb_read8         m_in_pb_cb;
-	devcb_write8        m_out_pb_cb;
-	devcb_write_line    m_irq_cb;
+	devcb_read8       m_in_pa_cb;
+	devcb_write8      m_out_pa_cb;
+	devcb_read8       m_in_pb_cb;
+	devcb_write8      m_out_pb_cb;
+	devcb_write_line  m_irq_cb;
 
 	uint8_t           m_irqstate;
 	uint8_t           m_irqenable;
-	int             m_irq;
+	int               m_irq;
 
 	uint8_t           m_pa7dir;     /* 0x80 = high-to-low, 0x00 = low-to-high */
 	uint8_t           m_pa7prev;
 
 	uint8_t           m_timershift;
 	uint8_t           m_timerstate;
-	emu_timer *     m_timer;
-
-	enum
-	{
-		TIMER_END_CB
-	};
+	emu_timer *       m_timer;
 };
 
 

@@ -3819,6 +3819,124 @@ public:
   static uint32_t calledFunc(uint32_t x) { return x + 1; }
 };
 
+// x86::Compiler - X86Test_FuncCallAVXClobber
+// ==========================================
+
+class X86Test_FuncCallAVXClobber : public X86TestCase {
+public:
+  X86Test_FuncCallAVXClobber() : X86TestCase("FuncCallAVXClobber") {}
+
+  static void add(TestApp& app) {
+    const CpuInfo& cpuInfo = CpuInfo::host();
+
+    if (cpuInfo.features().x86().hasAVX2() && sizeof(void*) == 8)
+      app.add(new X86Test_FuncCallAVXClobber());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    FuncNode* mainFunc = cc.addFunc(FuncSignatureT<void, void*, const void*, const void*>(CallConvId::kHost));
+    mainFunc->frame().setAvxEnabled();
+    mainFunc->frame().setAvxCleanup();
+
+    // We need a Windows calling convention to test this properly also on a non-Windows machine.
+    FuncNode* helperFunc = cc.newFunc(FuncSignatureT<void, void*, const void*>(CallConvId::kX64Windows));
+    helperFunc->frame().setAvxEnabled();
+    helperFunc->frame().setAvxCleanup();
+
+    {
+      size_t i;
+
+      x86::Gp dPtr = cc.newIntPtr("dPtr");
+      x86::Gp aPtr = cc.newIntPtr("aPtr");
+      x86::Gp bPtr = cc.newIntPtr("bPtr");
+      x86::Gp tPtr = cc.newIntPtr("tPtr");
+      x86::Ymm acc[8];
+      x86::Mem stack = cc.newStack(32, 1, "stack");
+
+      mainFunc->setArg(0, dPtr);
+      mainFunc->setArg(1, aPtr);
+      mainFunc->setArg(2, bPtr);
+
+      cc.lea(tPtr, stack);
+      for (i = 0; i < 8; i++) {
+        acc[i] = cc.newYmm("acc%zu", i);
+        cc.vmovdqu(acc[i], x86::ptr(aPtr));
+      }
+
+      InvokeNode* invokeNode;
+      cc.invoke(&invokeNode,
+        helperFunc->label(),
+        FuncSignatureT<void, void*, const void*>(CallConvId::kX64Windows));
+      invokeNode->setArg(0, tPtr);
+      invokeNode->setArg(1, bPtr);
+
+      for (i = 1; i < 8; i++) {
+        cc.vpaddd(acc[0], acc[0], acc[i]);
+      }
+
+      cc.vpaddd(acc[0], acc[0], x86::ptr(tPtr));
+      cc.vmovdqu(x86::ptr(dPtr), acc[0]);
+
+      cc.endFunc();
+    }
+
+    {
+      cc.addFunc(helperFunc);
+
+      x86::Gp dPtr = cc.newIntPtr("dPtr");
+      x86::Gp aPtr = cc.newIntPtr("aPtr");
+
+      helperFunc->setArg(0, dPtr);
+      helperFunc->setArg(1, aPtr);
+
+      x86::Gp tmp = cc.newIntPtr("tmp");
+      x86::Ymm acc = cc.newYmm("acc");
+
+      cc.mov(tmp, 1);
+      cc.vmovd(acc.xmm(), tmp);
+      cc.vpbroadcastd(acc, acc.xmm());
+      cc.vpaddd(acc, acc, x86::ptr(aPtr));
+      cc.vmovdqu(x86::ptr(dPtr), acc);
+
+      cc.endFunc();
+    }
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(void*, const void*, const void*);
+    Func func = ptr_as_func<Func>(_func);
+
+    size_t i;
+
+    static const uint32_t aData[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    static const uint32_t bData[8] = { 6, 3, 5, 9, 1, 8, 7, 2 };
+
+    uint32_t resultData[8];
+    uint32_t expectData[8];
+
+    for (i = 0; i < 8; i++)
+      expectData[i] = aData[i] * 8 + bData[i] + 1;
+
+    func(resultData, aData, bData);
+
+    result.assign("{");
+    expect.assign("{");
+
+    for (i = 0; i < 8; i++) {
+      result.appendFormat("%u", resultData[i]);
+      expect.appendFormat("%u", expectData[i]);
+
+      if (i != 7) result.append(", ");
+      if (i != 7) expect.append(", ");
+    }
+
+    result.append("}");
+    expect.append("}");
+
+    return result == expect;
+  }
+};
+
 // x86::Compiler - X86Test_MiscLocalConstPool
 // ==========================================
 
@@ -4186,6 +4304,7 @@ void compiler_add_x86_tests(TestApp& app) {
   app.addT<X86Test_FuncCallMisc4>();
   app.addT<X86Test_FuncCallMisc5>();
   app.addT<X86Test_FuncCallMisc6>();
+  app.addT<X86Test_FuncCallAVXClobber>();
 
   // Miscellaneous tests.
   app.addT<X86Test_MiscLocalConstPool>();

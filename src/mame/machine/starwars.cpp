@@ -115,7 +115,7 @@ void starwars_state::starwars_mproc_init()
 		m_PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	m_math_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starwars_state::math_run_clear),this));
+	m_math_timer = timer_alloc(FUNC(starwars_state::math_run_clear), this);
 }
 
 

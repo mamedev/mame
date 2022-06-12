@@ -94,7 +94,7 @@ void huc6261_device::apply_pal_offs(uint16_t *pix_data)
 	*pix_data &= 0x1ff;
 }
 
-void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 {
 	int vpos = screen().vpos();
 	int hpos = screen().hpos();
@@ -414,7 +414,7 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 
 void huc6261_device::device_start()
 {
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(huc6261_device::update_events), this);
 
 	m_bmp = std::make_unique<bitmap_rgb32>(WPF, LPF);
 

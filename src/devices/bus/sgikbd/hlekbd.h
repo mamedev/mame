@@ -31,7 +31,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_buffered_serial_interface overrides
@@ -45,13 +44,10 @@ protected:
 	// customised transmit_byte method
 	void transmit_byte(uint8_t byte);
 
-private:
-	enum
-	{
-		TIMER_CLICK = 30000,
-		TIMER_BEEP  = 30001
-	};
+	TIMER_CALLBACK_MEMBER(click_off);
+	TIMER_CALLBACK_MEMBER(beep_off);
 
+private:
 	enum
 	{
 		LED_NUM,

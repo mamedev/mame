@@ -59,16 +59,9 @@
 
 /*********************************************************************/
 
-void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gunbustr_state::trigger_irq5)
 {
-	switch (id)
-	{
-	case TIMER_GUNBUSTR_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in gunbustr_state::device_timer");
-	}
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
@@ -381,7 +374,7 @@ void gunbustr_state::init_gunbustr()
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
 
-	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
+	m_interrupt5_timer = timer_alloc(FUNC(gunbustr_state::trigger_irq5), this);
 }
 
 void gunbustr_state::init_gunbustrj()

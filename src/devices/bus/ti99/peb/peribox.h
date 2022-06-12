@@ -202,9 +202,9 @@ protected:
 	int     m_cru_base;
 
 	// Methods to decide whether we are acccessing the 4000-5fff region (DSR)
-	// or the cartridge region
-	static bool in_dsr_space(offs_t offset, bool amadec);
-	static bool in_cart_space(offs_t offset, bool amadec);
+	bool in_dsr_space(offs_t offset, bool amadec);
+
+	bool amabc_is_set(offs_t offset);
 };
 
 /*****************************************************************************

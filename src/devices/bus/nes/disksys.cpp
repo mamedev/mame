@@ -121,7 +121,7 @@ void nes_disksys_device::device_start()
 	m_disk->floppy_install_load_proc(nes_disksys_device::load_proc);
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
 
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_disksys_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_fds_motor_on));
@@ -212,7 +212,7 @@ uint8_t nes_disksys_device::read_m(offs_t offset)
 	return m_prgram[offset];
 }
 
-void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_disksys_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	// FIXME: This looks like a gross hack that ties the disk byte transfer IRQ to the PPU. Seriously?
 	if (m_irq_transfer)
@@ -403,25 +403,22 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  irq_timer_tick - handle IRQ timer
 //-------------------------------------------------
 
-void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_disksys_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (m_irq_count)
+			m_irq_count--;
+		else
 		{
-			if (m_irq_count)
-				m_irq_count--;
-			else
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = m_irq_count_latch;
-				if (!m_irq_repeat)
-					m_irq_enable = 0;
-				m_fds_status0 |= 0x01;
-			}
+			set_irq_line(ASSERT_LINE);
+			m_irq_count = m_irq_count_latch;
+			if (!m_irq_repeat)
+				m_irq_enable = 0;
+			m_fds_status0 |= 0x01;
 		}
 	}
 }

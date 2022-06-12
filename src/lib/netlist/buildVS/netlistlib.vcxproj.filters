@@ -309,6 +309,9 @@
     <ClCompile Include="..\macro\modules\nlmod_rtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\plib\ppmf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">

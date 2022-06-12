@@ -2037,21 +2037,21 @@ void sh34_base_device::device_start()
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_timer_callback), this));
+		m_timer[i] = timer_alloc(FUNC(sh34_base_device::sh4_timer_callback), this);
 		m_timer[i]->adjust(attotime::never, i);
 	}
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_dma_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_dmac_callback), this));
+		m_dma_timer[i] = timer_alloc(FUNC(sh34_base_device::sh4_dmac_callback), this);
 		m_dma_timer[i]->adjust(attotime::never, i);
 	}
 
-	m_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_refresh_timer_callback), this));
+	m_refresh_timer = timer_alloc(FUNC(sh34_base_device::sh4_refresh_timer_callback), this);
 	m_refresh_timer->adjust(attotime::never);
 	m_refresh_timer_base = 0;
 
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh34_base_device::sh4_rtc_timer_callback), this));
+	m_rtc_timer = timer_alloc(FUNC(sh34_base_device::sh4_rtc_timer_callback), this);
 	m_rtc_timer->adjust(attotime::never);
 
 	sh4_parse_configuration();

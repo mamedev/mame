@@ -159,7 +159,7 @@ void nes_jf17_device::pcb_reset()
 void nes_ss88006_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_ss88006_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_mmc_prg_bank));
@@ -315,26 +315,23 @@ void nes_jf17_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_ss88006_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			u16 mask = 0xffff;            // 16-bit counter (default)
+		u16 mask = 0xffff;            // 16-bit counter (default)
 
-			if (BIT(m_irq_mode, 3))       // 4-bit counter
-				mask = 0x000f;
-			else if (BIT(m_irq_mode, 2))  // 8-bit counter
-				mask = 0x00ff;
-			else if (BIT(m_irq_mode, 1))  // 12-bit counter
-				mask = 0x0fff;
+		if (BIT(m_irq_mode, 3))       // 4-bit counter
+			mask = 0x000f;
+		else if (BIT(m_irq_mode, 2))  // 8-bit counter
+			mask = 0x00ff;
+		else if (BIT(m_irq_mode, 1))  // 12-bit counter
+			mask = 0x0fff;
 
-			m_irq_count = (m_irq_count & ~mask) | ((m_irq_count - 1) & mask);
+		m_irq_count = (m_irq_count & ~mask) | ((m_irq_count - 1) & mask);
 
-			if ((m_irq_count & mask) == mask)
-				set_irq_line(ASSERT_LINE);
-		}
+		if ((m_irq_count & mask) == mask)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 

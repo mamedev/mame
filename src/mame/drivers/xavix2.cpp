@@ -618,7 +618,7 @@ uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void xavix2_state::machine_start()
 {
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix2_state::dma_end), this));
+	m_dma_timer = timer_alloc(FUNC(xavix2_state::dma_end), this);
 }
 
 void xavix2_state::machine_reset()

@@ -52,11 +52,6 @@
 
 #include "logmacro.h"
 
-enum
-{
-	PRGTIMER = 1
-};
-
 /*
     Constructor for all variants
 */
@@ -138,7 +133,7 @@ bool at29x_device::nvram_write(util::write_stream &file)
 /*
     Programming timer callback
 */
-void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(at29x_device::step_programming)
 {
 	switch (m_pgm)
 	{
@@ -482,7 +477,7 @@ void at29x_device::device_start()
 {
 	m_programming_buffer = std::make_unique<uint8_t[]>(m_sector_size);
 	m_eememory = std::make_unique<uint8_t[]>(m_memory_size+2);
-	m_programming_timer = timer_alloc(PRGTIMER);
+	m_programming_timer = timer_alloc(FUNC(at29x_device::step_programming), this);
 
 	// TODO: Complete 16-bit handling
 	m_address_mask = m_memory_size/(m_word_width/8) - 1;

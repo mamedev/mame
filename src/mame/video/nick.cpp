@@ -140,7 +140,7 @@ void nick_device::device_start()
 	m_write_virq.resolve_safe();
 
 	// allocate timers
-	m_timer_scanline = timer_alloc();
+	m_timer_scanline = timer_alloc(FUNC(nick_device::scanline_tick), this);
 	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving
@@ -182,10 +182,10 @@ void nick_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  scanline_tick - generate a scanline
 //-------------------------------------------------
 
-void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nick_device::scanline_tick)
 {
 	int scanline = screen().vpos();
 

@@ -94,7 +94,7 @@ void apexc_state::draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int 
 }
 
 
-uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apexc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, /*machine().visible_area*/panel_window);
 	draw_string(bitmap, "power", 8, 0, 0);

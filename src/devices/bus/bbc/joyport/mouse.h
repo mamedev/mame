@@ -31,12 +31,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t pb_r() override;
+
+	TIMER_CALLBACK_MEMBER(update);
 
 private:
 	required_ioport m_mouse_x;

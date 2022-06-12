@@ -207,8 +207,8 @@ void mcms_device::device_start()
 {
 	m_write_irq.resolve();
 	m_stream = stream_alloc(0, 2, 31250);
-	m_timer = timer_alloc(0);
-	m_clrtimer = timer_alloc(1);
+	m_timer = timer_alloc(FUNC(mcms_device::set_irq_tick), this);
+	m_clrtimer = timer_alloc(FUNC(mcms_device::clr_irq_tick), this);
 	m_enabled = false;
 	memset(m_vols, 0, sizeof(m_vols));
 	memset(m_table, 0, sizeof(m_table));
@@ -238,18 +238,16 @@ void mcms_device::device_reset()
 	m_enabled = false;
 }
 
-void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(mcms_device::set_irq_tick)
 {
-	if (tid == 0)
-	{
-		m_write_irq(ASSERT_LINE);
-		// clear this IRQ in 10 cycles (?)
-		m_clrtimer->adjust(attotime::from_usec(10), 0);
-	}
-	else if (tid == 1)
-	{
-		m_write_irq(CLEAR_LINE);
-	}
+	m_write_irq(ASSERT_LINE);
+	// clear this IRQ in 10 cycles (?)
+	m_clrtimer->adjust(attotime::from_usec(10), 0);
+}
+
+TIMER_CALLBACK_MEMBER(mcms_device::clr_irq_tick)
+{
+	m_write_irq(CLEAR_LINE);
 }
 
 void mcms_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)

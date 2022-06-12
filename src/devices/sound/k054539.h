@@ -64,13 +64,14 @@ protected:
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
+
+	TIMER_CALLBACK_MEMBER(call_timer_handler);
 
 private:
 	struct channel {
@@ -86,6 +87,8 @@ private:
 	double gain[8];
 	uint8_t posreg_latch[8][3];
 	int flags;
+
+	float filter_hist[8][4];
 
 	unsigned char regs[0x230];
 	std::unique_ptr<uint8_t []> ram;
@@ -107,6 +110,8 @@ private:
 	void keyon(int channel);
 	void keyoff(int channel);
 	void init_chip();
+	void advance_filter(int channel, int val);
+	float calculate_filter(int channel, float t);
 };
 
 DECLARE_DEVICE_TYPE(K054539, k054539_device)

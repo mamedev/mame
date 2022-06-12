@@ -452,7 +452,7 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="xl80" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
+			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="9433cs-0090.u3" size="0x1000" crc="aec58630" sha1="49fb99afcb419413be4b82babf022793362dd15b"/>
@@ -466,6 +466,32 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z80videopak">
+		<description>Z80 Video Pak</description>
+		<year>1984</year>
+		<publisher>Data 20</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="z80videopak" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="c6410-6 (c)1982.u6" size="0x0800" crc="22122efb" sha1="a32dba69da0923b7baa18f1cc18563aca3c827d6"/>
+			</dataarea>
+
+			<dataarea name="crtc" size="0x800">
+				<rom name="c68297 vid pak cg.u18" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04"/>
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="data20-video-pak.d64" size="174848" crc="ef80aaa2" sha1="b3a8711a6f0cb7a02e6c1cd1d92f2260c4ef9198"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1688,7 +1714,7 @@ license:CC0
 
 	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
-			<year>1983</year>
+		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
 		<part name="cart" interface="c64_cart">
@@ -6238,7 +6264,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/>
+				<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6252,7 +6278,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/>
+				<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6266,7 +6292,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/>
+				<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/>
 			</dataarea>
 		</part>
 	</software>

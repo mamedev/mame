@@ -23,8 +23,8 @@ Here are the key codes to enable play:
 
 Game              NUM  Start game                End ball
 -----------------------------------------------------------------------------------------------
-Sorcerer          532  AD hit 1                  AD
-Space Huttle      535  ASD hit 1                 ASD
+Sorcerer          532  ASD hit 1                 ASD
+Space Shuttle     535  ASD hit 1                 ASD
 Comet             540  1                         X
 
 Status:
@@ -70,7 +70,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer);
 
 private:
 	void dig0_w(u8 data);
@@ -81,7 +82,6 @@ private:
 	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
@@ -98,7 +98,7 @@ private:
 	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
 	emu_timer* m_irq_timer = nullptr;
-	static const device_timer_id TIMER_IRQ = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;
 	required_device<pia6821_device> m_pia21;
@@ -232,12 +232,6 @@ INPUT_CHANGED_MEMBER( s9_state::main_nmi )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ_LINE_MEMBER( s9_state::pia21_ca1_r )
-{
-// sound busy
-	return 1;
-}
-
 void s9_state::sol2_w(u8 data)
 {
 	if (m_game)
@@ -314,26 +308,21 @@ WRITE_LINE_MEMBER( s9_state::pia_irq )
 	}
 }
 
-void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s9_state::irq_timer)
 {
-	switch(id)
+	if(param == 1)
 	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
-		}
-		else
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
+		m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 }
 
@@ -350,7 +339,7 @@ void s9_state::machine_start()
 	save_item(NAME(m_comma12));
 	save_item(NAME(m_comma34));
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(s9_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
@@ -376,7 +365,7 @@ void s9_state::s9(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
-	m_pia21->readca1_handler().set(FUNC(s9_state::pia21_ca1_r));
+	m_pia21->ca1_w(1); // sound busy
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(s9_state::sol2_w));
 	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));

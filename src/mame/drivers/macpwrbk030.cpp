@@ -390,7 +390,7 @@ void macpb030_state::machine_start()
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
 
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macpb030_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macpb030_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 }
 

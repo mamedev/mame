@@ -16,7 +16,6 @@
 
 #include <array>
 #include <fstream>
-#include <fstream>
 #include <ios>
 #include <iostream>
 #include <memory>
@@ -26,7 +25,7 @@
 
 namespace plib {
 
-	/// \brief wrapper around isteam read
+	/// \brief wrapper around istream read
 	///
 	template <typename S, typename T>
 	static S & istream_read(S &is, T * data, size_t len)
@@ -37,7 +36,7 @@ namespace plib {
 		return is.read(reinterpret_cast<ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
-	/// \brief wrapper around osteam write
+	/// \brief wrapper around ostream write
 	///
 	template <typename S, typename T>
 	static S & ostream_write(S &os, const T * data, size_t len)
@@ -66,11 +65,11 @@ namespace plib {
 		istream_uptr(const istream_uptr &) = delete;
 		istream_uptr &operator=(const istream_uptr &) = delete;
 		istream_uptr(istream_uptr &&rhs) noexcept
+		: m_strm(std::move(rhs.m_strm))
+		, m_filename(std::move(rhs.m_filename))
 		{
-			m_strm = std::move(rhs.m_strm);
-			m_filename = std::move(rhs.m_filename);
 		}
-		istream_uptr &operator=(istream_uptr &&) /*noexcept*/ = delete;
+		istream_uptr &operator=(istream_uptr &&) = delete;
 
 		~istream_uptr() = default;
 
@@ -89,8 +88,7 @@ namespace plib {
 	};
 
 ///
-///
-/// putf8reader_t digests linux & dos/windows text files
+/// \brief digests linux & dos/windows text files
 ///
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class putf8_reader
@@ -121,11 +119,11 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline(putf8string &line)
+	bool read_line(putf8string &line)
 	{
 		putf8string::code_t c = 0;
 		line = "";
-		if (!this->readcode(c))
+		if (!this->read_code(c))
 		{
 			return false;
 		}
@@ -135,7 +133,7 @@ public:
 				break;
 			if (c != 13) // ignore CR
 				line += putf8string(1, c);
-			if (!this->readcode(c))
+			if (!this->read_code(c))
 				break;
 		}
 		return true;
@@ -148,11 +146,11 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline_lf(putf8string &line)
+	bool read_line_lf(putf8string &line)
 	{
 		putf8string::code_t c = 0;
 		line = "";
-		if (!this->readcode(c))
+		if (!this->read_code(c))
 		{
 			return false;
 		}
@@ -162,7 +160,7 @@ public:
 				line += putf8string(1, c);
 			if (c == 10)
 				break;
-			if (!this->readcode(c))
+			if (!this->read_code(c))
 				break;
 		}
 		return true;
@@ -176,7 +174,7 @@ public:
 		return (!m_strm->eof());
 	}
 
-	bool readcode(putf8string::traits_type::code_t &c)
+	bool read_code(putf8string::traits_type::code_t &c)
 	{
 		std::array<std::istream::char_type, 4> b{0};
 		if (m_strm->eof())
@@ -202,9 +200,9 @@ private:
 	std::unique_ptr<std::istream> m_strm;
 };
 
-// -----------------------------------------------------------------------------
-// putf8writer_t: writer on top of ostream
-// -----------------------------------------------------------------------------
+///
+/// \brief writer on top of ostream
+///
 
 class putf8_writer
 {
@@ -218,7 +216,7 @@ public:
 
 	virtual ~putf8_writer() = default;
 
-	void writeline(const pstring &line) const
+	void write_line(const pstring &line) const
 	{
 		write(line);
 		write(10);
@@ -257,7 +255,7 @@ public:
 	~putf8_fmt_writer() override = default;
 
 //protected:
-	void vdowrite(const pstring &s) const
+	void upstream_write(const pstring &s) const
 	{
 		write(s);
 	}
@@ -266,9 +264,9 @@ public:
 private:
 };
 
-// -----------------------------------------------------------------------------
-// pbinary_writer_t: writer on top of ostream
-// -----------------------------------------------------------------------------
+///
+/// \brief writer on top of ostream
+///
 
 class pbinary_writer
 {
@@ -299,7 +297,7 @@ public:
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		const auto sz(val.size());
+		const typename std::vector<T>::size_type sz(val.size());
 		write(sz);
 		ostream_write(m_strm, val.data(), sz);
 	}
@@ -348,7 +346,7 @@ private:
 	std::istream &m_strm;
 };
 
-inline void copystream(std::ostream &dest, std::istream &src)
+inline void copy_stream(std::ostream &dest, std::istream &src)
 {
 	// FIXME: optimize
 	std::array<std::ostream::char_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
@@ -366,7 +364,7 @@ class ifstream : public std::ifstream
 {
 public:
 
-	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version::vmajor()>=9),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
@@ -387,8 +385,10 @@ public:
 class ofstream : public std::ofstream
 {
 public:
-	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version::vmajor()>=9),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
+
+	ofstream() : std::ofstream() {}
 
 	template <typename T>
 	explicit ofstream(const pstring_t<T> &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
@@ -400,6 +400,19 @@ public:
 	: std::ofstream(filename_type(putf8string(name)).c_str(), mode)
 	{
 	}
+
+	template <typename T>
+	void open(const pstring_t<T> &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	{
+		std::ofstream::open(filename_type(name).c_str(), mode);
+	}
+
+	template <typename T>
+	void open(const std::string &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	{
+		std::ofstream::open(filename_type(putf8string(name)).c_str(), mode);
+	}
+
 };
 
 

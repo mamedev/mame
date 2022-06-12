@@ -334,11 +334,6 @@ void exorterm155_device::pia_disp_pb_w(u8 data)
 	m_rs232_conn_dtr_handler(BIT(data, 7));
 }
 
-READ_LINE_MEMBER(exorterm155_device::pia_disp_ca2_r)
-{
-	return m_ring;
-}
-
 //**************************************************************************
 //  VIDEO EMULATION
 //**************************************************************************
@@ -582,7 +577,7 @@ WRITE_LINE_MEMBER(exorterm155_device::rs232_conn_dsr_w)
 
 WRITE_LINE_MEMBER(exorterm155_device::rs232_conn_ri_w)
 {
-	m_ring = state;
+	m_pia_disp->ca2_w(state);
 }
 
 WRITE_LINE_MEMBER(exorterm155_device::rs232_conn_cts_w)
@@ -757,12 +752,11 @@ void exorterm155_device::device_start()
 
 	save_item(NAME(m_sys_timer_count));
 	save_item(NAME(m_dsr));
-	save_item(NAME(m_ring));
 	save_item(NAME(m_kbd_start_holdoff));
 
 	// Keyboard
-	m_kbd_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_scan_row), this));
-	m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat), this));
+	m_kbd_scan_timer = timer_alloc(FUNC(exorterm155_device::kbd_scan_row), this);
+	m_kbd_repeat_timer = timer_alloc(FUNC(exorterm155_device::kbd_repeat), this);
 	kbd_reset_state();
 	kbd_repeat_stop();
 
@@ -774,7 +768,6 @@ void exorterm155_device::device_start()
 	save_item(NAME(m_kbd_last_modifiers));
 
 	m_dsr = 1;
-	m_ring = 0;
 }
 
 void exorterm155_device::device_reset()
@@ -877,7 +870,7 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 	m_pia_disp->writepa_handler().set(FUNC(exorterm155_device::pia_disp_pa_w));
 	m_pia_disp->readpb_handler().set(FUNC(exorterm155_device::pia_disp_pb_r));
 	m_pia_disp->writepb_handler().set(FUNC(exorterm155_device::pia_disp_pb_w));
-	m_pia_disp->readca2_handler().set(FUNC(exorterm155_device::pia_disp_ca2_r));
+	m_pia_disp->ca2_w(0);
 	m_pia_disp->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<5>));
 	m_pia_disp->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<6>));
 

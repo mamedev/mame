@@ -746,7 +746,7 @@ void a2bus_grapplerplus_device::device_start()
 {
 	a2bus_grapplerplus_device_base::device_start();
 
-	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_grapplerplus_device::update_strobe), this));
+	m_strobe_timer = timer_alloc(FUNC(a2bus_grapplerplus_device::update_strobe), this);
 
 	m_next_strobe = 1U;
 

@@ -58,13 +58,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_set_input(int inputnum, int state) override;
+
+	TIMER_CALLBACK_MEMBER(adc_complete);
 
 	void send_port(uint8_t offset, uint8_t data);
 	uint8_t read_port(uint8_t offset);

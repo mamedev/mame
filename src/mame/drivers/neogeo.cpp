@@ -860,9 +860,9 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::vblank_interrupt_callback)
 
 void neogeo_base_state::create_interrupt_timers()
 {
-	m_display_position_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::display_position_interrupt_callback),this));
-	m_display_position_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::display_position_vblank_callback),this));
-	m_vblank_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_base_state::vblank_interrupt_callback),this));
+	m_display_position_interrupt_timer = timer_alloc(FUNC(neogeo_base_state::display_position_interrupt_callback), this);
+	m_display_position_vblank_timer = timer_alloc(FUNC(neogeo_base_state::display_position_vblank_callback), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(neogeo_base_state::vblank_interrupt_callback), this);
 }
 
 

@@ -64,7 +64,7 @@ void electron_state::video_start()
 		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE_INTERRUPT);
+	m_scanline_timer = timer_alloc(FUNC(electron_state::electron_scanline_interrupt), this);
 	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 

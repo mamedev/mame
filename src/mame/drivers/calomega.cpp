@@ -890,44 +890,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
 	// logerror("Timer_2 event : state=%d\n", m_timer);
 }
 
-READ_LINE_MEMBER(calomega_state::timer_r)
-{
-	// logerror("timer_1 read : state=%d\n", m_timer);
-	return m_timer;
-}
-
 WRITE_LINE_MEMBER(calomega_state::vblank0_w)
 {
-	m_vblank = state;
 	m_pia[0]->read(0);
 	m_pia[0]->read(0);
 	m_pia[1]->cb1_w(state);
 	// m_pia[1]->read(3);  // CRB
-	// logerror("V_BLANK_0 event : state=%d\n", m_vblank);
+	// logerror("V_BLANK_0 event : state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::vblank1_w)
 {
-	m_vblank = state;
 	m_pia[0]->read(2);
 	m_pia[0]->cb1_w(state);
-	// logerror("V_BLANK_1 event (sale ): state=%d\n", m_vblank);
+	// logerror("V_BLANK_1 event (sale ): state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 {
-	m_vblank = state;
 	m_pia[1]->read(0);
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
 
-	// logerror("V_BLANK_2 event : state=%d\n", m_vblank);
-}
-
-READ_LINE_MEMBER(calomega_state::vblank_r)
-{
-	// logerror("V_BLANK read : state=%d\n", m_vblank);
-	return m_vblank;
+	// logerror("V_BLANK_2 event : state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
@@ -948,10 +933,6 @@ void calomega_state::dummy_pia_w(uint8_t data)
 	m_pia_data = data;
 }
 
-READ_LINE_MEMBER(calomega_state::dummy_pia_line_r)
-{
-	return false;
-}
 WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
 {
 }
@@ -4614,8 +4595,8 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
-	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
-	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->ca1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->cb1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
@@ -4626,7 +4607,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
 	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.   (CPU -> PIA)
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
@@ -4687,8 +4668,8 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
-	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
-	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->ca1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->cb1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
@@ -4699,7 +4680,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
 	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.   (CPU -> PIA)
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
@@ -4822,8 +4803,8 @@ void calomega_state::sys906(machine_config &config)
 	PIA6821(config.replace(), m_pia[1], 0);
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
-	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.    (CPU -> PIA)
+	m_pia[1]->ca1_w(0);                                                       // Timer Interrupt Ack.      (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.    (CPU -> PIA)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));       // Mux. Scan lines
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));       // Lamps 1 to 8
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::pia1_cb2_w));            // V_BLANK interrupt line input (from Vertical Synch)

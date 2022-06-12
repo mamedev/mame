@@ -33,8 +33,6 @@ public:
 	uint16_t read(offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	static void set_verbose(int on_off);
-
 protected:
 	static constexpr unsigned OMTI_MAX_LUN = 1;
 	static constexpr unsigned CDB_SIZE = 10;
@@ -50,7 +48,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -59,7 +56,9 @@ protected:
 	virtual void dack_line_w(int line, int state) override;
 	virtual void eop_w(int state) override;
 
-	void set_interrupt(enum line_state line_state);
+	void set_interrupt(line_state state);
+
+	TIMER_CALLBACK_MEMBER(trigger_interrupt);
 
 	required_device<upd765a_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
@@ -82,34 +81,34 @@ private:
 
 	void fdc_map(address_map &map);
 
-	uint16_t jumper;
+	uint16_t m_jumper;
 
-	uint8_t omti_state;
+	uint8_t m_omti_state;
 
-	uint8_t status_port;
-	uint8_t config_port;
-	uint8_t mask_port;
+	uint8_t m_status_port;
+	uint8_t m_config_port;
+	uint8_t m_mask_port;
 
 	// command descriptor block
-	uint8_t command_buffer[CDB_SIZE];
-	int command_length;
-	int command_index;
-	int command_status;
+	uint8_t m_command_buffer[CDB_SIZE];
+	uint8_t m_command_length;
+	uint16_t m_command_index;
+	uint8_t m_command_status;
 
 	// data buffer
-	std::vector<uint8_t> sector_buffer;
-	uint8_t *data_buffer;
-	int data_length;
-	int data_index;
+	std::vector<uint8_t> m_sector_buffer;
+	uint8_t *m_data_buffer;
+	uint16_t m_data_length;
+	uint16_t m_data_index;
 
 	// sense data
-	uint8_t sense_data[4];
+	uint8_t m_sense_data[4];
 
 	// these are used only to satisfy dex
-	uint32_t diskaddr_ecc_error;
-	uint32_t diskaddr_format_bad_track;
-	uint8_t alternate_track_buffer[4];
-	uint32_t alternate_track_address[2];
+	uint32_t m_diskaddr_ecc_error;
+	uint32_t m_diskaddr_format_bad_track;
+	uint8_t m_alternate_track_buffer[4];
+	uint32_t m_alternate_track_address[2];
 
 	emu_timer *m_timer;
 
@@ -162,7 +161,7 @@ public:
 	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// get sector diskaddr of logical unit lun into data_buffer
-	uint32_t get_sector(int32_t diskaddr, uint8_t *data_buffer, uint32_t length, uint8_t lun);
+	uint32_t get_sector(int32_t diskaddr, uint8_t *buffer, uint32_t length, uint8_t lun);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

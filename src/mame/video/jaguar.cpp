@@ -569,7 +569,7 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_blitter_status = 0;
 		int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
 		int outer_count = m_blitter_regs[B_COUNT] >> 16;
-		timer_set(attotime::from_ticks(inner_count * outer_count, m_gpu->clock()), TID_BLITTER_DONE);
+		m_blitter_done_timer->adjust(attotime::from_ticks(inner_count * outer_count, m_gpu->clock()));
 		blitter_run();
 	}
 
@@ -639,7 +639,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
 					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
-					timer_set(sample_period, TID_PIT);
+					m_pit_timer->adjust(sample_period);
 				}
 				break;
 
@@ -732,41 +732,30 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
  *
  *************************************/
 
-void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 {
-	switch (id)
+	m_blitter_status = 1;
+}
+
+TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
+{
+	if (m_gpu_regs[INT1] & 0x8)
+		trigger_host_cpu_irq(3);
+	if (m_gpu_regs[PIT0] != 0)
 	{
-		case TID_SCANLINE:
-			scanline_update(param);
-			break;
-
-		case TID_BLITTER_DONE:
-			m_blitter_status = 1;
-			break;
-
-		case TID_PIT:
-			if (m_gpu_regs[INT1] & 0x8)
-				trigger_host_cpu_irq(3);
-			if (m_gpu_regs[PIT0] != 0)
-			{
-				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
-				timer_set(sample_period, TID_PIT);
-			}
-			break;
-
-		case TID_SERIAL:
-			serial_update();
-			break;
-
-		case TID_GPU_SYNC:
-			// if a command is still pending, and we haven't maxed out our timer, set a new one
-			if (m_gpu_command_pending && param < 1000)
-				timer_set(attotime::from_usec(50), TID_GPU_SYNC, ++param);
-			break;
+		attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
+		m_pit_timer->adjust(sample_period);
 	}
 }
 
-void jaguar_state::scanline_update(int param)
+TIMER_CALLBACK_MEMBER(jaguar_state::gpu_sync)
+{
+	// if a command is still pending, and we haven't maxed out our timer, set a new one
+	if (m_gpu_command_pending && param < 1000)
+		m_gpu_sync_timer->adjust(attotime::from_usec(50), ++param);
+}
+
+TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 {
 	int vc = param & 0xffff;
 	int hdb = param >> 16;
@@ -832,8 +821,15 @@ void jaguar_state::video_start()
 	memset(&m_gpu_regs, 0, sizeof(m_gpu_regs));
 	m_cpu_irq_state = 0;
 
-	m_object_timer = timer_alloc(TID_SCANLINE);
+	m_object_timer = timer_alloc(FUNC(jaguar_state::scanline_update), this);
+	m_blitter_done_timer = timer_alloc(FUNC(jaguar_state::blitter_done), this);
+	m_pit_timer = timer_alloc(FUNC(jaguar_state::pit_update), this);
+	m_gpu_sync_timer = timer_alloc(FUNC(jaguar_state::gpu_sync), this);
+
 	adjust_object_timer(0);
+	m_blitter_done_timer->adjust(attotime::never);
+	m_pit_timer->adjust(attotime::never);
+	m_gpu_sync_timer->adjust(attotime::never);
 
 	m_screen_bitmap.allocate(760, 512);
 

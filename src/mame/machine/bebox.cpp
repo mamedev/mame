@@ -726,18 +726,6 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 }
 
 
-void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_GET_DEVICES:
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in bebox_state::device_timer");
-	}
-}
-
-
 /*************************************
  *
  *  Driver main
@@ -746,8 +734,6 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 
 void bebox_state::machine_reset()
 {
-	timer_set(attotime::zero, TIMER_GET_DEVICES);
-
 	m_ppc[0]->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_ppc[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 

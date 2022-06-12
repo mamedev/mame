@@ -6,17 +6,17 @@
 //
 //============================================================
 
+#include "winutil.h"
+
+// lib/util
+#include "timeconv.h"
+
+// osd
+#include "strconv.h"
+
 // standard windows headers
 #include <windows.h>
 #include <direct.h>
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "winutil.h"
-#include "strconv.h"
-#include "timeconv.h"
 
 
 //============================================================

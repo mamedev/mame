@@ -207,6 +207,10 @@ private:
 	bool m_int_state;
 	u16 m_reg[64];
 	u64 m_cam[16];
+
+	// These wrappers handle 16-bit data stored on 32-bit word boundaries when in 32-bit mode
+	u16 read_bus_word(offs_t address);
+	void write_bus_word(offs_t address, u16 data);
 };
 
 DECLARE_DEVICE_TYPE(DP83932C, dp83932c_device)

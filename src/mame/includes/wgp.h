@@ -47,17 +47,12 @@ public:
 	void init_wgp2();
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT4,
-		TIMER_CPUB_INTERRUPT6
-	};
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
+
+	TIMER_CALLBACK_MEMBER(trigger_cpu_b_int6);
 
 private:
 	void coins_w(u8 data);

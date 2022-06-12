@@ -36,7 +36,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(bus_error_off);
 
 private:
 	required_device<m68000_base_device> m_maincpu;
@@ -53,6 +54,7 @@ private:
 	required_shared_ptr<uint32_t> m_mailbox;
 	required_shared_ptr<uint32_t> m_p_ram;
 	required_region_ptr<uint32_t> m_sysrom;
+	required_ioport m_dips;
 
 	DECLARE_WRITE_LINE_MEMBER(dusirq_callback);
 	DECLARE_WRITE_LINE_MEMBER(scsiirq_callback);

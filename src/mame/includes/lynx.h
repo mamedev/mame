@@ -49,7 +49,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 private:
@@ -237,6 +236,11 @@ private:
 	// io ports
 	required_ioport m_joy_io;
 	required_ioport m_pause_io;
+
+	// timers
+	emu_timer *m_blitter_timer = nullptr;
+	emu_timer *m_loopback_timer = nullptr;
+	emu_timer *m_uart_timer = nullptr;
 
 	// connected to cartridge slot
 	inline u32 get_cart_addr() { return (BIT(m_mikey.IODAT(), 4) * m_audin_offset) + (m_cart_addr_block * m_granularity) + m_cart_addr_counter; }

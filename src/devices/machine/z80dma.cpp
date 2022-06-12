@@ -181,7 +181,7 @@ void z80dma_device::device_start()
 	m_out_iorq_cb.resolve_safe();
 
 	// allocate timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80dma_device::timerproc), this));
+	m_timer = timer_alloc(FUNC(z80dma_device::timerproc), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -566,17 +566,14 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 
 void z80dma_device::update_status()
 {
-	uint16_t pending_transfer;
-	attotime next;
-
 	// no transfer is active right now; is there a transfer pending right now?
-	pending_transfer = is_ready() & m_dma_enabled;
+	bool const pending_transfer = is_ready() && m_dma_enabled;
 
 	if (pending_transfer)
 	{
 		m_is_read = true;
 		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
-		next = attotime::from_hz(clock());
+		attotime const next = attotime::from_hz(clock());
 		m_timer->adjust(
 			attotime::zero,
 			0,
@@ -706,6 +703,7 @@ void z80dma_device::write(uint8_t data)
 					m_read_regs_follow[0] = m_status;
 					break;
 				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
+					LOG("Z80DMA Reset and Disable Interrupts\n");
 					WR3 &= ~0x20;
 					m_ip = 0;
 					m_ius = 0;
@@ -759,7 +757,6 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
 					m_dma_enabled = 1;
-					update_status();
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					LOG("Z80DMA Set Read Mask\n");
@@ -784,7 +781,6 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_FORCE_READY:
 					LOG("Z80DMA Force Ready\n");
 					m_force_ready = 1;
-					update_status();
 					break;
 				case COMMAND_ENABLE_INTERRUPTS:
 					LOG("Z80DMA Enable IRQ\n");
@@ -806,6 +802,7 @@ void z80dma_device::write(uint8_t data)
 				default:
 					logerror("Z80DMA Unknown WR6 command %02x\n", data);
 			}
+			update_status();
 		}
 		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
 			logerror("Z80DMA Unknown base register %02x\n", data);

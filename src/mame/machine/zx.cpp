@@ -14,7 +14,7 @@
 void zx_state::init_zx()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
-	m_tape_input = timer_alloc(TIMER_TAPE_INPUT);
+	m_tape_input = timer_alloc(FUNC(zx_state::zx_tape_input), this);
 
 	if(m_ram->size() == 32768)
 		m_program->unmap_readwrite(0x8000, 0xbfff);
@@ -41,7 +41,7 @@ void zx_state::machine_reset()
 	m_tape_input->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 
-void zx_state::zx_tape_input()
+TIMER_CALLBACK_MEMBER(zx_state::zx_tape_input)
 {
 	m_cassette_cur_level = m_cassette->input();
 }

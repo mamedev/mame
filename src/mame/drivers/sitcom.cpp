@@ -68,18 +68,18 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void update_ppi_pa(uint8_t data);
+	virtual void update_ppi_pb(uint8_t data);
+
 	void sitcom_mem(address_map &map);
 	void sitcom_io(address_map &map);
 
 	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
-
-	virtual void update_ppi_pa(uint8_t data);
-	virtual void update_ppi_pb(uint8_t data);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	static void sitcom_null_modem(device_t *device)
 	{
@@ -99,11 +99,6 @@ protected:
 class sitcom_timer_state : public sitcom_state
 {
 public:
-	enum
-	{
-		TIMER_SHUTTER
-	};
-
 	sitcom_timer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sitcom_state(mconfig, type, tag)
 		, m_speed(*this, "SPEED")
@@ -125,13 +120,13 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	virtual void update_ppi_pa(uint8_t data) override;
 	virtual void update_ppi_pb(uint8_t data) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	TIMER_CALLBACK_MEMBER(shutter_tick);
 
 	void update_dac(uint8_t value);
 
@@ -299,16 +294,9 @@ INPUT_CHANGED_MEMBER( sitcom_timer_state::update_speed )
 	}
 }
 
-void sitcom_timer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sitcom_timer_state::shutter_tick)
 {
-	switch (id)
-	{
-	case TIMER_SHUTTER:
-		m_shutter = false;
-		break;
-	default:
-		sitcom_state::device_timer(timer, id, param);
-	}
+	m_shutter = false;
 }
 
 void sitcom_timer_state::machine_start()
@@ -318,7 +306,7 @@ void sitcom_timer_state::machine_start()
 	m_test_led.resolve();
 	m_dac.resolve();
 
-	m_shutter_timer = timer_alloc(TIMER_SHUTTER);
+	m_shutter_timer = timer_alloc(FUNC(sitcom_timer_state::shutter_tick), this);
 
 	save_item(NAME(m_shutter));
 	save_item(NAME(m_dac_cs));

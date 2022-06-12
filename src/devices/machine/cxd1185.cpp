@@ -100,7 +100,7 @@ void cxd1185_device::device_start()
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_ioport));
 
-	m_state_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd1185_device::state_timer), this));
+	m_state_timer = timer_alloc(FUNC(cxd1185_device::state_timer), this);
 	m_state = IDLE;
 
 	m_irq_asserted = false;

@@ -281,7 +281,7 @@ INPUT_PORTS_END
 
 void gijoe_state::machine_start()
 {
-	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
+	m_dmadelay_timer = timer_alloc(FUNC(gijoe_state::dmaend_callback), this);
 
 	save_item(NAME(m_cur_control2));
 }

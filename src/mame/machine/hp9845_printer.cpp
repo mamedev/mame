@@ -172,7 +172,7 @@ void hp9845_printer_device::device_start()
 	save_item(NAME(m_fsm_state));
 	save_item(NAME(m_cur_line));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(hp9845_printer_device::clear_busy_flag), this);
 }
 
 void hp9845_printer_device::device_reset()
@@ -186,7 +186,7 @@ void hp9845_printer_device::device_reset()
 	m_sts_handler(true);
 }
 
-void hp9845_printer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp9845_printer_device::clear_busy_flag)
 {
 	m_busy = false;
 	update_fsm();

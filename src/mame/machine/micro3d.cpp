@@ -125,18 +125,6 @@ static inline int64_t normalised_multiply(int32_t a, int32_t b)
 	return result >> 14;
 }
 
-void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_MAC_DONE:
-		mac_done_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in micro3d_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 {
 	m_drmath->set_input_line(AM29000_INTR0, ASSERT_LINE);
@@ -334,7 +322,7 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 
 	/* TODO: Calculate a better estimate for timing */
 	if (m_mac_stat)
-		timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, TIMER_MAC_DONE);
+		m_mac_done_timer->adjust(attotime::from_hz(MAC_CLK) * mac_cycles);
 
 	m_mrab11 = mrab11;
 	m_vtx_addr = vtx_addr;
@@ -530,9 +518,15 @@ void micro3d_state::init_botss()
 	init_micro3d();
 }
 
+void micro3d_state::machine_start()
+{
+	m_mac_done_timer = timer_alloc(FUNC(micro3d_state::mac_done_callback), this);
+}
+
 void micro3d_state::machine_reset()
 {
 	m_vgb->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_drmath->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_mac_done_timer->adjust(attotime::never);
 }

@@ -478,94 +478,81 @@ void sega315_5377_device::set_sega315_5124_compatibility_mode(bool sega315_5124_
 }
 
 
-void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sega315_5124_device::eol_flag_check)
 {
-	switch (id)
+	/* Activate flags that were pending until the end of the line. */
+	check_pending_flags();
+}
+
+TIMER_CALLBACK_MEMBER(sega315_5124_device::draw_lborder)
+{
+	rectangle rec;
+	rec.min_y = rec.max_y = param;
+
+	update_palette();
+
+	/* Draw left border */
+	rec.min_x = LBORDER_START;
+	rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
+	m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
+	m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
+}
+
+TIMER_CALLBACK_MEMBER(sega315_5124_device::draw_rborder)
+{
+	rectangle rec;
+	rec.min_y = rec.max_y = param;
+
+	update_palette();
+
+	/* Draw right border */
+	rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
+	rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
+	m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
+	m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
+}
+
+TIMER_CALLBACK_MEMBER(sega315_5124_device::trigger_hint)
+{
+	if (m_pending_hint || m_hint_occurred)
 	{
-	case TIMER_LINE:
-		process_line_timer();
-		break;
-
-	case TIMER_FLAGS:
-		/* Activate flags that were pending until the end of the line. */
-		check_pending_flags();
-		break;
-
-	case TIMER_DRAW:
-		update_palette();
-		draw_scanline(LBORDER_START + LBORDER_WIDTH, param, screen().vpos() - param);
-		break;
-
-	case TIMER_LBORDER:
+		if (BIT(m_reg[0x00], 4))
 		{
-			rectangle rec;
-			rec.min_y = rec.max_y = param;
+			m_n_int_state = 0;
 
-			update_palette();
-
-			/* Draw left border */
-			rec.min_x = LBORDER_START;
-			rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
-			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
+			if (!m_n_int_cb.isnull())
+				m_n_int_cb(ASSERT_LINE);
 		}
-		break;
-
-	case TIMER_RBORDER:
-		{
-			rectangle rec;
-			rec.min_y = rec.max_y = param;
-
-			update_palette();
-
-			/* Draw right border */
-			rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
-			rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
-			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
-		}
-		break;
-
-	case TIMER_HINT:
-		if (m_pending_hint || m_hint_occurred)
-		{
-			if (BIT(m_reg[0x00], 4))
-			{
-				m_n_int_state = 0;
-
-				if (!m_n_int_cb.isnull())
-					m_n_int_cb(ASSERT_LINE);
-			}
-		}
-		break;
-
-	case TIMER_VINT:
-		if ((m_pending_status & STATUS_VINT) || (m_status & STATUS_VINT))
-		{
-			if (BIT(m_reg[0x01], 5))
-			{
-				m_n_int_state = 0;
-
-				if (!m_n_int_cb.isnull())
-					m_n_int_cb(ASSERT_LINE);
-			}
-		}
-		break;
-
-	case TIMER_NMI:
-		if (!m_n_nmi_in_state)
-		{
-			if (m_n_nmi_state)
-				m_n_nmi_cb(ASSERT_LINE);
-		}
-		else
-		{
-			if (!m_n_nmi_state)
-				m_n_nmi_cb(CLEAR_LINE);
-		}
-		m_n_nmi_state = m_n_nmi_in_state;
-		break;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(sega315_5124_device::trigger_vint)
+{
+	if ((m_pending_status & STATUS_VINT) || (m_status & STATUS_VINT))
+	{
+		if (BIT(m_reg[0x01], 5))
+		{
+			m_n_int_state = 0;
+
+			if (!m_n_int_cb.isnull())
+				m_n_int_cb(ASSERT_LINE);
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sega315_5124_device::update_nmi)
+{
+	if (!m_n_nmi_in_state)
+	{
+		if (m_n_nmi_state)
+			m_n_nmi_cb(ASSERT_LINE);
+	}
+	else
+	{
+		if (!m_n_nmi_state)
+			m_n_nmi_cb(CLEAR_LINE);
+	}
+	m_n_nmi_state = m_n_nmi_in_state;
 }
 
 
@@ -583,7 +570,7 @@ void sega315_5377_device::vblank_end(int vpos)
 }
 
 
-void sega315_5124_device::process_line_timer()
+TIMER_CALLBACK_MEMBER(sega315_5124_device::process_line_timer)
 {
 	const int vpos = screen().vpos();
 	int vpos_limit = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING]
@@ -1723,8 +1710,14 @@ void sega315_5124_device::draw_scanline_mode3(int *line_buffer, int line)
 }
 
 
-void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, int line)
+TIMER_CALLBACK_MEMBER(sega315_5124_device::draw_scanline)
 {
+	int pixel_offset_x = LBORDER_START + LBORDER_WIDTH;
+	int pixel_plot_y = param;
+	int line = screen().vpos() - param;
+
+	update_palette();
+
 	int blitline_buffer[256];
 	int priority_selected[256];
 
@@ -2021,16 +2014,16 @@ void sega315_5124_device::device_start()
 	screen().register_screen_bitmap(m_tmpbitmap);
 	screen().register_screen_bitmap(m_y1_bitmap);
 
-	m_display_timer = timer_alloc(TIMER_LINE);
+	m_display_timer = timer_alloc(FUNC(sega315_5124_device::process_line_timer), this);
 	m_display_timer->adjust(screen().time_until_pos(0, DISPLAY_CB_HPOS), 0, screen().scan_period());
-	m_pending_flags_timer = timer_alloc(TIMER_FLAGS);
+	m_pending_flags_timer = timer_alloc(FUNC(sega315_5124_device::eol_flag_check), this);
 	m_pending_flags_timer->adjust(screen().time_until_pos(0, WIDTH - 1), 0, screen().scan_period());
-	m_draw_timer = timer_alloc(TIMER_DRAW);
-	m_lborder_timer = timer_alloc(TIMER_LBORDER);
-	m_rborder_timer = timer_alloc(TIMER_RBORDER);
-	m_hint_timer = timer_alloc(TIMER_HINT);
-	m_vint_timer = timer_alloc(TIMER_VINT);
-	m_nmi_timer = timer_alloc(TIMER_NMI);
+	m_draw_timer = timer_alloc(FUNC(sega315_5124_device::draw_scanline), this);
+	m_lborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_lborder), this);
+	m_rborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_rborder), this);
+	m_hint_timer = timer_alloc(FUNC(sega315_5124_device::trigger_hint), this);
+	m_vint_timer = timer_alloc(FUNC(sega315_5124_device::trigger_vint), this);
+	m_nmi_timer = timer_alloc(FUNC(sega315_5124_device::update_nmi), this);
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_pending_status));

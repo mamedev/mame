@@ -88,7 +88,7 @@ private:
 
 void teleray10_state::machine_start()
 {
-	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(teleray10_state::bell_toggle), this));
+	m_bell_timer = timer_alloc(FUNC(teleray10_state::bell_toggle), this);
 
 	m_topr = 0;
 	m_timer_expired = false;

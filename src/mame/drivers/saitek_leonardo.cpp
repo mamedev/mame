@@ -123,7 +123,7 @@ private:
 	void p6_w(u8 data);
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { 0, 0 };
+	u8 m_led_data[2] = { };
 };
 
 void leo_state::machine_start()

@@ -73,8 +73,6 @@ void nes_somari_device::device_start()
 void nes_somari_device::pcb_reset()
 {
 	m_board_mode = SOMARI_MMC3_MODE;
-
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
 	// MMC1 regs

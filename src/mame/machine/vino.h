@@ -37,12 +37,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	static constexpr device_timer_id TIMER_FETCH_CHA = 0;
-	static constexpr device_timer_id TIMER_FETCH_CHB = 1;
-
 	enum channel_num_t : uint32_t
 	{
 		CHAN_A,
@@ -218,7 +214,7 @@ private:
 	uint32_t linear_rgb(uint32_t a, uint32_t b, float f);
 	uint32_t bilinear_pixel(float s, float t);
 	void input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v);
-	void fetch_pixel(int channel);
+	template <int Channel> TIMER_CALLBACK_MEMBER(fetch_pixel);
 	attotime calculate_field_rate(int channel);
 	attotime calculate_fetch_rate(int channel);
 

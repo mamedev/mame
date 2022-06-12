@@ -47,6 +47,7 @@ void bbc_cumana68k_device::cumana68k_mem(address_map &map)
 
 void bbc_cumana68k_device::floppy_formats(format_registration &fr)
 {
+	fr.add_mfm_containers();
 	fr.add(FLOPPY_OS9_FORMAT);
 }
 
@@ -99,8 +100,7 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	m_pia_sasi->readpa_handler().set(m_sasi, FUNC(nscsi_callback_device::read));
 	m_pia_sasi->writepa_handler().set(m_sasi, FUNC(nscsi_callback_device::write));
 	m_pia_sasi->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_sasi_pb_w));
-	m_pia_sasi->readca1_handler().set(m_sasi, FUNC(nscsi_callback_device::req_r));
-	m_pia_sasi->readcb1_handler().set_constant(1); // tied to +5V
+	m_pia_sasi->cb1_w(1); // tied to +5V
 	m_pia_sasi->ca2_handler().set(m_sasi, FUNC(nscsi_callback_device::ack_w));
 	m_pia_sasi->cb2_handler().set(m_sasi, FUNC(nscsi_callback_device::rst_w));
 	m_pia_sasi->irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));

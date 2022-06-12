@@ -17,10 +17,11 @@ public:
 	auto tx_callback() { return m_out_tx_func.bind(); }
 
 protected:
-	void device_start() override;
-	void tra_callback() override;
-	void tra_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void device_start() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+
+	TIMER_CALLBACK_MEMBER(scan_keyboard);
 
 private:
 	void push_tx(uint8_t data) { ++m_head %= 16; m_buffer[m_head] = data; }

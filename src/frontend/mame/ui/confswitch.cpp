@@ -167,7 +167,7 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset Machine"), 0, (void *)1);
+	item_append(_("Reset System"), 0, (void *)1);
 }
 
 
@@ -311,6 +311,7 @@ menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, ren
 	, m_first_nub(0.0f)
 	, m_clickable_height(0.0f)
 {
+	set_heading(_("DIP Switches"));
 }
 
 
@@ -504,11 +505,11 @@ void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
 
 menu_settings_machine_config::menu_settings_machine_config(mame_ui_manager &mui, render_container &container) : menu_confswitch(mui, container, IPT_CONFIG)
 {
+	set_heading(_("Machine Configuration"));
 }
 
 menu_settings_machine_config::~menu_settings_machine_config()
 {
 }
-
 
 } // namespace ui

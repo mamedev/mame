@@ -35,8 +35,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(handle_event);
 
 private:
 	static constexpr unsigned MAX_PSXCD_TIMERS = 4;
@@ -106,25 +107,38 @@ private:
 	uint32_t msf_to_lba_ps(uint32_t msf) { msf = cdrom_file::msf_to_lba(msf); return (msf>150)?(msf-150):msf; }
 	uint32_t lba_to_msf_ps(uint32_t lba) { return cdrom_file::lba_to_msf_alt(lba+150); }
 
-	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
-	static const unsigned int raw_sector_size=2352;
+	static const uint32_t sector_buffer_size = 16;
+	static const uint32_t default_irq_delay = 16000;
+	static const uint32_t raw_sector_size = 2352;
 
-	uint8_t cmdbuf[64]{}, mode = 0, secbuf[sector_buffer_size][raw_sector_size]{};
-	uint8_t filter_file = 0, filter_channel = 0, lastsechdr[8]{}, status = 0;
+	uint8_t cmdbuf[64]{};
+	uint8_t mode = 0;
+	uint8_t secbuf[sector_buffer_size][raw_sector_size]{};
+	uint8_t filter_file = 0;
+	uint8_t filter_channel = 0;
+	uint8_t lastsechdr[8]{};
+	uint8_t status = 0;
 	int rdp = 0;
 	uint8_t m_cursec = 0, sectail = 0;
 	uint16_t m_transcurr = 0;
 	uint8_t m_transbuf[raw_sector_size]{};
-	command_result *res_queue = nullptr, *m_int1 = nullptr;
+	command_result *res_queue = nullptr;
+	command_result *m_int1 = nullptr;
 
 	struct {
-		uint8_t sr = 0, ir = 0, imr = 0;
+		uint8_t sr = 0;
+		uint8_t ir = 0;
+		uint8_t imr = 0;
 		struct {
-			uint8_t ll = 0, lr = 0, rl = 0, rr = 0;
+			uint8_t ll = 0;
+			uint8_t lr = 0;
+			uint8_t rl = 0;
+			uint8_t rr = 0;
 		} vol;
 	} m_regs;
 
-	CDPOS loc, curpos;
+	CDPOS loc;
+	CDPOS curpos;
 
 #ifdef LSB_FIRST
 	enum {
@@ -140,10 +154,15 @@ private:
 	};
 #endif
 
-	bool open = false, m_mute = false, m_dmaload = false;
-	device_timer_id next_read_event{};
+	bool open = false;
+	bool m_mute = false;
+	bool m_dmaload = false;
+	int next_read_event{};
 	int64_t next_sector_t = 0;
-	unsigned int autopause_sector = 0, start_read_delay = 0, read_sector_cycles = 0, preread_delay = 0;
+	uint32_t autopause_sector = 0;
+	uint32_t start_read_delay = 0;
+	uint32_t read_sector_cycles = 0;
+	uint32_t preread_delay = 0;
 
 	uint32_t m_param_count = 0;
 	uint32_t m_sysclock = 0;

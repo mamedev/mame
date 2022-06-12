@@ -33,11 +33,30 @@ namespace netlist
 		device_t(device_t &owner, const pstring &name,
 			const pstring &model);
 
-		PCOPYASSIGNMOVE(device_t, delete)
+		device_t(const device_t &) = delete;
+		device_t &operator=(const device_t &) = delete;
+		device_t(device_t &&) noexcept = delete;
+		device_t &operator=(device_t &&) noexcept = delete;
 
 		~device_t() noexcept override = default;
 
 	protected:
+		template <typename T1, typename T2>
+		void push_two(T1 &term1, netlist_sig_t newQ1, const netlist_time &delay1,
+			T2 &term2, netlist_sig_t newQ2, const netlist_time &delay2) noexcept
+		{
+			if (delay2 < delay1)
+			{
+				term1.push(newQ1, delay1);
+				term2.push(newQ2, delay2);
+			}
+			else
+			{
+				term2.push(newQ2, delay2);
+				term1.push(newQ1, delay1);
+			}
+		}
+
 
 		//NETLIB_UPDATE_TERMINALSI() { }
 	private:

@@ -1102,7 +1102,7 @@ VIDEO_START_MEMBER(tx1_state,tx1)
 	m_rod_bmp = std::make_unique<uint8_t[]>(256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(tx1_state::interrupt_callback),this);
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
@@ -2986,7 +2986,7 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 	m_rod_bmp = std::make_unique<uint8_t[]>(3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(tx1_state::interrupt_callback),this);
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
@@ -3000,7 +3000,7 @@ VIDEO_START_MEMBER(tx1_state,buggybjr)
 	m_rod_bmp = std::make_unique<uint8_t[]>(256 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(tx1_state::interrupt_callback),this);
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));

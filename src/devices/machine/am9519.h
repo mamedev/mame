@@ -57,12 +57,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(check_irqs);
 
 private:
-	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
-
-	inline void set_timer() { timer_set(attotime::zero, TIMER_CHECK_IRQ); }
 	void set_irq_line(int irq, int state);
 
 	devcb_write_line m_out_int_func;
@@ -79,6 +77,8 @@ private:
 	u8 m_aclear;
 	u8 m_count[8];
 	u8 m_resp[8][4];
+
+	emu_timer *m_irq_check_timer;
 };
 
 DECLARE_DEVICE_TYPE(AM9519, am9519_device)

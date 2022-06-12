@@ -4566,7 +4566,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		<description>Bishoujo Shashinkan  - Moving School (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="美少女写真館 ｽｸｰﾙ"/>
+		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4708,7 +4708,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		<description>Bishoujo Shashinkan - Studio Cut (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="美少女写真館 ｽﾀｼﾞｵ"/>
+		<info name="alt_title" value="美少女写真館スタジオ・カット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="bishojo shashinkan studio.d88" size="348848" crc="3d19fe3c" sha1="083096a803a487b6a04c1acde9e377b5c44a8c3d"/>
@@ -35289,7 +35289,7 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		<description>Tokyo Joshikosei Sailor-fuku Nyumon (1 &amp; 2 &amp; 3)</description>
 		<year>1988?</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
-		<info name="alt_title" value="東京女子高生ｾｰﾗｰ服123"/>
+		<info name="alt_title" value="東京女子高生セーラー服123"/>
 		<!--combined image-->
 		<!--rom name="tokyo joshikosei sailor-fuku nyumon(1&amp;2&amp;3).d88" size="1046272" crc="63a79526" sha1="ca85e86628503edc15c4d40cba981e1123c0f04c"/-->
 

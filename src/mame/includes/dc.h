@@ -43,6 +43,7 @@ public:
 	/* machine related */
 	uint32_t dc_sysctrl_regs[0x200/4]{};
 	uint8_t m_armrst = 0U;
+	emu_timer *m_ch2_dma_irq_timer = nullptr;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -154,7 +154,6 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 
 void nes_txrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	// 4-screen mirroring is taken care in pcb_start, if needed...
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
@@ -174,7 +173,6 @@ void nes_hkrom_device::device_start()
 
 void nes_hkrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 1);
 	m_mmc6_reg = 0xf0;
 	m_wram_enable = 0;
@@ -206,7 +204,7 @@ void nes_zz_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Here, IRQ counter decrements every scanline. */
-void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

@@ -187,8 +187,8 @@ void tubep_state::second_cpu_irq_line_clear_w(uint8_t data)
 void tubep_state::tubep_second_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).w(FUNC(tubep_state::tubep_background_a000_w));
-	map(0xc000, 0xc000).w(FUNC(tubep_state::tubep_background_c000_w));
+	map(0xa000, 0xa000).w(FUNC(tubep_state::background_a000_w));
+	map(0xc000, 0xc000).w(FUNC(tubep_state::background_c000_w));
 	map(0xe000, 0xe7ff).ram().share("share1");                              /* 6116 #1 */
 	map(0xe800, 0xebff).writeonly().share("backgroundram"); /* row of 8 x 2147 RAMs on main PCB */
 	map(0xf000, 0xf3ff).lw8([this](offs_t off, u8 data) { m_sprite_colorsharedram[off] = data; }, "sc_w"); /* sprites color lookup table */
@@ -235,26 +235,12 @@ void tubep_state::tubep_sound_portmap(address_map &map)
 }
 
 
-void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tubep_state::assert_sprite_int)
 {
-	switch (id)
-	{
-	case TIMER_SPRITE:
-		m_mcu->set_input_line(0, ASSERT_LINE);
-		break;
-	case TIMER_TUBEP_SCANLINE:
-		tubep_scanline_callback(param);
-		break;
-	case TIMER_RJAMMER_SCANLINE:
-		rjammer_scanline_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tubep_state::device_timer");
-	}
+	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-
-TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
+TIMER_CALLBACK_MEMBER(tubep_state::scanline_callback)
 {
 	int scanline = param;
 
@@ -283,7 +269,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	if (scanline == 16)
 	{
 		LOGIRQ("/nmi CPU#3\n");
-		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		vblank_end(); /* switch buffered sprite RAM page */
 		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -320,7 +306,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 void tubep_state::machine_start()
 {
 	// Create interrupt timer
-	m_interrupt_timer = timer_alloc(TIMER_TUBEP_SCANLINE);
+	m_interrupt_timer = timer_alloc(FUNC(tubep_state::scanline_callback), this);
 }
 
 
@@ -342,7 +328,7 @@ void tubep_state::nsc_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("sprite_color");
 	map(0x0800, 0x0fff).ram().share("share2");
-	map(0x2000, 0x2009).w(FUNC(tubep_state::tubep_sprite_control_w));
+	map(0x2000, 0x2009).w(FUNC(tubep_state::sprite_control_w));
 	map(0x200a, 0x200b).nopw(); /* not used by the games - perhaps designed for debugging */
 	map(0xc000, 0xffff).rom();
 }
@@ -401,12 +387,12 @@ void rjammer_state::rjammer_second_map(address_map &map)
 void rjammer_state::rjammer_second_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xb0, 0xb0).w(FUNC(rjammer_state::rjammer_background_page_w));
-	map(0xd0, 0xd0).w(FUNC(rjammer_state::rjammer_background_LS377_w));
+	map(0xb0, 0xb0).w(FUNC(rjammer_state::background_page_w));
+	map(0xd0, 0xd0).w(FUNC(rjammer_state::background_ls377_w));
 }
 
 
-TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
+TIMER_CALLBACK_MEMBER(rjammer_state::scanline_callback)
 {
 	int scanline = param;
 
@@ -435,7 +421,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	if (scanline == 16)
 	{
 		LOGIRQ("/nmi CPU#3\n");
-		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		vblank_end(); /* switch buffered sprite RAM page */
 		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -470,7 +456,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 void rjammer_state::machine_start()
 {
 	// Create interrupt timer
-	m_interrupt_timer = timer_alloc(TIMER_RJAMMER_SCANLINE);
+	m_interrupt_timer = timer_alloc(FUNC(rjammer_state::scanline_callback), this);
 
 	// Set up save state
 	save_item(NAME(m_msm5205_toggle));
@@ -483,8 +469,8 @@ void rjammer_state::machine_reset()
 	m_msm5205_toggle = false;
 	m_adpcm_mux->select_w(0);
 
-	rjammer_voice_startstop_w(0);
-	rjammer_voice_frequency_select_w(0);
+	voice_startstop_w(0);
+	voice_frequency_select_w(0);
 }
 
 
@@ -495,7 +481,7 @@ void rjammer_state::machine_reset()
  *
  *************************************/
 
-void rjammer_state::rjammer_voice_startstop_w(uint8_t data)
+void rjammer_state::voice_startstop_w(uint8_t data)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
@@ -503,7 +489,7 @@ void rjammer_state::rjammer_voice_startstop_w(uint8_t data)
 }
 
 
-void rjammer_state::rjammer_voice_frequency_select_w(uint8_t data)
+void rjammer_state::voice_frequency_select_w(uint8_t data)
 {
 	// bit 0 of data selects voice frequency on MSM5205 (pin 1)
 	// 0 -4 KHz; 1- 8KHz
@@ -514,7 +500,7 @@ void rjammer_state::rjammer_voice_frequency_select_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(rjammer_state::rjammer_adpcm_vck_w)
+WRITE_LINE_MEMBER(rjammer_state::adpcm_vck_w)
 {
 	if (state)
 	{
@@ -527,7 +513,7 @@ WRITE_LINE_MEMBER(rjammer_state::rjammer_adpcm_vck_w)
 }
 
 
-void rjammer_state::rjammer_voice_input_w(uint8_t data)
+void rjammer_state::voice_input_w(uint8_t data)
 {
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
@@ -542,7 +528,7 @@ void rjammer_state::rjammer_voice_input_w(uint8_t data)
 }
 
 
-void rjammer_state::rjammer_voice_intensity_control_w(uint8_t data)
+void rjammer_state::voice_intensity_control_w(uint8_t data)
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
 	/* need to buffer the data */
@@ -560,13 +546,13 @@ void rjammer_state::rjammer_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x10, 0x10).w(FUNC(rjammer_state::rjammer_voice_startstop_w));
-	map(0x18, 0x18).w(FUNC(rjammer_state::rjammer_voice_frequency_select_w));
-	map(0x80, 0x80).w(FUNC(rjammer_state::rjammer_voice_input_w));
+	map(0x10, 0x10).w(FUNC(rjammer_state::voice_startstop_w));
+	map(0x18, 0x18).w(FUNC(rjammer_state::voice_frequency_select_w));
+	map(0x80, 0x80).w(FUNC(rjammer_state::voice_input_w));
 	map(0x90, 0x91).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x92, 0x93).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x94, 0x95).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x96, 0x96).w(FUNC(rjammer_state::rjammer_voice_intensity_control_w));
+	map(0x96, 0x96).w(FUNC(rjammer_state::voice_intensity_control_w));
 }
 
 
@@ -831,10 +817,10 @@ void tubep_state::tubep(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 264);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(tubep_state::screen_update_tubep));
+	m_screen->set_screen_update(FUNC(tubep_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(tubep_state::tubep_palette), 32 + 256*64);
+	PALETTE(config, "palette", FUNC(tubep_state::palette_init), 32 + 256*64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -895,10 +881,10 @@ void rjammer_state::rjammer(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(19968000 / 4, 320, 0, 256, 264, 16, 240);
-	m_screen->set_screen_update(FUNC(rjammer_state::screen_update_rjammer));
+	m_screen->set_screen_update(FUNC(rjammer_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(rjammer_state::rjammer_palette), 64);
+	PALETTE(config, "palette", FUNC(rjammer_state::palette_init), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -919,7 +905,7 @@ void rjammer_state::rjammer(machine_config &config)
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.075);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
-	m_msm->vck_callback().set(FUNC(rjammer_state::rjammer_adpcm_vck_w));
+	m_msm->vck_callback().set(FUNC(rjammer_state::adpcm_vck_w));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 KHz (changes at run time)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.325);
 

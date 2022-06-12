@@ -84,16 +84,16 @@ c1531_device::c1531_device(const machine_config &mconfig, const char *tag, devic
 void c2n_device::device_start()
 {
 	// allocate timers
-	m_read_timer = timer_alloc();
+	m_read_timer = timer_alloc(FUNC(c2n_device::read_tick), this);
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  read_tick - periodically read the datasette
 //-------------------------------------------------
 
-void c2n_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c2n_device::read_tick)
 {
 	if (m_motor)
 	{

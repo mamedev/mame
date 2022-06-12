@@ -203,7 +203,7 @@ private:
 void cgang_state::machine_start()
 {
 	for (int i = 0; i < 5; i++)
-		m_sol_filter[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgang_state::output_sol),this));
+		m_sol_filter[i] = timer_alloc(FUNC(cgang_state::output_sol), this);
 
 	// resolve outputs
 	m_gun_lamps.resolve();

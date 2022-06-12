@@ -99,7 +99,7 @@ u16 fuuki32_state::sprram_r(offs_t offset)
 	return m_spriteram[offset];
 }
 
-void fuuki32_state::fuuki32_tile_cb(u32 &code)
+void fuuki32_state::tile_cb(u32 &code)
 {
 	const u32 bank = (code & 0xc000) >> 14;
 
@@ -108,7 +108,7 @@ void fuuki32_state::fuuki32_tile_cb(u32 &code)
 	code += bank_lookedup * 0x4000;
 }
 
-void fuuki32_state::fuuki32_colpri_cb(u32 &colour, u32 &pri_mask)
+void fuuki32_state::colpri_cb(u32 &colour, u32 &pri_mask)
 {
 	const u8 priority = (colour >> 6) & 3;
 	switch (priority)

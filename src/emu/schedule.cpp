@@ -53,9 +53,7 @@ emu_timer::emu_timer() :
 	m_temporary(false),
 	m_period(attotime::zero),
 	m_start(attotime::zero),
-	m_expire(attotime::never),
-	m_device(nullptr),
-	m_id(0)
+	m_expire(attotime::never)
 {
 }
 
@@ -74,21 +72,19 @@ emu_timer::~emu_timer()
 //  re-allocated as a non-device timer
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init(running_machine &machine, timer_expired_delegate callback, bool temporary)
+emu_timer &emu_timer::init(running_machine &machine, timer_expired_delegate &&callback, bool temporary)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
 	m_next = nullptr;
 	m_prev = nullptr;
-	m_callback = callback;
+	m_callback = std::move(callback);
 	m_param = 0;
 	m_enabled = false;
 	m_temporary = temporary;
 	m_period = attotime::never;
 	m_start = machine.time();
 	m_expire = attotime::never;
-	m_device = nullptr;
-	m_id = 0;
 
 	// if we're not temporary, register ourselves with the save state system
 	if (!m_temporary)
@@ -96,37 +92,6 @@ inline emu_timer &emu_timer::init(running_machine &machine, timer_expired_delega
 
 	// insert into the list
 	machine.scheduler().timer_list_insert(*this);
-	return *this;
-}
-
-
-//-------------------------------------------------
-//  init - completely initialize the state when
-//  re-allocated as a device timer
-//-------------------------------------------------
-
-inline emu_timer &emu_timer::init(device_t &device, device_timer_id id, bool temporary)
-{
-	// ensure the entire timer state is clean
-	m_machine = &device.machine();
-	m_next = nullptr;
-	m_prev = nullptr;
-	m_callback = timer_expired_delegate(FUNC(emu_timer::device_timer_expired), this);
-	m_param = 0;
-	m_enabled = false;
-	m_temporary = temporary;
-	m_period = attotime::never;
-	m_start = machine().time();
-	m_expire = attotime::never;
-	m_device = &device;
-	m_id = id;
-
-	// if we're not temporary, register ourselves with the save state system
-	if (!m_temporary)
-		register_save();
-
-	// insert into the list
-	machine().scheduler().timer_list_insert(*this);
 	return *this;
 }
 
@@ -233,38 +198,24 @@ attotime emu_timer::remaining() const noexcept
 
 void emu_timer::register_save()
 {
-	// determine our instance number and name
+	// determine our instance number - timers are indexed based on the callback function name
 	int index = 0;
-	std::string name;
-
-	if (m_device == nullptr)
-	{
-		// for non-device timers, it is an index based on the callback function name
-		name = m_callback.name() ? m_callback.name() : "unnamed";
-		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device == nullptr)
-			{
-				if (curtimer->m_callback.name() != nullptr && m_callback.name() != nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
-					index++;
-				else if (curtimer->m_callback.name() == nullptr && m_callback.name() == nullptr)
-					index++;
-			}
-	}
-	else
-	{
-		// for device timers, it is an index based on the device and timer ID
-		name = string_format("%s/%d", m_device->tag(), m_id);
-		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device == m_device && curtimer->m_id == m_id)
+	std::string name = m_callback.name() ? m_callback.name() : "unnamed";
+	for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
+		if (!curtimer->m_temporary)
+		{
+			if (curtimer->m_callback.name() != nullptr && m_callback.name() != nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
 				index++;
-	}
+			else if (curtimer->m_callback.name() == nullptr && m_callback.name() == nullptr)
+				index++;
+		}
 
 	// save the bits
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_enabled));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
+	machine().save().save_item(nullptr, "timer", name.c_str(), index, NAME(m_param));
+	machine().save().save_item(nullptr, "timer", name.c_str(), index, NAME(m_enabled));
+	machine().save().save_item(nullptr, "timer", name.c_str(), index, NAME(m_period));
+	machine().save().save_item(nullptr, "timer", name.c_str(), index, NAME(m_start));
+	machine().save().save_item(nullptr, "timer", name.c_str(), index, NAME(m_expire));
 }
 
 
@@ -294,24 +245,10 @@ inline void emu_timer::schedule_next_period()
 void emu_timer::dump() const
 {
 	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param);
-	if (m_device == nullptr)
-		if (m_callback.name() == nullptr)
-			machine().logerror(" cb=NULL\n");
-		else
-			machine().logerror(" cb=%s\n", m_callback.name());
+	if (m_callback.name() == nullptr)
+		machine().logerror(" cb=NULL\n");
 	else
-		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
-}
-
-
-//-------------------------------------------------
-//  device_timer_expired - trampoline to avoid a
-//  conditional jump on the hot path
-//-------------------------------------------------
-
-void emu_timer::device_timer_expired(emu_timer &timer, s32 param)
-{
-	timer.m_device->timer_expired(timer, timer.m_id, param);
+		machine().logerror(" cb=%s\n", m_callback.name());
 }
 
 
@@ -564,14 +501,17 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 	if (m_execute_list == nullptr)
 		rebuild_execute_list();
 
-	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
+	{
+		// if we have a non-zero time, schedule a timer
 		timer_set(after, timer_expired_delegate(FUNC(device_scheduler::timed_trigger), this), trigid);
-
-	// send the trigger to everyone who cares
+	}
 	else
-		for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
+	{
+		// send the trigger to everyone who cares
+		for (device_execute_interface *exec = m_execute_list; exec; exec = exec->m_nextexec)
 			exec->trigger(trigid);
+	}
 }
 
 
@@ -596,7 +536,7 @@ void device_scheduler::boost_interleave(const attotime &timeslice_time, const at
 
 emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 {
-	return &m_timer_allocator.alloc()->init(machine(), callback, false);
+	return &m_timer_allocator.alloc()->init(machine(), std::move(callback), false);
 }
 
 
@@ -608,30 +548,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 
 void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
 {
-	m_timer_allocator.alloc()->init(machine(), callback, true).adjust(duration, param);
-}
-
-
-//-------------------------------------------------
-//  timer_alloc - allocate a global device timer
-//  and return a pointer
-//-------------------------------------------------
-
-emu_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id)
-{
-	return &m_timer_allocator.alloc()->init(device, id, false);
-}
-
-
-//-------------------------------------------------
-//  timer_set - allocate an anonymous device timer
-//  and set it to go off after the given amount of
-//  time
-//-------------------------------------------------
-
-void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, int param)
-{
-	m_timer_allocator.alloc()->init(device, id, true).adjust(duration, param);
+	m_timer_allocator.alloc()->init(machine(), std::move(callback), true).adjust(duration, param);
 }
 
 
@@ -897,10 +814,7 @@ inline void device_scheduler::execute_timers()
 
 			if (!timer.m_callback.isnull())
 			{
-				if (timer.m_device != nullptr)
-					LOG("execute_timers: timer device %s timer %d\n", timer.m_device->tag(), timer.m_id);
-				else
-					LOG("execute_timers: timer callback %s\n", timer.m_callback.name());
+				LOG("execute_timers: timer callback %s\n", timer.m_callback.name());
 				timer.m_callback(timer.m_param);
 			}
 

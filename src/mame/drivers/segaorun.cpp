@@ -550,72 +550,63 @@ void segaorun_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  timer events
 //-------------------------------------------------
 
-void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segaorun_state::irq2_gen_tick)
 {
-	switch (id)
+	// set the IRQ2 line
+	m_irq2_state = 1;
+	update_main_irqs();
+}
+
+TIMER_CALLBACK_MEMBER(segaorun_state::scanline_tick)
+{
+	int scanline = param;
+	int next_scanline = scanline;
+
+	// trigger IRQs on certain scanlines
+	switch (scanline)
 	{
-		case TID_IRQ2_GEN:
-			// set the IRQ2 line
-			m_irq2_state = 1;
-			update_main_irqs();
+		// IRQ2 triggers on HBLANK of scanlines 65, 129, 193
+		case 65:
+		case 129:
+		case 193:
+			m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1));
+			next_scanline = scanline + 1;
 			break;
 
-		case TID_SCANLINE:
-		{
-			int scanline = param;
-			int next_scanline = scanline;
-
-			// trigger IRQs on certain scanlines
-			switch (scanline)
-			{
-				// IRQ2 triggers on HBLANK of scanlines 65, 129, 193
-				case 65:
-				case 129:
-				case 193:
-					m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1));
-					next_scanline = scanline + 1;
-					break;
-
-				// IRQ2 turns off at the start of scanlines 66, 130, 194
-				case 66:
-				case 130:
-				case 194:
-					m_irq2_state = 0;
-					next_scanline = (scanline == 194) ? 223 : (scanline + 63);
-					break;
-
-				// VBLANK triggers on scanline 223
-				case 223:
-					m_vblank_irq_state = 1;
-					next_scanline = scanline + 1;
-					m_subcpu->set_input_line(4, ASSERT_LINE);
-					break;
-
-				// VBLANK turns off at the start of scanline 224
-				case 224:
-					m_vblank_irq_state = 0;
-					next_scanline = 65;
-					m_subcpu->set_input_line(4, CLEAR_LINE);
-					break;
-
-				default:
-					break;
-			}
-
-			// update IRQs on the main CPU
-			update_main_irqs();
-
-			// come back at the next targeted scanline
-			timer.adjust(m_screen->time_until_pos(next_scanline), next_scanline);
+		// IRQ2 turns off at the start of scanlines 66, 130, 194
+		case 66:
+		case 130:
+		case 194:
+			m_irq2_state = 0;
+			next_scanline = (scanline == 194) ? 223 : (scanline + 63);
 			break;
-		}
+
+		// VBLANK triggers on scanline 223
+		case 223:
+			m_vblank_irq_state = 1;
+			next_scanline = scanline + 1;
+			m_subcpu->set_input_line(4, ASSERT_LINE);
+			break;
+
+		// VBLANK turns off at the start of scanline 224
+		case 224:
+			m_vblank_irq_state = 0;
+			next_scanline = 65;
+			m_subcpu->set_input_line(4, CLEAR_LINE);
+			break;
 
 		default:
-			throw emu_fatalerror("Unknown id in segaorun_state::device_timer");
+			break;
 	}
+
+	// update IRQs on the main CPU
+	update_main_irqs();
+
+	// come back at the next targeted scanline
+	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
 
@@ -3032,9 +3023,9 @@ ROM_END
 void segaorun_state::init_generic()
 {
 	// allocate a scanline timer
-	m_scanline_timer = timer_alloc(TID_SCANLINE);
+	m_scanline_timer = timer_alloc(FUNC(segaorun_state::scanline_tick), this);
 
-	m_irq2_gen_timer = timer_alloc(TID_IRQ2_GEN);
+	m_irq2_gen_timer = timer_alloc(FUNC(segaorun_state::irq2_gen_tick), this);
 
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)

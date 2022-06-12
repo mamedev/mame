@@ -58,18 +58,14 @@ uint32_t pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 }
 
-void pc4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc4_state::clear_busy_flag)
 {
-	switch(id)
-	{
-		case BUSY_TIMER:
-			m_busy_flag = 0;
-			break;
+	m_busy_flag = 0;
+}
 
-		case BLINKING_TIMER:
-			m_blink = !m_blink;
-			break;
-	}
+TIMER_CALLBACK_MEMBER(pc4_state::blink_tick)
+{
+	m_blink = !m_blink;
 }
 
 void pc4_state::lcd_control_w(uint8_t data)

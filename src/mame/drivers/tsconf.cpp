@@ -195,8 +195,8 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
-	m_frame_irq_timer = timer_alloc(TIMER_IRQ_FRAME);
-	m_line_irq_timer = timer_alloc(TIMER_IRQ_SCANLINE);
+	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
+	m_line_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
 }
 
 void tsconf_state::machine_start()

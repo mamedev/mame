@@ -29,7 +29,7 @@ namcos21_dsp_device::namcos21_dsp_device(const machine_config &mconfig, const ch
 void namcos21_dsp_device::device_start()
 {
 	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
-	m_suspend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos21_dsp_device::suspend_callback),this));
+	m_suspend_timer = timer_alloc(FUNC(namcos21_dsp_device::suspend_callback), this);
 
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;

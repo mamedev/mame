@@ -11,17 +11,19 @@
 
 #pragma once
 
-#include "sound/msm5205.h"
-#include "sound/qsound.h"
-#include "sound/okim6295.h"
-#include "machine/gen_latch.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/74157.h"
+#include "machine/gen_latch.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
-#include "cpu/m68000/m68000.h"
+#include "sound/msm5205.h"
+#include "sound/okim6295.h"
+#include "sound/qsound.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 // Video raw params
 // measured clocks:
@@ -312,109 +314,6 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_memory_region m_region_stars;
 	output_finder<3> m_led_cboard;
-};
-
-class cps2_state : public cps_state
-{
-public:
-	cps2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 2)
-		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_region_key(*this, "key")
-		, m_qsound(*this, "qsound")
-		, m_objram1(*this, "objram1")
-		, m_objram2(*this, "objram2")
-		, m_output(*this, "output")
-		, m_io_in0(*this, "IN0")
-		, m_io_in1(*this, "IN1")
-		, m_cps2_dial_type(0)
-		, m_ecofghtr_dial_direction0(0)
-		, m_ecofghtr_dial_direction1(0)
-		, m_ecofghtr_dial_last0(0)
-		, m_ecofghtr_dial_last1(0)
-	{ }
-
-	void cps2(machine_config &config);
-	void gigaman2(machine_config &config);
-	void dead_cps2(machine_config &config);
-	void init_cps2_video();
-	void init_cps2();
-	void init_cps2nc();
-	void init_cps2crypt();
-	void init_gigaman2();
-	void init_ssf2tb();
-	void init_pzloop2();
-	void init_singbrd();
-	void init_ecofghtr();
-
-private:
-	void init_digital_volume();
-	uint16_t gigaman2_dummyqsound_r(offs_t offset);
-	void gigaman2_dummyqsound_w(offs_t offset, uint16_t data);
-	void gigaman2_gfx_reorder();
-	void cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t cps2_qsound_volume_r();
-	uint16_t kludge_r();
-	uint16_t joy_or_paddle_r();
-	uint16_t joy_or_paddle_ecofghtr_r();
-	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
-	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
-
-	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t cps2_objram1_r(offs_t offset);
-	uint16_t cps2_objram2_r(offs_t offset);
-	void cps2_objram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cps2_objram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void unshuffle(uint64_t *buf, int len);
-	void cps2_gfx_decode();
-	virtual void find_last_sprite() override;
-	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
-	void cps2_set_sprite_priorities();
-	void cps2_objram_latch();
-	uint16_t *cps2_objbase();
-	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override;
-
-	void cps2_map(address_map &map);
-	void dead_cps2_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-
-	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	optional_memory_region m_region_key;
-
-	optional_device<qsound_device> m_qsound;
-
-	required_shared_ptr<uint16_t> m_objram1;
-	required_shared_ptr<uint16_t> m_objram2;
-	required_shared_ptr<uint16_t> m_output;
-
-	optional_ioport m_io_in0;
-	optional_ioport m_io_in1;
-
-	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
-	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
-
-	/* video-related */
-	int          m_cps2_last_sprite_offset = 0; /* Offset of the last sprite */
-	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
-	int          m_objram_bank = 0;
-	int          m_cps2_obj_size = 0;
-
-	/* misc */
-	int          m_readpaddle = 0;  // pzloop2
-	int          m_cps2networkpresent = 0;
-	int          m_cps2digitalvolumelevel = 0;
-	int          m_cps2disabledigitalvolume = 0;
-	emu_timer    *m_digital_volume_timer = nullptr;
-	int          m_cps2_dial_type = 0;
-	int          m_ecofghtr_dial_direction0 = 0;
-	int          m_ecofghtr_dial_direction1 = 0;
-	int          m_ecofghtr_dial_last0 = 0;
-	int          m_ecofghtr_dial_last1 = 0;
 };
 
 

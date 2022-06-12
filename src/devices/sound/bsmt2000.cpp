@@ -126,6 +126,11 @@ void bsmt2000_device::device_start()
 	save_item(NAME(m_left_data));
 	save_item(NAME(m_right_data));
 	save_item(NAME(m_write_pending));
+
+	// allocate timers
+	m_deferred_reset = timer_alloc(FUNC(bsmt2000_device::deferred_reset), this);
+	m_deferred_reg_write = timer_alloc(FUNC(bsmt2000_device::deferred_reg_write), this);
+	m_deferred_data_write = timer_alloc(FUNC(bsmt2000_device::deferred_data_write), this);
 }
 
 
@@ -135,39 +140,45 @@ void bsmt2000_device::device_start()
 
 void bsmt2000_device::device_reset()
 {
-	synchronize(TIMER_ID_RESET);
+	m_deferred_reset->adjust(attotime::zero);
 }
 
 
 
 //-------------------------------------------------
-//  device_timer - handle deferred writes and
-//  resets as a timer callback
+//  deferred_reset -
 //-------------------------------------------------
 
-void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(bsmt2000_device::deferred_reset)
 {
-	switch (id)
-	{
-		// deferred reset
-		case TIMER_ID_RESET:
-			m_stream->update();
-			m_cpu->reset();
-			break;
-
-		// deferred register write
-		case TIMER_ID_REG_WRITE:
-			m_register_select = param & 0xffff;
-			break;
-
-		// deferred data write
-		case TIMER_ID_DATA_WRITE:
-			m_write_data = param & 0xffff;
-			if (m_write_pending) logerror("BSMT2000: Missed data\n");
-			m_write_pending = true;
-			break;
-	}
+	m_stream->update();
+	m_cpu->reset();
 }
+
+
+
+//-------------------------------------------------
+//  deferred_reg_write -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(bsmt2000_device::deferred_reg_write)
+{
+	m_register_select = param & 0xffff;
+}
+
+
+
+//-------------------------------------------------
+//  deferred_data_write -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(bsmt2000_device::deferred_data_write)
+{
+	m_write_data = param & 0xffff;
+	if (m_write_pending) logerror("BSMT2000: Missed data\n");
+	m_write_pending = true;
+}
+
 
 
 //-------------------------------------------------
@@ -211,7 +222,7 @@ uint16_t bsmt2000_device::read_status()
 
 void bsmt2000_device::write_reg(uint16_t data)
 {
-	synchronize(TIMER_ID_REG_WRITE, data);
+	m_deferred_reg_write->adjust(attotime::zero, data);
 }
 
 
@@ -222,7 +233,7 @@ void bsmt2000_device::write_reg(uint16_t data)
 
 void bsmt2000_device::write_data(uint16_t data)
 {
-	synchronize(TIMER_ID_DATA_WRITE, data);
+	m_deferred_data_write->adjust(attotime::zero, data);
 
 	// boost the interleave on a write so that the caller detects the status more accurately
 	machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(10));

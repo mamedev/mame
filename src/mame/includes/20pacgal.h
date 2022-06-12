@@ -12,10 +12,12 @@
 
 #pragma once
 
+#include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 
 class _20pacgal_state : public driver_device
@@ -33,7 +35,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_rs232(*this, "rs232")
 	{ }
 
 	void _20pacgal(machine_config &config);
@@ -57,10 +60,11 @@ protected:
 	uint8_t m_game_selected = 0;  /* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<z180_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<rs232_port_device> m_rs232;
 
 	/* memory */
 	std::unique_ptr<uint8_t[]> m_sprite_gfx_ram;

@@ -1121,7 +1121,7 @@ void apollo_state::common(machine_config &config)
 
 	ISA16(config, m_isa, 0);
 	m_isa->set_custom_spaces();
-	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
+	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir1_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));
 	m_isa->irq4_callback().set(m_pic8259_master, FUNC(pic8259_device::ir4_w));
 	m_isa->irq5_callback().set(m_pic8259_master, FUNC(pic8259_device::ir5_w));
@@ -1276,8 +1276,7 @@ void apollo_stdio_device::device_start()
 
 	m_tx_w.resolve_safe();
 
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(
-			FUNC(apollo_stdio_device::poll_timer), this));
+	m_poll_timer = timer_alloc(FUNC(apollo_stdio_device::poll_timer), this);
 }
 
 //-------------------------------------------------
@@ -1304,13 +1303,6 @@ void apollo_stdio_device::device_reset()
 
 	// start timer
 	m_poll_timer->adjust(attotime::zero, 0, attotime::from_msec(1)); // every 1ms
-}
-
-void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
-		int param)
-{
-//  FIXME?
-//  device_serial_interface::device_timer(timer, id, param);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

@@ -704,7 +704,7 @@ void sslam_state::machine_start()
 	save_item(NAME(m_snd_bank));
 	save_item(NAME(m_unk_458));
 
-	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
+	m_music_timer = timer_alloc(FUNC(sslam_state::music_playback), this);
 }
 
 void powerbls_state::machine_start()

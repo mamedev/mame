@@ -95,7 +95,6 @@ void nes_konami_vrc1_device::device_start()
 
 void nes_konami_vrc1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -112,7 +111,6 @@ void nes_konami_vrc2_device::device_start()
 
 void nes_konami_vrc2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -124,7 +122,7 @@ void nes_konami_vrc2_device::pcb_reset()
 void nes_konami_vrc3_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_konami_vrc3_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
@@ -136,7 +134,6 @@ void nes_konami_vrc3_device::device_start()
 
 void nes_konami_vrc3_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -151,7 +148,7 @@ void nes_konami_vrc3_device::pcb_reset()
 void nes_konami_vrc4_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_konami_vrc4_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
@@ -251,10 +248,8 @@ u8 nes_konami_vrc2_device::read_m(offs_t offset)
 {
 	LOG_MMC(("VRC-2 read_m, offset: %04x\n", offset));
 
-	if (!m_battery.empty())
-		return m_battery[offset & (m_battery.size() - 1)];
-	else if (!m_prgram.empty())
-		return m_prgram[offset & (m_prgram.size() - 1)];
+	if (!m_battery.empty() || !m_prgram.empty())
+		return device_nes_cart_interface::read_m(offset);
 	else    // VRC2 was planned with EEPROM support; the non-working feature behaves as a vestigial 1-bit latch in $6000-$6fff on certain boards (contraj, ggoemon2 depend on this)
 		return (offset < 0x1000) ? (get_open_bus() & 0xfe) | (m_latch & 1) : get_open_bus();
 }
@@ -263,10 +258,8 @@ void nes_konami_vrc2_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("VRC-2 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_battery.empty())
-		m_battery[offset & (m_battery.size() - 1)] = data;
-	else if (!m_prgram.empty())
-		m_prgram[offset & (m_prgram.size() - 1)] = data;
+	if (!m_battery.empty() || !m_prgram.empty())
+		device_nes_cart_interface::write_m(offset, data);
 	else if (offset < 0x1000)
 		m_latch = data;
 }
@@ -316,21 +309,18 @@ void nes_konami_vrc2_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_konami_vrc3_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			u16 mask = m_irq_mode ? 0x00ff : 0xffff; // 8 or 16 bit mode?
+		u16 mask = m_irq_mode ? 0x00ff : 0xffff; // 8 or 16 bit mode?
 
-			// upper byte only incremented and reloaded in 16-bit mode
-			m_irq_count = (m_irq_count & ~mask) | ((m_irq_count + 1) & mask);
-			if (!(m_irq_count & mask))
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = (m_irq_count & ~mask) | (m_irq_count_latch & mask);
-			}
+		// upper byte only incremented and reloaded in 16-bit mode
+		m_irq_count = (m_irq_count & ~mask) | ((m_irq_count + 1) & mask);
+		if (!(m_irq_count & mask))
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_count = (m_irq_count & ~mask) | (m_irq_count_latch & mask);
 		}
 	}
 }
@@ -391,26 +381,23 @@ void nes_konami_vrc4_device::irq_tick()
 		m_irq_count++;
 }
 
-void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_konami_vrc4_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (m_irq_mode) // cycle mode
+			irq_tick();
+		else    // scanline mode
 		{
-			if (m_irq_mode) // cycle mode
-				irq_tick();
-			else    // scanline mode
-			{
-				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
-				// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
-				// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
-				m_irq_prescale -= 3;
+			// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
+			// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
+			// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
+			m_irq_prescale -= 3;
 
-				if (m_irq_prescale <= 0)
-				{
-					m_irq_prescale += 341;
-					irq_tick();
-				}
+			if (m_irq_prescale <= 0)
+			{
+				m_irq_prescale += 341;
+				irq_tick();
 			}
 		}
 	}

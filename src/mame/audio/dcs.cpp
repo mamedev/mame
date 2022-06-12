@@ -747,6 +747,10 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 void dcs_audio_device::device_reset()
 {
 	dcs_reset(0);
+
+	m_s1_ack_timer->adjust(attotime::never);
+	m_s1_ack2_timer->adjust(attotime::never);
+	m_s2_ack_timer->adjust(attotime::never);
 }
 
 void dcs_audio_device::device_start()
@@ -789,6 +793,11 @@ void dcs_audio_device::device_start()
 		m_sounddata_banks = m_sounddata_words / 0x800;
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, 0x800*2);
 	}
+
+	/* allocate timers */
+	m_s1_ack_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback1), this);
+	m_s1_ack2_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback2), this);
+	m_s2_ack_timer = timer_alloc(FUNC(dcs_audio_device::s2_ack_callback), this);
 
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;
@@ -888,6 +897,11 @@ void dcs2_audio_device::device_start()
 	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0 && m_rev < REV_DSIO);
 	if (m_transfer.hle_enabled)
 		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
+
+	/* allocate timers */
+	m_s1_ack_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback1), this);
+	m_s1_ack2_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback2), this);
+	m_s2_ack_timer = timer_alloc(FUNC(dcs_audio_device::s2_ack_callback), this);
 
 	/* register for save states */
 	dcs_register_state();
@@ -2207,7 +2221,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this), param);
+		m_s1_ack2_timer->adjust(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(0x000a);
@@ -2219,13 +2233,13 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), param);
+		m_s1_ack_timer->adjust(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(param);
 
 	/* chain to the next word we need to write back */
-	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this));
+	m_s1_ack2_timer->adjust(attotime::from_usec(1));
 }
 
 
@@ -2343,7 +2357,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), transfer.sum);
+					m_s1_ack_timer->adjust(attotime::from_usec(1), transfer.sum);
 				return 1;
 			}
 			break;
@@ -2357,7 +2371,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), param);
+		m_s2_ack_timer->adjust(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(param);
@@ -2456,7 +2470,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), transfer.sum);
+					m_s2_ack_timer->adjust(attotime::from_usec(1), transfer.sum);
 					transfer.watchdog->reset();
 				}
 				return 1;

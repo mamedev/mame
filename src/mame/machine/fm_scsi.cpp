@@ -79,8 +79,8 @@ void fmscsi_device::device_start()
 	m_drq_handler.resolve_safe();
 
 	// allocate read timer
-	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
-	m_phase_timer = timer_alloc(TIMER_PHASE);
+	m_transfer_timer = timer_alloc(FUNC(fmscsi_device::update_transfer), this);
+	m_phase_timer = timer_alloc(FUNC(fmscsi_device::set_phase), this);
 }
 
 void fmscsi_device::device_reset()
@@ -117,21 +117,13 @@ int fmscsi_device::get_scsi_cmd_len(uint8_t cbyte)
 	//return 6;
 }
 
-void fmscsi_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(fmscsi_device::update_transfer)
 {
-	switch(id)
+	set_input_line(FMSCSI_LINE_REQ,1);
+	//logerror("FMSCSI: timer triggered: %i/%i\n",m_result_index,m_result_length);
+	if(m_output_lines & FMSCSI_LINE_DMAE)
 	{
-	case TIMER_TRANSFER:
-		set_input_line(FMSCSI_LINE_REQ,1);
-		//logerror("FMSCSI: timer triggered: %i/%i\n",m_result_index,m_result_length);
-		if(m_output_lines & FMSCSI_LINE_DMAE)
-		{
-			m_drq_handler(1);
-		}
-		break;
-	case TIMER_PHASE:
-		set_phase(param);
-		break;
+		m_drq_handler(1);
 	}
 }
 
@@ -256,12 +248,12 @@ void fmscsi_device::fmscsi_data_w(uint8_t data)
 	}
 }
 
-void fmscsi_device::set_phase(int phase)
+TIMER_CALLBACK_MEMBER(fmscsi_device::set_phase)
 {
-	m_phase = phase;
+	m_phase = param;
 	logerror("FMSCSI: phase set to %i\n",m_phase);
 	// set input lines accordingly
-	switch(phase)
+	switch(param)
 	{
 	case SCSI_PHASE_BUS_FREE:
 		set_input_line(FMSCSI_LINE_BSY,0);

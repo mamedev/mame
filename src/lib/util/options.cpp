@@ -273,12 +273,12 @@ void core_options::entry::validate(const std::string &data)
 		}
 		break;
 
-	case OPTION_STRING:
+	case core_options::option_type::STRING:
 		// strings can be anything
 		break;
 
-	case OPTION_INVALID:
-	case OPTION_HEADER:
+	case core_options::option_type::INVALID:
+	case core_options::option_type::HEADER:
 	default:
 		// anything else is invalid
 		throw options_error_exception("Attempted to set invalid option %s\n", name());
@@ -656,7 +656,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		if (!args[arg].empty() && args[arg][0] == '-')
 		{
 			auto curentry = get_entry(&args[arg][1]);
-			if (curentry && curentry->type() == OPTION_COMMAND)
+			if (curentry && curentry->type() == core_options::option_type::COMMAND)
 			{
 				// can only have one command
 				if (!m_command.empty())
@@ -694,7 +694,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		}
 
 		// at this point, we've already processed commands
-		if (curentry->type() == OPTION_COMMAND)
+		if (curentry->type() == core_options::option_type::COMMAND)
 			continue;
 
 		// get the data for this argument, special casing booleans

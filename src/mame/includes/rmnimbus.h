@@ -123,8 +123,12 @@ private:
 	uint8_t m_last_playmode = 0;
 	uint8_t m_ay8910_a = 0;
 	uint8_t m_ay8910_b = 0;
-	uint16_t m_x = 0, m_y = 0, m_yline = 0;
-	uint8_t m_colours = 0, m_mode = 0, m_upmode = 0;
+	uint16_t m_x = 0;
+	uint16_t m_y = 0;
+	uint16_t m_yline = 0;
+	uint8_t m_colours = 0;
+	uint8_t m_mode = 0;
+	uint8_t m_upmode = 0;
 	uint32_t m_debug_video = 0;
 	uint8_t m_vector = 0;
 	uint8_t m_eeprom_bits = 0;
@@ -183,7 +187,7 @@ private:
 	void set_pixel40(uint16_t x, uint16_t y, uint8_t colour);
 	void write_pixel_line(uint16_t x, uint16_t y, uint16_t, uint8_t pixels, uint8_t bpp);
 	void move_pixel_line(uint16_t x, uint16_t y, uint8_t width);
-	void write_pixel_data(uint16_t x, uint16_t y, uint16_t    data);
+	void write_pixel_data(uint16_t x, uint16_t y, uint16_t data);
 	void change_palette(uint8_t bank, uint16_t colours);
 	void external_int(uint8_t vector, bool state);
 	uint8_t cascade_callback();
@@ -210,43 +214,36 @@ private:
 	int m_scsi_req = 0;
 	int m_scsi_reqlat = 0;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	enum
-	{
-		TIMER_MOUSE
-	};
-
 	// Static data related to Floppy and SCSI hard disks
 	struct
 	{
-		uint8_t   reg400 = 0;
+		uint8_t reg400 = 0;
 	} m_nimbus_drives;
 
 	/* 8031 Peripheral controller */
 	struct
 	{
-		uint8_t   ipc_in = 0;
-		uint8_t   ipc_out = 0;
-		uint8_t   status_in = 0;
-		uint8_t   status_out = 0;
+		uint8_t ipc_in = 0;
+		uint8_t ipc_out = 0;
+		uint8_t status_in = 0;
+		uint8_t status_out = 0;
 	} m_ipc_interface;
 
 	/* Mouse/Joystick */
 	struct
 	{
-		uint8_t     m_mouse_x = 0;
-		uint8_t     m_mouse_y = 0;
+		uint8_t m_mouse_x = 0;
+		uint8_t m_mouse_y = 0;
 
-		uint8_t     m_mouse_pcx = 0;
-		uint8_t     m_mouse_pcy = 0;
+		uint8_t m_mouse_pcx = 0;
+		uint8_t m_mouse_pcy = 0;
 
-		uint8_t     m_intstate_x = 0;
-		uint8_t     m_intstate_y = 0;
+		uint8_t m_intstate_x = 0;
+		uint8_t m_intstate_y = 0;
 
-		uint8_t     m_reg0a4 = 0;
+		uint8_t m_reg0a4 = 0;
 
-		emu_timer   *m_mouse_timer = nullptr;
+		emu_timer *m_mouse_timer = nullptr;
 	} m_nimbus_mouse;
 
 	bool m_voice_enabled = false;
@@ -268,7 +265,7 @@ private:
 	void video_debug(const std::vector<std::string> &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	void do_mouse();
+	TIMER_CALLBACK_MEMBER(do_mouse);
 };
 
 #endif // MAME_INCLUDES_RMNIMBUS_H

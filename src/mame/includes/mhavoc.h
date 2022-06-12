@@ -100,4 +100,5 @@ private:
 	uint8_t m_gamma_irq_clock = 0;
 	uint8_t m_has_gamma_cpu = 0;
 	uint8_t m_speech_write_buffer = 0;
+	emu_timer *m_gamma_sync_timer = nullptr;
 };

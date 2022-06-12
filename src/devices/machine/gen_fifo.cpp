@@ -52,56 +52,51 @@ template<typename T> void generic_fifo_device_base<T>::device_start()
 	m_empty_cb.resolve_safe();
 	m_full_cb.resolve_safe();
 
-	m_sync_empty = timer_alloc(0);
-	m_sync_full = timer_alloc(1);
+	m_sync_empty = timer_alloc(FUNC(generic_fifo_device_base<T>::sync_empty), this);
+	m_sync_full = timer_alloc(FUNC(generic_fifo_device_base<T>::sync_full), this);
 
 	// This is not saving the fifo, let's hope it's empty...
 	save_item(NAME(m_empty_triggered));
 	save_item(NAME(m_full_triggered));
 }
 
-template<typename T> void generic_fifo_device_base<T>::device_timer(emu_timer &timer, device_timer_id id, int param)
+template<typename T> TIMER_CALLBACK_MEMBER(generic_fifo_device_base<T>::sync_empty)
 {
-	switch(id) {
-	case T_FULL: {
-		// Add the extra values in if there's space
-		bool was_empty = is_empty();
-		bool was_full = is_full();
-
-		while(!m_extra_values.empty() && !is_full()) {
-			T t(std::move(m_extra_values.front()));
-			m_extra_values.erase(m_extra_values.begin());
-			m_values.emplace_back(std::move(t));
+	// Sync was called for a fifo empty, is it still empty?
+	if(is_empty()) {
+		// If yes, stop the destination if not done yet
+		if(!m_empty_triggered) {
+			m_empty_triggered = true;
+			m_on_fifo_empty_post_sync();
 		}
+	}
+}
 
-		// Adjust devcb lines as needed
-		if(was_empty && !is_empty())
-			m_empty_cb(false);
-		if(!was_full && is_full())
-			m_full_cb(true);
+template<typename T> TIMER_CALLBACK_MEMBER(generic_fifo_device_base<T>::sync_full)
+{
+	// Add the extra values in if there's space
+	bool was_empty = is_empty();
+	bool was_full = is_full();
 
-		// Are there still values that don't fit?
-		if(!m_extra_values.empty()) {
-			// If yes, stop the source if not done yet
-			if(!m_full_triggered) {
-				m_full_triggered = true;
-				m_on_fifo_full_post_sync();
-			}
-		}
-		break;
+	while(!m_extra_values.empty() && !is_full()) {
+		T t(std::move(m_extra_values.front()));
+		m_extra_values.erase(m_extra_values.begin());
+		m_values.emplace_back(std::move(t));
 	}
 
-	case T_EMPTY: {
-		// Sync was called for a fifo empty, is it still empty?
-		if(is_empty()) {
-			// If yes, stop the destination if not done yet
-			if(!m_empty_triggered) {
-				m_empty_triggered = true;
-				m_on_fifo_empty_post_sync();
-			}
+	// Adjust devcb lines as needed
+	if(was_empty && !is_empty())
+		m_empty_cb(false);
+	if(!was_full && is_full())
+		m_full_cb(true);
+
+	// Are there still values that don't fit?
+	if(!m_extra_values.empty()) {
+		// If yes, stop the source if not done yet
+		if(!m_full_triggered) {
+			m_full_triggered = true;
+			m_on_fifo_full_post_sync();
 		}
-		break;
-	}
 	}
 }
 

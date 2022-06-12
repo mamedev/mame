@@ -21,10 +21,6 @@
  * Sachen Discrete PCBs [mapper 150 & 243]
  * Sachen 8259 [mapper 141 (A), 138 (B), 139 (C), 137 (D)]
 
- Known issues on specific mappers:
-
- * 133 Qi Wang starts with corrupted graphics (ingame seems better)
-
 
  ***********************************************************************************************************/
 
@@ -159,7 +155,6 @@ nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, 
 
 void nes_sachen_tca01_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(1);
 	chr8(0, m_chr_source);
@@ -173,7 +168,6 @@ void nes_sachen_tcu02_device::device_start()
 
 void nes_sachen_tcu02_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -203,7 +197,6 @@ void nes_sachen_74x374_device::device_start()
 
 void nes_sachen_74x374_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -220,7 +213,6 @@ void nes_sachen_8259a_device::device_start()
 
 void nes_sachen_8259a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_VERT);
@@ -231,7 +223,6 @@ void nes_sachen_8259a_device::pcb_reset()
 
 void nes_sachen_8259d_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(m_vrom_chunks - 1, CHRROM);
 	set_nt_mirroring(PPU_MIRROR_VERT);

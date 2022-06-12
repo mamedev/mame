@@ -91,9 +91,9 @@ void st2204_device::device_start()
 	init_base_timer(0x0020);
 	init_lcd_timer(0x0040);
 
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t1_interrupt), this));
-	m_psg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::psg_interrupt), this));
+	m_timer[0] = timer_alloc(FUNC(st2204_device::t0_interrupt), this);
+	m_timer[1] = timer_alloc(FUNC(st2204_device::t1_interrupt), this);
+	m_psg_timer = timer_alloc(FUNC(st2204_device::psg_interrupt), this);
 
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));

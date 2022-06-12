@@ -1595,7 +1595,7 @@ INPUT_PORTS_END
 void mdallas_state::mdallas(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 1000000); // approximation - RC osc. R=57K, C=101pF
+	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
 	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
@@ -2149,6 +2149,71 @@ ROM_END
 
 /***************************************************************************
 
+  National Semiconductor Cops Pocket Assistant (CPA)
+  * COP444 MCU label COP444L-JXY/N
+  * 8-digit 7seg display, 1-bit sound
+
+  It's a programmable COP400 series MCU simulator, on a COP400 series MCU.
+  Note that this MCU doesn't have executable RAM, so it truly is a simulator.
+  The hardware/PCB and the green clamshell are identical to Mattel Dalla$.
+
+***************************************************************************/
+
+// handlers: see mdallas_state
+
+// config
+
+static INPUT_PORTS_START( copspa )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_NAME("0 / CLRA")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME("1 / LQID")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_NAME("2 / COMP")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_NAME("3 / CAB")
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME("4 / RC")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / SC")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_NAME("6 / ASC")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / CBA")
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8') PORT_NAME("8 / SKC")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_NAME("9 / SKE")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_NAME("A / JP")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_NAME("B / JSR")
+
+	PORT_START("IN.3") // G3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_NAME("C / LBI")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_NAME("D / SMB")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_NAME("E / RMB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_NAME("F / SKMB")
+
+	PORT_START("IN.4") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_NAME("Prog")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("SS / AISC")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("Run / STII")
+
+	PORT_START("IN.5") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_NAME("Exec / LD")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_NAME("Reset / X")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_NAME("Modify / XIS")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_NAME("Disp / XDS")
+INPUT_PORTS_END
+
+// roms
+
+ROM_START( copspa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cop444l-jxy_n", 0x0000, 0x0800, CRC(8e5da5d2) SHA1(d557a5ede206fa0dff7b549acef9e0ef48e48c8a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   SCAT specialist calculators
   * COP404LSN-5 MCU (no internal ROM)
   * 2KB EPROM (ETC2716Q)
@@ -2431,6 +2496,7 @@ CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  e
 CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, copspa,     0,         0, mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "Cops Pocket Assistant", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1984, solution,   0,         0, scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 

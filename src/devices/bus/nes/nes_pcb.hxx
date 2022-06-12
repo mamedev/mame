@@ -350,7 +350,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_kc885",        BMC_KC885 },
 	{ "bmc_sfc12",        BMC_SFC12 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
-	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
 	{ "bmc_f15",          BMC_F15 },
 	{ "bmc_f600",         BMC_F600 },
 	{ "bmc_gn45",         BMC_GN45 },
@@ -679,8 +678,6 @@ void nes_cart_slot_device::call_load_pcb()
 				m_cart->set_mmc1_type(mmc1_type::MMC1A);
 			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
 				m_cart->set_mmc1_type(mmc1_type::MMC1B);
-			else if (!strcmp(type, "MMC1C"))
-				m_cart->set_mmc1_type(mmc1_type::MMC1C);
 		}
 	}
 

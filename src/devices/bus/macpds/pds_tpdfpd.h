@@ -28,7 +28,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -41,6 +40,8 @@ private:
 	void ramdac_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_vbl_disable;

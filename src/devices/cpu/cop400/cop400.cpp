@@ -1031,7 +1031,7 @@ void cop400_cpu_device::serial_tick()
 	}
 }
 
-void cop400_cpu_device::counter_tick()
+TIMER_CALLBACK_MEMBER(cop400_cpu_device::advance_counter)
 {
 	T++;
 
@@ -1061,17 +1061,6 @@ void cop400_cpu_device::inil_tick()
     INITIALIZATION
 ***************************************************************************/
 
-void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_COUNTER:
-		counter_tick();
-		break;
-	}
-}
-
-
 void cop400_cpu_device::device_start()
 {
 	/* find address spaces */
@@ -1095,7 +1084,7 @@ void cop400_cpu_device::device_start()
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
-		m_counter_timer = timer_alloc(TIMER_COUNTER);
+		m_counter_timer = timer_alloc(FUNC(cop400_cpu_device::advance_counter), this);
 		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
 	}
 

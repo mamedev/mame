@@ -39,18 +39,14 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-private:
-	enum
-	{
-		BELL_TIMER_ID = 1
-	};
+	TIMER_CALLBACK_MEMBER(bell_off);
 
+private:
 	void mem_map(address_map &map);
 
 	required_device<m6802_cpu_device> m_maincpu;
@@ -82,7 +78,6 @@ private:
 	void pia0_ca2_w(int state);
 
 	void pia1_pa_w(uint8_t data);
-	int pia1_ca1_r();
 	void pia1_ca2_w(int state);
 
 	uint8_t m_keyboard_data;

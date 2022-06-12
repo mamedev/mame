@@ -355,7 +355,7 @@ uint8_t irisha_state::keyboard_r()
 
 void irisha_state::machine_start()
 {
-	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer = timer_alloc(FUNC(irisha_state::irisha_key), this);
 	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
 	save_item(NAME(m_sg1_line));
 	save_item(NAME(m_keypressed));

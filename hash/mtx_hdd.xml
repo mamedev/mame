@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mtx_hdd" description="Memotech MTX Compact Flash images">
+
+	<software name="cpm54">
+		<description>CP/M 54K</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="cpm54" sha1="cf4a80e6aa229b93c1def5e89e2ee76fe9cba9a7" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cpm59">
+		<description>CP/M 59K</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="cpm59" sha1="24498c0c954eac2c4bab2e3c5317ceeddef63578" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fuzix">
+		<description>Fuzix OS</description>
+		<year>2019</year>
+		<publisher>Etched Pixels</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="fuzix" sha1="ff1934600cf630d11d904ef0915a596ff89fab69" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hextrain">
+		<description>Hex-Train</description>
+		<year>2016</year>
+		<publisher>Andy Key</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="hextrain" sha1="da8ad4944eff3e34254f4d9685b00c22c159b543" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

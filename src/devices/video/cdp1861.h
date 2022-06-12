@@ -81,16 +81,12 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(int_tick);
+	TIMER_CALLBACK_MEMBER(efx_tick);
+	TIMER_CALLBACK_MEMBER(dma_tick);
 
 private:
-	enum
-	{
-		TIMER_INT,
-		TIMER_EFX,
-		TIMER_DMA
-	};
-
 	devcb_write_line m_write_int;
 	devcb_write_line m_write_dma_out;
 	devcb_write_line m_write_efx;

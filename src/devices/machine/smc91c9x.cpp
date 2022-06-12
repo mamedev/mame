@@ -62,7 +62,7 @@ smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag,
 
 smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_device_type(device_type)
 	, m_num_ebuf(16)
 	, m_irq_handler(*this)
@@ -82,7 +82,7 @@ void smc91c9x_device::device_start()
 	m_buffer = std::make_unique<u8[]>(ETHER_BUFFER_SIZE * m_num_ebuf);
 
 	// TX timer
-	m_tx_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smc91c9x_device::tx_poll), this));
+	m_tx_poll = timer_alloc(FUNC(smc91c9x_device::tx_poll), this);
 
 	m_irq_handler.resolve_safe();
 

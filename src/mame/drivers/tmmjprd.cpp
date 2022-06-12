@@ -506,7 +506,7 @@ void tmmjprd_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void tmmjprd_state::machine_start()
 {
 #if EMULATE_BLITTER
-	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmmjprd_state::blit_done), this));
+	m_blit_done_timer = timer_alloc(FUNC(tmmjprd_state::blit_done), this);
 #endif
 
 	save_item(NAME(m_mux_data));

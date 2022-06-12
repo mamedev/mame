@@ -595,12 +595,12 @@ ROM_END
 } // Anonymous namespace
 
 // Pinball
-GAME( 1979, flash_l2, 0,        s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, flash_l1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, flash_t1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, trizn_l1, 0,        s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, trizn_t1, trizn_l1, s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, tmwrp_l3, 0,        s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-3)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, tmwrp_l2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, tmwrp_t2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, stlwr_l2, 0,        s4, stlwr, s4_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, flash_l2, 0,        s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, flash_l1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, flash_t1, flash_l2, s4, flash, s4_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, trizn_l1, 0,        s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, trizn_t1, trizn_l1, s4, trizn, s4_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, tmwrp_l3, 0,        s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-3)",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, tmwrp_l2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, L-2)",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, tmwrp_t2, tmwrp_l3, s4, tmwrp, s4_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, stlwr_l2, 0,        s4, stlwr, s4_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

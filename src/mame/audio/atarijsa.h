@@ -60,6 +60,7 @@ public:
 	// configuration
 	auto test_read_cb() { return m_test_read_cb.bind(); }
 	auto main_int_cb() { return m_main_int_cb.bind(); }
+	void set_swapped_coins(bool swap) { m_swapped_coins = swap; }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
@@ -114,6 +115,7 @@ protected:
 	double              m_ym2151_volume;
 	uint8_t             m_ym2151_ct1;
 	uint8_t             m_ym2151_ct2;
+	bool                m_swapped_coins;
 };
 
 
@@ -169,9 +171,6 @@ public:
 	// construction/destruction
 	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration
-	void set_inverted_coins() { m_inverted_coins = true; } // for Xybots
-
 	// read/write handlers
 	uint8_t rdio_r();
 	void wrio_w(uint8_t data);
@@ -199,9 +198,6 @@ protected:
 	// internal state
 	double              m_pokey_volume;
 	double              m_tms5220_volume;
-
-private:
-	bool m_inverted_coins;
 };
 
 

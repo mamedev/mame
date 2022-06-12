@@ -75,7 +75,7 @@ ioport_constructor xavix_mtrk_wheel_device::device_input_ports() const
 void xavix_mtrk_wheel_device::device_start()
 {
 	m_event_out_cb.resolve_safe();
-	m_event_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_mtrk_wheel_device::event_timer), this));
+	m_event_timer = timer_alloc(FUNC(xavix_mtrk_wheel_device::event_timer), this);
 }
 
 void xavix_mtrk_wheel_device::device_reset()
