@@ -288,7 +288,7 @@ vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, const 
 
 void vme_cp31_card_device::device_start()
 {
-	m_bus_error_timer = timer_alloc(0);
+	m_bus_error_timer = timer_alloc(FUNC(vme_cp31_card_device::bus_error_off), this);
 }
 
 void vme_cp31_card_device::device_reset()
@@ -314,7 +314,7 @@ void vme_cp31_card_device::device_reset()
 			&m_rom_shadow_tap);
 }
 
-void vme_cp31_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(vme_cp31_card_device::bus_error_off)
 {
 	m_bus_error = false;
 }

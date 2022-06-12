@@ -426,7 +426,7 @@ void econet_e01_device::device_start()
 	m_led.resolve();
 
 	// allocate timers
-	m_clk_timer = timer_alloc();
+	m_clk_timer = timer_alloc(FUNC(econet_e01_device::clk_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_adlc_ie));
@@ -451,10 +451,10 @@ void econet_e01_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clk_tick - update our clock output
 //-------------------------------------------------
 
-void econet_e01_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(econet_e01_device::clk_tick)
 {
 	if (m_clk_en)
 	{

@@ -60,7 +60,6 @@ public:
 	void checkmat(machine_config &config);
 	void dogpatch(machine_config &config);
 	void invad2ct(machine_config &config);
-	void invaders(machine_config &config);
 	void maze(machine_config &config);
 	void mw8080bw_root(machine_config &config);
 	void phantom2(machine_config &config);
@@ -76,26 +75,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
-
-	DECLARE_MACHINE_RESET(mw8080bw);
-
 	IRQ_CALLBACK_MEMBER(interrupt_vector);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
 
 	u8 mw8080bw_shift_result_rev_r();
 
-	int invaders_is_cabinet_cocktail();
-
-	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// device/memory pointers
@@ -105,9 +94,6 @@ protected:
 	required_shared_ptr<uint8_t> m_main_ram;
 	optional_device<discrete_sound_device> m_discrete;
 	required_device<screen_device> m_screen;
-
-	// misc game specific
-	uint8_t       m_flip_screen = 0;
 
 private:
 	// misc game specific
@@ -136,7 +122,6 @@ private:
 	void bowler_audio_6_w(uint8_t data);
 	DECLARE_MACHINE_START(maze);
 	DECLARE_MACHINE_START(phantom2);
-	DECLARE_MACHINE_START(invaders);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
@@ -151,8 +136,6 @@ private:
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
 	uint8_t vpos_to_vysnc_chain_counter(int vpos);
 	int vysnc_chain_counter_to_vpos(uint8_t counter, int vblank);
-	void mw8080bw_create_interrupt_timer();
-	void mw8080bw_start_interrupt_timer();
 	uint8_t tornbase_get_cabinet_type();
 
 	void blueshrk_audio(machine_config &config);
@@ -167,7 +150,6 @@ private:
 	void checkmat_io_map(address_map &map);
 	void dogpatch_io_map(address_map &map);
 	void invad2ct_io_map(address_map &map);
-	void invaders_io_map(address_map &map);
 	void main_map(address_map &map);
 	void maze_io_map(address_map &map);
 	void phantom2_io_map(address_map &map);
@@ -400,15 +382,50 @@ private:
 };
 
 
-#define TORNBASE_CAB_TYPE_UPRIGHT_OLD   (0)
-#define TORNBASE_CAB_TYPE_UPRIGHT_NEW   (1)
-#define TORNBASE_CAB_TYPE_COCKTAIL      (2)
-
 #define INVADERS_CAB_TYPE_PORT_TAG      ("CAB")
 #define INVADERS_P1_CONTROL_PORT_TAG    ("CONTP1")
 #define INVADERS_P2_CONTROL_PORT_TAG    ("CONTP2")
 #define INVADERS_SW6_SW7_PORT_TAG       ("SW6SW7")
 #define INVADERS_SW5_PORT_TAG           ("SW5")
+
+class invaders_state : public mw8080bw_state
+{
+public:
+	invaders_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_player_controls(*this, "CONTP%u", 1U),
+		m_cabinet_type(*this, INVADERS_CAB_TYPE_PORT_TAG)
+	{
+	}
+
+	void invaders(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
+
+protected:
+	void machine_start() override;
+
+	bool is_cabinet_cocktail();
+
+	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	optional_ioport_array<2> m_player_controls;
+	optional_ioport m_cabinet_type;
+
+	uint8_t m_flip_screen = 0;
+
+private:
+	void io_map(address_map &map);
+};
+
+
+#define TORNBASE_CAB_TYPE_UPRIGHT_OLD   (0)
+#define TORNBASE_CAB_TYPE_UPRIGHT_NEW   (1)
+#define TORNBASE_CAB_TYPE_COCKTAIL      (2)
 
 #define BLUESHRK_SPEAR_PORT_TAG         ("IN0")
 
@@ -423,8 +440,7 @@ private:
 #define INVADERS_CONTROL_PORT_PLAYER(player) \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) \
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(player) \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(player) \
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(player)
 
 #define INVADERS_CAB_TYPE_PORT \
 	PORT_START(INVADERS_CAB_TYPE_PORT_TAG) \

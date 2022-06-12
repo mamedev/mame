@@ -23,14 +23,13 @@ public:
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
-	static constexpr device_timer_id TIMER_RTC = 0;
-
 	ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(rtc_tick);
 
 	u16 m_io_regs[8];
 	u32 m_base20, m_base30, m_base40;

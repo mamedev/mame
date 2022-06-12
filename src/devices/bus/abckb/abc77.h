@@ -40,7 +40,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -57,9 +56,11 @@ private:
 		TIMER_RESET
 	};
 
-	inline void serial_output(int state);
-	inline void serial_clock();
-	inline void key_down(int state);
+	void serial_output(int state);
+	void key_down(int state);
+
+	TIMER_CALLBACK_MEMBER(serial_clock);
+	TIMER_CALLBACK_MEMBER(reset_tick);
 
 	required_device<i8035_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;

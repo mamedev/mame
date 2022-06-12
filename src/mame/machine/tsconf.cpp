@@ -767,56 +767,47 @@ void tsconf_state::dma_ready(int line)
 	}
 }
 
-void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 {
-	switch (id)
+	if (BIT(m_regs[INT_MASK], 0))
 	{
-	case TIMER_IRQ_FRAME:
-	{
-		if (BIT(m_regs[INT_MASK], 0))
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-		}
-		break;
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 	}
-	case TIMER_IRQ_SCANLINE:
-	{
-		u16 screen_vpos = m_screen->vpos();
-		m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
-		if (BIT(m_regs[INT_MASK], 1))
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
-			// Not quite precise. Scanline can't be skipped.
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-		}
-		if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-		}
+}
 
-		m_screen->update_now();
-		for (const auto &[reg, val] : m_scanline_delayed_regs_update)
-		{
-			m_regs[reg] = val;
-			switch (reg)
-			{
-			case G_Y_OFFS_L:
-			case G_Y_OFFS_H:
-				m_gfx_y_frame_offset = get_screen_area().top() - m_screen->vpos();
-				break;
+TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
+{
+	u16 screen_vpos = m_screen->vpos();
+	m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
+	if (BIT(m_regs[INT_MASK], 1))
+	{
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
+		// Not quite precise. Scanline can't be skipped.
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+	}
+	if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
+	{
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+	}
 
-			default:
-				break;
-			}
+	m_screen->update_now();
+	for (const auto &[reg, val] : m_scanline_delayed_regs_update)
+	{
+		m_regs[reg] = val;
+		switch (reg)
+		{
+		case G_Y_OFFS_L:
+		case G_Y_OFFS_H:
+			m_gfx_y_frame_offset = get_screen_area().top() - m_screen->vpos();
+			break;
+
+		default:
+			break;
 		}
-		m_scanline_delayed_regs_update.clear();
-		break;
 	}
-	default:
-		spectrum_state::device_timer(timer, id, param);
-	}
+	m_scanline_delayed_regs_update.clear();
 }
 
 u8 tsconf_state::beta_neutral_r(offs_t offset)

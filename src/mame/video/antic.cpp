@@ -314,6 +314,10 @@ antic_device::antic_device(const machine_config &mconfig, const char *tag, devic
 	m_render1(0),
 	m_render2(0),
 	m_render3(0),
+	m_cycle_steal_timer(nullptr),
+	m_issue_dli_timer(nullptr),
+	m_scanline_timer(nullptr),
+	m_line_done_timer(nullptr),
 	m_cmd(0),
 	m_steal_cycles(0),
 	m_vscrol_old(0),
@@ -409,6 +413,17 @@ void antic_device::device_start()
 
 	save_pointer(NAME(m_cclk_expand), 21 * 256);
 	save_pointer(NAME(m_used_colors), 21 * 256);
+
+	/* timers */
+	m_cycle_steal_timer = timer_alloc(FUNC(antic_device::steal_cycles), this);
+	m_issue_dli_timer = timer_alloc(FUNC(antic_device::issue_dli), this);
+	m_scanline_timer = timer_alloc(FUNC(antic_device::scanline_render), this);
+	m_line_done_timer = timer_alloc(FUNC(antic_device::line_done), this);
+
+	m_cycle_steal_timer->adjust(attotime::never);
+	m_issue_dli_timer->adjust(attotime::never);
+	m_scanline_timer->adjust(attotime::never);
+	m_line_done_timer->adjust(attotime::never);
 }
 
 
@@ -1936,25 +1951,6 @@ void antic_device::linerefresh()
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
 (attotime)(screen().scan_period() * (cycles) / CYCLES_PER_LINE)
 
-void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TIMER_CYCLE_STEAL:
-			steal_cycles(param);
-			break;
-		case TIMER_ISSUE_DLI:
-			issue_dli(param);
-			break;
-		case TIMER_LINE_REND:
-			scanline_render(param);
-			break;
-		case TIMER_LINE_DONE:
-			line_done(param);
-			break;
-	}
-}
-
 int antic_device::cycle()
 {
 	return screen().hpos() * CYCLES_PER_LINE / screen().width();
@@ -2011,7 +2007,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
 TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
 	LOG("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles);
-	timer_set(ANTIC_TIME_FROM_CYCLES(m_steal_cycles), TIMER_LINE_DONE);
+	m_line_done_timer->adjust(ANTIC_TIME_FROM_CYCLES(m_steal_cycles));
 	m_steal_cycles = 0;
 	m_maincpu->spin_until_trigger(TRIGGER_STEAL);
 }
@@ -2082,7 +2078,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 
 	m_steal_cycles += CYCLES_REFRESH;
 	LOG("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles);
-	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles), TIMER_CYCLE_STEAL);
+	m_cycle_steal_timer->adjust(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));
 }
 
 
@@ -2195,7 +2191,7 @@ void antic_device::scanline_dma(int param)
 						{
 							/* remove the DLI bit */
 							new_cmd &= ~ANTIC_DLI;
-							timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI), TIMER_ISSUE_DLI);
+							m_issue_dli_timer->adjust(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI));
 						}
 						/* load memory scan bit set ? */
 						if( new_cmd & ANTIC_LMS )
@@ -2331,9 +2327,9 @@ void antic_device::scanline_dma(int param)
 
 	m_r.nmist &= ~DLI_NMI;
 	if (m_modelines == 1 && (m_cmd & m_w.nmien & DLI_NMI))
-		timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI), TIMER_ISSUE_DLI);
+		m_issue_dli_timer->adjust(ANTIC_TIME_FROM_CYCLES(CYCLES_DLI_NMI));
 
-	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSTART), TIMER_LINE_REND);
+	m_scanline_timer->adjust(ANTIC_TIME_FROM_CYCLES(CYCLES_HSTART));
 }
 
 /*****************************************************************************

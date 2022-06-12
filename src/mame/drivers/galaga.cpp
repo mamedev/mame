@@ -827,7 +827,7 @@ void galaga_state::machine_start()
 {
 	m_leds.resolve();
 	/* create the interrupt timer */
-	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
+	m_cpu3_interrupt_timer = timer_alloc(FUNC(galaga_state::cpu3_interrupt_callback), this);
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_nmi_mask));

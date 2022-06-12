@@ -103,7 +103,7 @@ void asr733_device::device_start()
 	m_keyint_line.resolve();
 	m_lineint_line.resolve();
 
-	m_line_timer = timer_alloc(0);
+	m_line_timer = timer_alloc(FUNC(asr733_device::line_tick), this);
 
 	uint8_t *dst;
 
@@ -395,19 +395,21 @@ void asr733_device::cru_w(offs_t offset, uint8_t data)
 	}
 }
 
-/*
-    Video refresh
-*/
+//-------------------------------------------------
+//  video refresh
+//-------------------------------------------------
+
 void asr733_device::refresh(bitmap_ind16 &bitmap, int x, int y)
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, x, y, m_bitmap->cliprect());
 }
 
 
-/*
-    Time callbacks
-*/
-void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+//-------------------------------------------------
+//  line_tick - check the keyboard
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(asr733_device::line_tick)
 {
 	check_keyboard();
 	m_lineint_line(ASSERT_LINE);
@@ -417,174 +419,24 @@ void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param
 static const unsigned char key_translate[3][51] =
 {
 	{   /* unshifted */
-		'1',
-		'2',
-		'3',
-		'4',
-		'5',
-		'6',
-		'7',
-		'8',
-		'9',
-		'0',
-		':',
-		'-',
-
-		0x1b,
-		'Q',
-		'W',
-		'E',
-		'R',
-		'T',
-		'Y',
-		'U',
-		'I',
-		'O',
-		'P',
-		0x0a,
-		0x0d,
-
-		0,
-		'A',
-		'S',
-		'D',
-		'F',
-		'G',
-		'H',
-		'J',
-		'K',
-		'L',
-		';',
-		0x08,
-		0,
-
-		0,
-		'Z',
-		'X',
-		'C',
-		'V',
-		'B',
-		'N',
-		'M',
-		',',
-		'.',
-		'/',
-		0,
-
+		'1',  '2', '3', '4', '5', '6', '7', '8', '9', '0', ':', '-',
+		0x1b, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 0x0a, 0x0d,
+		0,    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', 0x08, 0,
+		0,    'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 0,
 		' '
 	},
 	{   /* shifted */
-		'!',
-		'"',
-		'#',
-		'$',
-		'%',
-		'&',
-		'^',
-		'(',
-		')',
-		' ',
-		'*',
-		'=',
-
-		0x1b,
-		'Q',
-		'W',
-		'E',
-		'R',
-		'T',
-		'Y',
-		'U',
-		'I',
-		'_',
-		'@',
-		0x0a,
-		0x0d,
-
-		0,
-		'A',
-		'S',
-		'D',
-		'F',
-		'G',
-		'H',
-		'J',
-		0,
-		'/',
-		'+',
-		0x08,
-		0,
-
-		0,
-		'Z',
-		'X',
-		'C',
-		'V',
-		'B',
-		'^',
-		'|',
-		'<',
-		'>',
-		'?',
-		0,
-
+		'!',  '"', '#', '$', '%', '&', '^', '(', ')', ' ', '*', '=',
+		0x1b, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', '_', '@', 0x0a, 0x0d,
+		0,    'A', 'S', 'D', 'F', 'G', 'H', 'J',   0, '/', '+', 0x08, 0,
+		0,    'Z', 'X', 'C', 'V', 'B', '^', '|', '<', '>', '?', 0,
 		' '
 	},
 	{   /* control */
-		'1',
-		'2',
-		'3',
-		'4',
-		'5',
-		'6',
-		'7',
-		'8',
-		'9',
-		'0',
-		':',
-		'-',
-
-		0x1b,
-		0x11,
-		0x17,
-		0x05,
-		0x12,
-		0x14,
-		0x19,
-		0x15,
-		0x09,
-		0x0f,
-		0x10,
-		0x0a,
-		0x0d,
-
-		0,
-		0x01,
-		0x13,
-		0x04,
-		0x06,
-		0x07,
-		0x08,
-		0x0a,
-		0x0b,
-		0x0c,
-		';',
-		0x08,
-		0,
-
-		0,
-		0x1a,
-		0x18,
-		0x03,
-		0x16,
-		0x02,
-		0x0e,
-		0x0d,
-		',',
-		'.',
-		'/',
-		0,
-
+		'1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',  ':', '-',
+		0x1b, 0x11, 0x17, 0x05, 0x12, 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x0a, 0x0d,
+		0,    0x01, 0x13, 0x04, 0x06, 0x07, 0x08, 0x0a, 0x0b, 0x0c, ';',  0x08, 0,
+		0,    0x1a, 0x18, 0x03, 0x16, 0x02, 0x0e, 0x0d, ',',  '.',  '/',  0,
 		' '
 	}
 };

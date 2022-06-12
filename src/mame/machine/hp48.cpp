@@ -108,7 +108,7 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 	}
 
 	/* schedule end of reception */
-	machine().scheduler().timer_set(RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::rs232_byte_recv_cb),this), data);
+	m_recv_done_timer->adjust(RS232_DELAY, data);
 }
 
 
@@ -137,7 +137,7 @@ void hp48_state::rs232_send_byte()
 	m_io[0x12] |= 3;
 
 	/* schedule transmission */
-	machine().scheduler().timer_set(RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::rs232_byte_sent_cb),this), data);
+	m_send_done_timer->adjust(RS232_DELAY, data);
 }
 
 
@@ -976,15 +976,23 @@ void hp48_state::base_machine_start(hp48_models model)
 	}
 
 	/* timers */
-	m_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::timer1_cb), this));
+	m_1st_timer = timer_alloc(FUNC(hp48_state::timer1_cb), this);
 	m_1st_timer->adjust(attotime::from_hz(16), 0, attotime::from_hz(16));
 
-	m_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::timer2_cb), this));
+	m_2nd_timer = timer_alloc(FUNC(hp48_state::timer2_cb), this);
 	m_2nd_timer->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
 
 	/* 1ms keyboard polling */
-	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::kbd_cb), this));
+	m_kbd_timer = timer_alloc(FUNC(hp48_state::kbd_cb), this);
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	/* serial receive done */
+	m_recv_done_timer = timer_alloc(FUNC(hp48_state::rs232_byte_recv_cb), this);
+	m_recv_done_timer->adjust(attotime::never);
+
+	/* serial send done */
+	m_send_done_timer = timer_alloc(FUNC(hp48_state::rs232_byte_sent_cb), this);
+	m_send_done_timer->adjust(attotime::never);
 
 	m_lshift0.resolve();
 	m_rshift0.resolve();

@@ -288,6 +288,7 @@ csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
 cubo.cpp
+cucaracha.cpp
 cultures.cpp
 cupidon.cpp
 cv1k.cpp
@@ -376,6 +377,7 @@ ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
 efdt.cpp
+efg8080.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -434,6 +436,7 @@ forte2.cpp
 fortecar.cpp
 freekick.cpp
 freeway.cpp
+frenzyxprss.cpp
 fresh.cpp
 fromanc2.cpp
 fromance.cpp
@@ -500,7 +503,6 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
-gokidetor.cpp
 goldart.cpp
 goldngam.cpp
 goldnpkr.cpp
@@ -545,7 +547,6 @@ hapyfish.cpp
 harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
-headonb.cpp
 heromem.cpp
 hexion.cpp
 hideseek.cpp
@@ -1140,19 +1141,21 @@ segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
+segafruit.cpp
 segag80r.cpp
 segag80v.cpp
 segahang.cpp
 segajw.cpp
 segald.cpp
-segam1.cpp
 segaorun.cpp
 segas16a.cpp
 segas16b.cpp
+segas16b_isgsm.cpp
 segas18.cpp
 segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
+segasm1.cpp
 segasp.cpp
 segattl.cpp
 segaufo.cpp
@@ -1383,6 +1386,7 @@ toaplan2.cpp
 toki.cpp
 toki_ms.cpp
 tomcat.cpp
+tomsadvs.cpp
 tonton.cpp
 toobin.cpp
 topspeed.cpp

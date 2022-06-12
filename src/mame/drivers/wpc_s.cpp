@@ -2835,6 +2835,19 @@ ROM_START(wcs_l2)
 	ROM_LOAD16_BYTE("wcup_u8.rom", 0xc00000, 0x080000, CRC(670cd382) SHA1(89548420c3b6b8a3d7621b10c538ee1dc6a7be62))
 ROM_END
 
+ROM_START(wcs_l1)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("wcs_lx1_1.bin", 0x00000, 0x80000, CRC(b9066ffc) SHA1(9fae6be9c074462e38ab3504b0885ef118e426bf))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("wcup_u2.rom", 0x000000, 0x080000, CRC(92252f28) SHA1(962a58ea910bcb90c82c81456a888d45f23fcd9a))
+	ROM_LOAD16_BYTE("wcup_u3.rom", 0x200000, 0x080000, CRC(83f541ad) SHA1(2d81d89e43f350caba60d5bec8a66560f8556ad8))
+	ROM_LOAD16_BYTE("wcup_u4.rom", 0x400000, 0x080000, CRC(1540c505) SHA1(aca5a421a0fd067f5411fae2fc3c7c3bcfa1b12f))
+	ROM_LOAD16_BYTE("wcup_u5.rom", 0x600000, 0x080000, CRC(bddad8d4) SHA1(ae6bb1ca3d97a56d1ba984060a1c1ef6c7a00159))
+	ROM_LOAD16_BYTE("wcup_u6.rom", 0x800000, 0x080000, CRC(00f46c12) SHA1(64e99eb32908dbb7b90ee8fa92a20aacf800aeac))
+	ROM_LOAD16_BYTE("wcup_u7.rom", 0xa00000, 0x080000, CRC(fff01703) SHA1(fb8d7212fe562e9933941b7bfc707aed1eb74e79))
+	ROM_LOAD16_BYTE("wcup_u8.rom", 0xc00000, 0x080000, CRC(670cd382) SHA1(89548420c3b6b8a3d7621b10c538ee1dc6a7be62))
+ROM_END
+
 ROM_START(wcs_la2)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("wcup_la2.rom", 0x00000, 0x80000, CRC(c13a73f9) SHA1(38b540c42d15580c27f34680dc26432db77644c4))
@@ -2947,6 +2960,7 @@ GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0
 GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_l1,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-1)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

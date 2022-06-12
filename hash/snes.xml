@@ -1904,7 +1904,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="megamnx3up" cloneof="megamnx3">
 		<!-- lostlevels.org -->
-		<!-- Notes: the software matches the final release, but the hardware differs significantly  -->
+		<!-- Notes: the software matches the final release, but the hardware differs significantly -->
 		<description>Mega Man X3 (USA, final prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
@@ -5071,7 +5071,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<!-- Notes: this game has to be redumped without the intro!!!!  -->
+	<!-- Notes: this game has to be redumped without the intro!!!! -->
 	<software name="futarg" cloneof="issdx">
 		<description>Futbol Argentino '96 (Hacked)</description>
 		<year>199?</year>
@@ -20860,7 +20860,7 @@ more investigation needed...
 	</software>
 
 	<software name="parlpar3">
-		<!--  Alt. Title: 京楽 三洋 豊丸 奥村 太陽 Parlor ! パー ラー!3 / Kyouraku - Sanyou - Toyomaru - Okumura - Taiyou - Parlor! Parlor! 3 (Box) -->
+		<!-- Alt. Title: 京楽 三洋 豊丸 奥村 太陽 Parlor ! パー ラー!3 / Kyouraku - Sanyou - Toyomaru - Okumura - Taiyou - Parlor! Parlor! 3 (Box) -->
 		<description>Parlor! Parlor! 3 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Nihon Telenet</publisher>
@@ -33054,7 +33054,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-					<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
+				<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -33614,7 +33614,7 @@ Alternate board (XL-1)
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="" />
-			<!--  Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping -->
+			<!-- Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping -->
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-kx-1.u2"   size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
@@ -34470,7 +34470,7 @@ List of unclassified roms
 				<rom name="accele brid (japan).sfc" size="2097152" crc="4a736c38" sha1="8c9b8623d51d646631c0e5bc592440db4cfd1eab" offset="0x000000" />
 			</dataarea>
 		</part>
-		</software>
+	</software>
 
 	<software name="acenerae">
 		<description>Ace o Nerae! (Jpn)</description>

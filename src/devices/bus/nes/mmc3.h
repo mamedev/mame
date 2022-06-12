@@ -23,7 +23,7 @@ public:
 	virtual void prg_cb(int start, int bank);
 	virtual void chr_cb(int start, int bank, int source);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:

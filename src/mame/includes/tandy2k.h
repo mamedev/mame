@@ -116,6 +116,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_reset_after_children() override;
+
+	void tandy2k_mem(address_map &map);
+	void tandy2k_io(address_map &map);
+	void tandy2k_hd_io(address_map &map);
+	void vpac_mem(address_map &map);
+	void vrambank_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(update_mouse);
+	TIMER_CALLBACK_MEMBER(mcu_delay_cb);
+
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_i8255a;
@@ -140,11 +153,6 @@ private:
 	required_shared_ptr<uint16_t> m_hires_ram;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_reset_after_children() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -253,26 +261,17 @@ private:
 		BT_IRQ = 2
 	};
 
-	enum
-	{
-		MOUS_TIMER,
-		MCU_DELAY
-	};
-
 	uint8_t m_clkmouse_cmd[8]{};
 	int m_clkmouse_cnt = 0;
 	uint8_t m_clkmouse_irq = 0;
-	uint16_t m_mouse_x = 0, m_mouse_y = 0;
+	uint16_t m_mouse_x = 0;
+	uint16_t m_mouse_y = 0;
 	emu_timer *m_mouse_timer = nullptr;
 	emu_timer *m_mcu_delay = nullptr;
 
-	void tandy2k_hd_io(address_map &map);
-	void tandy2k_io(address_map &map);
-	void tandy2k_mem(address_map &map);
-	void vpac_mem(address_map &map);
-	void vrambank_mem(address_map &map);
-
-	required_ioport m_buttons, m_x_axis, m_y_axis;
+	required_ioport m_buttons;
+	required_ioport m_x_axis;
+	required_ioport m_y_axis;
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H

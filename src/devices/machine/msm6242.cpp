@@ -100,7 +100,7 @@ void msm6242_device::device_start()
 	m_out_int_handler.resolve();
 
 	// let's call the timer callback every tick
-	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
+	m_timer = timer_alloc(FUNC(msm6242_device::rtc_timer_callback), this);
 	m_timer->adjust(attotime::zero);
 
 	// set up registers
@@ -161,22 +161,6 @@ void msm6242_device::device_post_load()
 	update_timer();
 }
 
-
-
-//-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_RTC_CALLBACK:
-			rtc_timer_callback();
-			break;
-	}
-}
 
 
 //-------------------------------------------------
@@ -377,7 +361,7 @@ void msm6242_device::rtc_clock_updated(int year, int month, int day, int day_of_
 //  rtc_timer_callback
 //-------------------------------------------------
 
-void msm6242_device::rtc_timer_callback()
+TIMER_CALLBACK_MEMBER(msm6242_device::rtc_timer_callback)
 {
 	update_rtc_registers();
 	update_timer();

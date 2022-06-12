@@ -102,7 +102,7 @@ void leland_state::video_start()
 	m_video_ram = make_unique_clear<u8[]>(VRAM_SIZE);
 
 	/* scanline timer */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
+	m_scanline_timer = timer_alloc(FUNC(leland_state::scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	save_item(NAME(m_gfx_control));

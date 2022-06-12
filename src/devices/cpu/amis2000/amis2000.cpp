@@ -188,7 +188,7 @@ void amis2152_cpu_device::device_start()
 {
 	amis2000_base_device::device_start();
 
-	m_d2f_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amis2152_cpu_device::d2f_timer_cb), this));
+	m_d2f_timer = timer_alloc(FUNC(amis2152_cpu_device::d2f_timer_cb), this);
 
 	// zerofill
 	m_d2f_latch = 0;

@@ -725,13 +725,12 @@ void m2_te_device::device_start()
 	// Allocate PIP RAM
 	m_pipram = std::make_unique<uint32_t[]>(PIP_RAM_WORDS);
 
-	// TODO
+	// Clear our state; TODO: Proper reset values
 	memset(&m_gc, 0, sizeof(m_gc));
 	memset(&m_se, 0, sizeof(m_se));
 	memset(&m_es, 0, sizeof(m_es));
 	memset(&m_tm, 0, sizeof(m_tm));
 	memset(&m_db, 0, sizeof(m_db));
-
 
 	// Register state for saving
 	save_pointer(NAME(m_tram), TEXTURE_RAM_WORDS);
@@ -742,6 +741,9 @@ void m2_te_device::device_start()
 	save_item(NAME(m_es.m_regs));
 	save_item(NAME(m_tm.m_regs));
 	save_item(NAME(m_db.m_regs));
+
+	// Allocate timers
+	m_done_timer = timer_alloc(FUNC(m2_te_device::command_done), this);
 }
 
 
@@ -3461,7 +3463,7 @@ void m2_te_device::execute()
 	logerror("Z writes: %u\n", g_statistics[STAT_ZBUFFER_STORES]);
 	logerror("Total: %u cycles (%fusec)\n", total_cycles, clocks_to_attotime(total_cycles).as_double()*1.0e6);
 #endif
-	timer_set(clocks_to_attotime(total_cycles), 0);
+	m_done_timer->adjust(clocks_to_attotime(total_cycles));
 #else
 	// Interrupt after stopping?
 	if (m_gc.te_master_mode & TEICNTL_INT)
@@ -3896,14 +3898,8 @@ void m2_te_device::load_texture()
     TIMERS
 ***************************************************************************/
 
-void m2_te_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m2_te_device::command_done)
 {
-	switch (id)
-	{
-		case 0:
-			if (m_gc.te_master_mode & TEICNTL_INT)
-				set_interrupt(INTSTAT_IMMEDIATE_INSTR);
-			break;
-	}
-
+	if (m_gc.te_master_mode & TEICNTL_INT)
+		set_interrupt(INTSTAT_IMMEDIATE_INSTR);
 }

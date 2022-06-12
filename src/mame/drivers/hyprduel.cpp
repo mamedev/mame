@@ -399,7 +399,7 @@ void hyprduel_state::machine_start()
 	save_item(NAME(m_subcpu_resetline));
 	save_item(NAME(m_cpu_trigger));
 
-	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback), this));
+	m_vblank_end_timer = timer_alloc(FUNC(hyprduel_state::vblank_end_callback), this);
 }
 
 void hyprduel_state::i4220_config(machine_config &config)

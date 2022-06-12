@@ -27,39 +27,42 @@ namespace netlist
 
 		explicit netlist_t(netlist_state_t &state, const pstring &aname);
 
-		PCOPYASSIGNMOVE(netlist_t, delete)
+		netlist_t(const netlist_t &) = delete;
+		netlist_t &operator=(const netlist_t &) = delete;
+		netlist_t(netlist_t &&) noexcept = delete;
+		netlist_t &operator=(netlist_t &&) noexcept = delete;
 
 		virtual ~netlist_t() noexcept = default;
 
 		// run functions
 
-		const netlist_time_ext &time() const noexcept { return m_time; }
+		constexpr const netlist_time_ext &time() const noexcept { return m_time; }
 
 		void process_queue(netlist_time_ext delta) noexcept;
 		void abort_current_queue_slice() noexcept
 		{
-			qremove(nullptr);
-			qpush(m_time, nullptr);
+			queue_remove(nullptr);
+			queue_push(m_time, nullptr);
 		}
 
-		const detail::queue_t &queue() const noexcept { return m_queue; }
+		constexpr const detail::queue_t &queue() const noexcept { return m_queue; }
 
 		template <typename... Args>
-		void qpush(Args&&...args) noexcept
+		void queue_push(Args&&...args) noexcept
 		{
 			if (config::use_queue_stats::value && m_use_stats)
-				m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
-			else
 				m_queue.emplace<true>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
+			else
+				m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
 		}
 
 		template <class R>
-		void qremove(const R &elem) noexcept
+		void queue_remove(R &&elem) noexcept
 		{
 			if (config::use_queue_stats::value && m_use_stats)
-				m_queue.remove<true>(elem);
+				m_queue.remove<true>(std::forward<R>(elem));
 			else
-				m_queue.remove<false>(elem);
+				m_queue.remove<false>(std::forward<R>(elem));
 		}
 
 		// Control functions

@@ -72,6 +72,14 @@ public:
 	void init_endurob2();
 
 private:
+	// driver overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(i8751_sync);
+	TIMER_CALLBACK_MEMBER(ppi_sync);
+
 	// PPI read/write callbacks
 	void video_lamps_w(uint8_t data);
 	void tilemap_sound_w(uint8_t data);
@@ -110,19 +118,6 @@ private:
 	void sound_portmap_2203x2(address_map &map);
 	void sub_map(address_map &map);
 
-	// timer IDs
-	enum
-	{
-		TID_INIT_I8751,
-		TID_PPI_WRITE
-	};
-
-	// driver overrides
-	virtual void video_start() override;
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// devices
 	required_device<m68000_device> m_maincpu;
 	required_device<m68000_device> m_subcpu;
@@ -141,12 +136,13 @@ private:
 	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
-	bool                    m_sharrier_video = false;
+	bool m_sharrier_video = false;
 
 	// internal state
-	uint8_t                   m_adc_select = 0;
+	emu_timer              * m_i8751_sync_timer = nullptr;
+	uint8_t                  m_adc_select = 0;
 	optional_ioport_array<4> m_adc_ports;
-	bool                    m_shadow = false;
+	bool                     m_shadow = false;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	output_finder<2> m_lamps;
+	output_finder<2>         m_lamps;
 };

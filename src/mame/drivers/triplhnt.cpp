@@ -22,9 +22,9 @@ void triplhnt_state::init_triplhnt()
 }
 
 
-void triplhnt_state::set_collision(int code)
+TIMER_CALLBACK_MEMBER(triplhnt_state::set_collision)
 {
-	m_hit_code = code;
+	m_hit_code = param;
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }

@@ -2880,7 +2880,7 @@ No [VDP] sprites
 	</software>
 
 
-<!-- This was marked as rev. A on the EA sticker, but its header (and ROM markings) uses the Jpn title... weird situation :-)  -->
+<!-- This was marked as rev. A on the EA sticker, but its header (and ROM markings) uses the Jpn title... weird situation :-) -->
 	<software name="fatalrewa" cloneof="fatalrew" supported="no">
 		<!-- Originally marked as Fatal Rewind, boots as The Killing Game Show -->
 		<description>The Killing Game Show (Euro)</description>
@@ -6482,7 +6482,7 @@ Unsupported [Menacer] peripheral
 	</software>
 
 
-<!-- does mpr-18875 belong to the US version or to an alt PCB with a single ROM?  -->
+<!-- does mpr-18875 belong to the US version or to an alt PCB with a single ROM? -->
 	<software name="pocahont">
 		<description>Pocahontas (Euro)</description>
 		<year>1996</year>
@@ -6786,7 +6786,7 @@ Unsupported [Menacer] peripheral
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-12651A"/>
-				<dataarea name="rom" width="16" endianness="big" size="262144">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="mpr-12651a.ic1" size="262144" crc="4d47a647" sha1="e337e618653830f84c77789e81724c5fc69888be"/>
 			</dataarea>
 		</part>
@@ -10210,7 +10210,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<!-- The PCB contains 4 different ROMs, but it is unknown how the dump should be split (maybe we can reconstruct that from the checksums?)  -->
+			<!-- The PCB contains 4 different ROMs, but it is unknown how the dump should be split (maybe we can reconstruct that from the checksums?) -->
 			<feature name="pcb" value=""/>
 			<feature name="u1" value="MO 1 6/26 56 CE41"/> <!-- The 56 might be a 95 written upside down -->
 			<feature name="u2" value="Real Monsters 7-7-95"/>
@@ -10410,7 +10410,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950427)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-				<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 27, 1995).bin" size="2097152" crc="fdac8190" sha1="1a2bece0e3f66dcdd44b555ce45deda510b8ca3a"/>
@@ -25847,7 +25847,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		</part>
 	</software>
 
-<!-- undumped original '96 release by Kin Tec known to exist  -->
+<!-- undumped original '96 release by Kin Tec known to exist -->
 	<software name="shuihu">
 		<description>Shui Hu - Feng Yun Zhuan (Tw)</description>
 		<year>1999</year>
@@ -35041,7 +35041,7 @@ Bad dump of a supposedly Russian version of pele2 (cfr. corrupted MD header at t
 		</part>
 	</software>
 
-<!--  super_mario_2.bin       FIXED BITS (xxxxxx1xxxxxxxxx)  -->
+<!-- super_mario_2.bin       FIXED BITS (xxxxxx1xxxxxxxxx) -->
 	<software name="smario2a" cloneof="smario2" supported="no">
 		<description>Super Mario 2 (Bad?)</description>
 		<year>199?</year>

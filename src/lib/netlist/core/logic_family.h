@@ -25,7 +25,12 @@ namespace netlist
 		{
 		}
 
-		PCOPYASSIGNMOVE(logic_family_desc_t, delete)
+		logic_family_desc_t(const logic_family_desc_t &) = delete;
+		logic_family_desc_t &operator=(const logic_family_desc_t &) = delete;
+
+		// FOXME: Should be move constructible
+		logic_family_desc_t(logic_family_desc_t &&) noexcept = delete;
+		logic_family_desc_t &operator=(logic_family_desc_t &&) noexcept = delete;
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
@@ -76,7 +81,13 @@ namespace netlist
 	public:
 		logic_family_t() : m_logic_family(nullptr) {}
 		logic_family_t(const logic_family_desc_t *d) : m_logic_family(d) {}
-		PCOPYASSIGNMOVE(logic_family_t, delete)
+
+		logic_family_t(const logic_family_t &) = delete;
+		logic_family_t &operator=(const logic_family_t &) = delete;
+
+		// FIXME: logic family can be move constructible.
+		logic_family_t(logic_family_t &&) noexcept = delete;
+		logic_family_t &operator=(logic_family_t &&) noexcept = delete;
 
 		const logic_family_desc_t *logic_family() const noexcept { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) noexcept { m_logic_family = fam; }

@@ -147,16 +147,9 @@ Region byte at offset 0x031:
                 INTERRUPTS
 ***********************************************************/
 
-void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(slapshot_state::trigger_int6)
 {
-	switch (id)
-	{
-	case TIMER_SLAPSHOT_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in slapshot_state::device_timer");
-	}
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 
@@ -398,7 +391,7 @@ void slapshot_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_int6_timer = timer_alloc(TIMER_SLAPSHOT_INTERRUPT6);
+	m_int6_timer = timer_alloc(FUNC(slapshot_state::trigger_int6), this);
 }
 
 

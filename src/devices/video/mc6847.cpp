@@ -148,23 +148,6 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 
 
 //-------------------------------------------------
-//  setup_timer - sets up a single timer relative
-//  to the clock
-//-------------------------------------------------
-
-inline emu_timer *mc6847_friend_device::setup_timer(device_timer_id id, double offset, double period)
-{
-	emu_timer *timer = timer_alloc(id);
-	timer->adjust(
-			clocks_to_attotime(offset * m_divider),
-			0,
-			clocks_to_attotime(period * m_divider));
-	return timer;
-}
-
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -174,10 +157,14 @@ void mc6847_friend_device::device_start()
 	m_write_fsync.resolve_safe();
 
 	/* create the timers */
-	m_frame_timer = setup_timer(    TIMER_FRAME,        0,                      m_tpfs * TIMER_HSYNC_PERIOD);
-	m_hsync_on_timer = setup_timer( TIMER_HSYNC_ON,     TIMER_HSYNC_ON_TIME,    TIMER_HSYNC_PERIOD);
-	m_hsync_off_timer = setup_timer(TIMER_HSYNC_OFF,    TIMER_HSYNC_OFF_TIME,   TIMER_HSYNC_PERIOD);
-	m_fsync_timer = timer_alloc(TIMER_FSYNC);
+	m_frame_timer = timer_alloc(FUNC(mc6847_friend_device::new_frame), this);
+	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
+	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
+	m_fsync_timer = timer_alloc(FUNC(mc6847_friend_device::change_field_sync), this);
+
+	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(m_tpfs * TIMER_HSYNC_PERIOD * m_divider));
+	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
+	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_OFF_TIME * m_divider), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
 
 	m_top_border_scanlines = 0;
 	m_body_scanlines = 0;
@@ -250,27 +237,10 @@ void mc6847_friend_device::update_field_sync_timer()
 
 
 //-------------------------------------------------
-//  device_timer
-//-------------------------------------------------
-
-void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_FRAME:       new_frame();                    break;
-		case TIMER_HSYNC_ON:    change_horizontal_sync(true);   break;
-		case TIMER_HSYNC_OFF:   change_horizontal_sync(false);  break;
-		case TIMER_FSYNC:       change_field_sync(param != 0);  break;
-	}
-}
-
-
-
-//-------------------------------------------------
 //  new_frame
 //-------------------------------------------------
 
-inline void mc6847_friend_device::new_frame()
+TIMER_CALLBACK_MEMBER(mc6847_friend_device::new_frame)
 {
 	m_physical_scanline = 0;
 	m_logical_scanline = 0;
@@ -306,8 +276,9 @@ std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 //  change_horizontal_sync
 //-------------------------------------------------
 
-inline void mc6847_friend_device::change_horizontal_sync(bool line)
+TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 {
+	bool line = (bool)param;
 	g_profiler.start(PROFILER_USER1);
 
 	// are we on a rising edge?
@@ -374,8 +345,9 @@ inline void mc6847_friend_device::change_horizontal_sync(bool line)
 //  change_field_sync
 //-------------------------------------------------
 
-inline void mc6847_friend_device::change_field_sync(bool line)
+TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_field_sync)
 {
+	bool line = (bool)param;
 	/* output field sync */
 	if (line != m_field_sync)
 	{
@@ -446,7 +418,7 @@ inline void mc6847_friend_device::next_scanline()
 //  horizontal_sync_changed
 //-------------------------------------------------
 
-void mc6847_friend_device::horizontal_sync_changed(bool line)
+TIMER_CALLBACK_MEMBER(mc6847_friend_device::horizontal_sync_changed)
 {
 }
 

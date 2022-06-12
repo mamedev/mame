@@ -29,7 +29,8 @@
 		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 	#endif
 #elif defined(__GNUC__) && !(defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ))
-	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	//#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	#define gsl_Expects(e) (__builtin_expect(!!(e), 1) ? static_cast<void>(0) : __builtin_unreachable())
 #elif defined(_MSC_VER)
 	#define gsl_Expects(e) __assume(e)
 #else

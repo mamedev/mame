@@ -47,6 +47,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void vidbrain_mem(address_map &map);
+	void vidbrain_io(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(joystick_tick);
+
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void sound_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
+	DECLARE_WRITE_LINE_MEMBER( hblank_w );
+	uint8_t memory_read_byte(offs_t offset);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
@@ -64,23 +80,6 @@ private:
 	required_ioport m_joy4_x;
 	required_ioport m_joy4_y;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	enum
-	{
-		TIMER_JOYSTICK
-	};
-
-	void keyboard_w(uint8_t data);
-	uint8_t keyboard_r();
-	void sound_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
-	DECLARE_WRITE_LINE_MEMBER( hblank_w );
-	uint8_t memory_read_byte(offs_t offset);
-
 	// keyboard state
 	uint8_t m_keylatch = 0;
 	int m_joy_enable = 0;
@@ -90,8 +89,6 @@ private:
 
 	// timers
 	emu_timer *m_timer_ne555 = nullptr;
-	void vidbrain_io(address_map &map);
-	void vidbrain_mem(address_map &map);
 };
 
 #endif

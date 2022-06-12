@@ -300,14 +300,14 @@ public:
 	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	template <typename T, typename U>
-	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option)
+	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)
 		: rc2014_rc80_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		option_reset();
 		slot_options(*this);
 		set_default_option(default_option);
-		set_fixed(false);
+		set_fixed(fixed);
 	}
 
 protected:

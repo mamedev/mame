@@ -53,20 +53,26 @@ private:
 		SD_STATE_DIS,
 		SD_STATE_INA,
 
-		//FIXME Existing states wich must be revisited
+		//FIXME Existing states which must be revisited
 		SD_STATE_WRITE_WAITFE,
 		SD_STATE_WRITE_DATA
 	};
 	sd_state m_state;
 
+	// MMFS for Acorn machines expect dummy byte before response
+	static constexpr int SPI_DELAY_RESPONSE = 1;
+
 	void send_data(u16 count, sd_state new_state);
 	void do_command();
 	void change_state(sd_state new_state);
 
+	void latch_in();
+	void shift_out();
+
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;
 
-	int m_ss, m_in_bit;
+	int m_ss, m_in_bit, m_clk_state;
 	u8 m_in_latch, m_out_latch, m_cur_bit;
 	u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
 	u32 m_blknext;

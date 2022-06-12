@@ -122,11 +122,6 @@ enum
 class st_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MOUSE_TICK
-	};
-
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
@@ -181,7 +176,7 @@ protected:
 	optional_ioport m_mousey;
 	optional_ioport m_config;
 
-	void mouse_tick();
+	TIMER_CALLBACK_MEMBER(mouse_tick);
 
 	// driver
 	uint16_t fdc_data_r(offs_t offset);
@@ -263,7 +258,6 @@ protected:
 	uint16_t fpu_r();
 	void fpu_w(uint16_t data);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 
 	output_finder<> m_led;
@@ -312,9 +306,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);
-	void dmasound_tick();
+	TIMER_CALLBACK_MEMBER(dmasound_tick);
 	void microwire_shift();
-	void microwire_tick();
+	TIMER_CALLBACK_MEMBER(microwire_tick);
 	void state_save();
 
 	/* microwire state */
@@ -344,7 +338,6 @@ public:
 	void ste(machine_config &config);
 	void ste_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 };
 
@@ -385,23 +378,6 @@ public:
 protected:
 	virtual void machine_start() override;
 };
-
-
-//**************************************************************************
-//  TIMERS
-//**************************************************************************
-
-void st_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_MOUSE_TICK:
-		mouse_tick();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in st_state::device_timer");
-	}
-}
 
 
 //**************************************************************************
@@ -789,7 +765,7 @@ uint16_t st_state::berr_r()
 //  mouse_tick -
 //-------------------------------------------------
 
-void st_state::mouse_tick()
+TIMER_CALLBACK_MEMBER(st_state::mouse_tick)
 {
 	/*
 
@@ -1097,7 +1073,7 @@ WRITE_LINE_MEMBER( ste_state::write_monochrome )
 //  dmasound_tick -
 //-------------------------------------------------
 
-void ste_state::dmasound_tick()
+TIMER_CALLBACK_MEMBER(ste_state::dmasound_tick)
 {
 	if (m_dmasnd_samples == 0)
 	{
@@ -1141,22 +1117,6 @@ void ste_state::dmasound_tick()
 		{
 			m_dmasound_timer->enable(0);
 		}
-	}
-}
-
-
-void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_DMASOUND_TICK:
-		dmasound_tick();
-		break;
-	case TIMER_MICROWIRE_TICK:
-		microwire_tick();
-		break;
-	default:
-		st_state::device_timer(timer, id, param);
 	}
 }
 
@@ -1377,7 +1337,7 @@ void ste_state::microwire_shift()
 //  microwire_tick -
 //-------------------------------------------------
 
-void ste_state::microwire_tick()
+TIMER_CALLBACK_MEMBER(ste_state::microwire_tick)
 {
 	switch (m_mw_shift)
 	{
@@ -2210,7 +2170,7 @@ void st_state::machine_start()
 	// allocate timers
 	if (m_mousex.found())
 	{
-		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
+		m_mouse_timer = timer_alloc(FUNC(st_state::mouse_tick), this);
 		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	}
 
@@ -2264,8 +2224,8 @@ void ste_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* allocate timers */
-	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
-	m_microwire_timer = timer_alloc(TIMER_MICROWIRE_TICK);
+	m_dmasound_timer = timer_alloc(FUNC(ste_state::dmasound_tick), this);
+	m_microwire_timer = timer_alloc(FUNC(ste_state::microwire_tick), this);
 
 	/* register for state saving */
 	state_save();

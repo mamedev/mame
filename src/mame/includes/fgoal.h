@@ -48,18 +48,18 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	bitmap_ind16   m_bgbitmap{};
-	bitmap_ind16   m_fgbitmap{};
+	bitmap_ind16 m_bgbitmap{};
+	bitmap_ind16 m_fgbitmap{};
 	uint8_t      m_xpos = 0U;
 	uint8_t      m_ypos = 0U;
-	int        m_current_color = 0;
+	int          m_current_color = 0;
 
 	/* misc */
-	int        m_player = 0;
+	int          m_player = 0;
 	uint8_t      m_row = 0U;
 	uint8_t      m_col = 0U;
-	int        m_prev_coin = 0;
-	emu_timer  *m_interrupt_timer = nullptr;
+	int          m_prev_coin = 0;
+	emu_timer   *m_interrupt_timer = nullptr;
 
 	uint8_t analog_r();
 	uint8_t nmi_reset_r();
@@ -86,8 +86,6 @@ private:
 	unsigned video_ram_address();
 
 	void cpu_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_FGOAL_H

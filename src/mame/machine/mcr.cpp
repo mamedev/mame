@@ -86,7 +86,7 @@ void mcr_state::machine_start()
 void mcr_nflfoot_state::machine_start()
 {
 	/* allocate a timer for the IPU watchdog */
-	m_ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_nflfoot_state::ipu_watchdog_reset), this));
+	m_ipu_watchdog_timer = timer_alloc(FUNC(mcr_nflfoot_state::ipu_watchdog_reset), this);
 }
 
 

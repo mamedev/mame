@@ -395,8 +395,8 @@ void cuda_device::device_start()
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
 
-	m_timer = timer_alloc(0);
-	m_prog_timer = timer_alloc(1);
+	m_timer = timer_alloc(FUNC(cuda_device::seconds_tick), this);
+	m_prog_timer = timer_alloc(FUNC(cuda_device::timer_tick), this);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));
@@ -457,37 +457,35 @@ void cuda_device::device_reset()
 	last_adb = 0;
 }
 
-void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cuda_device::seconds_tick)
 {
-	if (id == 0)
-	{
-		onesec |= 0x40;
+	onesec |= 0x40;
 
-		if (onesec & 0x10)
-		{
-			m_maincpu->set_input_line(M68HC05EG_INT_CPI, ASSERT_LINE);
-		}
+	if (onesec & 0x10)
+	{
+		m_maincpu->set_input_line(M68HC05EG_INT_CPI, ASSERT_LINE);
 	}
-	else
-	{
-		timer_ctrl |= 0x80;
+}
 
-		if (timer_ctrl & 0x20)
+TIMER_CALLBACK_MEMBER(cuda_device::timer_tick)
+{
+	timer_ctrl |= 0x80;
+
+	if (timer_ctrl & 0x20)
+	{
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+	}
+
+	ripple_counter--;
+	if (ripple_counter <= 0)
+	{
+		timer_ctrl |= 0x40;
+
+		ripple_counter = timer_counter;
+
+		if (timer_ctrl & 0x10)
 		{
 			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-		}
-
-		ripple_counter--;
-		if (ripple_counter <= 0)
-		{
-			timer_ctrl |= 0x40;
-
-			ripple_counter = timer_counter;
-
-			if (timer_ctrl & 0x10)
-			{
-				m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-			}
 		}
 	}
 }

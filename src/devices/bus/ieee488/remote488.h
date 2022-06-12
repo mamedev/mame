@@ -31,18 +31,10 @@ public:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ren(int state) override;
 
-	// Timers
-	enum {
-		TMR_ID_POLL,
-		TMR_ID_HEARTBEAT,
-		TMR_ID_AH
-	};
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// Position of signals in "S/R" msgs
@@ -101,10 +93,14 @@ private:
 	bool m_pp_requested;
 	uint8_t m_pp_dio;
 	uint8_t m_sh_dio;
-	bool m_waiting_cp;
+	bool m_waiting_checkpoint;
+
+
+	TIMER_CALLBACK_MEMBER(process_input_msgs);
+	TIMER_CALLBACK_MEMBER(heartbeat_tick);
+	TIMER_CALLBACK_MEMBER(checkpoint_timeout_tick);
 
 	void bus_reset();
-	void process_input_msgs();
 	void set_connection(bool state);
 	void recvd_data_byte(uint8_t data , bool eoi);
 	void flush_data();

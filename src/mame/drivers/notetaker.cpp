@@ -113,6 +113,14 @@ DONE:
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_VIDEO			(1U << 1)
+#define LOG_READOP_STATUS	(1U << 2)
+#define LOG_FIFO            (1U << 3)
+#define LOG_SPC_DSP         (1U << 4)
+#define LOG_FIFO_VERBOSE    (1U << 5)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 class notetaker_state : public driver_device
 {
@@ -135,15 +143,17 @@ public:
 
 	void notetakr(machine_config &config);
 
-	void init_notetakr();
-
 private:
-	enum
-	{
-		TIMER_FIFOCLK,
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void driver_init() override;
 
-// devices
+	void iop_io(address_map &map);
+	void iop_mem(address_map &map);
+	void ep_io(address_map &map);
+	void ep_mem(address_map &map);
+
+	// devices
 	required_device<cpu_device> m_iop_cpu;
 	required_device<pic8259_device> m_iop_pic;
 	required_device<cpu_device> m_ep_cpu;
@@ -158,135 +168,114 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_mainram;
 
-//declarations
 	// screen
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
-	void IPConReg_w(uint16_t data);
-	void EPConReg_w(uint16_t data);
-	void FIFOReg_w(uint16_t data);
-	void FIFOBus_w(uint16_t data);
-	void DiskReg_w(uint16_t data);
-	void LoadDispAddr_w(uint16_t data);
+	void ipcon_reg_w(uint16_t data);
+	void epcon_reg_w(uint16_t data);
+	void fifo_reg_w(uint16_t data);
+	void fifo_bus_w(uint16_t data);
+	void disk_reg_w(uint16_t data);
+	void load_disp_addr_w(uint16_t data);
 
 	// uarts
-	uint16_t ReadOPStatus_r();
-	void LoadKeyCtlReg_w(uint16_t data);
-	void KeyDataReset_w(uint16_t data);
-	void KeyChipReset_w(uint16_t data);
-	uint16_t ReadEIAStatus_r();
-	void LoadEIACtlReg_w(uint16_t data);
-	void EIADataReset_w(uint16_t data);
-	void EIAChipReset_w(uint16_t data);
+	uint16_t read_op_status_r();
+	void load_key_ctl_reg_w(uint16_t data);
+	void key_data_reset_w(uint16_t data);
+	void key_chip_reset_w(uint16_t data);
+	uint16_t read_eia_status_r();
+	void load_eia_ctl_reg_w(uint16_t data);
+	void eia_data_reset_w(uint16_t data);
+	void eia_chip_reset_w(uint16_t data);
+
 	// mem map stuff
 	uint16_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ep_mainram_r(offs_t offset, uint16_t mem_mask);
 	void ep_mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	//variables
-	//  IPConReg
-	uint8_t m_BootSeqDone = 0;
-	uint8_t m_ProcLock = 0;
-	uint8_t m_CharCtr = 0;
-	uint8_t m_DisableROM = 0;
-	uint8_t m_CorrOn_q = 0;
-	uint8_t m_LedInd6 = 0;
-	uint8_t m_LedInd7 = 0;
-	uint8_t m_LedInd8 = 0;
+
+	// IPConReg
+	uint8_t m_boot_seq_done = 0;
+	uint8_t m_proc_lock = 0;
+	uint8_t m_char_ctr = 0;
+	uint8_t m_disable_rom = 0;
+	uint8_t m_corr_on_q = 0;
+	uint8_t m_led_ind6 = 0;
+	uint8_t m_led_ind7 = 0;
+	uint8_t m_led_ind8 = 0;
+
 	//  FIFOReg
-	uint8_t m_TabletYOn = 0;
-	uint8_t m_TabletXOn = 0;
-	uint8_t m_FrSel2 = 0;
-	uint8_t m_FrSel1 = 0;
-	uint8_t m_FrSel0 = 0;
-	uint8_t m_SHConB = 0;
-	uint8_t m_SHConA = 0;
-	uint8_t m_SetSH = 0;
+	uint8_t m_tablet_y_on = 0;
+	uint8_t m_tablet_x_on = 0;
+	uint8_t m_fr_sel2 = 0;
+	uint8_t m_fr_sel1 = 0;
+	uint8_t m_fr_sel0 = 0;
+	uint8_t m_sh_conb = 0;
+	uint8_t m_sh_cona = 0;
+	uint8_t m_set_sh = 0;
+
 	// DiskReg
-	uint8_t m_ADCSpd0 = 0;
-	uint8_t m_ADCSpd1 = 0;
-	uint8_t m_StopWordClock_q = 0;
-	uint8_t m_ClrDiskCont_q = 0;
-	uint8_t m_ProgBitClk1 = 0;
-	uint8_t m_ProgBitClk2 = 0;
-	uint8_t m_ProgBitClk3 = 0;
-	uint8_t m_AnSel4 = 0;
-	uint8_t m_AnSel2 = 0;
-	uint8_t m_AnSel1 = 0;
-	uint8_t m_DriveSel1 = 0;
-	uint8_t m_DriveSel2 = 0;
-	uint8_t m_DriveSel3 = 0;
-	uint8_t m_SideSelect = 0;
-	uint8_t m_Disk5VOn = 0;
-	uint8_t m_Disk12VOn = 0;
+	uint8_t m_adc_spd0 = 0;
+	uint8_t m_adc_spd1 = 0;
+	uint8_t m_stopword_clock_q = 0;
+	uint8_t m_clr_diskcont_q = 0;
+	uint8_t m_prog_bitclk1 = 0;
+	uint8_t m_prog_bitclk2 = 0;
+	uint8_t m_prog_bitclk3 = 0;
+	uint8_t m_an_sel4 = 0;
+	uint8_t m_an_sel2 = 0;
+	uint8_t m_an_sel1 = 0;
+	uint8_t m_drive_sel1 = 0;
+	uint8_t m_drive_sel2 = 0;
+	uint8_t m_drive_sel3 = 0;
+	uint8_t m_side_select = 0;
+	uint8_t m_disk_5v_on = 0;
+	uint8_t m_disk_12v_on = 0;
+
 	// output fifo, for DAC
 	uint16_t m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
 	uint8_t m_outfifo_count = 0;
 	uint8_t m_outfifo_tail_ptr = 0;
 	uint8_t m_outfifo_head_ptr = 0;
-	// fifo timer
-	emu_timer *m_FIFO_timer = nullptr;
-	TIMER_CALLBACK_MEMBER(timer_fifoclk);
-	// framebuffer display starting address
-	uint16_t m_DispAddr = 0;
 
-// separate cpu resets
+	// fifo timer
+	emu_timer *m_fifo_timer = nullptr;
+	TIMER_CALLBACK_MEMBER(timer_fifoclk);
+
+	// framebuffer display starting address
+	uint16_t m_disp_addr = 0;
+
 	void iop_reset();
 	void ep_reset();
-
-// overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void iop_io(address_map &map);
-	void iop_mem(address_map &map);
-	void ep_io(address_map &map);
-	void ep_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
-
-void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_FIFOCLK:
-		timer_fifoclk(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in notetaker_state::device_timer");
-	}
-}
 
 TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 {
-	uint16_t data;
 	//pop a value off the fifo and send it to the dac.
-#ifdef FIFO_VERBOSE
-	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
-#endif
-	data = m_outfifo[m_outfifo_tail_ptr];
+	if (m_outfifo_count == 0)
+		LOGMASKED(LOG_FIFO_VERBOSE, "output fifo is EMPTY! repeating previous sample!\n");
+
+	uint16_t data = m_outfifo[m_outfifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
 	if (m_outfifo_count > 0)
 	{
 		m_outfifo_tail_ptr++;
 		m_outfifo_count--;
 	}
-	m_outfifo_tail_ptr&=0xF;
+	m_outfifo_tail_ptr &= 0xf;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_fifo_timer->adjust(attotime::from_hz(((960_kHz_XTAL / 10) / 4) / ((m_fr_sel0 << 3) + (m_fr_sel1 << 2) + (m_fr_sel2 << 1) + 1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// have to figure out what resolution we're drawing to here and draw appropriately to screen
 	// code borrowed/stolen from video/mac.cpp
-	uint32_t const video_base = (m_DispAddr << 3) & 0x1ffff;
-#ifdef DEBUG_VIDEO
-	logerror("Video Base = 0x%05x\n", video_base);
-#endif
+	uint32_t const video_base = (m_disp_addr << 3) & 0x1ffff;
 	uint16_t const *video_ram_field1 = &m_mainram[video_base / 2];
 	uint16_t const *video_ram_field2 = &m_mainram[(video_base + 0x4b00) / 2];
+
+	LOGMASKED(LOG_VIDEO, "Video Base = 0x%05x\n", video_base);
 
 	for (int y = 0; y < 480; y++)
 	{
@@ -304,36 +293,36 @@ uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void notetaker_state::IPConReg_w(uint16_t data)
+void notetaker_state::ipcon_reg_w(uint16_t data)
 {
-	m_BootSeqDone = BIT(data, 7);
-	m_ProcLock    = BIT(data, 6); // bus lock for this processor (hold other processor in wait state)
-	m_CharCtr     = BIT(data, 5); // battery charge control (incorrectly called 'Char counter' in source code)
-	m_DisableROM  = BIT(data, 4); // disable rom at 0000-0fff
-	m_CorrOn_q    = BIT(data, 3); // CorrectionOn (ECC correction enabled); also LedInd5
-	m_LedInd6     = BIT(data, 2);
-	m_LedInd7     = BIT(data, 1);
-	m_LedInd8     = BIT(data, 0);
+	m_boot_seq_done = BIT(data, 7);
+	m_proc_lock     = BIT(data, 6); // bus lock for this processor (hold other processor in wait state)
+	m_char_ctr      = BIT(data, 5); // battery charge control (incorrectly called 'Char counter' in source code)
+	m_disable_rom   = BIT(data, 4); // disable rom at 0000-0fff
+	m_corr_on_q     = BIT(data, 3); // CorrectionOn (ECC correction enabled); also LedInd5
+	m_led_ind6      = BIT(data, 2);
+	m_led_ind7      = BIT(data, 1);
+	m_led_ind8      = BIT(data, 0);
 	popmessage("LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", BIT(data, 2), BIT(data, 3), BIT(data, 1), BIT(data, 0)); // cr1 and 2 are in the reverse order as expected, according to the schematic
 }
 
 /* handlers for the two system hd6402s (ay-5-1013 equivalent) */
 /* * Keyboard hd6402 */
-uint16_t notetaker_state::ReadOPStatus_r() // 74ls368 hex inverter at #l7 provides 4 bits, inverted
+uint16_t notetaker_state::read_op_status_r() // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
-	uint16_t data = 0xFFF0;
-	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
-	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
+	uint16_t data = 0xfff0;
+	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_fifo_out_rdy is true if the fifo has at least 1 word in it, false otherwise
+	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_fifo_in_rdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_kbduart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_kbduart->dav_r()  ? 0 : 0x02; // DR - pin 19
 	data |= m_kbduart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
-#ifdef DEBUG_READOPSTATUS
-	logerror("ReadOPStatus read, returning %04x\n", data);
-#endif
+
+	LOGMASKED(LOG_READOP_STATUS, "ReadOPStatus read, returning %04x\n", data);
+
 	return data;
 }
 
-void notetaker_state::LoadKeyCtlReg_w(uint16_t data)
+void notetaker_state::load_key_ctl_reg_w(uint16_t data)
 {
 	m_kbduart->write_cs(0);
 	m_kbduart->write_np(BIT(data, 4)); // PI - pin 35
@@ -344,45 +333,43 @@ void notetaker_state::LoadKeyCtlReg_w(uint16_t data)
 	m_kbduart->write_cs(1);
 }
 
-void notetaker_state::KeyDataReset_w(uint16_t data)
+void notetaker_state::key_data_reset_w(uint16_t data)
 {
 	m_kbduart->write_rdav(0); // DDR - pin 18
 	m_kbduart->write_rdav(1); // ''
 }
 
-void notetaker_state::KeyChipReset_w(uint16_t data)
+void notetaker_state::key_chip_reset_w(uint16_t data)
 {
 	m_kbduart->write_xr(0); // MR - pin 21
 	m_kbduart->write_xr(1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
-void notetaker_state::FIFOReg_w(uint16_t data)
+void notetaker_state::fifo_reg_w(uint16_t data)
 {
-	m_SetSH = (data&0x8000)?1:0;
-	m_SHConA = (data&0x4000)?1:0;
-	m_SHConB = (data&0x2000)?1:0;
-	m_FrSel0 = (data&0x1000)?1:0;
-	m_FrSel1 = (data&0x0800)?1:0;
-	m_FrSel2 = (data&0x0400)?1:0;
-	m_TabletXOn = (data&0x0200)?1:0;
-	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_set_sh = BIT(data, 15);
+	m_sh_cona = BIT(data, 14);
+	m_sh_conb = BIT(data, 13);
+	m_fr_sel0 = BIT(data, 12);
+	m_fr_sel1 = BIT(data, 11);
+	m_fr_sel2 = BIT(data, 10);
+	m_tablet_x_on = BIT(data, 9);
+	m_tablet_y_on = BIT(data, 8);
+	m_fifo_timer->adjust(attotime::from_hz(((960_kHz_XTAL / 10) / 4) / ((m_fr_sel0 << 3) + (m_fr_sel1 << 2) + (m_fr_sel2 << 1) + 1)));
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
 	*/
 	// todo: handle tablet and sample/hold stuff as well
-	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, ((((960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	LOGMASKED(LOG_FIFO, "Write to 0x60 fifo_reg_w of %04x; fifo timer set to %d hz\n", data, ((960'000 / 10) / 4) / ((m_fr_sel0 << 3) + (m_fr_sel1 << 2) + (m_fr_sel2 << 1) + 1));
 }
 
-void notetaker_state::FIFOBus_w(uint16_t data)
+void notetaker_state::fifo_bus_w(uint16_t data)
 {
 	if (m_outfifo_count == 16)
 	{
-#ifdef SPC_LOG_DSP
-		logerror("outfifo was full, write ignored!\n");
-#endif
+		LOGMASKED(LOG_SPC_DSP, "outfifo was full, write ignored!\n");
 		return;
 	}
 	m_outfifo[m_outfifo_head_ptr] = data >> 4;
@@ -391,7 +378,7 @@ void notetaker_state::FIFOBus_w(uint16_t data)
 	m_outfifo_head_ptr&=0xF;
 }
 
-void notetaker_state::DiskReg_w(uint16_t data)
+void notetaker_state::disk_reg_w(uint16_t data)
 {
 	/* See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf
 	   but note that bit 12 (called bit 3 in documentation) was changed between
@@ -399,23 +386,23 @@ void notetaker_state::DiskReg_w(uint16_t data)
 	   ClrDiskCont' rather than acting as ProgBitClk0, which is permanently
 	   wired high instead, meaning only the 4.5Mhz - 18Mhz dot clocks are
 	   available for the CRTC. */
-	m_ADCSpd0 = (data&0x8000)?1:0;
-	m_ADCSpd1 = (data&0x4000)?1:0;
-	m_StopWordClock_q = (data&0x2000)?1:0;
-	//if ((!(m_ClrDiskCont_q)) && (data&0x1000)) m_floppy->device_reset(); // reset on rising edge
-	m_ClrDiskCont_q = (data&0x1000)?1:0; // originally ProgBitClk0, but co-opted later to reset the FDC's external PLL
-	m_ProgBitClk1 = (data&0x0800)?1:0;
-	m_ProgBitClk2 = (data&0x0400)?1:0;
-	m_ProgBitClk3 = (data&0x0200)?1:0;
-	m_AnSel4 = (data&0x0100)?1:0;
-	m_AnSel2 = (data&0x80)?1:0;
-	m_AnSel1 = (data&0x40)?1:0;
-	m_DriveSel1 = (data&0x20)?1:0;
-	m_DriveSel2 = (data&0x10)?1:0; // drive 2 not present on hardware, but could work if present
-	m_DriveSel3 = (data&0x08)?1:0; // drive 3 not present on hardware, but could work if present
-	m_SideSelect = (data&0x04)?1:0;
-	m_Disk5VOn = (data&0x02)?1:0;
-	m_Disk12VOn = (data&0x01)?1:0;
+	m_adc_spd0 = BIT(data, 15);
+	m_adc_spd1 = BIT(data, 14);
+	m_stopword_clock_q = BIT(data, 13);
+	//if (!(m_clr_diskcont_q) && (data & 0x1000)) m_floppy->device_reset(); // reset on rising edge
+	m_clr_diskcont_q = BIT(data, 12); // originally ProgBitClk0, but co-opted later to reset the FDC's external PLL
+	m_prog_bitclk1 = BIT(data, 11);
+	m_prog_bitclk2 = BIT(data, 10);
+	m_prog_bitclk3 = BIT(data, 9);
+	m_an_sel4 = BIT(data, 8);
+	m_an_sel2 = BIT(data, 7);
+	m_an_sel1 = BIT(data, 6);
+	m_drive_sel1 = BIT(data, 5);
+	m_drive_sel2 = BIT(data, 4); // drive 2 not present on hardware, but could work if present
+	m_drive_sel3 = BIT(data, 3); // drive 3 not present on hardware, but could work if present
+	m_side_select = BIT(data, 2);
+	m_disk_5v_on = BIT(data, 1);
+	m_disk_12v_on = BIT(data, 0);
 
 	// ADC stuff
 	//TODO
@@ -423,45 +410,49 @@ void notetaker_state::DiskReg_w(uint16_t data)
 	// FDC stuff
 	// first handle the motor stuff; we'll clobber whatever was in m_floppy, then reset it to what it should be
 	m_floppy = m_floppy0->get_device();
+
 	// Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
 	// However, a tech note involves adding a patch so that MotorOn is only activated if the drive is actually selected.
-	m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn && m_DriveSel1));
+	m_floppy->mon_w(!(m_disk_5v_on && m_disk_12v_on && m_drive_sel1));
+
 	//m_floppy = m_floppy1->get_device();
-	//m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn && m_DriveSel2)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	//m_floppy->mon_w(!(m_disk_5v_on && m_disk_12v_on && m_drive_sel2)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
 	//m_floppy = m_floppy2->get_device();
-	//m_floppy->mon_w(!(m_Disk5VOn && m_Disk12VOn && m_DriveSel3)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+	//m_floppy->mon_w(!(m_disk_5v_on && m_disk_12v_on && m_drive_sel3)); // Disk5VOn and 12VOn can be thought of as a crude MotorOn signal as the motor won't run with either? of them missing.
+
 	// now restore m_floppy state to what it should be
-	if (m_DriveSel1) m_floppy = m_floppy0->get_device();
-	//else if (m_DriveSel2) m_floppy = m_floppy1->get_device();
-	//else if (m_DriveSel3) m_floppy = m_floppy2->get_device();
-	else m_floppy = nullptr;
+	if (m_drive_sel1)
+		m_floppy = m_floppy0->get_device();
+	else
+		m_floppy = nullptr;
+
 	m_fdc->set_floppy(m_floppy); // select the floppy
 	if (m_floppy)
 	{
-		m_floppy->ss_w(m_SideSelect);
+		m_floppy->ss_w(m_side_select);
 	}
 
 	// CRTC clock rate stuff
 	//TODO
 }
 
-void notetaker_state::LoadDispAddr_w(uint16_t data)
+void notetaker_state::load_disp_addr_w(uint16_t data)
 {
-	m_DispAddr = data;
+	m_disp_addr = data;
 	// for future low level emulation: clear the current counter position here as well, as well as empty/reset the display fifo, and the setmemrq state.
 }
 
 /* EIA hd6402 */
-uint16_t notetaker_state::ReadEIAStatus_r() // 74ls368 hex inverter at #f1 provides 2 bits, inverted
+uint16_t notetaker_state::read_eia_status_r() // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
-	uint16_t data = 0xFFFC;
+	uint16_t data = 0xfffc;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_eiauart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_eiauart->dav_r()  ? 0 : 0x02; // DR - pin 19
 	data |= m_eiauart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 	return data;
 }
 
-void notetaker_state::LoadEIACtlReg_w(uint16_t data)
+void notetaker_state::load_eia_ctl_reg_w(uint16_t data)
 {
 	m_eiauart->write_cs(0);
 	m_eiauart->write_np(BIT(data, 4)); // PI - pin 35
@@ -472,13 +463,13 @@ void notetaker_state::LoadEIACtlReg_w(uint16_t data)
 	m_eiauart->write_cs(1);
 }
 
-void notetaker_state::EIADataReset_w(uint16_t data)
+void notetaker_state::eia_data_reset_w(uint16_t data)
 {
 	m_eiauart->write_rdav(0); // DDR - pin 18
 	m_eiauart->write_rdav(1); // ''
 }
 
-void notetaker_state::EIAChipReset_w(uint16_t data)
+void notetaker_state::eia_chip_reset_w(uint16_t data)
 {
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
@@ -491,15 +482,19 @@ uint16_t notetaker_state::iop_r(offs_t offset)
 	uint16_t *rom = (uint16_t *)(memregion("iop")->base());
 	rom += 0x7f800;
 	uint16_t *ram = m_mainram.get();
-	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
+	if (m_boot_seq_done == 0 || (m_disable_rom == 0 && (offset & 0x7f800) == 0))
 	{
-		rom += (offset&0x7FF);
+		rom += offset & 0x7ff;
 		return *rom;
 	}
 	else
 	{
 		// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
-		if (offset >= 0x7fff4) { logerror("attempt to read processor control regs at %d\n", offset<<1); return 0xFFFF; }
+		if (offset >= 0x7fff4)
+		{
+			logerror("attempt to read processor control regs at %d\n", offset << 1);
+			return 0xffff;
+		}
 		ram += offset;
 		return *ram;
 	}
@@ -509,13 +504,16 @@ void notetaker_state::iop_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//uint16_t tempword;
 	uint16_t *ram = m_mainram.get();
-	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
+	if (m_boot_seq_done == 0 || (m_disable_rom == 0 && (offset & 0x7f800) == 0))
 	{
-		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
+		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset << 1);
 		return;
 	}
 	// are we in the FFFE8-FFFEF area where the parity/int/reset/etc stuff lives?
-	if (offset >= 0x7fff4) { logerror("attempt to write processor control regs at %d with %02X ignored\n", offset<<1, data); }
+	if (offset >= 0x7fff4)
+	{
+		logerror("attempt to write processor control regs at %d with %02X ignored\n", offset << 1, data);
+	}
 	COMBINE_DATA(&ram[offset]);
 }
 
@@ -596,26 +594,26 @@ void notetaker_state::iop_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).mirror(0x7e1c).rw(m_iop_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x20, 0x21).mirror(0x7e1e).w(FUNC(notetaker_state::IPConReg_w)); // I/O processor (rom mapping, etc) control register
+	map(0x20, 0x21).mirror(0x7e1e).w(FUNC(notetaker_state::ipcon_reg_w)); // I/O processor (rom mapping, etc) control register
 	map(0x42, 0x42).mirror(0x7e10).r(m_kbduart, FUNC(ay31015_device::receive)); // read keyboard data
-	map(0x44, 0x45).mirror(0x7e10).r(FUNC(notetaker_state::ReadOPStatus_r)); // read keyboard fifo state
-	map(0x48, 0x49).mirror(0x7e10).w(FUNC(notetaker_state::LoadKeyCtlReg_w)); // kbd uart control register
+	map(0x44, 0x45).mirror(0x7e10).r(FUNC(notetaker_state::read_op_status_r)); // read keyboard fifo state
+	map(0x48, 0x49).mirror(0x7e10).w(FUNC(notetaker_state::load_key_ctl_reg_w)); // kbd uart control register
 	map(0x4a, 0x4a).mirror(0x7e10).w(m_kbduart, FUNC(ay31015_device::transmit)); // kbd uart data register
-	map(0x4c, 0x4d).mirror(0x7e10).w(FUNC(notetaker_state::KeyDataReset_w)); // kbd uart ddr switch (data reset)
-	map(0x4e, 0x4f).mirror(0x7e10).w(FUNC(notetaker_state::KeyChipReset_w)); // kbd uart reset
-	map(0x60, 0x61).mirror(0x7e1e).w(FUNC(notetaker_state::FIFOReg_w)); // DAC sample and hold and frequency setup
+	map(0x4c, 0x4d).mirror(0x7e10).w(FUNC(notetaker_state::key_data_reset_w)); // kbd uart ddr switch (data reset)
+	map(0x4e, 0x4f).mirror(0x7e10).w(FUNC(notetaker_state::key_chip_reset_w)); // kbd uart reset
+	map(0x60, 0x61).mirror(0x7e1e).w(FUNC(notetaker_state::fifo_reg_w)); // DAC sample and hold and frequency setup
 	//map(0xa0, 0xa1).mirror(0x7e18).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255
-	map(0xc0, 0xc1).mirror(0x7e1e).w(FUNC(notetaker_state::FIFOBus_w)); // DAC data write to FIFO
-	map(0x100, 0x101).mirror(0x7e1e).w(FUNC(notetaker_state::DiskReg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
+	map(0xc0, 0xc1).mirror(0x7e1e).w(FUNC(notetaker_state::fifo_bus_w)); // DAC data write to FIFO
+	map(0x100, 0x101).mirror(0x7e1e).w(FUNC(notetaker_state::disk_reg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
 	map(0x120, 0x127).mirror(0x7e18).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write)).umask16(0x00ff); // floppy controller
 	map(0x140, 0x15f).mirror(0x7e00).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write)).umask16(0x00ff); // crt controller
-	map(0x160, 0x161).mirror(0x7e1e).w(FUNC(notetaker_state::LoadDispAddr_w)); // loads the start address for the display framebuffer
-	map(0x1a0, 0x1a1).mirror(0x7e10).r(FUNC(notetaker_state::ReadEIAStatus_r)); // read eia fifo state
+	map(0x160, 0x161).mirror(0x7e1e).w(FUNC(notetaker_state::load_disp_addr_w)); // loads the start address for the display framebuffer
+	map(0x1a0, 0x1a1).mirror(0x7e10).r(FUNC(notetaker_state::read_eia_status_r)); // read eia fifo state
 	map(0x1a2, 0x1a2).mirror(0x7e10).r(m_eiauart, FUNC(ay31015_device::receive)); // read eia data
-	map(0x1a8, 0x1a9).mirror(0x7e10).w(FUNC(notetaker_state::LoadEIACtlReg_w)); // eia uart control register
+	map(0x1a8, 0x1a9).mirror(0x7e10).w(FUNC(notetaker_state::load_eia_ctl_reg_w)); // eia uart control register
 	map(0x1aa, 0x1aa).mirror(0x7e10).w(m_eiauart, FUNC(ay31015_device::transmit)); // eia uart data register
-	map(0x1ac, 0x1ad).mirror(0x7e10).w(FUNC(notetaker_state::EIADataReset_w)); // eia uart ddr switch (data reset)
-	map(0x1ae, 0x1af).mirror(0x7e10).w(FUNC(notetaker_state::EIAChipReset_w)); // eia uart reset
+	map(0x1ac, 0x1ad).mirror(0x7e10).w(FUNC(notetaker_state::eia_data_reset_w)); // eia uart ddr switch (data reset)
+	map(0x1ae, 0x1af).mirror(0x7e10).w(FUNC(notetaker_state::eia_chip_reset_w)); // eia uart reset
 	//map(0x1c0, 0x1c1).mirror(0x7e1e).r(FUNC(notetaker_state::SelADCHi_r)); // ADC read
 	//map(0x1e0, 0x1e1).mirror(0x7e1e).r(FUNC(notetaker_state::CRTSwitch_w)); // CRT power enable?
 }
@@ -674,7 +672,7 @@ read from 0x44 (byte wide) to check input fifo status
 
 /* Emulator CPU */
 
-void notetaker_state::EPConReg_w(uint16_t data)
+void notetaker_state::epcon_reg_w(uint16_t data)
 {
 	/*m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 8k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
 	m_EP_LED2 = (data&0x40)?1:0;
@@ -740,7 +738,7 @@ void notetaker_state::ep_io(address_map &map)
 	map.unmap_value_high();
 	map(0x800, 0x803).mirror(0x07fc).rw(m_ep_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	//map(0x1000, 0x1001).mirror(0x07fe).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
-	map(0x2000, 0x2001).mirror(0x07fe).w(FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
+	map(0x2000, 0x2001).mirror(0x07fe).w(FUNC(notetaker_state::epcon_reg_w)); // emu processor control reg & leds
 	//map(0x4000, 0x4001).mirror(0x07fe).w(FUNC(notetaker_state::EmuClearParity_w)); // writes here clear the local 8k-ram parity error register
 }
 
@@ -757,17 +755,21 @@ void notetaker_state::machine_start()
 {
 	// allocate RAM
 	m_mainram = make_unique_clear<uint16_t[]>(0x100000/2);
+
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
-	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
-	m_FIFO_timer->adjust(attotime::never);
+	m_fifo_timer = timer_alloc(FUNC(notetaker_state::timer_fifoclk), this);
+	m_fifo_timer->adjust(attotime::never);
+
 	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
 	m_fdc->dden_w(0);
+
 	// Keyboard UART: /SWE is tied permanently LOW
 	m_kbduart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+
 	// EIA UART: /SWE is tied permanently LOW
 	m_eiauart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
-	// savestate stuff
-	// TODO: add me!
+
+	// TODO: register savestate items
 }
 
 /* Machine Reset; this emulates the full system reset, triggered by ExtReset' (cardcage pin <50>) or the PowerOnReset' circuit */
@@ -783,26 +785,36 @@ void notetaker_state::iop_reset()
 	// reset the Keyboard UART
 	m_kbduart->write_xr(0); // MR - pin 21
 	m_kbduart->write_xr(1); // ''
+
 	// reset the EIA UART
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
+
 	// reset the IPConReg ls273 latch at #f1
-	IPConReg_w(0x0000);
+	ipcon_reg_w(0x0000);
+
 	// Clear the DAC FIFO
-	for (int i=0; i<16; i++) m_outfifo[i] = 0;
-	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
+	for (int i = 0; i < 16; i++)
+		m_outfifo[i] = 0;
+	m_outfifo_count = 0;
+	m_outfifo_tail_ptr = 0;
+	m_outfifo_head_ptr = 0;
+
 	// reset the FIFOReg latch at #h9
-	FIFOReg_w(0x0000);
+	fifo_reg_w(0x0000);
+
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
-	DiskReg_w(0x0000);
+	disk_reg_w(0x0000);
+
 	// reset the framebuffer display address counter:
-	m_DispAddr = 0;
+	m_disp_addr = 0;
 }
 
 /* EP Reset; this emulates the EPReset' signal */
 void notetaker_state::ep_reset()
 {
-	//TODO: force ep into reset and hold it there, until the iop releases it. there's 6 'state' bits controllable by the memory mapped cpu control reg, which need to be reset for epcpu and iocpu separately
+	// TODO: force ep into reset and hold it there, until the iop releases it.
+	// there's 6 'state' bits controllable by the memory mapped cpu control reg, which need to be reset for epcpu and iocpu separately
 }
 
 /* Input ports */
@@ -854,7 +866,8 @@ void notetaker_state::notetakr(machine_config &config)
 	   written with 101, changing the divider to (36mhz/4)/8 */
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
 	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
-	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
+	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen.
+	// hence with the hack this interrupt triggers twice as often as it should
 	m_crtc->vsyn_callback().set(m_iop_pic, FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	m_crtc->set_screen("screen");
 
@@ -868,12 +881,13 @@ void notetaker_state::notetakr(machine_config &config)
 	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
 	m_eiauart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
 
-	clock_device &eiaclock(CLOCK(config, "eiaclock", ((960_kHz_XTAL/10)/4)/5)); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	// hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	clock_device &eiaclock(CLOCK(config, "eiaclock", ((960_kHz_XTAL / 10) / 4) / 5));
 	eiaclock.signal_handler().set(m_eiauart, FUNC(ay31015_device::write_rcp));
 	eiaclock.signal_handler().append(m_eiauart, FUNC(ay31015_device::write_tcp));
 
 	/* Floppy */
-	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	FD1791(config, m_fdc, (((24_MHz_XTAL / 3) / 2) / 2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	FLOPPY_CONNECTOR(config, "wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* sound hardware */
@@ -883,7 +897,7 @@ void notetaker_state::notetakr(machine_config &config)
 	DAC1200(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 }
 
-void notetaker_state::init_notetakr()
+void notetaker_state::driver_init()
 {
 	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
@@ -897,7 +911,7 @@ void notetaker_state::init_notetakr()
 	{
 		uint16_t wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
 		uint16_t addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-		uint16_t *temppointer = romdst+(addrtemp&0x7FF);
+		uint16_t *temppointer = romdst + (addrtemp & 0x7ff);
 		*temppointer = wordtemp;
 		romsrc++;
 	}
@@ -921,10 +935,14 @@ ROM_START( notetakr )
 	ROM_SYSTEM_BIOS( 1, "v1.50", "Bootable IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(1))
+
 	ROM_REGION( 0x100000, "iop", ROMREGION_ERASEFF ) // area for descrambled roms
 	// main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
+
+	// keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iop
 	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP ) // keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iop
+	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP )
+
 	ROM_REGION( 0x500, "proms", ROMREGION_ERASEFF )
 	/* disk data separator prom from the disk/display module board:
 	   there are two different versions of this prom, both generated by BCPL programs,
@@ -935,9 +953,16 @@ ROM_START( notetakr )
 	   thing that ever sees the prom data bus, this prom will work even if the
 	   bit order for those bits is backwards.
 	*/
-	ROM_LOAD( "disksep.82s147.a4", 0x000, 0x200, CRC(38363714) SHA1(c995d2702573f5afb5fc919150d3a5661013f999) ) // 1979 version
-	ROM_LOAD( "timingprom.82s147.b1", 0x200, 0x200, CRC(3003b50a) SHA1(77d9ffe4716c2297708b8e5ebce7f930619c3cc3) ) // memory cas/ras/write state machine prom from the memory address logic board; the contents of this are listed in http://www.bitsavers.org/pdf/xerox/notetaker/schematics/19781027_Memory_Address_Timing.pdf
-	ROM_LOAD( "memreqprom.82s126.d9", 0x400, 0x100, CRC(56b2be8b) SHA1(5df0579ed8afeb59113700be6f2982ef85f64b44) ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
+	// 1979 version
+	ROM_LOAD( "disksep.82s147.a4", 0x000, 0x200, CRC(38363714) SHA1(c995d2702573f5afb5fc919150d3a5661013f999) )
+
+	// memory cas/ras/write state machine prom from the memory address logic board; the contents of this are listed in:
+	// http://www.bitsavers.org/pdf/xerox/notetaker/schematics/19781027_Memory_Address_Timing.pdf
+	ROM_LOAD( "timingprom.82s147.b1", 0x200, 0x200, CRC(3003b50a) SHA1(77d9ffe4716c2297708b8e5ebce7f930619c3cc3) )
+
+	// SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
+	ROM_LOAD( "memreqprom.82s126.d9", 0x400, 0x100, CRC(56b2be8b) SHA1(5df0579ed8afeb59113700be6f2982ef85f64b44) )
+
 	/*
 	SetMemRq:
 	Address:
@@ -970,5 +995,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, init_notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
-
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)

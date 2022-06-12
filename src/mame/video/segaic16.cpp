@@ -1258,7 +1258,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;
-			info->latch_timer = machine().scheduler().timer_alloc( timer_expired_delegate(FUNC(segaic16_video_device::tilemap_16b_latch_values),this) );
+			info->latch_timer = timer_alloc(FUNC(segaic16_video_device::tilemap_16b_latch_values), this);
 			break;
 
 		case TILEMAP_16B_ALT:
@@ -1267,7 +1267,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;
-			info->latch_timer = machine().scheduler().timer_alloc( timer_expired_delegate(FUNC(segaic16_video_device::tilemap_16b_latch_values),this) );
+			info->latch_timer = timer_alloc(FUNC(segaic16_video_device::tilemap_16b_latch_values), this);
 			break;
 
 		default:

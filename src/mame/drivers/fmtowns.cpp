@@ -439,47 +439,17 @@ uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 	return 0xff;
 }
 
-void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-	case TIMER_FREERUN:
-		freerun_inc();
-		break;
-	case TIMER_INTERVAL2:
-		intervaltimer2_timeout();
-		break;
-	case TIMER_KEYBOARD:
-		poll_keyboard();
-		break;
-	case TIMER_MOUSE:
-		mouse_timeout();
-		break;
-	case TIMER_WAIT:
-		wait_end();
-		break;
-	case TIMER_CDSTATUS:
-		towns_cd_status_ready();
-		break;
-	case TIMER_CDDA:
-		towns_delay_cdda(m_cdrom.target());
-		break;
-	case TIMER_SPRITES:
-		draw_sprites();
-		break;
-	}
-}
-void towns_state::freerun_inc()
+TIMER_CALLBACK_MEMBER(towns_state::freerun_inc)
 {
 	m_freerun_timer++;
 }
 
-void towns_state::intervaltimer2_timeout()
+TIMER_CALLBACK_MEMBER(towns_state::intervaltimer2_timeout)
 {
 	m_intervaltimer2_timeout_flag = 1;
 }
 
-void towns_state::wait_end()
+TIMER_CALLBACK_MEMBER(towns_state::wait_end)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT,CLEAR_LINE);
 }
@@ -726,24 +696,20 @@ void towns_state::kb_sendcode(uint8_t scancode, int release)
 	//logerror("KB: sending scancode 0x%02x\n",scancode);
 }
 
-void towns_state::poll_keyboard()
+TIMER_CALLBACK_MEMBER(towns_state::poll_keyboard)
 {
-	int port,bit;
-	uint8_t scan;
-	uint32_t portval;
-
-	scan = 0;
-	for(port=0;port<4;port++)
+	uint8_t scan = 0;
+	for(int port = 0; port < 4; port++)
 	{
-		portval = m_kb_ports[port]->read();
-		for(bit=0;bit<32;bit++)
+		uint32_t portval = m_kb_ports[port]->read();
+		for(int bit = 0; bit < 32; bit++)
 		{
-			if(((portval & (1<<bit))) != ((m_kb_prev[port] & (1<<bit))))
+			if(BIT(portval, bit) != BIT(m_kb_prev[port], bit))
 			{  // bit changed
-				if((portval & (1<<bit)) == 0)  // release
-					kb_sendcode(scan,1);
+				if(BIT(portval, bit) == 0)  // release
+					kb_sendcode(scan, 1);
 				else
-					kb_sendcode(scan,0);
+					kb_sendcode(scan, 0);
 			}
 			scan++;
 		}
@@ -929,7 +895,7 @@ void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 
 // Controller ports
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
-void towns_state::mouse_timeout()
+TIMER_CALLBACK_MEMBER(towns_state::mouse_timeout)
 {
 	m_towns_mouse_output = MOUSE_START;  // reset mouse data
 }
@@ -1421,7 +1387,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 	}
 }
 
-void towns_state::towns_cd_status_ready()
+TIMER_CALLBACK_MEMBER(towns_state::towns_cd_status_ready)
 {
 	m_towns_cd.status |= 0x02;  // status read request
 	m_towns_cd.status |= 0x01;  // ready
@@ -1631,9 +1597,9 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	}
 }
 
-void towns_state::towns_delay_cdda(cdrom_image_device* dev)
+TIMER_CALLBACK_MEMBER(towns_state::towns_delay_cdda)
 {
-	towns_cdrom_play_cdda(dev);
+	towns_cdrom_play_cdda(m_cdrom.target());
 }
 
 void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
@@ -2734,19 +2700,19 @@ void towns_state::driver_start()
 	//towns_sprram = std::make_unique<uint8_t[]>(0x20000);
 	m_towns_serial_rom = std::make_unique<uint8_t[]>(256/8);
 	init_serial_rom();
-	m_towns_kb_timer = timer_alloc(TIMER_KEYBOARD);
-	m_towns_mouse_timer = timer_alloc(TIMER_MOUSE);
-	m_towns_wait_timer = timer_alloc(TIMER_WAIT);
-	m_towns_freerun_counter = timer_alloc(TIMER_FREERUN);
-	m_towns_intervaltimer2 = timer_alloc(TIMER_INTERVAL2);
-	m_towns_status_timer = timer_alloc(TIMER_CDSTATUS);
-	m_towns_cdda_timer = timer_alloc(TIMER_CDDA);
+	m_towns_kb_timer = timer_alloc(FUNC(towns_state::poll_keyboard), this);
+	m_towns_mouse_timer = timer_alloc(FUNC(towns_state::mouse_timeout), this);
+	m_towns_wait_timer = timer_alloc(FUNC(towns_state::wait_end), this);
+	m_towns_freerun_counter = timer_alloc(FUNC(towns_state::freerun_inc), this);
+	m_towns_intervaltimer2 = timer_alloc(FUNC(towns_state::intervaltimer2_timeout), this);
+	m_towns_status_timer = timer_alloc(FUNC(towns_state::towns_cd_status_ready), this);
+	m_towns_cdda_timer = timer_alloc(FUNC(towns_state::towns_delay_cdda), this);
 
 	memset(&m_video,0,sizeof(struct towns_video_controller));
 	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this));
+	m_towns_cd.read_timer = timer_alloc(FUNC(towns_state::towns_cdrom_read_byte), this);
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);

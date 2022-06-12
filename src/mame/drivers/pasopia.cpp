@@ -218,7 +218,7 @@ void pasopia_state::machine_start()
 {
 	m_p_vram = make_unique_clear<u16[]>(0x4000);
 
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 
 	m_hblank = 0;

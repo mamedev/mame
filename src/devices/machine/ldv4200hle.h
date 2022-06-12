@@ -51,16 +51,9 @@ public:
 	auto serial_tx() { return m_serial_tx.bind(); }
 
 protected:
-	// timer IDs
-	enum
-	{
-		TID_VBI_DATA_FETCH = TID_FIRST_PLAYER_TIMER
-	};
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// laserdisc overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -71,6 +64,8 @@ protected:
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
+
+	TIMER_CALLBACK_MEMBER(process_vbi_data);
 
 private:
 	enum player_command : uint16_t

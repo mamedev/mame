@@ -51,7 +51,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(prg_timer_tick);
 
 private:
 	required_device<screen_device> m_screen;
@@ -94,14 +95,9 @@ private:
 	}m_timer;
 
 	emu_timer *m_timer_scanline;
-	enum timer_id
-	{
-		SCANLINE_TIMER = 1,
-		PRG_TIMER
-	};
 
-	inline void flush_prg_timer();
-	inline void flush_scanline_timer(int current_scanline);
+	void flush_prg_timer();
+	TIMER_CALLBACK_MEMBER(flush_scanline_timer);
 
 	bool m_invert_vblank_lines;
 };

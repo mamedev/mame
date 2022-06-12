@@ -45,7 +45,7 @@
 #define LOG_HANDSET     (1U<<4)
 #define LOG_CLOCK       (1U<<5)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -54,19 +54,17 @@ DEFINE_DEVICE_TYPE(TI99_HANDSET, bus::ti99::joyport::ti99_handset_device, "ti99_
 
 namespace bus::ti99::joyport {
 
-#define TRACE_HANDSET 0
-#define TRACE_JOYSTICK 0
-
-static const char *const joynames[2][4] =
-{
-	{ "JOY0", "JOY2", "JOY4", "JOY6" },     // X axis
-	{ "JOY1", "JOY3", "JOY5", "JOY7" }      // Y axis
-};
-
-static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
-
 ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI99_HANDSET, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this), m_ack(0), m_clock_high(false), m_buf(0), m_buflen(0), m_delay_timer(nullptr)
+	: device_t(mconfig, TI99_HANDSET, tag, owner, clock)
+	, device_ti99_joyport_interface(mconfig, *this)
+	, m_joyx(*this, "JOYX%u", 0U)
+	, m_joyy(*this, "JOYY%u", 0U)
+	, m_keys(*this, "KP%u", 0U)
+	, m_ack(0)
+	, m_clock_high(false)
+	, m_buf(0)
+	, m_buflen(0)
+	, m_delay_timer(nullptr)
 {
 }
 
@@ -85,7 +83,7 @@ ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const ch
 */
 uint8_t ti99_handset_device::read_dev()
 {
-	return (m_buf & 0xf) | 0x10 | (m_clock_high? 0x20:0) | ( m_buflen==3? 0x00:0x40);
+	return (m_buf & 0xf) | 0x10 | (m_clock_high ? 0x20 : 0x00) | (m_buflen == 3 ? 0x00 : 0x40);
 }
 
 void ti99_handset_device::write_dev(uint8_t data)
@@ -100,7 +98,7 @@ void ti99_handset_device::write_dev(uint8_t data)
     of P0 is changed, because, in one occasion, the ISR asserts the line before
     it reads the data, so we need to delay the acknowledge process.
 */
-void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ti99_handset_device::delayed_data_ack)
 {
 	m_clock_high = !m_clock_high;
 	m_buf >>= 4;
@@ -120,8 +118,10 @@ void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 
 	if (m_buflen == 0)
-		/* See if we need to post a new event */
-	do_task();
+	{
+		// See if we need to post a new event
+		do_task();
+	}
 }
 
 /*
@@ -129,10 +129,10 @@ void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int
 */
 void ti99_handset_device::set_acknowledge(int data)
 {
-	if ((m_buflen !=0) && (data != m_ack))
+	if (m_buflen != 0 && data != m_ack)
 	{
 		m_ack = data;
-		if ((data!=0) == m_clock_high)
+		if (data != 0 && m_clock_high)
 		{
 			// I don't know what the real delay is, but 30us apears to be enough
 			m_delay_timer->adjust(attotime::from_usec(30));
@@ -167,54 +167,58 @@ void ti99_handset_device::post_message(int message)
 */
 bool ti99_handset_device::poll_keyboard(int num)
 {
-	uint32_t key_buf;
 	uint8_t current_key;
-	int i;
 
-	/* read current key state */
-	key_buf = (ioport(keynames[num])->read() | (ioport(keynames[num + 1])->read() << 16) ) >> (4*num);
+	// read current key state
+	uint32_t key_buf = (m_keys[num]->read() | (m_keys[num + 1]->read() << 16)) >> (4*num);
 
 	// If a key was previously pressed, this key was not shift, and this key is
 	// still down, then don't change the current key press.
-	if (previous_key[num] !=0 && (previous_key[num] != 0x24)
-		&& (key_buf & (1 << (previous_key[num] & 0x1f))))
+	if (previous_key[num] !=0 && previous_key[num] != 0x24 && BIT(key_buf, previous_key[num] & 0x1f))
 	{
-		/* check the shift modifier state */
-		if (((previous_key[num] & 0x20) != 0) == ((key_buf & 0x0008) != 0))
-			/* the shift modifier state has not changed */
+		// check the shift modifier state
+		if (BIT(previous_key[num], 5) == BIT(key_buf, 3))
+		{
+			// the shift modifier state has not changed
 			return false;
+		}
 		else
 		{
 			// The shift modifier state has changed: we need to update the
 			// keyboard state
 			if (key_buf & 0x0008)
-			{   /* shift has been pressed down */
-				previous_key[num] = current_key = previous_key[num] | 0x20;
+			{
+				// shift has been pressed down
+				current_key = previous_key[num] | 0x20;
+				previous_key[num] = current_key;
 			}
 			else
 			{
-				previous_key[num] = current_key = previous_key[num] & ~0x20;
+				current_key = previous_key[num] & ~0x20;
+				previous_key[num] = current_key;
 			}
-			/* post message */
-			post_message((((unsigned)current_key) << 4) | (num << 1));
+			// post message
+			post_message(((uint32_t)current_key << 4) | (num << 1));
 			return true;
 		}
 	}
 
-	current_key = 0;    /* default value if no key is down */
-	for (i=0; i<20; i++)
+	current_key = 0;    // default value if no key is down
+	for (int i = 0; i < 20; i++)
 	{
-		if (key_buf & (1 << i))
+		if (BIT(key_buf, i))
 		{
 			current_key = i + 1;
-			if (key_buf & 0x0008)
-				current_key |= 0x20;    /* set shift flag */
+			if (BIT(key_buf, 3))
+				current_key |= 0x20;    // set shift flag
 
 			if (current_key != 0x24)
+			{
 				// If this is the shift key, any other key we may find will
 				// have higher priority; otherwise, we may exit the loop and keep
 				// the key we have just found.
 				break;
+			}
 		}
 	}
 
@@ -222,8 +226,8 @@ bool ti99_handset_device::poll_keyboard(int num)
 	{
 		previous_key[num] = current_key;
 
-		/* post message */
-		post_message((((unsigned) current_key) << 4) | (num << 1));
+		// post message
+		post_message(((uint32_t)current_key << 4) | (num << 1));
 		return true;
 	}
 	return false;
@@ -238,42 +242,39 @@ bool ti99_handset_device::poll_keyboard(int num)
 */
 bool ti99_handset_device::poll_joystick(int num)
 {
-	uint8_t current_joy;
-	int current_joy_x, current_joy_y;
 	int message;
-	/* read joystick position */
-	current_joy_x = ioport(joynames[0][num])->read();
-	current_joy_y = ioport(joynames[1][num])->read();
+	// read joystick position
+	uint8_t current_joy_x = m_joyx[num]->read();
+	uint8_t current_joy_y = m_joyy[num]->read();
 
-	/* compare with last saved position */
-	current_joy = current_joy_x | (current_joy_y << 4);
+	// compare with last saved position
+	uint8_t current_joy = current_joy_x | (current_joy_y << 4);
 	if (current_joy != previous_joy[num])
 	{
-		/* save position */
+		// save position
 		previous_joy[num] = current_joy;
 
-		/* transform position to signed quantity */
+		// transform position to signed quantity
 		current_joy_x -= 7;
 		current_joy_y -= 7;
 
 		message = 0;
 
-		/* set sign */
-		// note that we set the sign if the joystick position is 0 to work
+		// set sign, note that we set the sign if the joystick position is 0 to work
 		// around a bug in the ti99/4 ROMs
 		if (current_joy_x <= 0)
 		{
 			message |= 0x040;
-			current_joy_x = - current_joy_x;
+			current_joy_x = -current_joy_x;
 		}
 
 		if (current_joy_y <= 0)
 		{
 			message |= 0x400;
-			current_joy_y = - current_joy_y;
+			current_joy_y = -current_joy_y;
 		}
 
-		/* convert absolute values to Gray code and insert in message */
+		// convert absolute values to Gray code and insert in message
 		if (current_joy_x & 4)
 			current_joy_x ^= 3;
 		if (current_joy_x & 2)
@@ -286,10 +287,10 @@ bool ti99_handset_device::poll_joystick(int num)
 			current_joy_y ^= 1;
 		message |= current_joy_y << 7;
 
-		/* set joystick address */
+		// set joystick address
 		message |= (num << 1) | 0x1;
 
-		/* post message */
+		// post message
 		post_message(message);
 		return true;
 	}
@@ -302,25 +303,23 @@ bool ti99_handset_device::poll_joystick(int num)
 */
 void ti99_handset_device::do_task()
 {
-	int i;
-
 	if (m_buflen == 0)
 	{
-		/* poll every handset */
-		for (i=0; i < MAX_HANDSETS; i++)
-			if (poll_joystick(i)==true) return;
-		for (i=0; i < MAX_HANDSETS; i++)
-			if (poll_keyboard(i)==true) return;
+		// poll every handset
+		for (int i = 0; i < MAX_HANDSETS; i++)
+			if (poll_joystick(i)) return;
+		for (int i = 0; i < MAX_HANDSETS; i++)
+			if (poll_keyboard(i)) return;
 	}
 	else if (m_buflen == 3)
 	{   /* update messages after they have been posted */
 		if (m_buf & 1)
 		{   /* keyboard */
-			poll_keyboard((~(m_buf >> 1)) & 0x3);
+			poll_keyboard(~(m_buf >> 1) & 0x3);
 		}
 		else
 		{   /* joystick */
-			poll_joystick((~(m_buf >> 1)) & 0x3);
+			poll_joystick(~(m_buf >> 1) & 0x3);
 		}
 	}
 }
@@ -333,7 +332,7 @@ void ti99_handset_device::pulse_clock()
 
 void ti99_handset_device::device_start()
 {
-	m_delay_timer = timer_alloc(DELAY_TIMER);
+	m_delay_timer = timer_alloc(FUNC(ti99_handset_device::delayed_data_ack), this);
 	save_item(NAME(m_ack));
 	save_item(NAME(m_clock_high));
 	save_item(NAME(m_buf));
@@ -358,28 +357,28 @@ INPUT_PORTS_START( handset )
 	/* 13 pseudo-ports for IR remote handsets */
 
 	/* 8 pseudo-ports for the 4 IR joysticks */
-	PORT_START("JOY0")  /* joystick 1, X axis */
+	PORT_START("JOYX0")  /* joystick 1, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(1)
 
-	PORT_START("JOY1")  /* joystick 1, Y axis */
+	PORT_START("JOYY0")  /* joystick 1, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("JOY2")  /* joystick 2, X axis */
+	PORT_START("JOYX1")  /* joystick 2, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(2)
 
-	PORT_START("JOY3")  /* joystick 2, Y axis */
+	PORT_START("JOYY1")  /* joystick 2, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START("JOY4")  /* joystick 3, X axis */
+	PORT_START("JOYX2")  /* joystick 3, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(3)
 
-	PORT_START("JOY5")  /* joystick 3, Y axis */
+	PORT_START("JOYY2")  /* joystick 3, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(3) PORT_REVERSE
 
-	PORT_START("JOY6")  /* joystick 4, X axis */
+	PORT_START("JOYX3")  /* joystick 4, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(4)
 
-	PORT_START("JOY7")  /* joystick 4, Y axis */
+	PORT_START("JOYY3")  /* joystick 4, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(4) PORT_REVERSE
 
 	/* 5 pseudo-ports for the 4 IR remote keypads */
@@ -508,7 +507,9 @@ INPUT_PORTS_START( joysticks )
 INPUT_PORTS_END
 
 ti99_twin_joystick_device::ti99_twin_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI99_JOYSTICK, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this), m_joystick(0)
+	: device_t(mconfig, TI99_JOYSTICK, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this)
+	, m_joystick(0)
+	, m_joys(*this, "JOY%u", 1U)
 {
 }
 
@@ -524,12 +525,10 @@ void ti99_twin_joystick_device::device_start()
 */
 uint8_t ti99_twin_joystick_device::read_dev()
 {
-	uint8_t value;
-	if (m_joystick==1) value = ioport("JOY1")->read();
-	else
+	uint8_t value = 0xff;
+	if (m_joystick > 0 && m_joystick <= 2)
 	{
-		if (m_joystick==2) value = ioport("JOY2")->read();
-		else value = 0xff;
+		value = m_joys[m_joystick - 1]->read();
 	}
 	LOGMASKED(LOG_JOYSTICK, "joy%d = %02x\n", m_joystick, value);
 	return value;

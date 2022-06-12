@@ -73,9 +73,9 @@ void mips_rambo_device::device_start()
 		ch.write_cb.resolve_safe();
 	}
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::timer), this));
-	m_dma = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::dma), this));
-	m_buzzer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::buzzer), this));
+	m_timer = timer_alloc(FUNC(mips_rambo_device::timer), this);
+	m_dma = timer_alloc(FUNC(mips_rambo_device::dma), this);
+	m_buzzer = timer_alloc(FUNC(mips_rambo_device::buzzer), this);
 }
 
 void mips_rambo_device::device_reset()

@@ -62,10 +62,11 @@ void m3745x_device::device_start()
 	m_write_p.resolve_all_safe();
 	m_read_ad.resolve_all_safe(0);
 
-	for (int i = 0; i < NUM_TIMERS; i++)
+	for (int i = TIMER_1; i <= TIMER_3; i++)
 	{
-		m_timers[i] = timer_alloc(i);
+		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	}
+	m_timers[TIMER_ADC] = timer_alloc(FUNC(m3745x_device::adc_complete), this);
 
 	m740_device::device_start();
 
@@ -116,22 +117,13 @@ void m3745x_device::device_reset()
 	m_last_all_ints = 0;
 }
 
-void m3745x_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m3745x_device::adc_complete)
 {
-	switch (id)
-	{
-		case TIMER_ADC:
-			m_timers[TIMER_ADC]->adjust(attotime::never);
+	m_timers[TIMER_ADC]->adjust(attotime::never);
 
-			m_adctrl |= ADCTRL_COMPLETE;
-			m_intreq2 |= IRQ2_ADC;
-			recalc_irqs();
-			break;
-
-		default:
-			printf("M3775x: unknown timer expire %d\n", id);
-			break;
-	}
+	m_adctrl |= ADCTRL_COMPLETE;
+	m_intreq2 |= IRQ2_ADC;
+	recalc_irqs();
 }
 
 void m3745x_device::execute_set_input(int inputnum, int state)

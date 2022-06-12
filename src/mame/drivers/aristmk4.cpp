@@ -378,13 +378,6 @@ public:
 	void init_aristmk4();
 
 private:
-	enum
-	{
-		TIMER_POWER_FAIL
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
 	required_device<ay8910_device> m_ay1;
@@ -417,6 +410,9 @@ private:
 	int m_cashcade_c = 0;
 	int m_printer_motor = 0;
 	emu_timer *m_power_timer = nullptr;
+	emu_timer *m_note_reset_timer = nullptr;
+	emu_timer *m_coin_reset_timer = nullptr;
+	emu_timer *m_hopper_reset_timer = nullptr;
 
 	uint8_t ldsw();
 	uint8_t cgdrr();
@@ -457,7 +453,7 @@ private:
 	TIMER_CALLBACK_MEMBER(note_input_reset);
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
 	TIMER_CALLBACK_MEMBER(hopper_reset);
-	void power_fail();
+	TIMER_CALLBACK_MEMBER(power_fail);
 	inline void uBackgroundColour();
 
 	void slots_mem(address_map &map);
@@ -634,7 +630,7 @@ uint8_t aristmk4_state::bv_p0()
 	case 0x02:
 		bv_p0_ret=0x89;
 		m_insnote++;
-		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::note_input_reset),this));
+		m_note_reset_timer->adjust(attotime::from_msec(150));
 		break;
 	default:
 		break; //timer will reset the input
@@ -834,7 +830,7 @@ uint8_t aristmk4_state::via_b_r()
 	case 0x02:
 		ret=ret^0x20;
 		m_inscrd++;
-		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::coin_input_reset),this));
+		m_coin_reset_timer->adjust(attotime::from_msec(150));
 		break;
 	default:
 		break; //timer will reset the input
@@ -846,7 +842,7 @@ uint8_t aristmk4_state::via_b_r()
 	{
 	case 0x00:
 		ret=ret^0x40;
-		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
+		m_hopper_reset_timer->adjust(attotime::from_msec(175));
 		m_hopper_motor = 0x02;
 		m_hopper_motor_out = 2;
 		break;
@@ -1728,7 +1724,10 @@ void aristmk4_state::machine_start()
 	m_credit_out_meter.resolve();
 	m_hopper_motor_out.resolve();
 	m_lamps.resolve();
-	m_power_timer = timer_alloc(TIMER_POWER_FAIL);
+	m_power_timer = timer_alloc(FUNC(aristmk4_state::power_fail), this);
+	m_note_reset_timer = timer_alloc(FUNC(aristmk4_state::note_input_reset), this);
+	m_coin_reset_timer = timer_alloc(FUNC(aristmk4_state::coin_input_reset), this);
+	m_hopper_reset_timer = timer_alloc(FUNC(aristmk4_state::hopper_reset), this);
 }
 
 void aristmk4_state::machine_reset()
@@ -1747,16 +1746,7 @@ void aristmk4_state::machine_reset()
 	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
-void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_POWER_FAIL: power_fail(); break;
-	default: throw emu_fatalerror("Unknown id in aristmk4_state::device_timer");
-	}
-}
-
-void aristmk4_state::power_fail()
+TIMER_CALLBACK_MEMBER(aristmk4_state::power_fail)
 {
 	/*
 	IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.

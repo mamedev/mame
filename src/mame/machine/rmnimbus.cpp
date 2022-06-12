@@ -215,7 +215,7 @@ void rmnimbus_state::machine_reset()
 
 void rmnimbus_state::machine_start()
 {
-	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
+	m_nimbus_mouse.m_mouse_timer = timer_alloc(FUNC(rmnimbus_state::do_mouse), this);
 
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -1669,18 +1669,10 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_MOUSE    : do_mouse(); break;
-	}
-}
-
 static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
 static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
-void rmnimbus_state::do_mouse()
+TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 {
 	uint8_t mouse_x;        // Current mouse X and Y
 	uint8_t mouse_y;

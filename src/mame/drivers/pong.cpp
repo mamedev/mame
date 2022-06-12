@@ -59,7 +59,7 @@ TODO: Volleyball...
 
 #include "machine/nl_breakout.h"
 #include "machine/nl_rebound.h"
-#include "machine/nl_pongf.h"
+#include "machine/nl_pong.h"
 #include "machine/nl_pongdoubles.h"
 
 #include "screen.h"
@@ -198,15 +198,6 @@ public:
 
 	void pongd(machine_config &config);
 	void pong(machine_config &config);
-	void pongf(machine_config &config);
-
-	NETLIST_START(pong)
-
-		MEMREGION_SOURCE("maincpu")
-		PARAM(NETLIST.USE_DEACTIVATE, 1)
-		INCLUDE(pong_schematics)
-
-	NETLIST_END()
 
 protected:
 
@@ -472,7 +463,7 @@ INPUT_PORTS_END
 void pong_state::pong(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(this, &pong_state::NETLIST_NAME(pong));
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(pong));
 
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
 	NETLIST_ANALOG_INPUT(config, "maincpu:vr1", "ic_a9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
@@ -555,15 +546,6 @@ void breakout_state::breakout(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-}
-
-void pong_state::pongf(machine_config &config)
-{
-	pong(config);
-
-	/* basic machine hardware */
-
-	subdevice<netlist_mame_device>("maincpu")->set_setup_func(NETLIST_NAME(pongf));
 }
 
 void pong_state::pongd(machine_config &config)
@@ -651,16 +633,11 @@ void rebound_state::rebound(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( pong ) /* dummy to satisfy game entry*/
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-	ROM_LOAD( "pong.netlist", 0x000000, 18273, CRC(d249ce49) SHA1(e1d2cfca74b75f0520965639e6947a351650fc3e) )
-ROM_END
-
 ROM_START( breakout )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( pongf ) /* dummy to satisfy game entry*/
+ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -712,8 +689,7 @@ ROM_START( consolet ) // dummy to satisfy game entry
 ROM_END
 */
 
-GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
-GAME(  1972, pongf,    pong, pongf,    pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
+GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1973, pongd,     0, pongd,    pongd,     pong_state,     empty_init, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
 GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0,  "Atari", "Rebound (Rev B) [TTL]", MACHINE_SUPPORTS_SAVE, layout_rebound)
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)

@@ -386,8 +386,8 @@ void pv1000_state::pv1000_postload()
 
 void pv1000_state::machine_start()
 {
-	m_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_on_cb),this));
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_off_cb),this));
+	m_irq_on_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_on_cb), this);
+	m_irq_off_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_off_cb), this);
 
 	m_gfxram = memregion("gfxram")->base();
 	save_pointer(NAME(m_gfxram), 0x400);

@@ -1020,20 +1020,42 @@ void mac_state::machine_start()
 {
 	if (m_screen)
 	{
-		this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
+		this->m_scanline_timer = timer_alloc(FUNC(mac_state::mac_scanline_tick), this);
 		this->m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 	}
 	else
 	{
-		m_adbupdate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_adbrefresh_tick),this));
+		m_adbupdate_timer = timer_alloc(FUNC(mac_state::mac_adbrefresh_tick), this);
 		m_adbupdate_timer->adjust(attotime::from_hz(70));
 	}
 
 	if (m_model != MODEL_MAC_IIFX)
-		m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
+		m_6015_timer = timer_alloc(FUNC(mac_state::mac_6015_tick), this);
 	else
-		m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::oss_6015_tick),this));
+		m_6015_timer = timer_alloc(FUNC(mac_state::oss_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_se30_vbl_enable));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(irq_count));
+	save_item(NAME(ca1_data));
+	save_item(NAME(ca2_data));
+	save_item(NAME(m_rbv_regs));
+	save_item(NAME(m_rbv_ier));
+	save_item(NAME(m_rbv_ifr));
+	save_item(NAME(m_rbv_colors));
+	save_item(NAME(m_rbv_count));
+	save_item(NAME(m_rbv_clutoffs));
+	save_item(NAME(m_rbv_palette));
+	save_item(NAME(m_sonora_vctl));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scsi_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_oss_regs));
+	save_item(NAME(m_via2_ca1_hack));
 }
 
 void mac_state::machine_reset()
@@ -1210,7 +1232,7 @@ void mac_state::mac_driver_init(model_t model)
 	if ((model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
 		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)))
 	{
-		m_overlay_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::overlay_timeout_func),this));
+		m_overlay_timeout = timer_alloc(FUNC(mac_state::overlay_timeout_func), this);
 	}
 	else
 	{

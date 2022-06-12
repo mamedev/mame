@@ -278,8 +278,8 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 
 void enigma2_state::create_interrupt_timers(  )
 {
-	m_interrupt_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_clear_callback),this));
-	m_interrupt_assert_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_assert_callback),this));
+	m_interrupt_clear_timer = timer_alloc(FUNC(enigma2_state::interrupt_clear_callback), this);
+	m_interrupt_assert_timer = timer_alloc(FUNC(enigma2_state::interrupt_assert_callback), this);
 }
 
 

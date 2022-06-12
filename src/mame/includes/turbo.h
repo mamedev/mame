@@ -267,6 +267,7 @@ private:
 	uint32_t get_sprite_bits(uint8_t road);
 	void rom_decode();
 	void update_samples();
+	TIMER_CALLBACK_MEMBER(update_sound_a);
 
 	void prg_map(address_map &map);
 };

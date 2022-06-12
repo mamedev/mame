@@ -61,16 +61,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
 
 protected:
-	enum
-	{
-		TIMER_MAC_DONE
-	};
-
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum planes
@@ -118,6 +112,7 @@ private:
 
 	/* MAC */
 	required_shared_ptr<uint32_t> m_mac_sram;
+	emu_timer            *m_mac_done_timer = nullptr;
 	uint32_t              m_sram_r_addr = 0;
 	uint32_t              m_sram_w_addr = 0;
 	uint32_t              m_vtx_addr = 0;

@@ -1025,7 +1025,7 @@ void sstingray_state::init_sstingry()
 	m_coin_id = 0x22 | (0x22 << 8);
 	m_game_id = 0;
 
-	m_alpha8511_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sstingray_state::alpha8511_sync), this));
+	m_alpha8511_sync_timer = timer_alloc(FUNC(sstingray_state::alpha8511_sync), this);
 	save_item(NAME(m_alpha8511_address));
 	save_item(NAME(m_alpha8511_control));
 	save_item(NAME(m_alpha8511_read_mode));

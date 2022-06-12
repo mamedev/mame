@@ -47,6 +47,7 @@ void mem_reset(dsp56156_core* cpustate)
 /************************************/
 void HCR_set(dsp56156_core* cpustate, uint16_t value)
 {
+	cpustate->device->logerror("HCR_set: %02x\n", value);
 	HF3_bit_set (cpustate, (value & 0x0010) >> 4);
 	HF2_bit_set (cpustate, (value & 0x0008) >> 3);
 	HCIE_bit_set(cpustate, (value & 0x0004) >> 2);
@@ -65,6 +66,7 @@ void HF3_bit_set(dsp56156_core* cpustate, uint16_t value)
 	HCR &= ~(0x0010);
 	HCR |=  (value << 4);
 
+	cpustate->device->logerror("HF3_bit_set: %d\n", value);
 	HF3_bit_host_set(cpustate, value);
 }
 void HF2_bit_set(dsp56156_core* cpustate, uint16_t value)
@@ -73,6 +75,7 @@ void HF2_bit_set(dsp56156_core* cpustate, uint16_t value)
 	HCR &= ~(0x0008);
 	HCR |=  (value << 3);
 
+	cpustate->device->logerror("HF2_bit_set: %d\n", value);
 	HF2_bit_host_set(cpustate, value);
 }
 void HCIE_bit_set(dsp56156_core* cpustate, uint16_t value)
@@ -468,12 +471,11 @@ void PCD_set(dsp56156_core* cpustate, uint16_t value)
 	if (value & 0xf000)
 		cpustate->device->logerror("Dsp56k : Attempting to set reserved bits in the PCD.  Ignoring.\n");
 
-	/* TODO: Temporary */
-	cpustate->device->logerror("Dsp56k : Setting general output port C data to 0x%04x\n", value);
-
 	value = value & 0x0fff;
 	PCD &= ~(0x0fff);
 	PCD |= (value << 0);
+
+	cpustate->device->output_portc(PCD);
 }
 
 void dsp56156_io_reset(dsp56156_core* cpustate)
@@ -888,18 +890,22 @@ uint8_t dsp56156_device::host_interface_read(uint8_t offset)
 	{
 		// Interrupt Control Register (ICR)
 		case 0x00:
+			logerror("DSP: Returning ICR\n");
 			return ICR;
 
 		// Command Vector Register (CVR)
 		case 0x01:
+			logerror("DSP: Returning CVR\n");
 			return CVR;
 
 		// Interrupt status register (ISR)
 		case 0x02:
+			logerror("DSP: Returning ISR\n");
 			return ISR;
 
 		// Interrupt vector register (IVR)
 		case 0x03:
+			logerror("DSP: Returning IVR\n");
 			return IVR;
 
 		// Read zeroes
@@ -936,13 +942,6 @@ uint8_t dsp56156_device::host_interface_read(uint8_t offset)
 
 	/* Shouldn't get here */
 	return 0xff;
-}
-
-/* MISC*/
-uint16_t dsp56156_device::get_peripheral_memory(uint16_t addr)
-{
-	dsp56156_core* cpustate = &m_core;
-	return cpustate->peripheral_ram[A2O(addr)];
 }
 
 

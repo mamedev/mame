@@ -439,7 +439,7 @@ void c1551_device::device_start()
 	m_leds.resolve();
 
 	// allocate timers
-	m_irq_timer = timer_alloc();
+	m_irq_timer = timer_alloc(FUNC(c1551_device::irq_timer_tick), this);
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
 
 	// install image callbacks
@@ -475,10 +475,10 @@ void c1551_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  irq_timer_tick - update IRQ line state
 //-------------------------------------------------
 
-void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c1551_device::irq_timer_tick)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, param);
 

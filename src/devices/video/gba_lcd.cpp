@@ -1765,8 +1765,8 @@ void gba_lcd_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	/* create a timer to fire scanline functions */
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_scan),this));
-	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_hbl),this));
+	m_scan_timer = timer_alloc(FUNC(gba_lcd_device::perform_scan), this);
+	m_hbl_timer = timer_alloc(FUNC(gba_lcd_device::perform_hbl), this);
 	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 
 	save_item(NAME(m_regs));

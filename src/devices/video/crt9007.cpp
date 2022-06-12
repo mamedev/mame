@@ -505,13 +505,13 @@ void crt9007_device::device_resolve_objects()
 void crt9007_device::device_start()
 {
 	// allocate timers
-	m_hsync_timer = timer_alloc(TIMER_HSYNC);
-	m_vsync_timer = timer_alloc(TIMER_VSYNC);
-	m_vlt_timer = timer_alloc(TIMER_VLT);
-	m_curs_timer = timer_alloc(TIMER_CURS);
-	m_drb_timer = timer_alloc(TIMER_DRB);
-	m_dma_timer = timer_alloc(TIMER_DMA);
-	m_frame_timer = timer_alloc(TIMER_FRAME);
+	m_hsync_timer = timer_alloc(FUNC(crt9007_device::hsync_update), this);
+	m_vsync_timer = timer_alloc(FUNC(crt9007_device::vsync_update), this);
+	m_vlt_timer = timer_alloc(FUNC(crt9007_device::vlt_update), this);
+	m_curs_timer = timer_alloc(FUNC(crt9007_device::cursor_update), this);
+	m_drb_timer = timer_alloc(FUNC(crt9007_device::drb_update), this);
+	m_dma_timer = timer_alloc(FUNC(crt9007_device::dma_update), this);
+	m_frame_timer = timer_alloc(FUNC(crt9007_device::frame_update), this);
 
 	// save state
 	save_item(NAME(m_reg));
@@ -605,100 +605,97 @@ void crt9007_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(crt9007_device::hsync_update)
 {
-	int x = screen().hpos();
-	int y = screen().vpos();
+	m_hs = bool(param);
 
-	switch (id)
+	LOG("CRT9007 y %03u x %04u : HS %u\n", screen().vpos(), screen().hpos(), m_hs);
+
+	m_write_hs(m_hs);
+
+	update_cblank_line();
+
+	update_hsync_timer(m_hs);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::vsync_update)
+{
+	m_vs = bool(param);
+
+	LOG("CRT9007 y %03u x %04u : VS %u\n", screen().vpos(), screen().hpos(), m_vs);
+
+	m_write_vs(m_vs);
+
+	if (m_vs)
 	{
-	case TIMER_HSYNC:
-		m_hs = bool(param);
-
-		LOG("CRT9007 y %03u x %04u : HS %u\n", y, x, m_hs);
-
-		m_write_hs(m_hs);
+		// reset all other bits except Light Pen Update to logic 0
+		m_status &= (STATUS_LIGHT_PEN_UPDATE | STATUS_INTERRUPT_PENDING);
+	}
+	else
+	{
+		trigger_interrupt(IE_VERTICAL_RETRACE);
 
 		update_cblank_line();
-
-		update_hsync_timer(m_hs);
-		break;
-
-	case TIMER_VSYNC:
-		m_vs = bool(param);
-
-		LOG("CRT9007 y %03u x %04u : VS %u\n", y, x, m_vs);
-
-		m_write_vs(m_vs);
-
-		if (m_vs)
-		{
-			// reset all other bits except Light Pen Update to logic 0
-			m_status &= (STATUS_LIGHT_PEN_UPDATE | STATUS_INTERRUPT_PENDING);
-		}
-		else
-		{
-			trigger_interrupt(IE_VERTICAL_RETRACE);
-
-			update_cblank_line();
-		}
-
-		update_vsync_timer(m_vs);
-		break;
-
-	case TIMER_VLT:
-		m_vlt = bool(param);
-
-		LOG("CRT9007 y %03u x %04u : VLT %u\n", y, x, m_vlt);
-
-		m_write_vlt(m_vlt);
-
-		update_vlt_timer(m_vlt);
-		break;
-
-	case TIMER_CURS:
-		LOG("CRT9007 y %03u x %04u : CURS %u\n", y, x, param);
-
-		m_write_curs(param);
-
-		update_curs_timer(param);
-		break;
-
-	case TIMER_DRB:
-		m_drb = bool(param);
-
-		LOG("CRT9007 y %03u x %04u : DRB %u\n", y, x, m_drb);
-
-		m_write_drb(m_drb);
-
-		if (!m_drb && !DMA_DISABLE)
-		{
-			// start DMA burst sequence
-			m_dma_count = CHARACTERS_PER_DATA_ROW;
-			m_dma_burst = DMA_BURST_COUNT ? (DMA_BURST_COUNT * 4) : CHARACTERS_PER_DATA_ROW;
-			m_dma_delay = DMA_BURST_DELAY;
-			m_dmar = true;
-
-			LOG("CRT9007 DMAR 1\n");
-			m_write_dmar(ASSERT_LINE);
-		}
-
-		update_drb_timer(m_drb);
-		break;
-
-	case TIMER_DMA:
-		readbyte(AUXILIARY_ADDRESS_2);
-
-		update_dma_timer();
-		break;
-
-	case TIMER_FRAME:
-		trigger_interrupt(IE_FRAME_TIMER);
-		break;
 	}
+
+	update_vsync_timer(m_vs);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
+{
+	m_vlt = bool(param);
+
+	LOG("CRT9007 y %03u x %04u : VLT %u\n", screen().vpos(), screen().hpos(), m_vlt);
+
+	m_write_vlt(m_vlt);
+
+	update_vlt_timer(m_vlt);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::cursor_update)
+{
+	LOG("CRT9007 y %03u x %04u : CURS %u\n", screen().vpos(), screen().hpos(), param);
+
+	m_write_curs(param);
+
+	update_curs_timer(param);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
+{
+	m_drb = bool(param);
+
+	LOG("CRT9007 y %03u x %04u : DRB %u\n", screen().vpos(), screen().hpos(), m_drb);
+
+	m_write_drb(m_drb);
+
+	if (!m_drb && !DMA_DISABLE)
+	{
+		// start DMA burst sequence
+		m_dma_count = CHARACTERS_PER_DATA_ROW;
+		m_dma_burst = DMA_BURST_COUNT ? (DMA_BURST_COUNT * 4) : CHARACTERS_PER_DATA_ROW;
+		m_dma_delay = DMA_BURST_DELAY;
+		m_dmar = true;
+
+		LOG("CRT9007 DMAR 1\n");
+		m_write_dmar(ASSERT_LINE);
+	}
+
+	update_drb_timer(m_drb);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
+{
+	readbyte(AUXILIARY_ADDRESS_2);
+	update_dma_timer();
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::frame_update)
+{
+	trigger_interrupt(IE_FRAME_TIMER);
 }
 
 

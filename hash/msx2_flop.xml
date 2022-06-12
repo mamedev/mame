@@ -1850,7 +1850,7 @@ The following floppies came with the machines.
 				<rom name="cosmos club (1989)(jast)(jp)(disk 1 of 2).dsk" size="737280" crc="78f7fe09" sha1="4e245bb052eb67a377cef2f12b3e7fe41da48c50"/>
 			</dataarea>
 		</part>
-			<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="cosmos club (1989)(jast)(jp)(disk 2 of 2).dsk" size="737280" crc="09f0abfe" sha1="3cc9b2ffc84abd4c54a2b88fe64f7c0fd6440bf2"/>
 			</dataarea>

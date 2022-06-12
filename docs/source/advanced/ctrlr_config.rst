@@ -41,8 +41,9 @@ Basic structure
 
 Controller configuration files follow a similar format to the system
 configuration files that MAME uses to save things like input settings and
-bookkeeping data.  This example shows the overall structure of a controller
-configuration file:
+bookkeeping data (created in the folder specified using the
+:ref:`cfg_directory option <mame-commandline-cfgdirectory>`).  This example
+shows the overall structure of a controller configuration file:
 
 .. code-block:: XML
 
@@ -127,21 +128,21 @@ left and right arrows will be replaced with the numeric 8, 2, 4 and 6 keys on
 the numeric keypad, respectively.
 
 Note that substitutions specified using ``remap`` elements only apply to inputs
-that use MAME’s default assignment for the control type.  That is, they only
-apply to default assignments for control types set in the “Inputs (general)”
-menu.  They *do not* apply to default input assignments set in driver/device I/O
-port definitions (using the ``PORT_CODE`` macro).
+that use MAME’s default assignment for the input type.  That is, they only apply
+to default assignments for control types set in the “Input Assignments
+(general)” menus.  They *do not* apply to default control assignments set in
+driver/device I/O port definitions (using the ``PORT_CODE`` macro).
 
 MAME applies ``remap`` elements found inside any applicable ``system`` element.
 
 
 .. _ctrlrcfg-typeoverride:
 
-Overriding defaults by control type
------------------------------------
+Overriding defaults by input type
+---------------------------------
 
 Use ``port`` elements with ``type`` attributes but without ``tag`` attributes to
-override the default host input assignments for a controls:
+override the default control assignments for emulated inputs by type:
 
 .. code-block:: XML
 
@@ -183,10 +184,10 @@ P1 Button 4 (Player 1 Controls)
     X key, or joystick 1 button 4
 
 Note that this will only apply for inputs that use MAME’s default assignment for
-the control type.  That is, ``port`` elements without ``tag`` attributes only
-override default assignments for control types set in the “Inputs (general)”
-menu.  They *do not* override default input assignments set in driver/device I/O
-port definitions (using the ``PORT_CODE`` macro).
+the input type.  That is, ``port`` elements without ``tag`` attributes only
+override default assignments for control types set in the “Input Assignments
+(general)” menus.  They *do not* override default control assignments set in
+driver/device I/O port definitions (using the ``PORT_CODE`` macro).
 
 MAME applies ``port`` elements without ``tag`` attributes found inside any
 applicable ``system`` element.
@@ -194,22 +195,22 @@ applicable ``system`` element.
 
 .. _ctrlrcfg-ctrloverride:
 
-Overriding defaults for specific controls
------------------------------------------
+Overriding defaults for specific inputs
+---------------------------------------
 
 Use ``port`` elements with ``tag``, ``type``, ``mask`` and ``defvalue``
-attributes to override defaults for specific controls.  These ``port`` elements
+attributes to override defaults for specific inputs.  These ``port`` elements
 should only occur inside ``system`` elements that apply to particular systems or
 source files (i.e. they should not occur inside ``system`` elements where the
-``name`` attribute has the value ``default``).  The default host input
-assignments can be overridden, as well as the toggle setting for digital
-controls.
+``name`` attribute has the value ``default``).  The default control assignments
+can be overridden, as well as the toggle setting for digital inputs.
 
 The ``tag``, ``type``, ``mask`` and ``defvalue`` are used to identify the
 affected input.  You can find out the values to use for a particular input by
-changing its assigned host input, exiting MAME, and checking the values in the
-system configuration file.  Note that these values are not guaranteed to be
-stable, and may change between MAME versions.
+changing its control assignment, exiting MAME, and checking the values in the
+system configuration file (created in the folder specified using the
+:ref:`cfg_directory option <mame-commandline-cfgdirectory>`).  Note that these
+values are not guaranteed to be stable, and may change between MAME versions.
 
 Here’s an example that overrides defaults for 280-ZZZAP:
 
@@ -225,5 +226,5 @@ Here’s an example that overrides defaults for 280-ZZZAP:
         </input>
     </system>
 
-This sets the host inputs to steer left and right to the K and J keys,
+This sets the controls to steer left and right to the K and J keys,
 respectively, and disables the toggle setting for the gear shift input.

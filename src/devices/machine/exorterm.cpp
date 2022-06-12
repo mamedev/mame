@@ -755,8 +755,8 @@ void exorterm155_device::device_start()
 	save_item(NAME(m_kbd_start_holdoff));
 
 	// Keyboard
-	m_kbd_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_scan_row), this));
-	m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat), this));
+	m_kbd_scan_timer = timer_alloc(FUNC(exorterm155_device::kbd_scan_row), this);
+	m_kbd_repeat_timer = timer_alloc(FUNC(exorterm155_device::kbd_repeat), this);
 	kbd_reset_state();
 	kbd_repeat_stop();
 

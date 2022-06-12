@@ -103,14 +103,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(dma_complete);
 
 private:
-	enum
-	{
-		TIMER_DMA_COMPLETE
-	};
-
 	static constexpr u32 c_dma_bank_words = 0x2000;
 
 	required_device<cpu_device> m_maincpu;
@@ -140,6 +135,7 @@ private:
 	u8   m_dma_cpu_bank;
 	u8   m_dma_busy;
 	u16  m_dsp_hold_signal;
+	emu_timer *m_dma_done_timer;
 
 	u32  m_msm_pos[2];
 	u8   m_msm_reset[2];
@@ -212,6 +208,9 @@ void mlanding_state::machine_start()
 	save_item(NAME(m_msm_nibble));
 	save_item(NAME(m_msm2_vck));
 	save_item(NAME(m_msm2_vck2));
+
+	// Allocate DMA timers
+	m_dma_done_timer = timer_alloc(FUNC(mlanding_state::dma_complete), this);
 }
 
 
@@ -282,7 +281,7 @@ void mlanding_state::dma_start_w(u16 data)
 		m_dma_busy = 1;
 
 		// This is a rather crude estimate!
-		timer_set(attotime::from_hz(16000000) * pixels, TIMER_DMA_COMPLETE);
+		m_dma_done_timer->adjust(attotime::from_hz(16000000) * pixels);
 	}
 }
 
@@ -290,7 +289,7 @@ void mlanding_state::dma_start_w(u16 data)
 void mlanding_state::dma_stop_w(u16 data)
 {
 	m_dma_busy = 0;
-	timer_set(attotime::never);
+	m_dma_done_timer->adjust(attotime::never);
 }
 
 
@@ -424,17 +423,9 @@ u32 mlanding_state::exec_dma()
 }
 
 
-void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mlanding_state::dma_complete)
 {
-	switch (id)
-	{
-	case TIMER_DMA_COMPLETE:
-		m_dma_busy = 0;
-		break;
-
-	default:
-		throw emu_fatalerror("Unknown id in mlanding_state::device_timer");
-	}
+	m_dma_busy = 0;
 }
 
 

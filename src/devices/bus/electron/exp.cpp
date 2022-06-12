@@ -99,6 +99,8 @@ void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 
 
 // slot devices
+#include "elksd64.h"
+#include "elksd128.h"
 #include "fbjoy.h"
 #include "fbprint.h"
 #include "mc68k.h"
@@ -119,6 +121,8 @@ void electron_expansion_devices(device_slot_interface &device)
 {
 	device.option_add("ap1", ELECTRON_AP1);
 	device.option_add("ap6", ELECTRON_AP6);
+	device.option_add("elksd64", ELECTRON_ELKSD64);
+	device.option_add("elksd128", ELECTRON_ELKSD128);
 	device.option_add("fbjoy", ELECTRON_FBJOY);
 	device.option_add("fbprint", ELECTRON_FBPRINT);
 	device.option_add("mc68k", ELECTRON_MC68K);

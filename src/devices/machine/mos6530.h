@@ -66,14 +66,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(end_state);
 
 private:
-	enum
-	{
-		TIMER_END_CALLBACK
-	};
-
 	struct mos6530_port
 	{
 		uint8_t m_in;

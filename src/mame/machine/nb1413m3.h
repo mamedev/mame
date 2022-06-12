@@ -139,11 +139,6 @@ public:
 	// configuration helpers
 	void set_type(int type) { m_nb1413m3_type = type; }
 
-	enum
-	{
-		TIMER_CB
-	};
-
 	void nmi_clock_w(uint8_t data);
 	uint8_t sndrom_r(address_space &space, offs_t offset);
 	void sndrombank1_w(uint8_t data);
@@ -180,7 +175,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 

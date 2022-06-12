@@ -114,12 +114,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	enum
-	{
-		TIMER_SCANLINE
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 private:
 	void mem(address_map &map);
@@ -165,17 +160,10 @@ private:
 *      Keyboard I/O Handlers      *
 ***********************************/
 
-void goupil_g1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(goupil_g1_state::scanline_tick)
 {
-	switch (id)
-	{
-	case TIMER_SCANLINE:
-		m_ef9364->update_scanline((uint16_t)m_screen->vpos());
-		m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 10));
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in goupil_g1_state::device_timer");
-	}
+	m_ef9364->update_scanline((uint16_t)m_screen->vpos());
+	m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 10));
 }
 
 void goupil_g1_state::mem(address_map &map)
@@ -453,7 +441,7 @@ void goupil_base_state::machine_reset()
 
 void goupil_g1_state::machine_start()
 {
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer = timer_alloc(FUNC(goupil_g1_state::scanline_tick), this);
 }
 
 void goupil_g1_state::machine_reset()

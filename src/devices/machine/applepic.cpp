@@ -81,7 +81,7 @@ void applepic_device::device_resolve_objects()
 void applepic_device::device_start()
 {
 	// Initialize timer
-	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(applepic_device::timer1_callback), this));
+	m_timer1 = timer_alloc(FUNC(applepic_device::timer1_callback), this);
 
 	// Save internal state
 	save_item(NAME(m_timer_last_expired));

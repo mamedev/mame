@@ -84,7 +84,7 @@ void decocass_tape_device::device_start()
 	int curblock, offs, numblocks;
 
 	/* fetch the data pointer */
-	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(decocass_tape_device::tape_clock_callback), this));
+	m_tape_timer = timer_alloc(FUNC(decocass_tape_device::tape_clock_callback), this);
 	if (!m_tape_data.found())
 		return;
 

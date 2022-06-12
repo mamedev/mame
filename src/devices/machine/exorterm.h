@@ -128,7 +128,6 @@ private:
 	void kbd_repeat_start(u8 row, u8 column);
 	void kbd_repeat_restart();
 	void kbd_repeat_stop();
-	void kbd_repeat();
 	void kbd_send_translated(u8 code);
 
 	TIMER_CALLBACK_MEMBER(kbd_scan_row);

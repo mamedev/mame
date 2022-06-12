@@ -27,8 +27,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -87,6 +85,8 @@ private:
 	void host_io(address_map &map);
 
 	void control_timer(bool start);
+
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;

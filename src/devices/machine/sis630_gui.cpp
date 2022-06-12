@@ -140,7 +140,8 @@ uint8_t sis630_svga_device::seq_reg_read(uint8_t index)
 			return m_ext_misc_ctrl_0;
 		case 0x0a:
 			return m_ext_vert_overflow;
-		case 0x0b ... 0x0c:
+		case 0x0b:
+		case 0x0c:
 			return m_ext_horz_overflow[index - 0xb];
 		case 0x0d:
 			return vga.crtc.start_addr_latch >> 16;

@@ -33,29 +33,6 @@ driver by Chris Moore
 
 /*************************************
  *
- *  Timer handling
- *
- *************************************/
-
-void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_CLEAR_SCREEN_DONE:
-		clear_screen_done_callback(param);
-		break;
-	case TIMER_VIA_IRQ_DELAYED:
-		via_irq_delayed(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in gameplan_state::device_timer");
-	}
-}
-
-
-
-/*************************************
- *
  *  Palette handling
  *
  *************************************/
@@ -220,26 +197,11 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 			/* set a timer for an arbitrarily short period.
 			   The real time it takes to clear to screen is not
 			   important to the software */
-			synchronize(TIMER_CLEAR_SCREEN_DONE);
+			m_clear_done_timer->adjust(attotime::zero);
 
 			break;
 		}
 	}
-}
-
-
-TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
-{
-	m_maincpu->set_input_line(0, param);
-}
-
-
-WRITE_LINE_MEMBER(gameplan_state::via_irq)
-{
-	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
-	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
-	   leave time for the program to see the flag change. */
-	timer_set(attotime::from_usec(50), TIMER_VIA_IRQ_DELAYED, state);
 }
 
 
@@ -253,6 +215,8 @@ void gameplan_state::video_start()
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
+
+	m_clear_done_timer = timer_alloc(FUNC(gameplan_state::clear_screen_done_callback), this);
 
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);

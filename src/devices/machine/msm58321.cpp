@@ -209,15 +209,15 @@ void msm58321_device::device_start()
 	m_busy_handler.resolve_safe();
 
 	// allocate timers
-	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_clock_timer = timer_alloc(FUNC(msm58321_device::clock_tick), this);
 	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));
 
 	// busy signal active period is approximately 427 µs
-	m_busy_timer = timer_alloc(TIMER_BUSY);
+	m_busy_timer = timer_alloc(FUNC(msm58321_device::release_busy), this);
 	m_busy_timer->adjust(clocks_to_attotime(32768 - 14), 0, clocks_to_attotime(32768));
 
 	// standard signal active period is approximately 122 µs
-	m_standard_timer = timer_alloc(TIMER_STANDARD);
+	m_standard_timer = timer_alloc(FUNC(msm58321_device::assert_standard), this);
 	m_standard_timer->adjust(clocks_to_attotime(32768-4), 0, clocks_to_attotime(32768));
 
 	// state saving
@@ -244,54 +244,57 @@ void msm58321_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the RTC
 //-------------------------------------------------
 
-void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(msm58321_device::clock_tick)
 {
-	switch (id)
+	if (m_khz_ctr & 1)
 	{
-	case TIMER_CLOCK:
+		m_reg[REGISTER_REF0] |= 1;
+		m_reg[REGISTER_REF1] |= 1;
+	}
+	else
+	{
+		m_reg[REGISTER_REF0] &= ~1;
+		m_reg[REGISTER_REF1] &= ~1;
+	}
 
-		if (m_khz_ctr & 1)
+	if (++m_khz_ctr >= 1024)
+	{
+		m_khz_ctr = 0;
+		if (!m_stop)
 		{
-			m_reg[REGISTER_REF0] |= 1;
-			m_reg[REGISTER_REF1] |= 1;
+			advance_seconds();
 		}
-		else
-		{
-			m_reg[REGISTER_REF0] &= ~1;
-			m_reg[REGISTER_REF1] &= ~1;
-		}
 
-		if (++m_khz_ctr >= 1024)
+		if (!m_busy)
 		{
-			m_khz_ctr = 0;
-			if (!m_stop)
-			{
-				advance_seconds();
-			}
-
-			if (!m_busy)
-			{
-				m_busy = 1;
-				m_busy_handler(m_busy);
-			}
-		}
-		break;
-
-	case TIMER_BUSY:
-		if (!m_cs1 || !m_cs2 || !m_write || m_address != REGISTER_RESET)
-		{
-			m_busy = 0;
+			m_busy = 1;
 			m_busy_handler(m_busy);
 		}
-		break;
-	case TIMER_STANDARD:
-		m_reg[REGISTER_REF0] = 0x0e;
-		m_reg[REGISTER_REF1] = 0x0e;
-		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  release_busy - release the 'busy' line after
+//  an appropriate amount of time
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(msm58321_device::release_busy)
+{
+	if (!m_cs1 || !m_cs2 || !m_write || m_address != REGISTER_RESET)
+	{
+		m_busy = 0;
+		m_busy_handler(m_busy);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(msm58321_device::assert_standard)
+{
+	m_reg[REGISTER_REF0] = 0x0e;
+	m_reg[REGISTER_REF1] = 0x0e;
 }
 
 void msm58321_device::update_standard()

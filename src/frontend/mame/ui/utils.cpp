@@ -210,6 +210,7 @@ public:
 		{
 			menu::stack_push<menu_selector>(
 					mui, container,
+					_("Filter"), // TODO: get localised name of filter in here somehow
 					std::vector<std::string>(m_choices), // ouch, a vector copy!
 					m_selection,
 					[this, cb = std::move(handler)] (int selection)
@@ -386,20 +387,10 @@ private:
 			, m_added(false)
 		{
 			set_process_flags(PROCESS_LR_REPEAT);
+			set_heading(_("Select Filters"));
 		}
 
 		virtual ~menu_configure() override { m_handler(m_parent); }
-
-	protected:
-		virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
-		{
-			char const *const text[] = { _("Select custom filters:") };
-			draw_text_box(
-					std::begin(text), std::end(text),
-					x, x2, y - top, y - ui().box_tb_border(),
-					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
-		}
 
 	private:
 		enum : uintptr_t
@@ -562,9 +553,6 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 	if (MAX > i)
 		item_append(_("Add filter"), 0, (void *)ADD_FILTER);
 	item_append(menu_item_type::SEPARATOR);
-
-	// leave space for heading
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 template <class Impl, class Base, typename Base::type Type>
@@ -641,6 +629,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event 
 				menu::stack_push<menu_selector>(
 						ui(),
 						container(),
+						std::string(ev->item->text()),
 						std::move(names),
 						sel,
 						[this, pos, t = std::move(types)] (int selection)
@@ -972,6 +961,8 @@ private:
 			, m_ini(parent.m_ini)
 		{
 			set_process_flags(PROCESS_LR_REPEAT);
+			set_heading("Select Category");
+
 			inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 			for (size_t i = 0; mgr.get_file_count() > i; ++i)
 			{
@@ -994,17 +985,6 @@ private:
 			m_parent.m_include_clones = valid ? m_state[m_ini].second : false;
 			m_parent.set_adjust_text();
 			m_handler(m_parent);
-		}
-
-	protected:
-		virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
-		{
-			char const *const text[] = { _("Select category:") };
-			draw_text_box(
-					std::begin(text), std::end(text),
-					x, x2, y - top, y - ui().box_tb_border(),
-					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 
 	private:
@@ -1091,7 +1071,6 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 void category_machine_filter::menu_configure::handle(event const *ev)
@@ -1148,6 +1127,7 @@ void category_machine_filter::menu_configure::handle(event const *ev)
 				menu::stack_push<menu_selector>(
 						ui(),
 						container(),
+						_("Category File"),
 						std::move(choices),
 						m_ini,
 						[this] (int selection)
@@ -1168,6 +1148,7 @@ void category_machine_filter::menu_configure::handle(event const *ev)
 				menu::stack_push<menu_selector>(
 						ui(),
 						container(),
+						_("Group"),
 						std::move(choices),
 						m_state[m_ini].first,
 						[this] (int selection)

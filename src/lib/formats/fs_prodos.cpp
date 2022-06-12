@@ -351,9 +351,9 @@ std::vector<dir_entry> impl::root_dir::contents()
 			auto name = blk.rstr(off+1, type & 0xf);
 			type >>= 4;
 			if(type == 0xd)
-				res.emplace_back(dir_entry(name, dir_entry_type::dir, id));
+				res.emplace_back(dir_entry(std::move(name), dir_entry_type::dir, id));
 			else if(type != 0)
-				res.emplace_back(dir_entry(name, dir_entry_type::file, id));
+				res.emplace_back(dir_entry(std::move(name), dir_entry_type::file, id));
 			off += 39;
 			id ++;
 		}

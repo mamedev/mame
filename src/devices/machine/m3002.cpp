@@ -83,7 +83,7 @@ void m3002_device::device_resolve_objects()
 void m3002_device::device_start()
 {
 	// Setup timer
-	m_second_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m3002_device::second_timer), this));
+	m_second_timer = timer_alloc(FUNC(m3002_device::second_timer), this);
 
 	// Save internal state
 	save_item(NAME(m_ram));

@@ -90,7 +90,7 @@ void wswan_video_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_timer = timer_alloc(TIMER_SCANLINE);
+	m_timer = timer_alloc(FUNC(wswan_video_device::scanline_interrupt), this);
 	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
 
 	// bind callbacks
@@ -164,17 +164,6 @@ void wswan_video_device::device_reset()
 	std::fill(std::begin(m_palette_port), std::end(m_palette_port), 0);
 
 	setup_palettes();
-}
-
-
-void wswan_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TIMER_SCANLINE:
-			scanline_interrupt();
-			break;
-	}
 }
 
 
@@ -1115,7 +1104,7 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void wswan_video_device::scanline_interrupt()
+TIMER_CALLBACK_MEMBER(wswan_video_device::scanline_interrupt)
 {
 	if (m_current_line < 144)
 		refresh_scanline();

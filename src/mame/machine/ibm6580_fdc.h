@@ -28,7 +28,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(assert_reset_line);
 
 private:
 	uint8_t m_bus, m_t0, m_t1, m_p1, m_p2;

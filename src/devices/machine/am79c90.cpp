@@ -87,7 +87,7 @@ void am7990_device_base::device_start()
 	m_dma_in_cb.resolve_safe(0);
 	m_dma_out_cb.resolve_safe();
 
-	m_transmit_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(am7990_device_base::transmit_poll), this));
+	m_transmit_poll = timer_alloc(FUNC(am7990_device_base::transmit_poll), this);
 	m_transmit_poll->adjust(TX_POLL_PERIOD, 0, TX_POLL_PERIOD);
 
 	save_item(NAME(m_rap));

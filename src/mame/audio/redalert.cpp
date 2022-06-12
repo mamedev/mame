@@ -219,8 +219,8 @@ void panther_audio_device::panther_audio_map(address_map &map)
 
 void irem_m37b_audio_device::device_start()
 {
-	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irem_m37b_audio_device::audio_irq_on), this));
-	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irem_m37b_audio_device::audio_irq_off), this));
+	m_audio_irq_on_timer = timer_alloc(FUNC(irem_m37b_audio_device::audio_irq_on), this);
+	m_audio_irq_off_timer = timer_alloc(FUNC(irem_m37b_audio_device::audio_irq_off), this);
 
 	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
 
@@ -318,8 +318,8 @@ void panther_audio_device::device_add_mconfig(machine_config &config)
 
 void demoneye_audio_device::device_start()
 {
-	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(demoneye_audio_device::audio_irq_on), this));
-	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(demoneye_audio_device::audio_irq_off), this));
+	m_audio_irq_on_timer = timer_alloc(FUNC(demoneye_audio_device::audio_irq_on), this);
+	m_audio_irq_off_timer = timer_alloc(FUNC(demoneye_audio_device::audio_irq_off), this);
 
 	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
 

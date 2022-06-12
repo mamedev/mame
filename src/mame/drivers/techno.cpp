@@ -55,11 +55,15 @@ public:
 	void techno(machine_config &config);
 
 private:
-	enum
-	{
-		IRQ_SET_TIMER,
-		IRQ_ADVANCE_TIMER
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map(address_map &map);
+	void audio_map(address_map &map);
+	void cpu_space_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(set_irq1);
+	TIMER_CALLBACK_MEMBER(clear_irq1);
 
 	u16 key_r();
 	u16 rtrg_r();
@@ -75,14 +79,6 @@ private:
 
 	u8 pa_r();
 	void pb_w(u8);
-
-	void mem_map(address_map &map);
-	void audio_map(address_map &map);
-	void cpu_space_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<tms7000_device> m_audiocpu;
@@ -314,23 +310,21 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Fix top left target middle")
 INPUT_PORTS_END
 
-void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(techno_state::clear_irq1)
 {
-	if (id == IRQ_ADVANCE_TIMER)
-	{
-		// vectors change per int: 88-8F, 98-9F)
-		if ((m_vector & 7) == 7)
-			m_vector = (m_vector ^ 0x10) & 0x97;
-		m_vector++;
+	// vectors change per int: 88-8F, 98-9F)
+	if ((m_vector & 7) == 7)
+		m_vector = (m_vector ^ 0x10) & 0x97;
+	m_vector++;
 
-		// schematics show a 74HC74 cleared only upon IRQ acknowledgment or reset, but this is clearly incorrect for xforce
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	}
-	else if (id == IRQ_SET_TIMER)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-		m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));
-	}
+	// schematics show a 74HC74 cleared only upon IRQ acknowledgment or reset, but this is clearly incorrect for xforce
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(techno_state::set_irq1)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));
 }
 
 // E04C
@@ -368,8 +362,8 @@ void techno_state::machine_start()
 	save_item(NAME(m_snd_ack));
 	save_item(NAME(m_last_solenoid));
 
-	m_irq_set_timer = timer_alloc(IRQ_SET_TIMER);
-	m_irq_advance_timer = timer_alloc(IRQ_ADVANCE_TIMER);
+	m_irq_set_timer = timer_alloc(FUNC(techno_state::set_irq1), this);
+	m_irq_advance_timer = timer_alloc(FUNC(techno_state::clear_irq1), this);
 }
 
 void techno_state::machine_reset()
@@ -384,6 +378,7 @@ void techno_state::machine_reset()
 
 	attotime freq = attotime::from_hz(XTAL(8'000'000) / 256); // 31250Hz
 	m_irq_set_timer->adjust(freq, 0, freq);
+	m_irq_advance_timer->adjust(attotime::never);
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 

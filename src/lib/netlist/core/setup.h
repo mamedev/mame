@@ -95,7 +95,7 @@ namespace netlist
 			// need to preserve order of device creation ...
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 			// lifetime control only - can be cleared before run
-			std::vector<std::pair<pstring, pstring>>    m_defparams;
+			std::vector<std::pair<pstring, pstring>>    m_default_params;
 			std::unordered_map<pstring, bool>           m_hints;
 			factory::list_t                             m_factory;
 		};
@@ -188,9 +188,6 @@ namespace netlist
 		log_type &log() noexcept;
 		const log_type &log() const noexcept;
 
-		// FIXME: needed from matrix_solver_t
-		void add_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
-
 	private:
 
 		void resolve_inputs();
@@ -215,7 +212,7 @@ namespace netlist
 
 		// net manipulations
 
-		void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
+		//void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
 		void move_connections(detail::net_t &net, detail::net_t &dest_net);
 		void delete_empty_nets();
 

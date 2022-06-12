@@ -809,7 +809,8 @@ m6805p2_device::m6805p2_device(machine_config const &mconfig, char const *tag, d
 	 * support prescalar clear, however the 1988 databook indicates the
 	 * M6805P2 does?
 	 */
-	//m_timer.set_options(m6805_timer::TIMER_NPC);
+	m_timer.set_options(m6805_timer::TIMER_MOR /* | m6805::TIMER_NPC */);
+	m_timer.set_source(m6805_timer::CLOCK_TIMER);
 
 	set_port_mask<2>(0xf0); // Port C is four bits wide
 	set_port_mask<3>(0xff); // Port D isn't present
@@ -818,6 +819,9 @@ m6805p2_device::m6805p2_device(machine_config const &mconfig, char const *tag, d
 m6805p6_device::m6805p6_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805P6, 11, 64)
 {
+	m_timer.set_options(m6805_timer::TIMER_MOR /* | m6805::TIMER_NPC */);
+	m_timer.set_source(m6805_timer::CLOCK_TIMER);
+
 	set_port_mask<2>(0xf0); // Port C is four bits wide
 	set_port_mask<3>(0xff); // Port D isn't present
 }
@@ -825,6 +829,8 @@ m6805p6_device::m6805p6_device(machine_config const &mconfig, char const *tag, d
 m6805r2_device::m6805r2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805R2, 12, 64)
 {
+	m_timer.set_options(m6805_timer::TIMER_MOR);
+	m_timer.set_source(m6805_timer::CLOCK_TIMER);
 }
 
 m6805r3_device::m6805r3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
@@ -836,6 +842,8 @@ m6805r3_device::m6805r3_device(machine_config const &mconfig, char const *tag, d
 m6805u2_device::m6805u2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805U2, 12, 64)
 {
+	m_timer.set_options(m6805_timer::TIMER_MOR);
+	m_timer.set_source(m6805_timer::CLOCK_TIMER);
 }
 
 m6805u3_device::m6805u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)

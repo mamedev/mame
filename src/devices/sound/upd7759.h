@@ -27,8 +27,8 @@ public:
 	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
 protected:
-	virtual void internal_start_w(int state) = 0;
-	virtual void internal_reset_w(int state);
+	virtual TIMER_CALLBACK_MEMBER(internal_start_w) = 0;
+	virtual TIMER_CALLBACK_MEMBER(internal_reset_w);
 
 	enum
 	{
@@ -77,6 +77,8 @@ protected:
 
 	void update_adpcm(int data);
 	virtual void advance_state();
+
+	TIMER_CALLBACK_MEMBER(sync_port_write);
 
 	// internal state
 	sound_stream  *m_channel;                   // stream channel for playback
@@ -131,14 +133,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( md_w );
 
 protected:
-	virtual void internal_start_w(int state) override;
-	virtual void internal_reset_w(int state) override;
-
 	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
+	virtual TIMER_CALLBACK_MEMBER(internal_reset_w) override;
+
+	TIMER_CALLBACK_MEMBER(drq_update);
 
 	void internal_md_w(int state);
 
@@ -151,14 +154,12 @@ class upd7756_device : public upd775x_device
 public:
 	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
-	virtual void device_reset() override;
-
 protected:
-	virtual void internal_start_w(int state) override;
-
 	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
 };
 
 DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)

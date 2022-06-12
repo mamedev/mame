@@ -61,6 +61,14 @@ public:
 	void namcona1_mcu_map(address_map &map);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override;
+
+	TIMER_CALLBACK_MEMBER(set_scanline_interrupt);
+	void scanline_interrupt(int scanline);
+
 	u16 custom_key_r(offs_t offset);
 	void custom_key_w(u16 data);
 	void vreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -85,19 +93,10 @@ protected:
 	u16 gfxram_r(offs_t offset);
 	void gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void device_post_load() override;
-
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void scanline_interrupt(int scanline);
 
 	void namcona1_main_map(address_map &map);
 	void namcona1_c219_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	enum
 	{
@@ -113,11 +112,6 @@ protected:
 		NAMCO_FA,
 		NAMCO_XDAY2,
 		NAMCO_SWCOURTB
-	};
-
-	enum
-	{
-		TIMER_SCANLINE
 	};
 
 	int m_gametype;
@@ -147,7 +141,7 @@ protected:
 	// this has to be u8 to be in the right byte order for the tilemap system
 	std::vector<u8> m_shaperam;
 
-	int m_mEnableInterrupts;
+	int m_enable_interrupts;
 	u16 m_count;
 	u32 m_keyval;
 	u16 m_mcu_mailbox[8];
@@ -163,7 +157,7 @@ protected:
 	int transfer_dword(u32 dest, u32 source);
 
 	void blit();
-	void UpdatePalette(int offset);
+	void update_palette(int offset);
 	void pdraw_tile(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, u32 code, u32 color,
 		int sx, int sy, bool flipx, bool flipy, u8 priority, bool bShadow, bool bOpaque, u8 gfx_region);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

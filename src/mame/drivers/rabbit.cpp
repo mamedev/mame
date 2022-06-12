@@ -116,9 +116,12 @@ public:
 
 	void rabbit(machine_config &config);
 
-	void init_rabbit();
-
 private:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(blit_done);
+
 	void tilemap0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void tilemap1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void tilemap2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -133,9 +136,6 @@ private:
 	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void rabbit_map(address_map &map);
-
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -177,6 +177,13 @@ private:
 	void do_blit();
 };
 
+void rabbit_state::machine_start()
+{
+	m_banking = 1;
+	m_vblirqlevel = 6;
+	m_bltirqlevel = 4;
+	/* 5 and 1 are also valid and might be raster related */
+}
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
 void rabbit_state::get_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
@@ -432,7 +439,7 @@ void rabbit_state::video_start()
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 
-	m_blit_done_timer = timer_alloc(TIMER_BLIT_DONE);
+	m_blit_done_timer = timer_alloc(FUNC(rabbit_state::blit_done), this);
 
 	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
@@ -570,16 +577,9 @@ void rabbit_state::rombank_w(uint32_t data)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(rabbit_state::blit_done)
 {
-	switch (id)
-	{
-	case TIMER_BLIT_DONE:
-		m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in rabbit_state::device_timer");
-	}
+	m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
 }
 
 void rabbit_state::do_blit()
@@ -913,16 +913,6 @@ void rabbit_state::rabbit(machine_config &config)
 
 
 
-void rabbit_state::init_rabbit()
-{
-	m_banking = 1;
-	m_vblirqlevel = 6;
-	m_bltirqlevel = 4;
-	/* 5 and 1 are also valid and might be raster related */
-}
-
-
-
 ROM_START( rabbit ) // This is the Asian version sold in Korea but the devs forgot to update the region disclaimer.
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
 	ROM_LOAD32_BYTE( "jpr0.0", 0x000000, 0x080000, CRC(52bb18c0) SHA1(625bc8a4daa6d08cacd92d9110cf67a95a91325a) )
@@ -1099,7 +1089,7 @@ ROM_START( rabbitjt )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
 
-GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
-GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996
-GAME( 1997, rabbitj,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 3/6?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1997
-GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 1/28, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1996
+GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
+GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996
+GAME( 1997, rabbitj,  rabbit, rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 3/6?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1997
+GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 1/28, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1996

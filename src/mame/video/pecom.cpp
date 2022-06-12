@@ -82,6 +82,6 @@ void pecom_state::machine_start()
 	save_item(NAME(m_reset));
 	save_item(NAME(m_dma));
 	save_pointer(NAME(m_charram), 0x0800);
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pecom_state::reset_tick),this));
+	m_reset_timer = timer_alloc(FUNC(pecom_state::reset_tick), this);
 }
 

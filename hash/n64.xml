@@ -1792,6 +1792,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
+	<software name="carnival">
+		<description>Carnivalé - Cenzo’s Adventure (prototype 20000721)</description>
+		<year>2000</year>
+		<publisher>Vatical Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="carnival [nsye].bin" size="67108864" crc="abb60a59" sha1="e942047db783437d0c8364d0b0d61aac2b0522f8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cvania">
 		<description>Castlevania (Europe)</description>
 		<year>1999</year>
@@ -3000,6 +3011,18 @@ patched out (+ a fix for internal checksum)
 			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-n3dj-0.u1" size="16777216" crc="0b3ad913" sha1="a567aa96860525963f9dafa256036c0df5f66909" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Loops on retry message when failing to read backup data. Note: to work on N64 flash carts this proto needs save memory set to flash ram. -->
+	<software name="dbanchou" supported="no">
+		<description>Doubutsu Banchou (Japan, prototype)</description>
+		<year>200?</year>
+		<publisher>Marigul</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="doubutsu_banchou.bin" size="33554432" crc="7a2e1b99" sha1="15a22d0e2320d4aa3487ec57532110ea4390b849" />
 			</dataarea>
 		</part>
 	</software>

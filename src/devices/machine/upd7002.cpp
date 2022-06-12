@@ -32,6 +32,7 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 
 void upd7002_device::device_start()
 {
+	m_conversion_timer = timer_alloc(FUNC(upd7002_device::conversion_complete), this);
 	m_get_analogue_cb.resolve();
 	m_eoc_cb.resolve();
 
@@ -68,31 +69,21 @@ READ_LINE_MEMBER( upd7002_device::eoc_r )
 }
 
 
-void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd7002_device::conversion_complete)
 {
-	switch (id)
+	if (param == m_conversion_counter)
 	{
-	case TIMER_CONVERSION_COMPLETE:
-		{
-			int counter_value = param;
-			if (counter_value == m_conversion_counter)
-			{
-				// this really always does a 12 bit conversion
-				m_data1 = m_digitalvalue >> 8;
-				m_data0 = m_digitalvalue & 0xf0;
+		// this really always does a 12 bit conversion
+		m_data1 = m_digitalvalue >> 8;
+		m_data0 = m_digitalvalue & 0xf0;
 
-				// set the status register with top 2 MSB, not busy and conversion complete
-				m_status = (m_status & 0x0f) | ((m_data1 & 0xc0) >> 2) | 0x40;
+		// set the status register with top 2 MSB, not busy and conversion complete
+		m_status = (m_status & 0x0f) | ((m_data1 & 0xc0) >> 2) | 0x40;
 
-				// call the EOC function with EOC from status
-				// eoc_r(0) this has just been set to 0
-				if (!m_eoc_cb.isnull()) m_eoc_cb(0);
-				m_conversion_counter=0;
-			}
-		}
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in upd7002_device::device_timer");
+		// call the EOC function with EOC from status
+		// eoc_r(0) this has just been set to 0
+		if (!m_eoc_cb.isnull()) m_eoc_cb(0);
+		m_conversion_counter = 0;
 	}
 }
 
@@ -155,12 +146,12 @@ void upd7002_device::write(offs_t offset, uint8_t data)
 		if (m_status & 0x08)
 		{
 			// 12 bit conversion takes 10ms
-			timer_set(attotime::from_msec(10), TIMER_CONVERSION_COMPLETE, m_conversion_counter);
+			m_conversion_timer->adjust(attotime::from_msec(10), m_conversion_counter);
 		}
 		else
 		{
 			// 8 bit conversion takes 4ms
-			timer_set(attotime::from_msec(4), TIMER_CONVERSION_COMPLETE, m_conversion_counter);
+			m_conversion_timer->adjust(attotime::from_msec(4), m_conversion_counter);
 		}
 		break;
 

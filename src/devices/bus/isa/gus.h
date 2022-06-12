@@ -121,11 +121,18 @@ public:
 	void dack_w(int line,uint8_t data);
 	void eop_w(int state);
 
-	// optional information overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
+	virtual void device_clock_changed() override;
+
+	virtual void update_irq() override;
+
 	// voice-specific registers
 	gus_voice m_voice[32];
 
@@ -147,18 +154,13 @@ protected:
 
 	void set_irq(uint8_t source, uint8_t voice);
 	void reset_irq(uint8_t source);
-	void update_volume_ramps();
+
+	TIMER_CALLBACK_MEMBER(adlib_timer1_tick);
+	TIMER_CALLBACK_MEMBER(adlib_timer2_tick);
+	TIMER_CALLBACK_MEMBER(dma_tick);
+	TIMER_CALLBACK_MEMBER(update_volume_ramps);
 
 	std::vector<uint8_t> m_wave_ram;
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-	virtual void device_clock_changed() override;
-
-	virtual void update_irq() override;
-
 private:
 	// internal state
 	sound_stream* m_stream;
@@ -198,11 +200,6 @@ private:
 	uint8_t m_fake_adlib_status;
 	uint32_t m_dma_current;
 	uint16_t m_volume_table[4096];
-
-	static const device_timer_id ADLIB_TIMER1 = 0;
-	static const device_timer_id ADLIB_TIMER2 = 1;
-	static const device_timer_id DMA_TIMER = 2;
-	static const device_timer_id VOL_RAMP_TIMER = 3;
 
 	int m_txirq;
 	int m_rxirq;

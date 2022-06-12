@@ -38,14 +38,13 @@ public:
 protected:
 	static constexpr int XMIT_RING_SIZE = 64;
 	static constexpr int RECV_RING_SIZE = 64;
-	static constexpr device_timer_id TIMER_STROBE_ON = 0;
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(strobe_tick);
 
 private:
 	// serial overrides

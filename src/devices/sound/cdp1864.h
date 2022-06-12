@@ -112,20 +112,15 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-private:
-	enum
-	{
-		TIMER_INT,
-		TIMER_EFX,
-		TIMER_DMA,
-		TIMER_HSYNC
-	};
+	TIMER_CALLBACK_MEMBER(int_tick);
+	TIMER_CALLBACK_MEMBER(efx_tick);
+	TIMER_CALLBACK_MEMBER(dma_tick);
 
+private:
 	void initialize_palette();
 
 	static constexpr int bckgnd[4] = { 2, 0, 4, 1 };
@@ -164,7 +159,6 @@ private:
 	emu_timer *m_int_timer;
 	emu_timer *m_efx_timer;
 	emu_timer *m_dma_timer;
-	emu_timer *m_hsync_timer;
 };
 
 

@@ -161,7 +161,7 @@ Clock mode:
 #define LOG_INT      (1U << 4)
 #define LOG_CLOCK    (1U << 5)
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 /*
@@ -466,17 +466,14 @@ void tms9901_device::update_clock()
 }
 
 /*
-    Timer callback
+    decrement_tick
     Decrementer counts down the value set in clock mode; when it reaches 0,
     raises an interrupt and resets to the start value
 */
-void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms9901_device::decrement_tick)
 {
-	if (id==DECREMENTER) // we have only that one
-	{
-		timer_clock_in(ASSERT_LINE);
-		timer_clock_in(CLEAR_LINE);
-	}
+	timer_clock_in(ASSERT_LINE);
+	timer_clock_in(CLEAR_LINE);
 }
 
 void tms9901_device::timer_clock_in(line_state clk)
@@ -627,7 +624,7 @@ void tms9901_device::device_start()
 	// Allow for using asynchronous and synchronous clocks
 	if (clock() != 0)
 	{
-		m_decrementer = timer_alloc(DECREMENTER);
+		m_decrementer = timer_alloc(FUNC(tms9901_device::decrement_tick), this);
 		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
 	}
 

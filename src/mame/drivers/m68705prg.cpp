@@ -54,11 +54,6 @@ public:
 	}
 
 protected:
-	enum
-	{
-		TIMER_INPUT_POLL
-	};
-
 	void m68705prg(machine_config &config);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom_load)
@@ -99,14 +94,13 @@ protected:
 		m_digits.resolve();
 		m_leds.resolve();
 
-		m_input_poll_timer = timer_alloc(TIMER_INPUT_POLL);
-
 		save_item(NAME(m_addr));
 		save_item(NAME(m_pb_val));
 
 		m_addr = 0x0000;
 		m_pb_val = 0xff;
 
+		m_input_poll_timer = timer_alloc(FUNC(m68705prg_state_base::input_poll_callback), this);
 		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 	}
 
@@ -115,6 +109,10 @@ protected:
 		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
 		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];
 		m_digits[2] = s_7seg[(m_addr >> 8) & 0x0f];
+	}
+
+	virtual TIMER_CALLBACK_MEMBER(input_poll_callback)
+	{
 	}
 
 	required_ioport                         m_sw;
@@ -191,19 +189,7 @@ protected:
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override
-	{
-		switch (id)
-		{
-		case TIMER_INPUT_POLL:
-			input_poll_callback(param);
-			break;
-		default:
-			driver_device::device_timer(timer, id, param);
-		}
-	}
-
-	TIMER_CALLBACK_MEMBER(input_poll_callback)
+	virtual TIMER_CALLBACK_MEMBER(input_poll_callback) override
 	{
 		ioport_value const switches(m_sw->read());
 		bool const reset(!BIT(switches, 0));

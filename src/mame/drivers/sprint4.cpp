@@ -32,11 +32,6 @@ namespace {
 class sprint4_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	sprint4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -62,6 +57,12 @@ public:
 	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void cpu_map(address_map &map);
+
 	uint8_t wram_r(offs_t offset);
 	uint8_t analog_r(offs_t offset);
 	uint8_t coin_r(offs_t offset);
@@ -75,18 +76,12 @@ private:
 	void bang_w(uint8_t data);
 	void attract_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	void sprint4_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
-
-	void sprint4_cpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -135,19 +130,6 @@ template <int N>
 READ_LINE_MEMBER(sprint4_state::collision_flipflop_r)
 {
 	return m_collision[N];
-}
-
-
-void sprint4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_NMI:
-		nmi_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in sprint4_state::device_timer");
-	}
 }
 
 
@@ -204,7 +186,7 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 void sprint4_state::machine_start()
 {
-	m_nmi_timer = timer_alloc(TIMER_NMI);
+	m_nmi_timer = timer_alloc(FUNC(sprint4_state::nmi_callback), this);
 
 	save_item(NAME(m_da_latch));
 	save_item(NAME(m_steer_FF1));
@@ -294,7 +276,7 @@ void sprint4_state::attract_w(uint8_t data)
 }
 
 
-void sprint4_state::sprint4_palette(palette_device &palette) const
+void sprint4_state::palette_init(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); // black
 	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); // peach
@@ -420,7 +402,7 @@ void sprint4_state::video_ram_w(offs_t offset, uint8_t data)
 }
 
 
-void sprint4_state::sprint4_cpu_map(address_map &map)
+void sprint4_state::cpu_map(address_map &map)
 {
 
 	map.global_mask(0x3fff);
@@ -586,7 +568,7 @@ void sprint4_state::sprint4(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, PIXEL_CLOCK / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sprint4_state::sprint4_cpu_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sprint4_state::cpu_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
@@ -598,7 +580,7 @@ void sprint4_state::sprint4(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sprint4);
-	PALETTE(config, m_palette, FUNC(sprint4_state::sprint4_palette), 10, 6);
+	PALETTE(config, m_palette, FUNC(sprint4_state::palette_init), 10, 6);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
