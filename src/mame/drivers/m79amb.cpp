@@ -136,21 +136,21 @@ void m79amb_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( m79amb )
 	PORT_START("8000")
-	PORT_DIPNAME( 0x03, 0x00, "Play Time" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Game_Time ))         PORT_DIPLOCATION("G6:!1,!2")
 	PORT_DIPSETTING(    0x00, "60 Seconds" )
 	PORT_DIPSETTING(    0x01, "90 Seconds" )
 	PORT_DIPSETTING(    0x02, "90 Seconds" )
 	PORT_DIPSETTING(    0x03, "120 Seconds" )
-	PORT_DIPNAME( 0x1c, 0x04, "Points for Extended Time" )
+	PORT_DIPNAME( 0x1c, 0x04, "Points for Extended Time" )  PORT_DIPLOCATION("G6:!3,!4,!5")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x04, "2500" )
 	PORT_DIPSETTING(    0x08, "3500" )
 	PORT_DIPSETTING(    0x0c, "5000" )
 	PORT_DIPSETTING(    0x1c, "No Extended Time" )
-	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ))           PORT_DIPLOCATION("G6:!6,!7,!8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x40, "1 Coin/2 Players")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ))
 
 	PORT_START("8002")
@@ -253,50 +253,32 @@ ROM_END
     181.6, 199.9, 205.4, 211.9, 223.5, 232.4, 254.0, 254.0
 */
 
-static const uint8_t lut_cross[0x20] = {
-		19,    20,    21,    23,    25,    27,    29,    37,
-		45,    53,    66,    82,    88,    95,   105,   111,
-	118,   130,   142,   149,   158,   165,   170,   177,
-	191,   203,   209,   218,   228,   243,   249,   255,
-};
-
-static const uint8_t lut_pos[0x20] = {
-	0x1f,  0x1e,  0x1c,  0x1d,  0x19,  0x18,  0x1a,  0x1b,
-	0x13,  0x12,  0x10,  0x11,  0x15,  0x14,  0x16,  0x17,
-	0x07,  0x06,  0x04,  0x05,  0x01,  0x00,  0x02,  0x03,
-	0x0b,  0x0a,  0x08,  0x09,  0x0d,  0x0c,  0x0e,  0x0f
-};
-
-
 void m79amb_state::init_m79amb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	/* PROM data is active low */
+	// PROM data is active low
 	for (int i = 0; i < 0x2000; i++)
 		rom[i] = ~rom[i];
 
-	/* gun positions */
-	for (int i = 0; i < 0x100; i++)
-	{
-		/* gun 1, start at left 18 */
-		for (int j = 0; j < 0x20; j++)
-		{
-			if (i <= lut_cross[j])
-			{
-				m_lut_gun1[i] = lut_pos[j];
-				break;
-			}
-		}
+	static constexpr uint8_t lut_cross[0x20] = {
+		19,    20,    21,    23,    25,    27,    29,    37,
+		45,    53,    66,    82,    88,    95,    105,   111,
+		118,   130,   142,   149,   158,   165,   170,   177,
+		191,   203,   209,   218,   228,   243,   249,   255,
+	};
 
-		/* gun 2, start at right 235 */
-		for (int j = 0; j < 0x20; j++)
-		{
-			if (i >= (253 - lut_cross[j]))
-			{
-				m_lut_gun2[i] = lut_pos[j];
-				break;
-			}
-		}
+	// gun positions
+	for (int i = 0, j = 0, k = 0xff; i < 0x20; i++)
+	{
+		const uint8_t gray = i ^ (i >> 1) ^ 0x1f; // 5-bit Gray code, inverted
+
+		// gun 1, start at left 18
+		while (j < 0x100 && j <= lut_cross[i])
+			m_lut_gun1[j++] = gray;
+
+		// gun 2, start at right 235
+		while (k >= 0 && k >= 253 - lut_cross[i])
+			m_lut_gun2[k--] = gray;
 	}
 }
 
