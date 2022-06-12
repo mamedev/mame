@@ -32301,7 +32301,7 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"    [c85f188
 	</software>
 
 	<software name="sorcerexp4" cloneof="sorcer">
-		<description>Sorcerian New Scenario Vol.1 - Uchuu Kara no Homonsha</description>
+		<description>Sorcerian New Scenario Vol.1 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -51787,7 +51787,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 
 	<software name="druaga">
 		<!-- The Sightseeing Tour of Druaga -->
-		<description>Druaga no To Kanko Tour</description>
+		<description>Druaga no Tou Kanko Tour</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Needs BASIC V2"/>

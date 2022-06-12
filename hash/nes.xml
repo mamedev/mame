@@ -9579,7 +9579,7 @@ license:CC0
 	</software>
 
 	<software name="downtspc">
-		<description>Downtown Special - Kunio-kun no Jidaigeki Dayo Zenin Shuugou! (Jpn)</description>
+		<description>Downtown Special - Kunio-kun no Jidaigeki Da yo Zenin Shuugou! (Japan)</description>
 		<year>1991</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-J6"/>
@@ -17553,7 +17553,7 @@ license:CC0
 	</software>
 
 	<software name="hydlide3">
-		<description>Hydlide 3 - Yami Kara no Houmonsha (Jpn)</description>
+		<description>Hydlide 3 - Yami kara no Houmonsha (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-HL3-6900"/>
@@ -24381,7 +24381,7 @@ license:CC0
 	</software>
 
 	<software name="holmesmk">
-		<description>Meitantei Holmes - M Kara no Chousenjou (Jpn)</description>
+		<description>Meitantei Holmes - M kara no Chousenjou (Japan)</description>
 		<year>1989</year>
 		<publisher>Towa Chiki</publisher>
 		<info name="serial" value="TCC-M3"/>
@@ -24704,7 +24704,7 @@ license:CC0
 	</software>
 
 	<software name="mezatopg">
-		<description>Mezase Top Pro - Green Ni Kakeru Yume (Jpn)</description>
+		<description>Mezase Top Pro - Green ni Kakeru Yume (Japan)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-41"/>
@@ -28714,7 +28714,7 @@ license:CC0
 	</software>
 
 	<software name="parodiusj" cloneof="parodius">
-		<description>Parodius da! (Jpn)</description>
+		<description>Parodius Da! (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC849"/>
@@ -41650,7 +41650,7 @@ license:CC0
 	</software>
 
 	<software name="vegascon">
-		<description>Vegas Connection - Casino Kara Ai O Komete (Jpn)</description>
+		<description>Vegas Connection - Casino kara Ai o Komete (Japan)</description>
 		<year>1989</year>
 		<publisher>Sigma Shouji</publisher>
 		<info name="serial" value="SEI-1B"/>
@@ -44589,7 +44589,7 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 as PCB the ones corresponding to the mapper present in the iNES header. They are probably good dumps in most of the case, but for the documentation
 to be 100% correct we would like some dumper to verify both the correctness of the dumps and which PCB is present inside the cart.
 
-If you can help us with any of these, please contact us (at the MESS boards) or directly bootgod.
+If you can help us with any of these, please contact us.
 
 Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
 
@@ -46876,7 +46876,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="famidobu">
-		<description>Famicom Doubutsu Seitai Zukan! - Katte Ni Shirokuma - Mori o Sukue no Maki! (Jpn)</description>
+		<description>Famicom Doubutsu Seitai Zukan! - Katte ni Shirokuma - Mori o Sukue no Maki! (Japan)</description>
 		<year>1989</year>
 		<publisher>CBS Sony Group</publisher>
 		<info name="serial" value="CBS-WB"/>
@@ -48287,7 +48287,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="kerodai2">
-		<description>Kero Kero Keroppi no Daibouken 2 - Donuts Ike Wa Oosawagi! (Jpn)</description>
+		<description>Kero Kero Keroppi no Daibouken 2 - Donuts Ike wa Oosawagi! (Japan)</description>
 		<year>1993</year>
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-KK"/>
@@ -48815,7 +48815,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="masuzoyu">
-		<description>Masuzoe Youichi - Asa Made Famicom (Jpn)</description>
+		<description>Masuzoe Youichi - Asa made Famicom (Japan)</description>
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-I4"/>
@@ -69455,7 +69455,7 @@ All musics were removed in this game.
 PRG/CHR from the available iNES/UNIF images and by using as PCB the ones corresponding to the mapper present in the iNES header.
 They might well be bad dumps, or hacked imaged. It would be nice to verify these dumps as well, but verification is unlikely to happen in the short future.
 
-If you can help us with any of these, please contact us (at the MESS boards) or directly bootgod.
+If you can help us with any of these, please contact us.
 
 Also notice that VRAM & WRAM are probably incorrect for some of these sets, at the moment... -->
 
@@ -76679,7 +76679,7 @@ Other
 	</software>
 
 	<software name="pokegren" cloneof="kerodai2">
-		<description>Pokemon Green (Kero Kero Keroppi no Daibouken 2 - Donuts Ike Wa Oosawagi! pirate)</description>
+		<description>Pokemon Green (Kero Kero Keroppi no Daibouken 2 - Donuts Ike wa Oosawagi! pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">

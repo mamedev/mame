@@ -857,7 +857,7 @@ license:CC0
 
 	<software name="specdemo" supported="no">
 		<description>Spectraview II Demo Disk</description>
-		<!-- Disk contains Sparta DOS and won't boot in MESS, works on other emulators -->
+		<!-- Disk contains Sparta DOS and won't boot in MAME, works on other emulators -->
 		<year>198?</year>
 		<publisher>Display Systems International</publisher>
 		<sharedfeat name="requirement" value="a800:spectra2"/>
