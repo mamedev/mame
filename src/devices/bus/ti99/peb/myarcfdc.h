@@ -103,6 +103,9 @@ private:
 
 	// Recent address
 	int m_address;
+
+	// AMA/B/C decoding active
+	bool m_dec_high;
 };
 
 // =========== Decoder PAL circuit ================
