@@ -2525,7 +2525,7 @@ D-9144-3005 ROM Board Assembly:
 +-------------------------+------------------+-+
 
 Connectors:
-2J1 40 pin ribbon cable connetor
+2J1 40 pin ribbon cable connector
 2J2  6 pin header (KEY pin 4)
 2J3 10 pin header (KEY pin 9)
 2J4  9 pin header (KEY pin 1)
@@ -2778,7 +2778,7 @@ D-9144-3006 ROM Board Assembly:
 +-------------------------+------------------+-+
 
 Connectors:
-2J1 40 pin ribbon cable connetor
+2J1 40 pin ribbon cable connector
 2J2  6 pin header (KEY pin 4)
 2J3 10 pin header (KEY pin 9)
 2J4  9 pin header (KEY pin 1)
@@ -2928,7 +2928,7 @@ D-9144-3012 ROM Board Assembly:
 +-------------------------+------------------+-+
 
 Connectors:
-2J1 40 pin ribbon cable connetor
+2J1 40 pin ribbon cable connector
 2J2  6 pin header (KEY pin 4)
 2J3 10 pin header (KEY pin 9)
 2J4  9 pin header (KEY pin 1)

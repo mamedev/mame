@@ -254,7 +254,7 @@ void archimedes_keyboard_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 	set_rate(31250);
 
-	m_mouse_timer = timer_alloc();
+	m_mouse_timer = timer_alloc(FUNC(archimedes_keyboard_device::update_mouse), this);
 
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
@@ -337,7 +337,7 @@ void archimedes_keyboard_device::tra_callback()
 	m_kout(transmit_register_get_data_bit());
 }
 
-void archimedes_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(archimedes_keyboard_device::update_mouse)
 {
 	//  Mouse quadrature signals
 	//  Increase      Decrease

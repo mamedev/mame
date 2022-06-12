@@ -14,22 +14,15 @@ READ_LINE_MEMBER(pocketc_state::brk_r)
 	return BIT(m_extra->read(), 0);
 }
 
-void pocketc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pocketc_state::power_up_done)
 {
-	switch (id)
-	{
-	case TIMER_POWER_UP:
-		m_power = 0;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pocketc_state::device_timer");
-	}
+	m_power = 0;
 }
 
 void pocketc_state::machine_start()
 {
 	m_cpu_nvram->set_base(m_maincpu->internal_ram(), 96);
-	m_power_timer = timer_alloc(TIMER_POWER_UP);
+	m_power_timer = timer_alloc(FUNC(pocketc_state::power_up_done), this);
 }
 
 void pocketc_state::machine_reset()

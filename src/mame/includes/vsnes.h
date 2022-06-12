@@ -114,7 +114,7 @@ private:
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
 	uint8_t vsnes_bootleg_z80_address_r(offs_t offset);
-	void vsnes_bootleg_scanline(int scanline, int vblank, int blanked);
+	void vsnes_bootleg_scanline(int scanline, bool vblank, bool blanked);
 	uint8_t vsnes_bootleg_ppudata();
 
 	void vsnes_bootleg_z80_map(address_map &map);

@@ -600,7 +600,7 @@ void helifire_state::machine_reset()
 void spacefev_state::spacefev(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	I8080A(config, m_maincpu, 20.160_MHz_XTAL / 10);
 	m_maincpu->out_status_func().set(FUNC(spacefev_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
@@ -608,9 +608,7 @@ void spacefev_state::spacefev(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -626,7 +624,7 @@ void spacefev_state::spacefev(machine_config &config)
 void sheriff_state::sheriff(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	I8080A(config, m_maincpu, 20.160_MHz_XTAL / 10);
 	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
@@ -634,9 +632,7 @@ void sheriff_state::sheriff(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -654,17 +650,14 @@ void sheriff_state::westgun2(machine_config &config)
 	sheriff(config);
 
 	/* basic machine hardware */
-	I8080A(config.replace(), m_maincpu, XTAL(19'968'000) / 10);
-	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
+	m_maincpu->set_clock(19.968_MHz_XTAL / 10);
+	m_screen->set_raw(19.968_MHz_XTAL / 4, 320, 0, 256, 262, 16, 240); // presumably more like other 8080bw.cpp games
 }
 
 void helifire_state::helifire(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(20'160'000) / 10);
+	I8080A(config, m_maincpu, 20.160_MHz_XTAL / 10);
 	m_maincpu->out_status_func().set(FUNC(helifire_state::n8080_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
@@ -672,9 +665,7 @@ void helifire_state::helifire(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));
 	m_screen->set_palette(m_palette);

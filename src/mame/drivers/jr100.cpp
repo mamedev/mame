@@ -206,7 +206,7 @@ INPUT_PORTS_END
 void jr100_state::machine_start()
 {
 	if (!m_sound_timer)
-		m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr100_state::sound_tick), this));
+		m_sound_timer = timer_alloc(FUNC(jr100_state::sound_tick), this);
 
 	save_item(NAME(m_keyboard_line));
 	save_item(NAME(m_use_pcg));

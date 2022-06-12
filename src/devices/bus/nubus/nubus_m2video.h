@@ -28,11 +28,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 private:
 	uint32_t m2video_r(offs_t offset, uint32_t mem_mask = ~0);

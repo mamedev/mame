@@ -134,8 +134,8 @@ static constexpr XTAL MAIN_CLOCK    = 12.096_MHz_XTAL;
 void sbrkout_state::machine_start()
 {
 	membank("bank1")->set_base(&m_videoram[0x380]);
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::scanline_callback),this));
-	m_pot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::pot_trigger_callback),this));
+	m_scanline_timer = timer_alloc(FUNC(sbrkout_state::scanline_callback), this);
+	m_pot_timer = timer_alloc(FUNC(sbrkout_state::pot_trigger_callback), this);
 
 	save_item(NAME(m_sync2_value));
 	save_item(NAME(m_pot_mask));

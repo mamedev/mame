@@ -12,11 +12,6 @@
 class nbmj8688_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -158,7 +153,7 @@ private:
 	void secolove_map(address_map &map);
 	void seiha_io_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };
 
 #endif // MAME_INCLUDES_NBMJ8688_H

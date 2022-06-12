@@ -336,9 +336,9 @@ void hp9885_device::device_start()
 	save_item(NAME(m_am_detector));
 	save_item(NAME(m_crc));
 
-	m_fsm_timer = timer_alloc(FSM_TMR_ID);
-	m_head_timer = timer_alloc(HEAD_TMR_ID);
-	m_bit_byte_timer = timer_alloc(BIT_BYTE_TMR_ID);
+	m_fsm_timer = timer_alloc(FUNC(hp9885_device::fsm_tick), this);
+	m_head_timer = timer_alloc(FUNC(hp9885_device::head_tick), this);
+	m_bit_byte_timer = timer_alloc(FUNC(hp9885_device::bit_byte_tick), this);
 
 	m_drive = m_drive_connector->get_device();
 
@@ -359,172 +359,170 @@ void hp9885_device::device_reset()
 	set_state(FSM_IDLE);
 }
 
-void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp9885_device::fsm_tick)
 {
-	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , id , m_fsm_state , m_head_state);
+	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , FSM_TMR_ID , m_fsm_state , m_head_state);
+	do_FSM();
+}
 
-	switch (id) {
-	case FSM_TMR_ID:
+TIMER_CALLBACK_MEMBER(hp9885_device::head_tick)
+{
+	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , HEAD_TMR_ID , m_fsm_state , m_head_state);
+	if (m_head_state == HEAD_SETTLING) {
+		LOG_HEAD("%.06f Head loaded\n" , machine().time().as_double());
+		m_head_state = HEAD_LOADED;
+		// Trigger actions to be done on head loading
 		do_FSM();
-		break;
+		m_head_timer->adjust(attotime::from_msec(HEAD_TO_MS - HD_SETTLE_MS));
+	} else {
+		LOG_HEAD("%.06f Head unloaded\n" , machine().time().as_double());
+		m_head_state = HEAD_UNLOADED;
+	}
+}
 
-	case HEAD_TMR_ID:
-		if (m_head_state == HEAD_SETTLING) {
-			LOG_HEAD("%.06f Head loaded\n" , machine().time().as_double());
-			m_head_state = HEAD_LOADED;
-			// Trigger actions to be done on head loading
-			do_FSM();
-			m_head_timer->adjust(attotime::from_msec(HEAD_TO_MS - HD_SETTLE_MS));
-		} else {
-			LOG_HEAD("%.06f Head unloaded\n" , machine().time().as_double());
-			m_head_state = HEAD_UNLOADED;
+TIMER_CALLBACK_MEMBER(hp9885_device::bit_byte_tick)
+{
+	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , BIT_BYTE_TMR_ID , m_fsm_state , m_head_state);
+
+	switch (m_fsm_state) {
+	case FSM_WAIT_ID_AM:
+	case FSM_WAIT_DATA_AM:
+		{
+			attotime edge;
+			attotime tm;
+			edge = m_drive->get_next_transition(m_pll.ctime);
+			bool half_bit = m_pll.feed_read_data(tm , edge , attotime::never);
+			m_am_detector <<= 1;
+			m_am_detector |= half_bit;
+			if (m_am_detector == 0x55552a54) {
+				// ID AM
+				// CDCDCDCDCDCDCDCD
+				//  0 0 0 0 1 1 1 0
+				// 0 1 1 1 0 0 0 0
+				LOG_DISK("Got ID AM\n");
+				preset_crc();
+				m_word_cnt = 2;
+				set_state(FSM_RD_ID);
+			} else if (m_am_detector == 0x55552a44) {
+				// DATA AM
+				// CDCDCDCDCDCDCDCD
+				//  0 0 0 0 1 0 1 0
+				// 0 1 1 1 0 0 0 0
+				LOG_DISK("Got Data AM\n");
+				if (m_fsm_state == FSM_WAIT_DATA_AM) {
+					m_rev_cnt = 0;
+					if (BIT(m_status , STS_XFER_COMPLETE)) {
+						output_status();
+						return;
+					} else {
+						preset_crc();
+						if (m_op == OP_READ) {
+							m_word_cnt = 129;
+							set_state(FSM_RD_DATA);
+						} else {
+							m_word_cnt = 130;
+							set_state(FSM_WR_DATA);
+							m_pll.start_writing(m_pll.ctime);
+							m_had_transition = false;
+							wr_word(m_input);
+							set_ibf(false);
+						}
+					}
+				}
+			}
 		}
 		break;
 
-	case BIT_BYTE_TMR_ID:
+	case FSM_RD_ID:
 		{
-			switch (m_fsm_state) {
-			case FSM_WAIT_ID_AM:
-			case FSM_WAIT_DATA_AM:
-				{
-					attotime edge;
-					attotime tm;
-					edge = m_drive->get_next_transition(m_pll.ctime);
-					bool half_bit = m_pll.feed_read_data(tm , edge , attotime::never);
-					m_am_detector <<= 1;
-					m_am_detector |= half_bit;
-					if (m_am_detector == 0x55552a54) {
-						// ID AM
-						// CDCDCDCDCDCDCDCD
-						//  0 0 0 0 1 1 1 0
-						// 0 1 1 1 0 0 0 0
-						LOG_DISK("Got ID AM\n");
-						preset_crc();
-						m_word_cnt = 2;
-						set_state(FSM_RD_ID);
-					} else if (m_am_detector == 0x55552a44) {
-						// DATA AM
-						// CDCDCDCDCDCDCDCD
-						//  0 0 0 0 1 0 1 0
-						// 0 1 1 1 0 0 0 0
-						LOG_DISK("Got Data AM\n");
-						if (m_fsm_state == FSM_WAIT_DATA_AM) {
-							m_rev_cnt = 0;
-							if (BIT(m_status , STS_XFER_COMPLETE)) {
-								output_status();
-								return;
-							} else {
-								preset_crc();
-								if (m_op == OP_READ) {
-									m_word_cnt = 129;
-									set_state(FSM_RD_DATA);
-								} else {
-									m_word_cnt = 130;
-									set_state(FSM_WR_DATA);
-									m_pll.start_writing(m_pll.ctime);
-									m_had_transition = false;
-									wr_word(m_input);
-									set_ibf(false);
-								}
-							}
-						}
-					}
+			// This is needed when state is switched to one of the AM waiting states
+			m_am_detector = 0;
+			auto word = rd_word();
+			m_word_cnt--;
+			LOG_DISK("W %04x C %u\n" , word , m_word_cnt);
+			if (m_word_cnt && word != ((m_seek_sector << 8) | m_track)) {
+				set_state(FSM_WAIT_ID_AM);
+			} else if (m_word_cnt == 0) {
+				if (m_crc) {
+					LOG_DISK("Wrong CRC in ID\n");
+					set_state(FSM_WAIT_ID_AM);
+				} else {
+					LOG_DISK("Sector found\n");
+					set_state(FSM_WAIT_DATA_AM);
 				}
-				break;
+			}
+		}
+		break;
 
-			case FSM_RD_ID:
-				{
-					// This is needed when state is switched to one of the AM waiting states
-					m_am_detector = 0;
-					auto word = rd_word();
-					m_word_cnt--;
-					LOG_DISK("W %04x C %u\n" , word , m_word_cnt);
-					if (m_word_cnt && word != ((m_seek_sector << 8) | m_track)) {
-						set_state(FSM_WAIT_ID_AM);
-					} else if (m_word_cnt == 0) {
-						if (m_crc) {
-							LOG_DISK("Wrong CRC in ID\n");
-							set_state(FSM_WAIT_ID_AM);
-						} else {
-							LOG_DISK("Sector found\n");
-							set_state(FSM_WAIT_DATA_AM);
-						}
-					}
+	case FSM_RD_DATA:
+		{
+			auto word = rd_word();
+			m_word_cnt--;
+			LOG_DISK("W %04x C %u\n" , word , m_word_cnt);
+			if (m_word_cnt >= 1) {
+				if (!BIT(m_status , STS_XFER_COMPLETE)) {
+					m_output = word;
+					m_obf = true;
+					update_busy();
 				}
-				break;
-
-			case FSM_RD_DATA:
-				{
-					auto word = rd_word();
-					m_word_cnt--;
-					LOG_DISK("W %04x C %u\n" , word , m_word_cnt);
-					if (m_word_cnt >= 1) {
-						if (!BIT(m_status , STS_XFER_COMPLETE)) {
-							m_output = word;
-							m_obf = true;
-							update_busy();
-						}
-					} else if (m_word_cnt == 0) {
-						if (m_crc) {
-							LOG_DISK("Wrong CRC in data\n");
-						}
-						// Move to next sector
-						adv_sector();
-						if (BIT(m_status , STS_XFER_COMPLETE) || m_sector_cnt == 0) {
-							BIT_SET(m_status , STS_XFER_COMPLETE);
-							output_status();
-						} else {
-							set_state(FSM_POSITIONING);
-							do_FSM();
-						}
-						return;
-					}
+			} else if (m_word_cnt == 0) {
+				if (m_crc) {
+					LOG_DISK("Wrong CRC in data\n");
 				}
-				break;
-
-			case FSM_WR_DATA:
-				{
-					m_word_cnt--;
-					if (m_word_cnt > 2) {
-						if (BIT(m_status , STS_XFER_COMPLETE)) {
-							wr_word(0);
-						} else {
-							wr_word(m_input);
-							if (m_word_cnt > 3) {
-								set_ibf(false);
-							}
-						}
-					} else if (m_word_cnt == 2) {
-						wr_word(m_crc);
-					} else if (m_word_cnt == 1) {
-						// Post-amble
-						wr_word(0);
-					} else {
-						m_pll.stop_writing(m_drive , m_pll.ctime);
-						// Move to next sector
-						adv_sector();
-						if (BIT(m_status , STS_XFER_COMPLETE) || m_sector_cnt == 0) {
-							BIT_SET(m_status , STS_XFER_COMPLETE);
-							output_status();
-						} else {
-							set_ibf(false);
-							set_state(FSM_POSITIONING);
-							do_FSM();
-						}
-						return;
-					}
+				// Move to next sector
+				adv_sector();
+				if (BIT(m_status , STS_XFER_COMPLETE) || m_sector_cnt == 0) {
+					BIT_SET(m_status , STS_XFER_COMPLETE);
+					output_status();
+				} else {
+					set_state(FSM_POSITIONING);
+					do_FSM();
 				}
-				break;
-
-			default:
-				LOG("Invalid FSM state %d\n" , m_fsm_state);
-				set_state(FSM_IDLE);
 				return;
 			}
-			timer.adjust(m_pll.ctime - machine().time());
 		}
 		break;
+
+	case FSM_WR_DATA:
+		{
+			m_word_cnt--;
+			if (m_word_cnt > 2) {
+				if (BIT(m_status , STS_XFER_COMPLETE)) {
+					wr_word(0);
+				} else {
+					wr_word(m_input);
+					if (m_word_cnt > 3) {
+						set_ibf(false);
+					}
+				}
+			} else if (m_word_cnt == 2) {
+				wr_word(m_crc);
+			} else if (m_word_cnt == 1) {
+				// Post-amble
+				wr_word(0);
+			} else {
+				m_pll.stop_writing(m_drive , m_pll.ctime);
+				// Move to next sector
+				adv_sector();
+				if (BIT(m_status , STS_XFER_COMPLETE) || m_sector_cnt == 0) {
+					BIT_SET(m_status , STS_XFER_COMPLETE);
+					output_status();
+				} else {
+					set_ibf(false);
+					set_state(FSM_POSITIONING);
+					do_FSM();
+				}
+				return;
+			}
+		}
+		break;
+
+	default:
+		LOG("Invalid FSM state %d\n" , m_fsm_state);
+		set_state(FSM_IDLE);
+		return;
 	}
+	m_bit_byte_timer->adjust(m_pll.ctime - machine().time());
 }
 
 void hp9885_device::floppy_ready_cb(floppy_image_device *floppy , int state)

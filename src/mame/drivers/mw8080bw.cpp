@@ -178,6 +178,117 @@ INPUT_CHANGED_MEMBER(mw8080bw_state::direct_coin_count)
 }
 
 
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
+
+uint8_t mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
+{
+	/* convert from a vertical position to the actual values on the vertical sync counters */
+	uint8_t counter;
+	int vblank = (vpos >= MW8080BW_VBSTART);
+
+	if (vblank)
+		counter = vpos - MW8080BW_VBSTART + MW8080BW_VCOUNTER_START_VBLANK;
+	else
+		counter = vpos + MW8080BW_VCOUNTER_START_NO_VBLANK;
+
+	return counter;
+}
+
+
+int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
+{
+	/* convert from the vertical sync counters to an actual vertical position */
+	int vpos;
+
+	if (vblank)
+		vpos = counter - MW8080BW_VCOUNTER_START_VBLANK + MW8080BW_VBSTART;
+	else
+		vpos = counter - MW8080BW_VCOUNTER_START_NO_VBLANK;
+
+	return vpos;
+}
+
+
+TIMER_CALLBACK_MEMBER(mw8080bw_state::interrupt_trigger)
+{
+	int const vpos = m_screen->vpos();
+	uint8_t const counter = vpos_to_vysnc_chain_counter(vpos);
+
+	if (m_int_enable)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_interrupt_time = machine().time();
+	}
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	// set up for next interrupt
+	uint8_t next_counter;
+	int next_vblank;
+	if (counter == MW8080BW_INT_TRIGGER_COUNT_1)
+	{
+		next_counter = MW8080BW_INT_TRIGGER_COUNT_2;
+		next_vblank = MW8080BW_INT_TRIGGER_VBLANK_2;
+	}
+	else
+	{
+		next_counter = MW8080BW_INT_TRIGGER_COUNT_1;
+		next_vblank = MW8080BW_INT_TRIGGER_VBLANK_1;
+	}
+
+	int const next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
+}
+
+
+WRITE_LINE_MEMBER(mw8080bw_state::int_enable_w)
+{
+	m_int_enable = state;
+}
+
+
+IRQ_CALLBACK_MEMBER(mw8080bw_state::interrupt_vector)
+{
+	int vpos = m_screen->vpos();
+	// MAME scheduling quirks cause this to happen more often than you might think, in fact far too often
+	if (machine().time() < m_interrupt_time)
+		vpos++;
+	uint8_t counter = vpos_to_vysnc_chain_counter(vpos);
+	uint8_t vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
+
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return vector;
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+void mw8080bw_state::machine_start()
+{
+	m_interrupt_timer = timer_alloc(FUNC(mw8080bw_state::interrupt_trigger), this);
+}
+
+
+void mw8080bw_state::machine_reset()
+{
+	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
+
+	m_interrupt_time = attotime::zero;
+}
+
+
+
 /*************************************
  *
  *  Special shifter circuit
@@ -222,8 +333,6 @@ void mw8080bw_state::mw8080bw_root(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
 	maincpu.set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
 	maincpu.out_inte_func().set(FUNC(mw8080bw_state::int_enable_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -887,7 +996,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 	mw8080bw_state::machine_start();
 
 	/* create astable timer for IC B1 */
-	m_maze_tone_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this));
+	m_maze_tone_timer = timer_alloc(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this);
 	m_maze_tone_timer->adjust(MAZE_555_B1_PERIOD, 0, MAZE_555_B1_PERIOD);
 
 	/* initialize state of Tone Timing FF, IC C1 */
@@ -2432,7 +2541,7 @@ void mw8080bw_state::bowler(machine_config &config)
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,invaders)
+void invaders_state::machine_start()
 {
 	mw8080bw_state::machine_start();
 
@@ -2443,67 +2552,64 @@ MACHINE_START_MEMBER(mw8080bw_state,invaders)
 
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
+CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw6_sw7_r)
 {
 	// upright PCB : switches visible
 	// cocktail PCB: HI
 
-	if (invaders_is_cabinet_cocktail())
+	if (is_cabinet_cocktail())
 		return 0x03;
 	else
 		return ioport(INVADERS_SW6_SW7_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
+CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw5_r)
 {
 	// upright PCB : switch visible
 	// cocktail PCB: HI
 
-	if (invaders_is_cabinet_cocktail())
+	if (is_cabinet_cocktail())
 		return 0x01;
 	else
 		return ioport(INVADERS_SW5_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
+CUSTOM_INPUT_MEMBER(invaders_state::invaders_in0_control_r)
 {
 	// upright PCB : P1 controls
 	// cocktail PCB: HI
 
-	if (invaders_is_cabinet_cocktail())
+	if (is_cabinet_cocktail())
 		return 0x07;
 	else
-		return ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
+		return m_player_controls[0]->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in1_control_r)
+CUSTOM_INPUT_MEMBER(invaders_state::invaders_in1_control_r)
 {
-	return ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
+	return m_player_controls[0]->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
+CUSTOM_INPUT_MEMBER(invaders_state::invaders_in2_control_r)
 {
 	// upright PCB : P1 controls
 	// cocktail PCB: P2 controls
 
-	if (invaders_is_cabinet_cocktail())
-		return ioport(INVADERS_P2_CONTROL_PORT_TAG)->read();
-	else
-		return ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
+	return m_player_controls[is_cabinet_cocktail() ? 1 : 0]->read();
 }
 
 
-int mw8080bw_state::invaders_is_cabinet_cocktail()
+bool invaders_state::is_cabinet_cocktail()
 {
-	return ioport(INVADERS_CAB_TYPE_PORT_TAG)->read();
+	return BIT(m_cabinet_type->read(), 0);
 }
 
 
-void mw8080bw_state::invaders_io_map(address_map &map)
+void invaders_state::io_map(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
@@ -2524,17 +2630,17 @@ static INPUT_PORTS_START( invaders )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_sw6_sw7_r)
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_sw6_sw7_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in0_control_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_sw5_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in0_control_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_sw5_r)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mw8080bw_state, direct_coin_count, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, invaders_state, direct_coin_count, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -2543,11 +2649,11 @@ static INPUT_PORTS_START( invaders )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) /* in the software, this is TILI, but not connected on the Midway PCB. Is this correct? */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // in the software, this is TILI, but not connected on the Midway PCB. Is this correct?
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
 	PORT_DIPNAME( 0x80, 0x00, "Display Coinage" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2577,26 +2683,29 @@ static INPUT_PORTS_START( invaders )
 INPUT_PORTS_END
 
 
-void mw8080bw_state::invaders(machine_config &config)
+void invaders_state::invaders(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::invaders_io_map);
-
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,invaders)
+	m_maincpu->set_addrmap(AS_IO, &invaders_state::io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	// video hardware
-	m_screen->set_screen_update(FUNC(mw8080bw_state::screen_update_invaders));
+	m_screen->set_screen_update(FUNC(invaders_state::screen_update_invaders));
 
 	// add shifter
 	MB14241(config, m_mb14241);
 
 	// audio hardware
-	INVADERS_AUDIO(config, "soundboard").  // the flip screen line is only connected on the cocktail PCB
-			flip_screen_out().set([this] (int state) { if (invaders_is_cabinet_cocktail()) m_flip_screen = state ? 1 : 0; });
+	INVADERS_AUDIO(config, "soundboard")
+			.flip_screen_out().set(
+					[this] (int state)
+					{
+						if (is_cabinet_cocktail()) // the flip screen line is only connected on the cocktail PCB
+							m_flip_screen = state ? 1 : 0;
+					});
 }
 
 
@@ -3121,7 +3230,7 @@ ROM_END
 /* 645 */ GAMEL( 1980, spcenctr,   0,        spcenctr, spcenctr, spcenctr_state, empty_init, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
 /* 652 */ GAMEL( 1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, empty_init, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
 /* 730 */ GAME(  1978, bowler,     0,        bowler,   bowler,   mw8080bw_state, empty_init, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 739 */ GAMEL( 1978, invaders,   0,        invaders, invaders, mw8080bw_state, empty_init, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
+/* 739 */ GAMEL( 1978, invaders,   0,        invaders, invaders, invaders_state, empty_init, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
 /* 742 */ GAME(  1978, blueshrk,   0,        blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 		  GAME(  1978, blueshrkmr, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 		  GAME(  1978, blueshrkmr2,blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -104,18 +104,18 @@ void redclash_state::videoram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void redclash_state::gfxbank_w(uint8_t data)
+WRITE_LINE_MEMBER(redclash_state::gfxbank_w)
 {
-	if (m_gfxbank != (data & 0x01))
+	if (m_gfxbank != state)
 	{
-		m_gfxbank = data & 0x01;
-		machine().tilemap().mark_all_dirty();
+		m_gfxbank = state;
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
-void redclash_state::flipscreen_w(uint8_t data)
+WRITE_LINE_MEMBER(redclash_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(state);
 }
 
 void redclash_state::star_reset_w(uint8_t data)

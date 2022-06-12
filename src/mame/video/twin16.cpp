@@ -447,7 +447,7 @@ void twin16_state::video_start()
 	memset(m_sprite_buffer,0xff,0x800*sizeof(uint16_t));
 	m_video_register = 0;
 	m_sprite_busy = 0;
-	m_sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(twin16_state::sprite_tick),this));
+	m_sprite_timer = timer_alloc(FUNC(twin16_state::sprite_tick),this);
 	m_sprite_timer->adjust(attotime::never);
 
 	/* register for savestates */

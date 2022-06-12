@@ -732,8 +732,12 @@ void newbrain_state::machine_start()
 {
 	m_digits.resolve();
 
-	// set power up timer
-	timer_set(attotime::from_usec(get_pwrup_t()), TIMER_ID_PWRUP);
+	// initialize timers
+	m_reset_timer = timer_alloc(FUNC(newbrain_state::clear_reset), this);
+	m_power_timer = timer_alloc(FUNC(newbrain_state::power_on), this);
+
+	m_reset_timer->adjust(attotime::never);
+	m_power_timer->adjust(attotime::from_usec(get_pwrup_t()));
 
 	// state saving
 	save_item(NAME(m_clk));
@@ -769,38 +773,32 @@ void newbrain_state::machine_reset()
 
 	enrg_w(0);
 
-	timer_set(attotime::from_usec(get_reset_t()), TIMER_ID_RESET);
+	m_reset_timer->adjust(attotime::from_usec(get_reset_t()));
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(newbrain_state::clear_reset)
 {
-	switch (id)
-	{
-	case TIMER_ID_RESET:
-		LOG("%s %s RESET 1\n", machine().time().as_string(), machine().describe_context());
+	LOG("%s %s RESET 1\n", machine().time().as_string(), machine().describe_context());
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_cop->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+}
 
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_cop->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		break;
+TIMER_CALLBACK_MEMBER(newbrain_state::power_on)
+{
+	LOG("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
+	m_pwrup = 1;
+}
 
-	case TIMER_ID_PWRUP:
-		LOG("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
-
-		m_pwrup = 1;
-		break;
-
-	case TIMER_ID_CLKINT:
-		LOG("%s CLKINT\n", machine().time().as_string());
-
-		m_clkint = 0;
-		check_interrupt();
-		break;
-	}
+TIMER_CALLBACK_MEMBER(newbrain_state::clear_clkint)
+{
+	LOG("%s CLKINT\n", machine().time().as_string());
+	m_clkint = 0;
+	check_interrupt();
 }
 
 

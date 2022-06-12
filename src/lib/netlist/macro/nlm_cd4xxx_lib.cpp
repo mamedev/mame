@@ -648,7 +648,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-    http://pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
 //-
 static NETLIST_START(CD4071_DIP)
 	CD4071_GATE(A)
@@ -727,7 +727,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-    http://pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
 //-
 static NETLIST_START(CD4081_DIP)
 	CD4081_GATE(A)

@@ -137,6 +137,7 @@ void bbc_tube_rc6502_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
 	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_ula->prst_handler().set(FUNC(bbc_tube_rc6502_device::prst_w));
 }
 
 void bbc_tube_rc65816_device::device_add_mconfig(machine_config &config)
@@ -149,6 +150,7 @@ void bbc_tube_rc65816_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_maincpu, G65816_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
+	m_ula->prst_handler().set(FUNC(bbc_tube_rc65816_device::prst_w));
 }
 
 //-------------------------------------------------
@@ -231,6 +233,13 @@ void bbc_tube_rc6502_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_rc6502_device::prst_w)
+{
+	device_reset();
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_rc6502_device::host_r(offs_t offset)
 {

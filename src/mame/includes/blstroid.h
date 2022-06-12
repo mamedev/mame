@@ -19,12 +19,6 @@
 class blstroid_state : public atarigen_state
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF = TID_ATARIGEN_LAST,
-		TIMER_IRQ_ON
-	};
-
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_playfield_tilemap(*this, "playfield"),
@@ -40,7 +34,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(irq_on);
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);

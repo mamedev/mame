@@ -74,7 +74,7 @@ ioport_constructor midiin_device::device_input_ports() const
 void midiin_device::device_start()
 {
 	m_input_cb.resolve_safe();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);
 }
@@ -91,69 +91,66 @@ void midiin_device::device_reset()
 }
 
 /*-------------------------------------------------
-    device_timer
+    midi_update
 -------------------------------------------------*/
 
-void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
 {
-	if (id == 0)
+	// if there's a sequence playing, that takes priority
+	midi_event *event = m_sequence.current_event();
+	if (event != nullptr)
 	{
-		// if there's a sequence playing, that takes priority
-		midi_event *event = m_sequence.current_event();
-		if (event != nullptr)
+		attotime curtime = m_timer->expire();
+		if (curtime < m_sequence_start)
 		{
-			attotime curtime = timer.expire();
-			if (curtime < m_sequence_start)
-			{
-				// we could get called before we're supposed to start; show a countdown
-				attotime delta = m_sequence_start - curtime;
-				popmessage("Waiting to start MIDI playback... %d", delta.seconds());
-				m_timer->adjust(std::min(delta, attotime(1, 0)));
-			}
-			else
-			{
-				// update the playback time
-				curtime -= m_sequence_start;
-				popmessage("Playing MIDI file: %d:%02d / %d:%02d", curtime.seconds() / 60, curtime.seconds() % 60, m_sequence.duration().seconds() / 60, m_sequence.duration().seconds() % 60);
-
-				// if it's time to process the current event, do it and advance
-				if (curtime >= event->time())
-				{
-					const u8 force_channel = m_config->read();
-
-					for (u8 curbyte : event->data())
-					{
-						if (force_channel <= 15 && curbyte >= 0x80 && curbyte < 0xf0)
-							curbyte = (curbyte & 0xf0) | force_channel;
-
-						xmit_char(curbyte);
-					}
-					event = m_sequence.advance_event();
-				}
-
-				// if there are more events, set a timer to trigger them
-				// (minimum duration 1 sec so that our playback time doesn't skip)
-				if (event != nullptr)
-					m_timer->adjust(std::min(event->time() - curtime, attotime(1, 0)));
-				else
-					popmessage("End of MIDI file");
-			}
+			// we could get called before we're supposed to start; show a countdown
+			attotime delta = m_sequence_start - curtime;
+			popmessage("Waiting to start MIDI playback... %d", delta.seconds());
+			m_timer->adjust(std::min(delta, attotime(1, 0)));
 		}
-		else if (m_midi)
+		else
 		{
-			uint8_t buf[8192*4];
-			int bytesRead;
+			// update the playback time
+			curtime -= m_sequence_start;
+			popmessage("Playing MIDI file: %d:%02d / %d:%02d", curtime.seconds() / 60, curtime.seconds() % 60, m_sequence.duration().seconds() / 60, m_sequence.duration().seconds() % 60);
 
-			while (m_midi->poll())
+			// if it's time to process the current event, do it and advance
+			if (curtime >= event->time())
 			{
-				bytesRead = m_midi->read(buf);
+				const u8 force_channel = m_config->read();
 
-				if (bytesRead > 0)
+				for (u8 curbyte : event->data())
 				{
-					for (int i = 0; i < bytesRead; i++)
-					{
-						xmit_char(buf[i]);
-					}
+					if (force_channel <= 15 && curbyte >= 0x80 && curbyte < 0xf0)
+						curbyte = (curbyte & 0xf0) | force_channel;
+
+					xmit_char(curbyte);
+				}
+				event = m_sequence.advance_event();
+			}
+
+			// if there are more events, set a timer to trigger them
+			// (minimum duration 1 sec so that our playback time doesn't skip)
+			if (event != nullptr)
+				m_timer->adjust(std::min(event->time() - curtime, attotime(1, 0)));
+			else
+				popmessage("End of MIDI file");
+		}
+	}
+	else if (m_midi)
+	{
+		uint8_t buf[8192*4];
+		int bytesRead;
+
+		while (m_midi->poll())
+		{
+			bytesRead = m_midi->read(buf);
+
+			if (bytesRead > 0)
+			{
+				for (int i = 0; i < bytesRead; i++)
+				{
+					xmit_char(buf[i]);
 				}
 			}
 		}

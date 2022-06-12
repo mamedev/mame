@@ -65,22 +65,16 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(asterix_state::audio_nmi)
 {
-	switch (id)
-	{
-	case TIMER_NMI:
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in asterix_state::device_timer");
-	}
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(attotime::from_usec(5), TIMER_NMI);
+	if (!m_audio_nmi_timer->remaining().is_never())
+		m_audio_nmi_timer->adjust(attotime::from_usec(5));
 }
 
 void asterix_state::sound_irq_w(uint16_t data)
@@ -238,6 +232,8 @@ void asterix_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_tilebanks));
 	save_item(NAME(m_spritebanks));
+
+	m_audio_nmi_timer = timer_alloc(FUNC(asterix_state::audio_nmi), this);
 }
 
 void asterix_state::machine_reset()

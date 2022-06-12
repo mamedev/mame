@@ -95,14 +95,36 @@ void cdp1869_device::cdp1869(address_map &map)
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  DEVICE FUNCTIONS
 //**************************************************************************
+
+//-------------------------------------------------
+//  get_rgb - get RGB value
+//-------------------------------------------------
+
+rgb_t cdp1869_device::get_rgb(int i, int c, int l)
+{
+	int luma = 0;
+
+	luma += (l & 4) ? CDP1869_WEIGHT_RED : 0;
+	luma += (l & 1) ? CDP1869_WEIGHT_GREEN : 0;
+	luma += (l & 2) ? CDP1869_WEIGHT_BLUE : 0;
+
+	luma = (luma * 0xff) / 100;
+
+	int const r = (c & 4) ? luma : 0;
+	int const g = (c & 1) ? luma : 0;
+	int const b = (c & 2) ? luma : 0;
+
+	return rgb_t(r, g, b);
+}
+
 
 //-------------------------------------------------
 //  is_ntsc - is device in NTSC mode
 //-------------------------------------------------
 
-inline bool cdp1869_device::is_ntsc()
+bool cdp1869_device::is_ntsc()
 {
 	return m_read_pal_ntsc() ? false : true;
 }
@@ -113,7 +135,7 @@ inline bool cdp1869_device::is_ntsc()
 //  the given address
 //-------------------------------------------------
 
-inline uint8_t cdp1869_device::read_page_ram_byte(offs_t pma)
+uint8_t cdp1869_device::read_page_ram_byte(offs_t pma)
 {
 	return space().read_byte(pma);
 }
@@ -124,7 +146,7 @@ inline uint8_t cdp1869_device::read_page_ram_byte(offs_t pma)
 //  the given address
 //-------------------------------------------------
 
-inline void cdp1869_device::write_page_ram_byte(offs_t pma, uint8_t data)
+void cdp1869_device::write_page_ram_byte(offs_t pma, uint8_t data)
 {
 	space().write_byte(pma, data);
 }
@@ -135,7 +157,7 @@ inline void cdp1869_device::write_page_ram_byte(offs_t pma, uint8_t data)
 //  the given address
 //-------------------------------------------------
 
-inline uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd)
+uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd)
 {
 	uint8_t data = 0;
 
@@ -153,7 +175,7 @@ inline uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_
 //  the given address
 //-------------------------------------------------
 
-inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data)
+void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data)
 {
 	if (!m_out_char_ram_func.isnull())
 	{
@@ -166,7 +188,7 @@ inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t 
 //  read_pcb - read page control bit
 //-------------------------------------------------
 
-inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
+int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
 {
 	int pcb = 0;
 
@@ -183,7 +205,7 @@ inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
 //  update_prd_changed_timer -
 //-------------------------------------------------
 
-inline void cdp1869_device::update_prd_changed_timer()
+void cdp1869_device::update_prd_changed_timer()
 {
 	int start = SCANLINE_PREDISPLAY_START_PAL;
 	int end = SCANLINE_PREDISPLAY_END_PAL;
@@ -224,32 +246,10 @@ inline void cdp1869_device::update_prd_changed_timer()
 
 
 //-------------------------------------------------
-//  get_rgb - get RGB value
-//-------------------------------------------------
-
-inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
-{
-	int luma = 0;
-
-	luma += (l & 4) ? CDP1869_WEIGHT_RED : 0;
-	luma += (l & 1) ? CDP1869_WEIGHT_GREEN : 0;
-	luma += (l & 2) ? CDP1869_WEIGHT_BLUE : 0;
-
-	luma = (luma * 0xff) / 100;
-
-	int const r = (c & 4) ? luma : 0;
-	int const g = (c & 1) ? luma : 0;
-	int const b = (c & 2) ? luma : 0;
-
-	return rgb_t(r, g, b);
-}
-
-
-//-------------------------------------------------
 //  get_lines - get number of character lines
 //-------------------------------------------------
 
-inline int cdp1869_device::get_lines()
+int cdp1869_device::get_lines()
 {
 	if (m_line16 && !m_dblpage)
 	{
@@ -270,7 +270,7 @@ inline int cdp1869_device::get_lines()
 //  get_pmemsize - get page memory size
 //-------------------------------------------------
 
-inline uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
+uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
 {
 	int pmemsize = cols * rows;
 
@@ -285,7 +285,7 @@ inline uint16_t cdp1869_device::get_pmemsize(int cols, int rows)
 //  get_pma - get page memory address
 //-------------------------------------------------
 
-inline uint16_t cdp1869_device::get_pma()
+uint16_t cdp1869_device::get_pma()
 {
 	if (m_dblpage)
 	{
@@ -302,7 +302,7 @@ inline uint16_t cdp1869_device::get_pma()
 //  get_pen - get pen for color bits
 //-------------------------------------------------
 
-inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
+int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 {
 	int r = 0, g = 0, b = 0;
 
@@ -392,7 +392,7 @@ void cdp1869_device::device_start()
 	m_out_char_ram_func.resolve();
 
 	// allocate timers
-	m_prd_timer = timer_alloc();
+	m_prd_timer = timer_alloc(FUNC(cdp1869_device::prd_update), this);
 	m_dispoff = 0;
 	update_prd_changed_timer();
 
@@ -456,10 +456,10 @@ void cdp1869_device::device_post_load()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  prd_update -
 //-------------------------------------------------
 
-void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cdp1869_device::prd_update)
 {
 	m_write_prd(param);
 	m_prd = param;

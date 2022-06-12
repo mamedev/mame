@@ -147,14 +147,12 @@ void nes_nrom_device::common_start()
 
 void nes_nrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 }
 
 void nes_axrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -169,7 +167,6 @@ void nes_cnrom_device::device_start()
 
 void nes_cnrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -178,7 +175,6 @@ void nes_cnrom_device::pcb_reset()
 
 void nes_cprom_device::pcb_reset()
 {
-	m_chr_source = CHRRAM;
 	prg32(0);
 	chr4_0(0, m_chr_source);
 	chr4_4(0, m_chr_source);
@@ -186,7 +182,6 @@ void nes_cprom_device::pcb_reset()
 
 void nes_uxrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -194,7 +189,6 @@ void nes_uxrom_device::pcb_reset()
 
 void nes_un1rom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);

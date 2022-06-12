@@ -182,7 +182,7 @@ void aic6250_device::device_start()
 
 	m_rev_cntrl = 0x02;
 
-	m_state_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aic6250_device::state_loop), this));
+	m_state_timer = timer_alloc(FUNC(aic6250_device::state_loop), this);
 	m_state = IDLE;
 
 	m_int_asserted = false;

@@ -378,6 +378,8 @@ void spectrum_disciple_device::device_start()
 	save_item(NAME(m_map));
 	save_item(NAME(m_control));
 	save_item(NAME(m_reset_delay));
+
+	m_reset_timer = timer_alloc(FUNC(spectrum_disciple_device::reset_tick), this);
 }
 
 //-------------------------------------------------
@@ -394,7 +396,7 @@ void spectrum_disciple_device::device_reset()
 	m_romcs = 0;
 	m_map = false;
 	m_reset_delay = true;
-	timer_set(attotime::from_usec(10), TIMER_RESET); // delay time is a guess
+	m_reset_timer->adjust(attotime::from_usec(10)); // delay time is a guess
 }
 
 //**************************************************************************
@@ -716,14 +718,7 @@ void spectrum_disciple_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spectrum_disciple_device::reset_tick)
 {
-	switch (id)
-	{
-	case TIMER_RESET:
-		m_reset_delay = false;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in spectrum_disciple_device::device_timer");
-	}
+	m_reset_delay = false;
 }

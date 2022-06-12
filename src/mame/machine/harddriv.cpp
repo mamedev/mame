@@ -45,6 +45,7 @@ void harddriv_state::device_start()
 
 	init_video();
 
+	m_xdsp_serial_irq_off_timer = timer_alloc(FUNC(harddriv_state::xdsp_sport1_irq_off_callback), this);
 }
 
 
@@ -79,6 +80,8 @@ void harddriv_state::device_reset()
 		m_ds3xdsp_timer_en = 0;
 		m_ds3xdsp_internal_timer->adjust(attotime::never);
 	}
+
+	m_xdsp_serial_irq_off_timer->adjust(attotime::never);
 }
 
 
@@ -1322,7 +1325,7 @@ WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
 /*
     TODO: The following does not work correctly
 */
-TIMER_CALLBACK_MEMBER(harddriv_state::xsdp_sport1_irq_off_callback)
+TIMER_CALLBACK_MEMBER(harddriv_state::xdsp_sport1_irq_off_callback)
 {
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
 }
@@ -1336,7 +1339,7 @@ void harddriv_state::hdds3sdsp_serial_tx_callback(uint32_t data)
 	m_ds3sdsp_sdata = data;
 
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_nsec(200), timer_expired_delegate(FUNC(harddriv_state::xsdp_sport1_irq_off_callback), this));
+	m_xdsp_serial_irq_off_timer->adjust(attotime::from_nsec(200));
 }
 
 

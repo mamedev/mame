@@ -170,8 +170,6 @@ t5182_device::t5182_device(const machine_config &mconfig, const char *tag, devic
 
 void t5182_device::device_start()
 {
-	m_setirq_cb = timer_alloc(SETIRQ_CB);
-
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));
 	save_item(NAME(m_semaphore_snd));
@@ -221,39 +219,27 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 		m_ourcpu->set_input_line(0,ASSERT_LINE);
 }
 
-void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case SETIRQ_CB:
-		setirq_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in t5182_device::device_timer");
-	}
-}
-
 void t5182_device::sound_irq_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, CPU_ASSERT);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_ASSERT);
 }
 
 void t5182_device::ym2151_irq_ack_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, YM2151_ACK);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ACK);
 }
 
 void t5182_device::cpu_irq_ack_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, CPU_CLEAR);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_CLEAR);
 }
 
 WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
 {
 	if (state)
-		synchronize(SETIRQ_CB, YM2151_ASSERT);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ASSERT);
 	else
-		synchronize(SETIRQ_CB, YM2151_CLEAR);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_CLEAR);
 }
 
 uint8_t t5182_device::sharedram_semaphore_snd_r()

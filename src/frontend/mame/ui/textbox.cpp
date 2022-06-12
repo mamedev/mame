@@ -111,14 +111,14 @@ void menu_textbox::draw(uint32_t flags)
 	float const aspect = machine().render().ui_aspect(&container());
 	float const line_height = ui().get_line_height();
 	float const ud_arrow_width = line_height * aspect;
-	float const gutter_width = 0.52f * line_height * aspect;
+	float const gutter_width = 0.5f * line_height * aspect;
 	float const visible_width = 1.0f - (2.0f * ui().box_lr_border() * aspect);
 	float const visible_left = (1.0f - visible_width) * 0.5f;
 	float const extra_height = 2.0f * line_height;
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
-	// determine effective positions taking into account the hilighting arrows
-	float const maximum_width = visible_width - 2.0f * gutter_width;
+	// determine effective positions
+	float const maximum_width = visible_width - (2.0f * gutter_width);
 
 	draw_background();
 	map_mouse();

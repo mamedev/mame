@@ -220,9 +220,9 @@ void ppu2c0x_device::start_nopalram()
 	m_int_callback.resolve_safe();
 
 	// allocate timers
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_nmi_timer = timer_alloc(TIMER_NMI);
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_hblank_timer = timer_alloc(FUNC(ppu2c0x_device::hblank_tick), this);
+	m_nmi_timer = timer_alloc(FUNC(ppu2c0x_device::nmi_tick), this);
+	m_scanline_timer = timer_alloc(FUNC(ppu2c0x_device::scanline_tick), this);
 
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(screen().time_until_pos(1));
@@ -492,100 +492,94 @@ void ppu2c04_clone_device::init_palette_tables()
  *************************************/
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void ppu2c0x_device::device_timer(emu_timer& timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ppu2c0x_device::hblank_tick)
 {
-	int blanked, vblank;
+	bool blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
+	bool vblank = (m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1);
 
-	switch (id)
+	//update_scanline();
+
+	if (!m_hblank_callback_proc.isnull())
+		m_hblank_callback_proc(m_scanline, vblank, blanked);
+
+	m_hblank_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(ppu2c0x_device::nmi_tick)
+{
+	// Actually fire the VMI
+	m_int_callback(ASSERT_LINE);
+	m_int_callback(CLEAR_LINE);
+
+	m_nmi_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(ppu2c0x_device::scanline_tick)
+{
+	bool blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
+	bool vblank = ((m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
+
+	/* if a callback is available, call it */
+	if (!m_scanline_callback_proc.isnull())
+		m_scanline_callback_proc(m_scanline, vblank, blanked);
+
+	/* update the scanline that just went by */
+	update_scanline();
+
+	/* increment our scanline count */
+	m_scanline++;
+
+	//logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->screen().vpos(), device->screen().hpos());
+
+	/* Note: this is called at the _end_ of each scanline */
+	if (m_scanline == m_vblank_first_scanline)
 	{
-	case TIMER_HBLANK:
-		blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
-		vblank = ((m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
+		// logerror("vblank starting\n");
+		/* We just entered VBLANK */
+		m_regs[PPU_STATUS] |= PPU_STATUS_VBLANK;
 
-		//update_scanline();
-
-		if (!m_hblank_callback_proc.isnull())
-			m_hblank_callback_proc(m_scanline, vblank, blanked);
-
-		m_hblank_timer->adjust(attotime::never);
-		break;
-
-	case TIMER_NMI:
-		// Actually fire the VMI
-		m_int_callback(ASSERT_LINE);
-		m_int_callback(CLEAR_LINE);
-
-		m_nmi_timer->adjust(attotime::never);
-		break;
-
-	case TIMER_SCANLINE:
-		blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
-		vblank = ((m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
-		int next_scanline;
-
-		/* if a callback is available, call it */
-		if (!m_scanline_callback_proc.isnull())
-			m_scanline_callback_proc(m_scanline, vblank, blanked);
-
-		/* update the scanline that just went by */
-		update_scanline();
-
-		/* increment our scanline count */
-		m_scanline++;
-
-		//logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->screen().vpos(), device->screen().hpos());
-
-		/* Note: this is called at the _end_ of each scanline */
-		if (m_scanline == m_vblank_first_scanline)
+		/* If NMI's are set to be triggered, go for it */
+		if (m_regs[PPU_CONTROL0] & PPU_CONTROL0_NMI)
 		{
-			// logerror("vblank starting\n");
-			/* We just entered VBLANK */
-			m_regs[PPU_STATUS] |= PPU_STATUS_VBLANK;
-
-			/* If NMI's are set to be triggered, go for it */
-			if (m_regs[PPU_CONTROL0] & PPU_CONTROL0_NMI)
-			{
-				// We need an ever-so-slight delay between entering vblank and firing an NMI - enough so that
-				// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
-				// via a read from $2002 in the NMI handler).
-				// B-Wings is an example game that needs this.
-				m_nmi_timer->adjust(m_cpu->cycles_to_attotime(4));
-			}
+			// We need an ever-so-slight delay between entering vblank and firing an NMI - enough so that
+			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
+			// via a read from $2002 in the NMI handler).
+			// B-Wings is an example game that needs this.
+			m_nmi_timer->adjust(m_cpu->cycles_to_attotime(4));
 		}
-
-		if (m_scanline == m_scanlines_per_frame - 1)
-		{
-			//logerror("vblank ending\n");
-			/* clear the vblank & sprite hit flag */
-			m_regs[PPU_STATUS] &= ~(PPU_STATUS_VBLANK | PPU_STATUS_SPRITE0_HIT | PPU_STATUS_8SPRITES);
-		}
-
-		/* see if we rolled */
-		else if (m_scanline == m_scanlines_per_frame)
-		{
-			/* if background or sprites are enabled, copy the ppu address latch */
-			if (!blanked)
-				m_refresh_data = m_refresh_latch;
-
-			/* reset the scanline count */
-			m_scanline = 0;
-			//logerror("sprite 0 x: %d y: %d num: %d\n", m_spriteram[3], m_spriteram[0] + 1, m_spriteram[1]);
-		}
-
-		next_scanline = m_scanline + 1;
-		if (next_scanline == m_scanlines_per_frame)
-			next_scanline = 0;
-
-		// Call us back when the hblank starts for this scanline
-		m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
-
-		// trigger again at the start of the next scanline
-		m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
-		break;
 	}
+
+	if (m_scanline == m_scanlines_per_frame - 1)
+	{
+		//logerror("vblank ending\n");
+		/* clear the vblank & sprite hit flag */
+		m_regs[PPU_STATUS] &= ~(PPU_STATUS_VBLANK | PPU_STATUS_SPRITE0_HIT | PPU_STATUS_8SPRITES);
+	}
+
+	/* see if we rolled */
+	else if (m_scanline == m_scanlines_per_frame)
+	{
+		/* if background or sprites are enabled, copy the ppu address latch */
+		if (!blanked)
+			m_refresh_data = m_refresh_latch;
+
+		/* reset the scanline count */
+		m_scanline = 0;
+		//logerror("sprite 0 x: %d y: %d num: %d\n", m_spriteram[3], m_spriteram[0] + 1, m_spriteram[1]);
+	}
+
+	int next_scanline = m_scanline + 1;
+	if (next_scanline == m_scanlines_per_frame)
+		next_scanline = 0;
+
+	// Call us back when the hblank starts for this scanline
+	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
+
+	// trigger again at the start of the next scanline
+	m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
 }
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood, Vas Crabb
+// copyright-holders:David Haywood, Vas Crabb
 #include "emu.h"
 #include "machine/taito68705interface.h"
 
@@ -184,6 +184,7 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, cons
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
+	, m_aux_out_cb(*this)
 	, m_aux_strobe_cb(*this)
 	, m_pb_output(0xff)
 {
@@ -201,6 +202,7 @@ void taito68705_mcu_device::device_start()
 {
 	taito68705_mcu_device_base::device_start();
 
+	m_aux_out_cb.resolve_all_safe();
 	m_aux_strobe_cb.resolve_safe();
 
 	save_item(NAME(m_pb_output));
@@ -239,6 +241,7 @@ void taito68705_mcu_device::mcu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// some games have additional peripherals strobed on falling edge
 	u8 const old_pa_value(pa_value());
+	u8 const aux_changed((data ^ m_pb_output) >> 2);
 	u8 const aux_strobes((mem_mask & ~data & m_pb_output) >> 2);
 
 	// rising edge on PB1 clears the host semaphore flag
@@ -248,6 +251,8 @@ void taito68705_mcu_device::mcu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 	// callbacks for other peripherals
 	for (unsigned i = 0; i < 6; ++i)
 	{
+		if (BIT(aux_changed, i))
+			m_aux_out_cb[i](BIT(data, i + 2));
 		if (BIT(aux_strobes, i))
 			m_aux_strobe_cb(i, old_pa_value, 0xff);
 	}

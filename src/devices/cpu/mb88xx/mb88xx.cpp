@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-    mb88xx.c
+    mb88xx.cpp
     Core implementation for the portable Fujitsu MB88xx series MCU emulator.
 
     Written by Ernesto Corvi
@@ -48,8 +48,8 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
 
 #define READOP(a)           (m_cache.read_byte(a))
 
-#define RDMEM(a)            (m_data.read_byte(a))
-#define WRMEM(a,v)          (m_data.write_byte((a), (v)))
+#define RDMEM(a)            (m_data.read_byte(a) & 0x0f)
+#define WRMEM(a,v)          (m_data.write_byte((a), (v) & 0x0f))
 
 #define TEST_ST()           (m_st & 1)
 #define TEST_ZF()           (m_zf & 1)
@@ -193,16 +193,13 @@ void mb88_cpu_device::device_start()
 	m_read_si.resolve_safe(0);
 	m_write_so.resolve_safe();
 
-	m_serial = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb88_cpu_device::serial_timer), this));
+	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
 	m_ctr = 0;
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PA));
-	save_item(NAME(m_SP[0]));
-	save_item(NAME(m_SP[1]));
-	save_item(NAME(m_SP[2]));
-	save_item(NAME(m_SP[3]));
+	save_item(NAME(m_SP));
 	save_item(NAME(m_SI));
 	save_item(NAME(m_A));
 	save_item(NAME(m_X));
@@ -707,7 +704,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x20: /* setR ZCS:... */
-				arg = m_read_r[m_Y/4]();
+				arg = m_read_r[m_Y/4]() & 0x0f;
 				m_write_r[m_Y/4](arg | (1 << (m_Y%4)));
 				m_st = 1;
 				break;
@@ -718,7 +715,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x22: /* rstR ZCS:... */
-				arg = m_read_r[m_Y/4]();
+				arg = m_read_r[m_Y/4]() & 0x0f;
 				m_write_r[m_Y/4](arg & ~(1 << (m_Y%4)));
 				m_st = 1;
 				break;
@@ -729,7 +726,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x24: /* tstr ZCS:..x */
-				arg = m_read_r[m_Y/4]();
+				arg = m_read_r[m_Y/4]() & 0x0f;
 				m_st = ( arg & ( 1 << (m_Y%4) ) ) ? 0 : 1;
 				break;
 
@@ -851,21 +848,21 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x40:  case 0x41:  case 0x42:  case 0x43: /* setD ZCS:... */
-				arg = m_read_r[0]();
+				arg = m_read_r[0]() & 0x0f;
 				arg |= (1 << (opcode&3));
 				m_write_r[0](arg);
 				m_st = 1;
 				break;
 
 			case 0x44:  case 0x45:  case 0x46:  case 0x47: /* rstD ZCS:... */
-				arg = m_read_r[0]();
+				arg = m_read_r[0]() & 0x0f;
 				arg &= ~(1 << (opcode&3));
 				m_write_r[0](arg);
 				m_st = 1;
 				break;
 
 			case 0x48:  case 0x49:  case 0x4a:  case 0x4b: /* tstD ZCS:..x */
-				arg = m_read_r[2]();
+				arg = m_read_r[2]() & 0x0f;
 				m_st = (arg & (1 << (opcode&3))) ? 0 : 1;
 				break;
 

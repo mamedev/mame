@@ -36,13 +36,12 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	void check_inputs();
+	TIMER_CALLBACK_MEMBER(check_inputs);
 
 private:
 	void apexc_palette(palette_device &palette) const;
-	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	void tape_write(uint8_t data);
 	void draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
@@ -79,7 +78,6 @@ private:
 
 	emu_timer *m_input_timer = nullptr;
 
-	static const device_timer_id TIMER_POLL_INPUTS;
 	static const rgb_t palette_table[4];
 };
 

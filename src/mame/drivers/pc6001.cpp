@@ -1504,8 +1504,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 
 void pc6001_state::machine_start()
 {
-	m_timer_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::audio_callback),this));
-	m_sub_trig_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::sub_trig_callback),this));
+	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
+	m_sub_trig_timer = timer_alloc(FUNC(pc6001_state::sub_trig_callback), this);
 }
 
 inline void pc6001_state::set_videoram_bank(uint32_t offs)

@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nlid_proxy.cpp
- *
- */
+
+///
+/// \file nlid_proxy.cpp
+///
+///
 
 #include "nlid_proxy.h"
 #include "core/setup.h"
@@ -82,7 +83,7 @@ namespace netlist::devices {
 	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *in_proxied)
 	: nld_base_a_to_d_proxy(anetlist, name, in_proxied)
 	, m_Q(*this, "Q")
-	, m_I(*this, "I", nldelegate(&nld_a_to_d_proxy::input, this))
+	, m_I(*this, "I", nl_delegate(&nld_a_to_d_proxy::input, this))
 	{
 	}
 
@@ -92,9 +93,9 @@ namespace netlist::devices {
 		const auto vn(m_tn->net().Q_Analog());
 		const auto vp(m_tp->net().Q_Analog());
 
-		if (logic_family()->is_above_high_thresh_V(v, vn, vp))
+		if (logic_family()->is_above_high_threshold_V(v, vn, vp))
 			out().push(1, netlist_time::quantum());
-		else if (logic_family()->is_below_low_thresh_V(v, vn, vp))
+		else if (logic_family()->is_below_low_threshold_V(v, vn, vp))
 			out().push(0, netlist_time::quantum());
 		else
 		{
@@ -114,12 +115,12 @@ namespace netlist::devices {
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied)
-	, m_I(*this, "I", nldelegate(&nld_d_to_a_proxy :: input, this))
+	, m_I(*this, "I", nl_delegate(&nld_d_to_a_proxy :: input, this))
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
 	{
-		register_subalias("Q", "RN.1");
+		register_sub_alias("Q", "RN.1");
 
 		connect(m_RN.N(), *m_tn);
 		connect(m_RP.P(), *m_tp);

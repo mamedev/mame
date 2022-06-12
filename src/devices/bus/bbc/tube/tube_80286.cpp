@@ -67,6 +67,7 @@ void bbc_tube_80286_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_i80286, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_i80286, INPUT_LINE_INT0);
+	m_ula->prst_handler().set(FUNC(bbc_tube_80286_device::prst_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1M");
@@ -127,6 +128,13 @@ void bbc_tube_80286_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_80286_device::prst_w)
+{
+	device_reset();
+
+	m_i80286->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_80286_device::host_r(offs_t offset)
 {

@@ -249,7 +249,7 @@ void h8_sci_device::device_start()
 	tx_cb.resolve_safe();
 	clk_cb.resolve_safe();
 
-	sync_timer = timer_alloc(0);
+	sync_timer = timer_alloc(FUNC(h8_sci_device::sync_tick), this);
 
 	if(external_clock_period.is_never()) {
 		internal_to_external_ratio = 0;
@@ -309,7 +309,7 @@ void h8_sci_device::device_reset()
 	cur_sync_time = attotime::never;
 }
 
-void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 {
 	// Used only to force system-wide syncs
 }
@@ -368,7 +368,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 
 				bool new_clock = delta >= divider;
 				if(new_clock != clock_value) {
-					cpu->synchronize();
+					machine().scheduler().synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 
@@ -397,7 +397,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 				assert(delta < fp);
 				bool new_clock = delta >= divider*8;
 				if(new_clock != clock_value) {
-					cpu->synchronize();
+					machine().scheduler().synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 
@@ -423,7 +423,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 				delta &= 1;
 				bool new_clock = delta >= 1;
 				if(new_clock != clock_value) {
-					cpu->synchronize();
+					machine().scheduler().synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 
@@ -447,7 +447,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 				delta &= 15;
 				bool new_clock = delta >= 8;
 				if(new_clock != clock_value) {
-					cpu->synchronize();
+					machine().scheduler().synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 
@@ -485,7 +485,7 @@ void h8_sci_device::clock_start(int mode)
 		return;
 
 	if(!clock_state) {
-		cpu->synchronize();
+		machine().scheduler().synchronize();
 		clock_state = mode;
 		switch(clock_mode) {
 		case CLKM_INTERNAL_ASYNC:

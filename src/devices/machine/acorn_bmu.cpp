@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 							m_register++;
 							break;
 						}
-						
+
 						if( m_state != STATE_IDLE )
 						{
 							m_sdar = 0 ;

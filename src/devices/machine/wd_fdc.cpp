@@ -175,10 +175,10 @@ void wd_fdc_device_base::device_start()
 	if (!has_enmf && !enmf_cb.isnull())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
-	t_gen = timer_alloc(TM_GEN);
-	t_cmd = timer_alloc(TM_CMD);
-	t_track = timer_alloc(TM_TRACK);
-	t_sector = timer_alloc(TM_SECTOR);
+	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
+	t_cmd = timer_alloc(FUNC(wd_fdc_device_base::cmd_w_tick), this);
+	t_track = timer_alloc(FUNC(wd_fdc_device_base::track_w_tick), this);
+	t_sector = timer_alloc(FUNC(wd_fdc_device_base::sector_w_tick), this);
 	dden = disable_mfm;
 	enmf = false;
 	floppy = nullptr;
@@ -315,18 +315,35 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::generic_tick)
 {
-	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
+	LOGEVENT("Event fired for TM_GEN\n");
 	live_sync();
+	do_generic();
+	general_continue();
+}
 
-	switch(id) {
-	case TM_GEN: do_generic(); break;
-	case TM_CMD: do_cmd_w(); break;
-	case TM_TRACK: do_track_w(); break;
-	case TM_SECTOR: do_sector_w(); break;
-	}
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::cmd_w_tick)
+{
+	LOGEVENT("Event fired for TM_CMD\n");
+	live_sync();
+	do_cmd_w();
+	general_continue();
+}
 
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::track_w_tick)
+{
+	LOGEVENT("Event fired for TM_TRACK\n");
+	live_sync();
+	do_track_w();
+	general_continue();
+}
+
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::sector_w_tick)
+{
+	LOGEVENT("Event fired for TM_SECTOR\n");
+	live_sync();
+	do_sector_w();
 	general_continue();
 }
 

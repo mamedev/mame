@@ -141,9 +141,6 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	static const device_timer_id TIMER_IOWQ = 0;
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -171,6 +168,8 @@ private:
 
 	void hazl1500_io(address_map &map);
 	void hazl1500_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(update_iowq);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
@@ -233,7 +232,7 @@ void hazl1500_state::machine_start()
 {
 	m_screen_buf = std::make_unique<float[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
 
-	m_iowq_timer = timer_alloc(TIMER_IOWQ);
+	m_iowq_timer = timer_alloc(FUNC(hazl1500_state::update_iowq), this);
 	m_iowq_timer->adjust(attotime::never);
 
 	m_uart->write_swe(0);
@@ -253,7 +252,7 @@ void hazl1500_state::machine_reset()
 	m_kbd_status_latch = 0;
 }
 
-void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hazl1500_state::update_iowq)
 {
 	m_cpu_iowq->write(1);
 	m_cpu_ba4->write(1);
@@ -394,7 +393,6 @@ WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 {
-	synchronize();
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
@@ -407,7 +405,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 {
-	synchronize();
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
@@ -422,7 +419,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 {
-	synchronize();
 	attotime second_fraction(0, time.attoseconds());
 	attotime frame_fraction(0, (second_fraction * 60).attoseconds());
 	attotime pixel_time = frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL);
@@ -461,7 +457,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 
 void hazl1500_state::refresh_address_w(uint8_t data)
 {
-	synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
 	m_iowq_timer->adjust(attotime::from_hz(XTAL(18'000'000)/9));
 	m_cpu_iowq->write(0);

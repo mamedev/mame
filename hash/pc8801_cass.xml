@@ -1433,5 +1433,22 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 			</dataarea>
 		</part>
 	</software>
+	
+	<!--
+		Originally published as a type-in program in the October 1985 issue of LOGiN Magazine.
+		Game programmed by Hiromichi Tanaka, converted to t88 format by Dustin Hubbard / Gaming Alexandria.
+	-->
+	<software name="3156coro2">
+		<description>3156 Coro Coro</description>
+		<year>1985</year>
+		<publisher>スクウェア (Square) / アスキー (ASCII)</publisher>
+		<info name="release" value="198510xx"/>
+		<info name="alt_title" value="サイコロコロコロ"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="39765">
+				<rom name="3156 Coro Coro.t88" size="39765" crc="fe75afd7" sha1="53416e69807eb5e24e09fbef9ee11ee52b542c56"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

@@ -20,11 +20,13 @@
 
 // Debugging
 #define LOG_NOISY_MASK  (LOG_GENERAL << 1)
-#define LOG_NOISY(...)  LOGMASKED(LOG_NOISY_MASK, __VA_ARGS__)
 #define LOG_REG_MASK    (LOG_NOISY_MASK << 1)
-#define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
 #define LOG_INT_MASK    (LOG_REG_MASK << 1)
+
+#define LOG_NOISY(...)  LOGMASKED(LOG_NOISY_MASK, __VA_ARGS__)
+#define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
 #define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -530,9 +532,9 @@ void tms9914_device::device_start()
 	m_int_write_func.resolve_safe();
 	m_accrq_write_func.resolve_safe();
 
-	m_sh_dly_timer = timer_alloc(SH_DELAY_TMR_ID);
-	m_ah_dly_timer = timer_alloc(AH_DELAY_TMR_ID);
-	m_c_dly_timer = timer_alloc(C_DELAY_TMR_ID);
+	m_sh_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
+	m_ah_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
+	m_c_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
 }
 
 void tms9914_device::device_reset()
@@ -593,9 +595,8 @@ void tms9914_device::device_reset()
 	update_ren();
 }
 
-void tms9914_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms9914_device::fsm_tick)
 {
-	LOG_NOISY("tmr %d\n" , id);
 	update_fsm();
 }
 

@@ -162,7 +162,7 @@ NETLIB_OBJECT(CD4066_GATE_DYNAMIC)
 	, m_last(*this, "m_last", false)
 	, m_supply(*this)
 	{
-		register_subalias("CTL", m_DUM1.P());
+		register_sub_alias("CTL", m_DUM1.P());
 
 		connect(m_DUM1.P(), m_DUM2.P());
 		connect(m_DUM1.N(), m_R.P());

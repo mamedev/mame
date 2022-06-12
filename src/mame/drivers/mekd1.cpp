@@ -150,7 +150,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(bit_rate);
+	TIMER_CALLBACK_MEMBER(bit_rate_half);
 
 	emu_timer *m_bit_rate_timer;
 	emu_timer *m_bit_rate_half_timer;
@@ -277,21 +278,15 @@ WRITE_LINE_MEMBER(mekd1_state::pia0_cb2_w)
 	// This is a tape reader control line.
 }
 
-void mekd1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mekd1_state::bit_rate)
 {
-	switch (id)
-	{
-	case TIMER_BIT_RATE:
-		m_bit_rate_out = 1;
-		break;
-	case TIMER_BIT_RATE_HALF:
-		m_bit_rate_half_out = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mekd1_state::device_timer");
-	}
+	m_bit_rate_out = 1;
 }
 
+TIMER_CALLBACK_MEMBER(mekd1_state::bit_rate_half)
+{
+	m_bit_rate_half_out = 1;
+}
 
 WRITE_LINE_MEMBER(mekd1_state::write_f1_clock)
 {
@@ -392,8 +387,8 @@ void mekd1_state::machine_reset()
 void mekd1_state::machine_start()
 {
 	// Allocate timers
-	m_bit_rate_timer = timer_alloc(TIMER_BIT_RATE);
-	m_bit_rate_half_timer = timer_alloc(TIMER_BIT_RATE_HALF);
+	m_bit_rate_timer = timer_alloc(FUNC(mekd1_state::bit_rate), this);
+	m_bit_rate_half_timer = timer_alloc(FUNC(mekd1_state::bit_rate_half), this);
 
 	save_item(NAME(m_bit_rate_out));
 	save_item(NAME(m_bit_rate_half_out));

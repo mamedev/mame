@@ -36,14 +36,14 @@ public:
 	auto dio_read_cb() { return m_dio_read_func.bind(); }
 	auto dio_write_cb() { return m_dio_write_func.bind(); }
 	// Set write callbacks to access uniline signals on IEEE-488
-	auto eoi_write_cb() { return m_signal_wr_fns[ PHI_488_EOI ].bind(); }
-	auto dav_write_cb() { return m_signal_wr_fns[ PHI_488_DAV ].bind(); }
-	auto nrfd_write_cb() { return m_signal_wr_fns[ PHI_488_NRFD ].bind(); }
-	auto ndac_write_cb() { return m_signal_wr_fns[ PHI_488_NDAC ].bind(); }
-	auto ifc_write_cb() { return m_signal_wr_fns[ PHI_488_IFC ].bind(); }
-	auto srq_write_cb() { return m_signal_wr_fns[ PHI_488_SRQ ].bind(); }
-	auto atn_write_cb() { return m_signal_wr_fns[ PHI_488_ATN ].bind(); }
-	auto ren_write_cb() { return m_signal_wr_fns[ PHI_488_REN ].bind(); }
+	auto eoi_write_cb() { return m_signal_wr_fns[PHI_488_EOI].bind(); }
+	auto dav_write_cb() { return m_signal_wr_fns[PHI_488_DAV].bind(); }
+	auto nrfd_write_cb() { return m_signal_wr_fns[PHI_488_NRFD].bind(); }
+	auto ndac_write_cb() { return m_signal_wr_fns[PHI_488_NDAC].bind(); }
+	auto ifc_write_cb() { return m_signal_wr_fns[PHI_488_IFC].bind(); }
+	auto srq_write_cb() { return m_signal_wr_fns[PHI_488_SRQ].bind(); }
+	auto atn_write_cb() { return m_signal_wr_fns[PHI_488_ATN].bind(); }
+	auto ren_write_cb() { return m_signal_wr_fns[PHI_488_REN].bind(); }
 	// Set write callback for INT signal
 	auto int_write_cb() { return m_int_write_func.bind(); }
 	// Set write callback for DMARQ signal
@@ -62,7 +62,7 @@ public:
 
 	void bus_dio_w(uint8_t data);
 
-	void set_ext_signal(phi_488_signal_t signal , int state);
+	void set_ext_signal(phi_488_signal_t signal, int state);
 
 	// Register read/write
 	// Mapping of PHI register bits:
@@ -95,7 +95,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(delayed_update);
 
 private:
 	// Depth of inbound/outbound FIFOs
@@ -113,8 +114,8 @@ private:
 	// Internal copy of bus signals
 	// These signals have the "right" polarity (i.e. the opposite of bus signals, 1=L)
 	uint8_t m_dio;
-	bool m_signals[ PHI_488_SIGNAL_COUNT ];
-	bool m_ext_signals[ PHI_488_SIGNAL_COUNT ];
+	bool m_signals[PHI_488_SIGNAL_COUNT];
+	bool m_ext_signals[PHI_488_SIGNAL_COUNT];
 
 	bool m_no_recursion;
 
@@ -227,8 +228,8 @@ private:
 	uint16_t m_reg_2nd_id;
 	uint16_t m_reg_control;
 	uint16_t m_reg_address;
-	util::fifo<uint16_t , FIFO_SIZE> m_fifo_in;
-	util::fifo<uint16_t , FIFO_SIZE> m_fifo_out;
+	util::fifo<uint16_t, FIFO_SIZE> m_fifo_in;
+	util::fifo<uint16_t, FIFO_SIZE> m_fifo_out;
 
 	typedef enum {
 		NBA_NONE,
@@ -245,20 +246,20 @@ private:
 	emu_timer *m_sh_dly_timer;
 	emu_timer *m_c_dly_timer;
 
-	void int_reg_w(offs_t offset , uint16_t data);
+	void int_reg_w(offs_t offset, uint16_t data);
 
 	uint8_t get_dio(void);
 	void set_dio(uint8_t data);
 	bool get_signal(phi_488_signal_t signal);
-	void set_signal(phi_488_signal_t signal , bool state);
+	void set_signal(phi_488_signal_t signal, bool state);
 
 	void pon_msg(void);
 	void update_488(void);
 	void update_fsm(void);
-	nba_origin_t nba_msg(uint8_t& new_byte , bool& new_eoi) const;
+	nba_origin_t nba_msg(uint8_t& new_byte, bool& new_eoi) const;
 	void clear_nba(nba_origin_t origin);
 	bool if_cmd_received(uint8_t byte);
-	bool byte_received(uint8_t byte , bool eoi);
+	bool byte_received(uint8_t byte, bool eoi);
 	void rx_n_data_freeze(uint16_t word);
 	bool ton_msg(void) const;
 	bool lon_msg(void) const;

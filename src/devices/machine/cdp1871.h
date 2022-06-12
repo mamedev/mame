@@ -66,11 +66,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void change_output_lines();
 	void clock_scan_counters();
 	void detect_keypress();
+
+	TIMER_CALLBACK_MEMBER(perform_scan);
 
 private:
 	devcb_read8            m_read_d1;

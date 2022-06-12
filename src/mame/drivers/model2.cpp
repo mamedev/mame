@@ -21,7 +21,6 @@
                culprit is a wrong command parameter in geo_parse texture data opcode;
     - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - doa, doaa: Kasumi model has many culled polygons;
     - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
     - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
@@ -1103,7 +1102,7 @@ void model2_state::fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask) { COMBI
 /* common map for all Model 2 versions */
 void model2_state::model2_base_mem(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().nopw().flags(i960_cpu_device::BURST);;
+	map(0x00000000, 0x001fffff).rom().nopw().flags(i960_cpu_device::BURST);
 
 	map(0x00500000, 0x005fffff).ram().share("workram").flags(i960_cpu_device::BURST);
 
@@ -4754,7 +4753,60 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD16_WORD_SWAP("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
 ROM_END
 
-ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, ROM board ID# 834-13055 */
+ROM_START( hotd ) /* House of the Dead, Model 2C, Main board ID# 837-12469-01 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-19696a.15", 0x000000, 0x080000, CRC(42adc32e) SHA1(92931e8339dbba23d7ade178fcc56d37291411cb) )
+	ROM_LOAD32_WORD("epr-19697a.16", 0x000002, 0x080000, CRC(1e247cd5) SHA1(693e929d543bad880ea69d781155949f0aa246de) )
+	ROM_LOAD32_WORD("epr-19694.13",  0x100000, 0x080000, CRC(e85ca1a3) SHA1(3d688be98f78fe40c2af1e91df6decd500400ae9) )
+	ROM_LOAD32_WORD("epr-19695.14",  0x100002, 0x080000, CRC(cd52b461) SHA1(bc96ab2a4ba7f30c0b89814acc8931c8bf800a82) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-19704.11",    0x0000000, 0x400000, CRC(aa80dbb0) SHA1(24e63f4392847f288971469cd10448536eb435d4) )
+	ROM_LOAD32_WORD("mpr-19705.12",    0x0000002, 0x400000, CRC(f906843b) SHA1(bee4f43b3ad15d93a2f9f07b873c9cf5d228e2f9) )
+	ROM_LOAD32_WORD("mpr-19702.9",     0x0800000, 0x400000, CRC(fc8aa3b7) SHA1(b64afb17d9c97277d8c4f20811f14f65a61cbb56) )
+	ROM_LOAD32_WORD("mpr-19703.10",    0x0800002, 0x400000, CRC(208d993d) SHA1(e5c45ea5621f99661a87ffe88e24764d2bbcb51e) )
+	ROM_LOAD32_WORD("mpr-19700.7",     0x1000000, 0x400000, CRC(0558cfd3) SHA1(94440839d3325176c2d03f39a78949d0ef040bba) )
+	ROM_LOAD32_WORD("mpr-19701.8",     0x1000002, 0x400000, CRC(224a8929) SHA1(933770546d46abca400e7f524eff2ae89241e56d) )
+	ROM_LOAD32_WORD("epr-19698.5",     0x1800000, 0x080000, CRC(e7a7b6ea) SHA1(77cb53f8730fdb55080b70910ab8c750d79acb02) )
+	ROM_LOAD32_WORD("epr-19699.6",     0x1800002, 0x080000, CRC(8160b3d9) SHA1(9dab483c60624dddba8085e94a4325739592ec17) )
+	ROM_COPY( "main_data", 0x1800000, 0x1900000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1a00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1b00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1c00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1d00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1e00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
+
+
+	ROM_REGION32_LE( 0x800000, "copro_data", 0 ) // TGPx4 program
+	ROM_LOAD32_WORD("epr-19707.29",  0x000000, 0x080000, CRC(384fd133) SHA1(6d060378d0f801b04d12e7ee874f2fa0572992d9) )
+	ROM_LOAD32_WORD("epr-19706.30",  0x000002, 0x080000, CRC(1277531c) SHA1(08d3e733ba9989fcd32290634171c73f26ab6e2b) )
+
+	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-19715.17", 0x0000000, 0x400000, CRC(3ff7dda7) SHA1(0a61b091bb0bc659f0cbca8ad401d0925a1dc2ea) )
+	ROM_LOAD32_WORD("mpr-19711.21", 0x0000002, 0x400000, CRC(080d13f1) SHA1(4167428a2a903aea2c14631ccf924afb81338b89) )
+	ROM_LOAD32_WORD("mpr-19714.18", 0x0800000, 0x400000, CRC(3e55ab49) SHA1(70b4c1627db80e6734112c02265495e2b4a53278) )
+	ROM_LOAD32_WORD("mpr-19710.22", 0x0800002, 0x400000, CRC(80df1036) SHA1(3cc59bb4910aa5382e95762f63325c06b763bd23) )
+	ROM_LOAD32_WORD("mpr-19713.19", 0x1000000, 0x400000, CRC(4d092cd3) SHA1(b6d0be283c25235249186751c7f025a7c38d2f36) )
+	ROM_LOAD32_WORD("mpr-19709.23", 0x1000002, 0x400000, CRC(d08937bf) SHA1(c92571e35960f27dc8b0b059f12167026d0666d1) )
+	ROM_LOAD32_WORD("mpr-19712.20", 0x1800000, 0x400000, CRC(41577943) SHA1(25a0d921c8662043c5860dc7a226d4895ff9fff6) )
+	ROM_LOAD32_WORD("mpr-19708.24", 0x1800002, 0x400000, CRC(5cb790f2) SHA1(d3cae450186bc62fd746b14d6a05cb397efcfe40) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-19718.27", 0x0000000, 0x400000, CRC(a9de5924) SHA1(3ebac2aeb1467939337c9a5c87ad9c293560dae2) )
+	ROM_LOAD32_WORD("mpr-19716.25", 0x0000002, 0x400000, CRC(45c7dcce) SHA1(f602cabd879c69afee544848feafb9fb9f5d51e2) )
+	ROM_LOAD32_WORD("mpr-19719.28", 0x0800000, 0x400000, CRC(838f8343) SHA1(fe6622b5917f9a99c097fd60d9446ac6b481fa75) )
+	ROM_LOAD32_WORD("mpr-19717.26", 0x0800002, 0x400000, CRC(393e440b) SHA1(927ac9cad22f87b339cc86043678470ff139ce1f) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19720.31", 0x000000, 0x080000, CRC(b367d21d) SHA1(1edaed489a3518ddad85728e416319f940ea02bb) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19721.32", 0x000000, 0x400000, CRC(f5d8fa9a) SHA1(6836973a687c59dd80f8e6c30d33155e306be199) )
+	ROM_LOAD16_WORD_SWAP("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
+ROM_END
+
+ROM_START( hotdo ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, ROM board ID# 834-13055 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19696.15", 0x000000, 0x080000, CRC(03da5623) SHA1(be0bd34a9216375c7204445f084f6c74c4d3b0c8) )
 	ROM_LOAD32_WORD("epr-19697.16", 0x000002, 0x080000, CRC(a9722d87) SHA1(0b14f9a81272f79a5b294bc024711042c5fb2637) )
@@ -5710,6 +5762,7 @@ ROM_END
 
 /*
 The Dead or Alive set below is also known to have genuine Tecmo labels:
+
  PROJECT      PROJECT
   EPR-AK       EPR-AK
  ROM No.  &   ROM No.
@@ -5719,9 +5772,15 @@ The Dead or Alive set below is also known to have genuine Tecmo labels:
 
 Sega ID# 836-12884 DEAD OR ALIVE
 
+For all DOA sets, internal information in the 0x2800 to 0x2A00 range shows: TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00
+
+Like the Model 2B version with mislabeled ROMs, the above labels with the 97/1/10 date might indicate a currently
+ undumped set of EPR-19310A & EPR-19311A based on the Jan 10, 1997 revised code as shown for the DOA set below
+
 */
 ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884 DEAD OR ALIVE, ROM board ID# 838-12885, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	// internal information shows source files names and revision dates. In this case Dec  4 1996
 	ROM_LOAD32_WORD("epr-19310a.12", 0x000000, 0x080000, CRC(06486f7a) SHA1(b3e14103570e5f45aed16e1c158e469bc85002ae) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19311a.13", 0x000002, 0x080000, CRC(1be62912) SHA1(dcc2df8e28e1a107867f74248e6ffcac83afe7c0) )
 
@@ -5763,8 +5822,53 @@ ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( doaab ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884-02 DEAD OR ALIVE, ROM board ID# 838-12885-02, 837-12880 security board */
+ROM_START( doaab ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884 DEAD OR ALIVE, ROM board ID# 838-12885, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	// internal information shows source files names and revision dates. In this case Nov  3 1996
+	ROM_LOAD32_WORD("epr-19310.12", 0x000000, 0x080000, CRC(3c571e75) SHA1(63371275b7cc4889b4f43d3ae27a55728bb2e89d) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
+	ROM_LOAD32_WORD("epr-19311.13", 0x000002, 0x080000, CRC(8818363d) SHA1(c10e07d4d90d5b975056f53bd5284de8cabd136a) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-19318.10",  0x0000000, 0x400000, CRC(ab431bfe) SHA1(45b5ccf67c91014daf6bf3c4bd8ec372b246e404) )
+	ROM_LOAD32_WORD("mpr-19319.11",  0x0000002, 0x400000, CRC(c5cb694d) SHA1(448b45d30cc7a71395a49a2c5789989fd7b7b4e7) )
+	ROM_LOAD32_WORD("mpr-19316.8",   0x0800000, 0x400000, CRC(2d2d1b1a) SHA1(77ce5d8aa98bdbc97ae08a452f584b30d8885cfc) )
+	ROM_LOAD32_WORD("mpr-19317.9",   0x0800002, 0x400000, CRC(96b17bcf) SHA1(3aa9d2f8afad74b5626ce2cf2d7a86aef8cac80b) )
+	ROM_LOAD32_WORD("mpr-19314.6",   0x1000000, 0x400000, CRC(a8d963fb) SHA1(6a1680d6380321279b0d701e4b47d4ae712f3b72) )
+	ROM_LOAD32_WORD("mpr-19315.7",   0x1000002, 0x400000, CRC(90ae5682) SHA1(ec56df14f0847daf9bd0435f785a8946c94d2988) )
+	ROM_LOAD32_WORD("mpr-19312.4",   0x1800000, 0x200000, CRC(1dcedb10) SHA1(a60fb9e7c0731004d0f0ff28c4cde272b21dd658) )
+	ROM_LOAD32_WORD("mpr-19313.5",   0x1800002, 0x200000, CRC(8c63055e) SHA1(9f375b3f4a8884163ffcf364989499f2cd21e18b) )
+	ROM_COPY("main_data", 0x1800000, 0x1c00000, 0x400000 )
+
+	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
+
+	ROM_REGION( 0x2000000, "polygons", ROMREGION_ERASEFF ) // Models
+	ROM_LOAD32_WORD("mpr-19322.16",  0x0000000, 0x400000, CRC(d0e6ecf0) SHA1(1b87f6337b4286fd738856da899462e7baa92601) )
+	ROM_LOAD32_WORD("mpr-19325.20",  0x0000002, 0x400000, CRC(7cbe432d) SHA1(8b31e292160b88df9c77b36096914d09ab8b6086) )
+	ROM_LOAD32_WORD("mpr-19323.17",  0x0800000, 0x400000, CRC(453d3f4a) SHA1(8c0530824bb8ecb007021ee6e93412597bb0ecd6) )
+	ROM_LOAD32_WORD("mpr-19326.21",  0x0800002, 0x400000, CRC(b976da02) SHA1(a154eb128604aac9e35438d8811971133eab94a1) )
+	ROM_LOAD32_WORD("mpr-19324.18",  0x1000000, 0x400000, CRC(0d6bf454) SHA1(4cf48f19128d728c4ec7e9ec7014223a6c0f2362) )
+	ROM_LOAD32_WORD("mpr-19327.22",  0x1000002, 0x400000, CRC(6a75634c) SHA1(8ed74c7afd95fc7a4df0f01a47479b6f44e3073c) )
+
+	ROM_REGION( 0x800000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-19321.25", 0x000000, 0x400000, CRC(9c49e845) SHA1(344839640d9814263fa5ed00c2043cd6f18d5cb2) )
+	ROM_LOAD32_WORD("mpr-19320.24", 0x000002, 0x400000, CRC(190c017f) SHA1(4c3250b9abe39fc5c8fd0fcdb5fb7ea131434516) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
+	ROM_LOAD16_WORD_SWAP("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
+	ROM_LOAD16_WORD_SWAP("mpr-19331.36", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19332.37", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
+ROM_END
+
+ROM_START( doaae ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 836-12884-02 DEAD OR ALIVE, ROM board ID# 838-12885-02, 837-12880 security board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	// internal information shows source files names and revision dates. In this case Nov  3 1996
 	ROM_LOAD32_WORD("epr-19383a.12", 0x000000, 0x080000, CRC(42e61481) SHA1(ecee88b17d60924c63d01ff72acb186350265e0a) ) // Game Mode Settings : Nation : defaults to Export and can't be changed in test mode
 	ROM_LOAD32_WORD("epr-19384a.13", 0x000002, 0x080000, CRC(034a3ab9) SHA1(a01d2f0a4accfdf892228b65c25e2ad9144ecf59) )
 
@@ -5809,6 +5913,7 @@ ROM_END
 ROM_START( doa ) /* Dead or Alive Jan 10 1997, probably Revision C, Model 2B, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	// ROMs have hand written labels - "EPR-19379B / EPR-19380B, 96/12/6", probably was reused and reprogrammed to newer revision
+	// internal information shows source files names and revision dates. In this case Jan 10 1997
 	ROM_LOAD32_WORD("epr-19379c.15", 0x000000, 0x080000, CRC(5cc62fbe) SHA1(a1489b92f32bcd16cca10017975beb62fc27a060) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19380c.16", 0x000002, 0x080000, CRC(58cfeaa9) SHA1(4319c22b8ebcff152676b62b5b1d4c1c7ce64fa6) )
 
@@ -5838,17 +5943,30 @@ ROM_START( doa ) /* Dead or Alive Jan 10 1997, probably Revision C, Model 2B, 83
 	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
+	ROM_LOAD16_WORD_SWAP("epr-19328.31", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
-	ROM_LOAD16_WORD_SWAP("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
-	ROM_LOAD16_WORD_SWAP("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
-	ROM_LOAD16_WORD_SWAP("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
-	ROM_LOAD16_WORD_SWAP("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
+	ROM_LOAD16_WORD_SWAP("mpr-19329.32", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
+	ROM_LOAD16_WORD_SWAP("mpr-19330.33", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
+	ROM_LOAD16_WORD_SWAP("mpr-19331.34", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19332.35", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
 ROM_END
 
+
+/*
+The Dead or Alive set below is also known to have genuine Tecmo labels:
+
+ PROJECT      PROJECT
+  EPR-AK       EPR-AK
+ ROM No.  &   ROM No.
+  19379B       19380B
+ DATE         DATE
+  96/12/6      96/12/6
+
+*/
 ROM_START( doab ) /* Dead or Alive Dec 6 1996, Revision B, Model 2B, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	// internal information shows source files names and revision dates. In this case Dec  4 1996
 	ROM_LOAD32_WORD("epr-19379b.15", 0x000000, 0x080000, CRC(8a10a944) SHA1(c675a344f74d0118907fb5292495883c0c30c719) ) // Game Mode Settings : Nation : defaults to Japan, can select Japan, U.S.A. & Export
 	ROM_LOAD32_WORD("epr-19380b.16", 0x000002, 0x080000, CRC(766c1ec8) SHA1(49250886f66db9fd37d88bc22c8f22046f74f043) )
 
@@ -5878,13 +5996,13 @@ ROM_START( doab ) /* Dead or Alive Dec 6 1996, Revision B, Model 2B, 837-12880 s
 	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
+	ROM_LOAD16_WORD_SWAP("epr-19328.31", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
-	ROM_LOAD16_WORD_SWAP("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
-	ROM_LOAD16_WORD_SWAP("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
-	ROM_LOAD16_WORD_SWAP("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
-	ROM_LOAD16_WORD_SWAP("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
+	ROM_LOAD16_WORD_SWAP("mpr-19329.32", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
+	ROM_LOAD16_WORD_SWAP("mpr-19330.33", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
+	ROM_LOAD16_WORD_SWAP("mpr-19331.34", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19332.35", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
 ROM_END
 
 ROM_START( sgt24h ) /* Super GT 24h, Model 2B */
@@ -7196,7 +7314,8 @@ GAME( 1995, srallycdxa, srallyc,  srallyc,      srallyc,   model2a_state, empty_
 GAME( 1995, vcop2,      0,        vcop2,        vcop2,     model2a_state, empty_init,    ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, skytargt,   0,        skytargt,     skytargt,  model2a_state, empty_init,    ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doaa,       doa,      model2a_0229, doa,       model2a_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Dec  4 1996, defaults to Japan but can be changed in test mode
-GAME( 1996, doaab,      doa,      model2a_0229, doa,       model2a_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Export, Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Nov  3 1996, fixed on Export
+GAME( 1996, doaab,      doa,      model2a_0229, doa,       model2a_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Nov  3 1996, defaults to Japan but can be changed in test mode
+GAME( 1996, doaae,      doa,      model2a_0229, doa,       model2a_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Export, Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Nov  3 1996, locked to Export
 GAME( 1997, zeroguna,   zerogun,  zeroguna,     zerogun,   model2a_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunaj,  zerogun,  zeroguna,     zerogun,   model2a_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,   0,        manxtt,       motoraid,  model2a_state, empty_init,    ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -7248,7 +7367,8 @@ GAME( 1996, stccb,      stcc,     stcc,         indy500,   model2c_state, empty_
 GAME( 1996, stcca,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, waverunr,   0,        waverunr,     waverunr,  model2c_state, empty_init,    ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,        0,        bel,          bel,       model2c_state, empty_init,    ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hotd,       0,        hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotd,       0,        hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotdo,      hotd,     hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotdp,      hotd,     hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead (prototype)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,    0,        overrev2c,    overrev,   model2c_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rascot2,    0,        model2c,      model2crx, model2c_state, empty_init,    ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

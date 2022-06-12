@@ -13,71 +13,66 @@ midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const 
 {
 }
 
-void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midi_keyboard_device::scan_keyboard)
 {
-	if(!id)
+	const int keyboard_notes[24] =
 	{
-		const int keyboard_notes[24] =
-		{
-			0x3c,   // C1
-			0x3d,   // C1#
-			0x3e,   // D1
-			0x3f,   // D1#
-			0x40,   // E1
-			0x41,   // F1
-			0x42,   // F1#
-			0x43,   // G1
-			0x44,   // G1#
-			0x45,   // A1
-			0x46,   // A1#
-			0x47,   // B1
-			0x48,   // C2
-			0x49,   // C2#
-			0x4a,   // D2
-			0x4b,   // D2#
-			0x4c,   // E2
-			0x4d,   // F2
-			0x4e,   // F2#
-			0x4f,   // G2
-			0x50,   // G2#
-			0x51,   // A2
-			0x52,   // A2#
-			0x53,   // B2
-		};
+		0x3c,   // C1
+		0x3d,   // C1#
+		0x3e,   // D1
+		0x3f,   // D1#
+		0x40,   // E1
+		0x41,   // F1
+		0x42,   // F1#
+		0x43,   // G1
+		0x44,   // G1#
+		0x45,   // A1
+		0x46,   // A1#
+		0x47,   // B1
+		0x48,   // C2
+		0x49,   // C2#
+		0x4a,   // D2
+		0x4b,   // D2#
+		0x4c,   // E2
+		0x4d,   // F2
+		0x4e,   // F2#
+		0x4f,   // G2
+		0x50,   // G2#
+		0x51,   // A2
+		0x52,   // A2#
+		0x53,   // B2
+	};
 
-		int i;
-
-		uint32_t kbstate = m_keyboard->read();
-		if(kbstate != m_keyboard_state)
+	uint32_t kbstate = m_keyboard->read();
+	if (kbstate != m_keyboard_state)
+	{
+		for (int i = 0; i < 24; i++)
 		{
-			for (i=0; i < 24; i++)
+			int kbnote = keyboard_notes[i];
+
+			if ((m_keyboard_state & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
 			{
-				int kbnote = keyboard_notes[i];
-
-				if ((m_keyboard_state & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
-				{
-					// key was on, now off -> send Note Off message
-					push_tx(0x80);
-					push_tx(kbnote);
-					push_tx(0x7f);
-				}
-				else if ((m_keyboard_state & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
-				{
-					// key was off, now on -> send Note On message
-					push_tx(0x90);
-					push_tx(kbnote);
-					push_tx(0x7f);
-				}
+				// key was on, now off -> send Note Off message
+				push_tx(0x80);
+				push_tx(kbnote);
+				push_tx(0x7f);
+			}
+			else if ((m_keyboard_state & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
+			{
+				// key was off, now on -> send Note On message
+				push_tx(0x90);
+				push_tx(kbnote);
+				push_tx(0x7f);
 			}
 		}
-		else
-			// no messages, send Active Sense message instead
-			push_tx(0xfe);
-
-		m_keyboard_state = kbstate;
-		if(is_transmit_register_empty())
-			tra_complete();
 	}
+	else
+		// no messages, send Active Sense message instead
+		push_tx(0xfe);
+
+	m_keyboard_state = kbstate;
+	if (is_transmit_register_empty())
+		tra_complete();
 }
 
 void midi_keyboard_device::device_start()
@@ -86,7 +81,7 @@ void midi_keyboard_device::device_start()
 	set_tra_rate(clock());
 	m_out_tx_func.resolve_safe();
 	m_head = m_tail = 0;
-	m_keyboard_timer = timer_alloc();
+	m_keyboard_timer = timer_alloc(FUNC(midi_keyboard_device::scan_keyboard), this);
 	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
@@ -97,7 +92,7 @@ void midi_keyboard_device::tra_callback()
 
 void midi_keyboard_device::tra_complete()
 {
-	if(m_head != m_tail)
+	if (m_head != m_tail)
 	{
 		transmit_register_setup(m_buffer[m_tail]);
 		++m_tail %= 16;

@@ -83,7 +83,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sample_tick);
 
 private:
 	int m_lastvalue;
@@ -509,7 +510,7 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pcxt_state::sample_tick)
 {
 	m_cvsd->digit_w(BIT(m_samples->as_u8(m_vaddr), m_bit));
 	m_cvsd->clock_w(1);
@@ -526,7 +527,7 @@ void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 
 void pcxt_state::machine_start()
 {
-	m_sample = timer_alloc();
+	m_sample = timer_alloc(FUNC(pcxt_state::sample_tick), this);
 
 	m_status = 0;
 	m_clr_status = 0;

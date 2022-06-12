@@ -56,11 +56,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	int m_scrollx = 0;
 	int m_scrolly = 0;
 	int m_blitter_destx = 0;
@@ -116,5 +111,5 @@ private:
 	void triplew1_map(address_map &map);
 	void triplew2_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };

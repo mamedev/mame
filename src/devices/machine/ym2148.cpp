@@ -45,7 +45,7 @@ void ym2148_device::device_start()
 
 	// Start a timer to trigger at clock / 8 / 16
 	const attotime rate = clocks_to_attotime(8 * 16);
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(ym2148_device::serial_clock_tick), this);
 	m_timer->adjust(rate, 0, rate);
 }
 
@@ -136,7 +136,7 @@ void ym2148_device::update_irq()
 }
 
 
-void ym2148_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ym2148_device::serial_clock_tick)
 {
 	receive_clock();
 	transmit_clock();

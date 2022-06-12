@@ -174,7 +174,7 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 	uint8_t       m_rev;
-	offs_t      m_polling_offset;
+	offs_t        m_polling_offset;
 	uint32_t      m_polling_count;
 	/* sound output */
 	uint8_t       m_channels;
@@ -213,12 +213,15 @@ protected:
 	uint8_t       m_last_output_full;
 	uint8_t       m_last_input_empty;
 	uint16_t      m_progflags;
+	emu_timer *   m_s1_ack_timer;
+	emu_timer *   m_s1_ack2_timer;
+	emu_timer *   m_s2_ack_timer;
 
 	write_line_delegate m_output_full_cb;
 	write_line_delegate m_input_empty_cb;
 
-	read16smo_delegate m_fifo_data_r;
-	read16mo_delegate m_fifo_status_r;
+	read16smo_delegate  m_fifo_data_r;
+	read16mo_delegate   m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 
 	/* timers */

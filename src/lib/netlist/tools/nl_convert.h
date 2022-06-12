@@ -20,13 +20,10 @@
 //  convert - convert a spice netlist
 // -------------------------------------------------
 
-namespace netlist
+namespace netlist::convert
 {
 
-namespace convert
-{
-
-using arena = plib::aligned_arena;
+using arena = plib::aligned_arena<>;
 
 class nl_convert_base_t
 {
@@ -75,7 +72,7 @@ protected:
 
 	struct replace_t
 	{
-		pstring m_ce; // controlling element - must be twoterm
+		pstring m_ce; // controlling element - must be a two terminal element
 		pstring m_repterm; // replace with terminal
 		pstring m_net; // connect to net
 	};
@@ -182,7 +179,7 @@ private:
 	std::unordered_map<pstring, arena::unique_ptr<pin_alias_t>> m_pins;
 
 	std::vector<unit_t> m_units;
-	pstring m_numberchars;
+	pstring m_number_chars;
 
 	std::unordered_map<pstring, str_list> dev_map;
 
@@ -213,13 +210,13 @@ public:
 
 	nl_convert_eagle_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
+	class tokenizer : public plib::tokenizer_t, public plib::token_reader_t
 	{
 	public:
-		using token_t = ptokenizer::token_t;
-		using token_type = ptokenizer::token_type;
-		using token_id_t = ptokenizer::token_id_t;
-		using token_store = ptokenizer::token_store;
+		using token_t = tokenizer_t::token_t;
+		using token_type = tokenizer_t::token_type;
+		using token_id_t = tokenizer_t::token_id_t;
+		using token_store = tokenizer_t::token_store_t;
 
 		tokenizer(nl_convert_eagle_t &convert);
 
@@ -250,13 +247,13 @@ public:
 
 	nl_convert_rinf_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
+	class tokenizer : public plib::tokenizer_t, public plib::token_reader_t
 	{
 	public:
-		using token_t = ptokenizer::token_t;
-		using token_type = ptokenizer::token_type;
-		using token_id_t = ptokenizer::token_id_t;
-		using token_store = ptokenizer::token_store;
+		using token_t = tokenizer_t::token_t;
+		using token_type = tokenizer_t::token_type;
+		using token_id_t = tokenizer_t::token_id_t;
+		using token_store = tokenizer_t::token_store_t;
 		tokenizer(nl_convert_rinf_t &convert);
 
 		token_id_t m_tok_HEA; // NOLINT
@@ -285,7 +282,6 @@ private:
 
 };
 
-} // namespace convert
-} // namespace netlist
+} // namespace netlist::convert
 
 #endif // NL_CONVERT_H_

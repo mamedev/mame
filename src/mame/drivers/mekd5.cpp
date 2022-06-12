@@ -113,12 +113,14 @@ public:
 	{ }
 
 	void mekd5(machine_config &config);
-	void init_mekd5();
 
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	DECLARE_WRITE_LINE_MEMBER(trace_timer_clear_w);
 
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
@@ -139,11 +141,12 @@ private:
 
 	bool keypad_key_pressed();
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(trace_tick);
+
+	emu_timer *m_trace_timer = nullptr;
 	uint8_t m_segment;
 	uint8_t m_digit;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_kpd_pia;
 	required_device<pia6821_device> m_user_pia;
@@ -240,21 +243,14 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mekd5_state::trace_tick)
 {
-	switch (id)
-	{
-	case TIMER_TRACE:
-		// CB2 is programmed to trigger on the falling edge, so after
-		// a count of 16. CB2 input comes from a counter, so the duty
-		// cycle should be 50/50, but it makes no difference to rise
-		// and fall here.
-		m_kpd_pia->cb2_w(1);
-		m_kpd_pia->cb2_w(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mekd5_state::device_timer");
-	}
+	// CB2 is programmed to trigger on the falling edge, so after
+	// a count of 16. CB2 input comes from a counter, so the duty
+	// cycle should be 50/50, but it makes no difference to rise
+	// and fall here.
+	m_kpd_pia->cb2_w(1);
+	m_kpd_pia->cb2_w(0);
 }
 
 
@@ -267,7 +263,7 @@ WRITE_LINE_MEMBER(mekd5_state::trace_timer_clear_w)
 	if (state)
 		m_kpd_pia->cb2_w(0);
 	else
-		timer_set(attotime::from_ticks(21, XTAL_MEKD5 / 4), TIMER_TRACE);
+		m_trace_timer->adjust(attotime::from_ticks(21, XTAL_MEKD5 / 4));
 }
 
 /***********************************************************
@@ -417,14 +413,12 @@ WRITE_LINE_MEMBER(mekd5_state::write_f13_clock)
 
 ************************************************************/
 
-void mekd5_state::init_mekd5()
-{
-}
-
 void mekd5_state::machine_start()
 {
 	save_item(NAME(m_segment));
 	save_item(NAME(m_digit));
+
+	m_trace_timer = timer_alloc(FUNC(mekd5_state::trace_tick), this);
 }
 
 void mekd5_state::machine_reset()
@@ -526,4 +520,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1980, mekd5,  0,      0,      mekd5,    mekd5, mekd5_state, init_mekd5, "Motorola", "MEK6802D5" , MACHINE_NO_SOUND )
+COMP( 1980, mekd5,  0,      0,      mekd5,    mekd5, mekd5_state, empty_init, "Motorola", "MEK6802D5" , MACHINE_NO_SOUND )

@@ -112,10 +112,6 @@ void k573kara_device::device_add_mconfig(machine_config &config)
 	duart_chan0.out_rts_callback().set("rs232_chan0", FUNC(rs232_port_device::write_rts));
 }
 
-void k573kara_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-}
-
 uint16_t k573kara_device::io_r()
 {
 	// Stage platforms can be connected through the RJ45 ports and the data returned through here.

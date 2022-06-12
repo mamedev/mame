@@ -35,7 +35,7 @@ void acan_sound_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
 	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(acan_sound_device::channel_irq), this);
 
 	m_timer_irq_handler.resolve_safe();
 	m_dma_irq_handler.resolve_safe();
@@ -71,7 +71,7 @@ void acan_sound_device::device_reset()
 	m_dma_irq_handler(0);
 }
 
-void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(acan_sound_device::channel_irq)
 {
 	if (m_regs[0x14] & 0x40)
 	{

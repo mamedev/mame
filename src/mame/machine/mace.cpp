@@ -86,8 +86,8 @@ void mace_device::device_start()
 	save_item(NAME(m_ust_msc.m_vin2_msc_ust));
 	save_item(NAME(m_ust_msc.m_vout_msc_ust));
 
-	m_timer_ust = timer_alloc(TIMER_UST);
-	m_timer_msc = timer_alloc(TIMER_MSC);
+	m_timer_ust = timer_alloc(FUNC(mace_device::ust_tick), this);
+	m_timer_msc = timer_alloc(FUNC(mace_device::msc_tick), this);
 	m_timer_ust->adjust(attotime::never);
 	m_timer_msc->adjust(attotime::never);
 }
@@ -440,20 +440,19 @@ void mace_device::rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 //  TIMERS
 //**************************************************************************
 
-void mace_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mace_device::ust_tick)
 {
-	if (id == TIMER_UST)
-	{
-		m_ust_msc.m_ust++;
-		m_ust_msc.m_ust_msc &= 0x00000000ffffffffULL;
-		m_ust_msc.m_ust_msc |= (uint64_t)m_ust_msc.m_ust << 32;
-	}
-	else if (id == TIMER_MSC)
-	{
-		m_ust_msc.m_msc++;
-		m_ust_msc.m_ust_msc &= 0xffffffff00000000ULL;
-		m_ust_msc.m_ust_msc |= m_ust_msc.m_msc;
-	}
+	m_ust_msc.m_ust++;
+	m_ust_msc.m_ust_msc &= 0x00000000ffffffffULL;
+	m_ust_msc.m_ust_msc |= (uint64_t)m_ust_msc.m_ust << 32;
+	check_ust_msc_compare();
+}
+
+TIMER_CALLBACK_MEMBER(mace_device::msc_tick)
+{
+	m_ust_msc.m_msc++;
+	m_ust_msc.m_ust_msc &= 0xffffffff00000000ULL;
+	m_ust_msc.m_ust_msc |= m_ust_msc.m_msc;
 	check_ust_msc_compare();
 }
 

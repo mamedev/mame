@@ -384,12 +384,12 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 void seicross_state::no_nvram(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000) / 6);   // D780C, 3.072 MHz?
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);   // D780C, 3.072 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &seicross_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &seicross_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(seicross_state::vblank_irq));
 
-	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   // ???
+	NSC8105(config, m_mcu, 18.432_MHz_XTAL / 6);   // ???
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200)); // 20 CPU slices per frame, a high value to ensure proper synchronization of the CPUs
@@ -398,10 +398,7 @@ void seicross_state::no_nvram(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate - frames per second, vblank duration
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // verified from schematics
 	screen.set_screen_update(FUNC(seicross_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -411,7 +408,7 @@ void seicross_state::no_nvram(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18.432_MHz_XTAL / 12));
 	aysnd.port_b_read_callback().set(FUNC(seicross_state::portB_r));
 	aysnd.port_b_write_callback().set(FUNC(seicross_state::portB_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -427,20 +424,20 @@ void seicross_state::nvram(machine_config &config)
 	// Basic machine hardware
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_nvram_map);
 
-	NVRAM(config, "nvram").set_custom_handler(FUNC(seicross_state::nvram_init));
+	NVRAM(config, "nvram").set_custom_handler(FUNC(seicross_state::nvram_init)); // 5101 + battery
 }
 
 void seicross_state::friskytb(machine_config &config)
 {
 	nvram(config);
-	M6802(config.replace(), m_mcu, XTAL(18'432'000) / 6);   // presumed to be an HD46802P or compatible
+	M6802(config.replace(), m_mcu, 18.432_MHz_XTAL / 6);   // presumed to be an HD46802P or compatible
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_nvram_map);
 }
 
 void seicross_state::sectznt(machine_config &config)
 {
 	no_nvram(config);
-	M6802(config.replace(), m_mcu, XTAL(18'432'000) / 6);   // actually HD46802P
+	M6802(config.replace(), m_mcu, 18.432_MHz_XTAL / 6);   // actually HD46802P
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 }
 

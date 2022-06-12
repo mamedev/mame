@@ -10,27 +10,23 @@
  */
 
 // FIXME: convert to device_rtc_interface and remove time.h
-// FIXME: convert logging to use logmacro.h
 
 #include "emu.h"
 #include "machine/ds1994.h"
 
 #include <ctime>
 
-#define VERBOSE_LEVEL 0
+#define LOG_ERRORS          (1U << 1)
+#define LOG_1WIRE           (1U << 2)
+#define LOG_ROM_COMMANDS    (1U << 3)
+#define LOG_COMMANDS        (1U << 4)
+#define LOG_STATES          (1U << 5)
+#define LOG_RESETS          (1U << 6)
+#define LOG_WRITES          (1U << 7)
+#define LOG_READS           (1U << 8)
 
-inline void ds1994_device::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		logerror("ds1994 %s: %s", machine().describe_context(), buf);
-	}
-}
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(DS1994, ds1994_device, "ds1994", "DS1994 iButton 4Kb Memory Plus Time")
@@ -115,9 +111,9 @@ void ds1994_device::device_start()
 	elem = STATE_IDLE;
 
 	// timers
-	m_timer_main  = timer_alloc(TIMER_MAIN);
-	m_timer_reset = timer_alloc(TIMER_RESET);
-	m_timer_clock = timer_alloc(TIMER_CLOCK);
+	m_timer_main  = timer_alloc(FUNC(ds1994_device::main_tick), this);
+	m_timer_reset = timer_alloc(FUNC(ds1994_device::reset_tick), this);
+	m_timer_clock = timer_alloc(FUNC(ds1994_device::clock_tick), this);
 
 	m_timer_clock->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
@@ -144,11 +140,11 @@ void ds1994_device::device_reset()
 			memcpy(m_regs, region->base() + ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE, REGS_SIZE);
 			return;
 		}
-		verboselog(0, "ds1994 %s: Wrong region length for data, expected 0x%x, got 0x%x\n", tag(), ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE, region->bytes());
+		LOGMASKED(LOG_ERRORS, "ds1994 %s: Wrong region length for data, expected 0x%x, got 0x%x\n", tag(), ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE, region->bytes());
 	}
 	else
 	{
-		verboselog(0, "ds1994 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
+		LOGMASKED(LOG_ERRORS, "ds1994 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
 		memset(m_rom,  0, ROM_SIZE);
 		memset(m_ram,  0, SPD_SIZE);
 		memset(m_sram, 0, DATA_SIZE);
@@ -168,11 +164,11 @@ bool ds1994_device::one_wire_tx_bit(uint8_t value)
 	if (!m_bit)
 	{
 		m_shift = value;
-		verboselog(1, "one_wire_tx_bit: Byte to send %02x\n", m_shift);
+		LOGMASKED(LOG_1WIRE, "one_wire_tx_bit: Byte to send %02x\n", m_shift);
 	}
 	m_tx = m_shift & 1;
 	m_shift >>= 1;
-	verboselog(1, "one_wire_tx_bit: State %d\n", m_tx);
+	LOGMASKED(LOG_1WIRE, "one_wire_tx_bit: State %d\n", m_tx);
 	m_bit++;
 	if (m_bit == 8) return true;
 	else
@@ -186,11 +182,11 @@ bool ds1994_device::one_wire_rx_bit(void)
 	{
 		m_shift |= 0x80;
 	}
-	verboselog(1, "one_wire_rx_bit: State %d\n", m_rx);
+	LOGMASKED(LOG_1WIRE, "one_wire_rx_bit: State %d\n", m_rx);
 	m_bit++;
 	if (m_bit == 8)
 	{
-		verboselog(1, "one_wire_rx_bit: Byte Received %02x\n", m_shift);
+		LOGMASKED(LOG_1WIRE, "one_wire_rx_bit: Byte Received %02x\n", m_shift);
 		return true;
 	}
 	 else
@@ -203,29 +199,29 @@ bool ds1994_device::one_wire_rx_bit(void)
 /*                                          */
 /********************************************/
 
-void ds1994_device::ds1994_rom_cmd(void)
+void ds1994_device::handle_rom_cmd(void)
 {
-	verboselog(2, "timer_main state_rom_command\n");
+	LOGMASKED(LOG_ROM_COMMANDS, "rom_cmd\n");
 	if (one_wire_rx_bit())
 	{
 		switch (m_shift)
 		{
 			case ROMCMD_READROM:
-				verboselog(1, "timer_main rom_cmd readrom\n");
+				LOGMASKED(LOG_ROM_COMMANDS, "rom_cmd readrom\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_state[0] = STATE_READROM;
 				m_state_ptr = 0;
 				break;
 			case ROMCMD_SKIPROM:
-				verboselog(1, "timer_main rom_cmd skiprom\n");
+				LOGMASKED(LOG_ROM_COMMANDS, "rom_cmd skiprom\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_state[0] = STATE_COMMAND;
 				m_state_ptr = 0;
 				break;
 			case ROMCMD_MATCHROM:
-				verboselog(1, "timer_main rom_cmd matchrom\n");
+				LOGMASKED(LOG_ROM_COMMANDS, "rom_cmd matchrom\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_state[0] = STATE_MATCHROM;
@@ -233,11 +229,11 @@ void ds1994_device::ds1994_rom_cmd(void)
 				break;
 			case ROMCMD_SEARCHROM:
 			case ROMCMD_SEARCHINT:
-				verboselog(0, "timer_main rom_command not implemented %02x\n", m_shift);
+				LOGMASKED(LOG_ERRORS, "rom_command not implemented %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_COMMAND;
 				break;
 			default:
-				verboselog(0, "timer_main rom_command not found %02x\n", m_shift);
+				LOGMASKED(LOG_ERRORS, "rom_command not found %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_IDLE;
 				break;
 		}
@@ -250,15 +246,15 @@ void ds1994_device::ds1994_rom_cmd(void)
 /*                                          */
 /********************************************/
 
-void ds1994_device::ds1994_cmd(void)
+void ds1994_device::handle_cmd(void)
 {
-	verboselog(2, "timer_main state_command\n");
+	LOGMASKED(LOG_COMMANDS, "state_command\n");
 	if (one_wire_rx_bit())
 	{
 		switch (m_shift)
 		{
 			case COMMAND_READ_MEMORY:
-				verboselog(1, "timer_main cmd read_memory\n");
+				LOGMASKED(LOG_COMMANDS, "cmd read_memory\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_state[0] = STATE_ADDRESS1;
@@ -268,7 +264,7 @@ void ds1994_device::ds1994_cmd(void)
 				m_state_ptr = 0;
 				break;
 			case COMMAND_WRITE_SCRATCHPAD:
-				verboselog(1, "timer_main cmd write_scratchpad\n");
+				LOGMASKED(LOG_COMMANDS, "cmd write_scratchpad\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_offs_ro = false;
@@ -279,7 +275,7 @@ void ds1994_device::ds1994_cmd(void)
 				m_state_ptr = 0;
 				break;
 			case COMMAND_READ_SCRATCHPAD:
-				verboselog(1, "timer_main cmd read_scratchpad\n");
+				LOGMASKED(LOG_COMMANDS, "cmd read_scratchpad\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_state[0] = STATE_TXADDRESS1;
@@ -290,7 +286,7 @@ void ds1994_device::ds1994_cmd(void)
 				m_state_ptr = 0;
 				break;
 			case COMMAND_COPY_SCRATCHPAD:
-				verboselog(1, "timer_main cmd copy_scratchpad\n");
+				LOGMASKED(LOG_COMMANDS, "cmd copy_scratchpad\n");
 				m_bit = 0;
 				m_byte = 0;
 				m_offs_ro = true;
@@ -303,7 +299,7 @@ void ds1994_device::ds1994_cmd(void)
 				m_state_ptr = 0;
 				break;
 			default:
-				verboselog(0, "timer_main command not handled %02x\n", m_shift);
+				LOGMASKED(LOG_COMMANDS, "command not handled %02x\n", m_shift);
 				m_state[m_state_ptr] = STATE_IDLE;
 				break;
 		}
@@ -316,7 +312,7 @@ void ds1994_device::ds1994_cmd(void)
 /*                                          */
 /********************************************/
 
-uint8_t ds1994_device::ds1994_readmem()
+uint8_t ds1994_device::readmem()
 {
 	if (m_address < 0x200)
 	{
@@ -332,7 +328,7 @@ uint8_t ds1994_device::ds1994_readmem()
 	return 0;
 }
 
-void ds1994_device::ds1994_writemem(uint8_t value)
+void ds1994_device::writemem(uint8_t value)
 {
 	if (m_address < 0x200)
 	{
@@ -353,231 +349,232 @@ void ds1994_device::ds1994_writemem(uint8_t value)
 /*                                               */
 /*************************************************/
 
-void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ds1994_device::main_tick)
 {
-	switch (id)
+	switch (m_state[m_state_ptr])
 	{
-		case TIMER_CLOCK:
-			for (auto & elem : m_rtc)
+		case STATE_RESET1:
+			LOGMASKED(LOG_STATES, "timer_main state_reset1 %d\n", m_rx);
+			m_tx = false;
+			m_state[m_state_ptr] = STATE_RESET2;
+			m_timer_main->adjust(t_pdl);
+			break;
+		case STATE_RESET2:
+			LOGMASKED(LOG_STATES, "timer_main state_reset2 %d\n", m_rx);
+			m_tx = true;
+			m_bit = 0;
+			m_shift = 0;
+			m_state[m_state_ptr] = STATE_ROMCMD;
+			break;
+		case STATE_ROMCMD:
+			handle_rom_cmd();
+			break;
+		case STATE_COMMAND:
+			handle_cmd();
+			break;
+		case STATE_MATCHROM:
+			LOGMASKED(LOG_STATES, "timer_main state_matchrom - Data to match: <- %d\n", m_rx);
+			if (one_wire_rx_bit())
 			{
-				elem++;
-				if (elem != 0)
+				if (m_rom[7- m_byte] == m_shift)
 				{
-					break;
+					m_byte++;
+					m_bit = 0;
+					LOGMASKED(LOG_STATES, "timer_main state_matchrom: datamatch %x - byte=%d\n", m_shift, m_byte);
+				}
+				else
+				{
+					m_state[m_state_ptr] = STATE_IDLE;
+					LOGMASKED(LOG_STATES, "timer_main state_matchrom: no match rx=%x <> mem=%x - byte:%d\n", m_shift, m_rom[7 - m_byte], m_byte);
 				}
 			}
-			break;
-		case TIMER_RESET:
-			verboselog(1, "timer_reset\n");
-			m_state[m_state_ptr] = STATE_RESET;
-			m_timer_reset->adjust(attotime::never);
-			break;
-		case TIMER_MAIN:
-			switch (m_state[m_state_ptr])
+			if (m_byte == ROM_SIZE)
 			{
-				case STATE_RESET1:
-					verboselog(2, "timer_main state_reset1 %d\n", m_rx);
-					m_tx = false;
-					m_state[m_state_ptr] = STATE_RESET2;
-					m_timer_main->adjust(t_pdl);
-					break;
-				case STATE_RESET2:
-					verboselog(2, "timer_main state_reset2 %d\n", m_rx);
-					m_tx = true;
-					m_bit = 0;
-					m_shift = 0;
-					m_state[m_state_ptr] = STATE_ROMCMD;
-					break;
-				case STATE_ROMCMD:
-					ds1994_rom_cmd();
-					break;
-				case STATE_COMMAND:
-					ds1994_cmd();
-					break;
-				case STATE_MATCHROM:
-					verboselog(2, "timer_main state_matchrom - Data to match: <- %d\n", m_rx);
-					if (one_wire_rx_bit())
-					{
-						if (m_rom[7- m_byte] == m_shift)
-						{
-							m_byte++;
-							m_bit = 0;
-							verboselog(2, "timer_main state_matchrom: datamatch %x - byte=%d\n", m_shift, m_byte);
-						}
-						else
-						{
-							m_state[m_state_ptr] = STATE_IDLE;
-							verboselog(1, "timer_main state_matchrom: no match rx=%x <> mem=%x - byte:%d\n", m_shift, m_rom[7 - m_byte], m_byte);
-						}
-					}
-					if (m_byte == ROM_SIZE)
-					{
-						verboselog(2, "timer_main matchrom finished\n");
-						m_state[m_state_ptr] = STATE_COMMAND;
-					}
-					break;
-				case STATE_ADDRESS1:
-					verboselog(2, "timer_main state_address1\n");
-					if (one_wire_rx_bit())
-					{
-						m_bit = 0;
-						if (m_offs_ro)
-						{
-							if (m_a1 != m_shift) m_auth = false;
-							verboselog(1, "timer_main state_address1 - TA1=%02x  - Auth_Code 1=%02x\n", m_a1, m_shift);
-						}
-						else
-						{
-							m_a1 = m_shift & 0xff;
-							verboselog(2, "timer_main state_address1 - Address1=%02x\n", m_a1);
-						}
-						m_state_ptr++;
-					}
-					break;
-				case STATE_ADDRESS2:
-					verboselog(2, "timer_main state_address2\n");
-					if (one_wire_rx_bit())
-					{
-						m_bit = 0;
-						if (m_offs_ro)
-						{
-							if ( m_a2 != m_shift )
-								m_auth = false;
-							verboselog(1, "timer_main state_address1 - TA2=%02x  - Auth_Code 2=%02x\n", m_a1, m_shift);
-						}
-						else
-						{
-							m_a2 = m_shift & 0xff;
-							verboselog(2, "timer_main state_address2 - Address2=%02x\n", m_a2);
-						}
-						m_state_ptr++;
-					}
-					break;
-				case STATE_OFFSET:
-					verboselog(2, "timer_main state_offset\n");
-					if (one_wire_rx_bit())
-					{
-						m_bit = 0;
-						if (m_offs_ro)
-						{
-							if (m_a2 != m_shift)
-								m_auth = false;
-							verboselog(1, "timer_main state_address1 - OFS_ES=%02x  - Auth_Code 3=%02x\n", m_offset, m_shift);
-						}
-						else
-						{
-							m_offset = m_shift & 0x1f;
-							verboselog(2, "timer_main state_address2 - Offset=%02x\n", m_offset);
-						}
-						m_state_ptr++;
-					}
-					break;
-				case STATE_WRITE_SCRATCHPAD:
-					verboselog(2, "timer_main state_write_scratchpad\n");
-					if (one_wire_rx_bit())
-					{
-						m_bit = 0;
-						m_ram[m_offset & 0x1f] = m_shift & 0xff;
-						m_offset++;
-					}
-					verboselog(2, "timer_main state_write_scratchpad %d Offs=%02x\n", m_rx, m_offset);
-					break;
-				case STATE_READROM:
-					m_tx = true;
-					if (m_byte == ROM_SIZE)
-					{
-						verboselog(1, "timer_main readrom finished\n");
-						m_state[m_state_ptr] = STATE_COMMAND;
-					}
-					else
-						verboselog(2, "timer_main readrom window closed\n");
-					break;
-				case STATE_TXADDRESS1:
-					m_tx = true;
-					if (m_byte == 1)
-					{
-						verboselog(1, "timer_main txaddress1 finished  m_byte=%d\n", m_byte);
-						m_byte = 0;
-						m_state_ptr++;
-					}
-					else
-						verboselog(2, "timer_main txaddress1 window closed\n");
-					break;
-				case STATE_TXADDRESS2:
-					m_tx = true;
-					if (m_byte == 1)
-					{
-						verboselog(1, "timer_main txaddress2 finished m_byte=%d\n", m_byte);
-						m_byte = 0;
-						m_state_ptr++;
-					}
-					else
-						verboselog(2, "timer_main txaddress2 window closed\n");
-					break;
-				case STATE_TXOFFSET:
-					m_tx = true;
-					if (m_byte == 1)
-					{
-						verboselog(1, "timer_main txoffset finished  - m_byte=%d\n", m_byte);
-						m_byte = 0;
-						m_state_ptr++;
-					}
-					else
-						verboselog(2, "timer_main txoffset window closed\n");
-					break;
-				case STATE_READ_MEMORY:
-					verboselog(2, "timer_main state_readmemory\n");
-					break;
-				case STATE_COPY_SCRATCHPAD:
-					verboselog(2, "timer_main state_copy_scratchpad\n");
-					break;
-				case STATE_READ_SCRATCHPAD:
-					verboselog(2, "timer_main state_read_scratchpad\n");
-					break;
-				default:
-					verboselog(0, "timer_main state not handled: %d\n", m_state[m_state_ptr]);
-					break;
+				LOGMASKED(LOG_STATES, "timer_main matchrom finished\n");
+				m_state[m_state_ptr] = STATE_COMMAND;
 			}
-			if (m_state[m_state_ptr] == STATE_INIT_COMMAND)
+			break;
+		case STATE_ADDRESS1:
+			LOGMASKED(LOG_STATES, "timer_main state_address1\n");
+			if (one_wire_rx_bit())
 			{
-				switch (m_state[m_state_ptr + 1])
+				m_bit = 0;
+				if (m_offs_ro)
 				{
-					case STATE_IDLE:
-					case STATE_COMMAND:
-					case STATE_ADDRESS1:
-					case STATE_ADDRESS2:
-					case STATE_OFFSET:
-						break;
-					case STATE_READ_MEMORY:
-						verboselog(2, "timer_main (init_cmd) -> state_read_memory - set address\n");
-						m_address = (m_a2 << 8) | m_a1;
-						break;
-					case STATE_WRITE_SCRATCHPAD:
-						verboselog(2, "timer_main (init_cmd) -> state_write_scratchpad - set address\n");
-						m_offs_ro = false;
-						m_offset = 0;
-						break;
-					case STATE_READ_SCRATCHPAD:
-						verboselog(2, "timer_main (init_cmd) -> state_read_scratchpad - set address\n");
-						m_address = 0;
-						break;
-					case STATE_COPY_SCRATCHPAD:
-						verboselog(2, "timer_main (init_cmd) -> state_copy_scratchpad - do copy\n");
-						if (m_auth)
-						{
-							m_address = (m_a2 << 8) | m_a1;
-							for (int i = 0; i <= m_offset; i++)
-							{
-								ds1994_writemem(m_ram[i]);
-								m_address++;
-							}
-						}
-						else
-							verboselog(1, "timer_main (init_cmd) -> state_copy_scratchpad - Auth-Rejected\n");
-						break;
+					if (m_a1 != m_shift) m_auth = false;
+					LOGMASKED(LOG_STATES, "timer_main state_address1 - TA1=%02x  - Auth_Code 1=%02x\n", m_a1, m_shift);
+				}
+				else
+				{
+					m_a1 = m_shift & 0xff;
+					LOGMASKED(LOG_STATES, "timer_main state_address1 - Address1=%02x\n", m_a1);
 				}
 				m_state_ptr++;
 			}
+			break;
+		case STATE_ADDRESS2:
+			LOGMASKED(LOG_STATES, "timer_main state_address2\n");
+			if (one_wire_rx_bit())
+			{
+				m_bit = 0;
+				if (m_offs_ro)
+				{
+					if ( m_a2 != m_shift )
+						m_auth = false;
+					LOGMASKED(LOG_STATES, "timer_main state_address1 - TA2=%02x  - Auth_Code 2=%02x\n", m_a1, m_shift);
+				}
+				else
+				{
+					m_a2 = m_shift & 0xff;
+					LOGMASKED(LOG_STATES, "timer_main state_address2 - Address2=%02x\n", m_a2);
+				}
+				m_state_ptr++;
+			}
+			break;
+		case STATE_OFFSET:
+			LOGMASKED(LOG_STATES, "timer_main state_offset\n");
+			if (one_wire_rx_bit())
+			{
+				m_bit = 0;
+				if (m_offs_ro)
+				{
+					if (m_a2 != m_shift)
+						m_auth = false;
+					LOGMASKED(LOG_STATES, "timer_main state_address1 - OFS_ES=%02x  - Auth_Code 3=%02x\n", m_offset, m_shift);
+				}
+				else
+				{
+					m_offset = m_shift & 0x1f;
+					LOGMASKED(LOG_STATES, "timer_main state_address2 - Offset=%02x\n", m_offset);
+				}
+				m_state_ptr++;
+			}
+			break;
+		case STATE_WRITE_SCRATCHPAD:
+			LOGMASKED(LOG_STATES, "timer_main state_write_scratchpad\n");
+			if (one_wire_rx_bit())
+			{
+				m_bit = 0;
+				m_ram[m_offset & 0x1f] = m_shift & 0xff;
+				m_offset++;
+			}
+			LOGMASKED(LOG_STATES, "timer_main state_write_scratchpad %d Offs=%02x\n", m_rx, m_offset);
+			break;
+		case STATE_READROM:
+			m_tx = true;
+			if (m_byte == ROM_SIZE)
+			{
+				LOGMASKED(LOG_STATES, "timer_main readrom finished\n");
+				m_state[m_state_ptr] = STATE_COMMAND;
+			}
+			else
+				LOGMASKED(LOG_STATES, "timer_main readrom window closed\n");
+			break;
+		case STATE_TXADDRESS1:
+			m_tx = true;
+			if (m_byte == 1)
+			{
+				LOGMASKED(LOG_STATES, "timer_main txaddress1 finished  m_byte=%d\n", m_byte);
+				m_byte = 0;
+				m_state_ptr++;
+			}
+			else
+				LOGMASKED(LOG_STATES, "timer_main txaddress1 window closed\n");
+			break;
+		case STATE_TXADDRESS2:
+			m_tx = true;
+			if (m_byte == 1)
+			{
+				LOGMASKED(LOG_STATES, "timer_main txaddress2 finished m_byte=%d\n", m_byte);
+				m_byte = 0;
+				m_state_ptr++;
+			}
+			else
+				LOGMASKED(LOG_STATES, "timer_main txaddress2 window closed\n");
+			break;
+		case STATE_TXOFFSET:
+			m_tx = true;
+			if (m_byte == 1)
+			{
+				LOGMASKED(LOG_STATES, "timer_main txoffset finished  - m_byte=%d\n", m_byte);
+				m_byte = 0;
+				m_state_ptr++;
+			}
+			else
+				LOGMASKED(LOG_STATES, "timer_main txoffset window closed\n");
+			break;
+		case STATE_READ_MEMORY:
+			LOGMASKED(LOG_STATES, "timer_main state_readmemory\n");
+			break;
+		case STATE_COPY_SCRATCHPAD:
+			LOGMASKED(LOG_STATES, "timer_main state_copy_scratchpad\n");
+			break;
+		case STATE_READ_SCRATCHPAD:
+			LOGMASKED(LOG_STATES, "timer_main state_read_scratchpad\n");
+			break;
+		default:
+			LOGMASKED(LOG_ERRORS, "timer_main state not handled: %d\n", m_state[m_state_ptr]);
+			break;
+	}
+
+	if (m_state[m_state_ptr] == STATE_INIT_COMMAND)
+	{
+		switch (m_state[m_state_ptr + 1])
+		{
+			case STATE_IDLE:
+			case STATE_COMMAND:
+			case STATE_ADDRESS1:
+			case STATE_ADDRESS2:
+			case STATE_OFFSET:
+				break;
+			case STATE_READ_MEMORY:
+				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_read_memory - set address\n");
+				m_address = (m_a2 << 8) | m_a1;
+				break;
+			case STATE_WRITE_SCRATCHPAD:
+				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_write_scratchpad - set address\n");
+				m_offs_ro = false;
+				m_offset = 0;
+				break;
+			case STATE_READ_SCRATCHPAD:
+				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_read_scratchpad - set address\n");
+				m_address = 0;
+				break;
+			case STATE_COPY_SCRATCHPAD:
+				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_copy_scratchpad - do copy\n");
+				if (m_auth)
+				{
+					m_address = (m_a2 << 8) | m_a1;
+					for (int i = 0; i <= m_offset; i++)
+					{
+						writemem(m_ram[i]);
+						m_address++;
+					}
+				}
+				else
+					LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_copy_scratchpad - Auth-Rejected\n");
+				break;
+		}
+		m_state_ptr++;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(ds1994_device::reset_tick)
+{
+	LOGMASKED(LOG_RESETS, "timer_reset\n");
+	m_state[m_state_ptr] = STATE_RESET;
+	m_timer_reset->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(ds1994_device::clock_tick)
+{
+	for (uint8_t &elem : m_rtc)
+	{
+		elem++;
+		if (elem != 0)
+		{
+			break;
+		}
 	}
 }
 
@@ -589,7 +586,7 @@ void ds1994_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 WRITE_LINE_MEMBER(ds1994_device::write)
 {
-	verboselog(1, "write(%d)\n", state);
+	LOGMASKED(LOG_WRITES, "write(%d)\n", state);
 	if (!state && m_rx)
 	{
 		switch (m_state[m_state_ptr])
@@ -598,27 +595,27 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 			case STATE_INIT_COMMAND:
 				break;
 			case STATE_ROMCMD:
-				verboselog(2, "state_romcommand\n");
+				LOGMASKED(LOG_WRITES, "state_romcommand\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_COMMAND:
-				verboselog(2, "state_command\n");
+				LOGMASKED(LOG_WRITES, "state_command\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_ADDRESS1:
-				verboselog(2, "state_address1\n");
+				LOGMASKED(LOG_WRITES, "state_address1\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_ADDRESS2:
-				verboselog(2, "state_address2\n");
+				LOGMASKED(LOG_WRITES, "state_address2\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_OFFSET:
-				verboselog(2, "state_offset\n");
+				LOGMASKED(LOG_WRITES, "state_offset\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_TXADDRESS1:
-				verboselog(2, "state_txaddress1\n");
+				LOGMASKED(LOG_WRITES, "state_txaddress1\n");
 				if (one_wire_tx_bit(m_a1))
 				{
 					m_bit = 0;
@@ -627,7 +624,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_TXADDRESS2:
-				verboselog(2, "state_txaddress2\n");
+				LOGMASKED(LOG_WRITES, "state_txaddress2\n");
 				if (one_wire_tx_bit(m_a2))
 				{
 					m_bit = 0;
@@ -636,7 +633,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_TXOFFSET:
-				verboselog(2, "state_txoffset\n");
+				LOGMASKED(LOG_WRITES, "state_txoffset\n");
 				if (one_wire_tx_bit(m_offset))
 				{
 					m_bit = 0;
@@ -645,7 +642,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_READROM:
-				verboselog(2, "state_readrom\n");
+				LOGMASKED(LOG_WRITES, "state_readrom\n");
 				if (one_wire_tx_bit(m_rom[7 - m_byte]))
 				{
 					m_bit = 0;
@@ -654,8 +651,8 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_READ_MEMORY:
-				verboselog(2, "state_read_memory\n");
-				if (one_wire_tx_bit(ds1994_readmem()))
+				LOGMASKED(LOG_WRITES, "state_read_memory\n");
+				if (one_wire_tx_bit(readmem()))
 				{
 					m_bit = 0;
 					if (m_address < DATA_SIZE + RTC_SIZE + REGS_SIZE)
@@ -666,29 +663,29 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_MATCHROM:
-				verboselog(2, "state_matchrom\n");
+				LOGMASKED(LOG_WRITES, "state_matchrom\n");
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_COPY_SCRATCHPAD:
 				if (m_auth)
 				{
-					verboselog(2, "state_copy_scratchpad Auth_Code Match: %d\n", m_tx);
+					LOGMASKED(LOG_WRITES, "state_copy_scratchpad Auth_Code Match: %d\n", m_tx);
 					m_tx = true;
 					m_auth = false;
 				}
 				else
 				{
 					m_tx = false;
-					verboselog(1, "state_copy_scratchpad Auth_Code No Match: %d\n", m_tx);
+					LOGMASKED(LOG_WRITES, "state_copy_scratchpad Auth_Code No Match: %d\n", m_tx);
 				}
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_WRITE_SCRATCHPAD:
-				verboselog(2, "state_write_scratchpad\n");
+				LOGMASKED(LOG_WRITES, "state_write_scratchpad\n");
 				m_timer_main->adjust(t_samp);
 				break;
 			case STATE_READ_SCRATCHPAD:
-				verboselog(2, "state_read_scratchpad\n");
+				LOGMASKED(LOG_WRITES, "state_read_scratchpad\n");
 				if (one_wire_tx_bit(m_ram[m_address]))
 				{
 					m_bit = 0;
@@ -700,7 +697,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 				m_timer_main->adjust(t_rdv);
 				break;
 			default:
-				verboselog(0, "state not handled: %d\n", m_state[m_state_ptr]);
+				LOGMASKED(LOG_ERRORS | LOG_WRITES, "state not handled: %d\n", m_state[m_state_ptr]);
 				break;
 		}
 		m_timer_reset->adjust(t_rstl);
@@ -728,7 +725,7 @@ WRITE_LINE_MEMBER(ds1994_device::write)
 
 READ_LINE_MEMBER(ds1994_device::read)
 {
-	verboselog(2, "read %d\n", m_tx && m_rx);
+	LOGMASKED(LOG_READS, "read %d\n", m_tx && m_rx);
 	return m_tx && m_rx;
 }
 

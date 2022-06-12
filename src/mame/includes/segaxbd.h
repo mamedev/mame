@@ -81,19 +81,13 @@ protected:
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
 
-	// timer IDs
-	enum
-	{
-		TID_SCANLINE,
-		TID_IRQ2_GEN
-	};
-
 	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device overrides
 //  virtual void machine_reset();
 	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	// internal helpers
 	void update_main_irqs();

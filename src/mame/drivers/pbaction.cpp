@@ -418,7 +418,7 @@ GFXDECODE_END
 
 void pbaction_state::machine_start()
 {
-	m_soundcommand_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pbaction_state::sound_trigger), this));
+	m_soundcommand_timer = timer_alloc(FUNC(pbaction_state::sound_trigger), this);
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_scroll));
 }
@@ -508,7 +508,7 @@ void pbaction_tecfri_state::machine_start()
 {
 	pbaction_state::machine_start();
 
-	m_subcommand_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pbaction_tecfri_state::sub_trigger), this));
+	m_subcommand_timer = timer_alloc(FUNC(pbaction_tecfri_state::sub_trigger), this);
 	m_digits.resolve();
 }
 

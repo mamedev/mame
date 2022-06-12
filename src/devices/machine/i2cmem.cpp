@@ -470,7 +470,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 							}
 							break;
 						}
-						
+
 						if( m_state != STATE_IDLE )
 						{
 							m_sdar = 0 ;

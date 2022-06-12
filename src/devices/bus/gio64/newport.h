@@ -311,7 +311,6 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -319,7 +318,7 @@ protected:
 	void device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision, uint32_t global_mask);
 	void mem_map(address_map &map) override;
 
-	static constexpr device_timer_id DCB_TIMEOUT = 0;
+	TIMER_CALLBACK_MEMBER(dcb_timeout_tick);
 
 	enum
 	{

@@ -7,8 +7,6 @@
 #include "http.h"
 #include "esqpanel.h"
 
-#define ESQPANEL_EXTERNAL_TIMER_ID 47000
-
 //**************************************************************************
 // External panel support
 //**************************************************************************
@@ -441,7 +439,7 @@ void esqpanel_device::device_start()
 			return write_contents(o);
 		});
 
-		m_external_timer = timer_alloc(ESQPANEL_EXTERNAL_TIMER_ID);
+		m_external_timer = timer_alloc(FUNC(esqpanel_device::check_external_panel_server), this);
 		m_external_timer->enable(false);
 	}
 }
@@ -482,14 +480,6 @@ void esqpanel_device::device_stop()
 
 	delete m_external_panel_server;
 	m_external_panel_server = nullptr;
-}
-
-void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if (ESQPANEL_EXTERNAL_TIMER_ID == id)
-	{
-		check_external_panel_server();
-	}
 }
 
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte
@@ -618,7 +608,7 @@ void esqpanel_device::xmit_char(uint8_t data)
 	}
 }
 
-void esqpanel_device::check_external_panel_server() {
+TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 	while (m_external_panel_server->has_commands())
 	{
 		std::string command = m_external_panel_server->get_next_command();

@@ -55,13 +55,25 @@ DEFINE_DEVICE_TYPE(TTL7474, ttl7474_device, "7474", "7474 TTL")
 //  ttl7474_device - constructor
 //-------------------------------------------------
 
-ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TTL7474, tag, owner, clock),
-		m_output_func(*this),
-		m_comp_output_func(*this)
+ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TTL7474, tag, owner, clock),
+	m_output_func(*this),
+	m_comp_output_func(*this)
 {
 	init();
 }
+
+
+//-------------------------------------------------
+//  device_resolve_objects - complete setup
+//-------------------------------------------------
+
+void ttl7474_device::device_resolve_objects()
+{
+	m_output_func.resolve_safe();
+	m_comp_output_func.resolve_safe();
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -78,9 +90,6 @@ void ttl7474_device::device_start()
 	save_item(NAME(m_last_clock));
 	save_item(NAME(m_last_output));
 	save_item(NAME(m_last_output_comp));
-
-	m_output_func.resolve_safe();
-	m_comp_output_func.resolve_safe();
 }
 
 
@@ -90,6 +99,7 @@ void ttl7474_device::device_start()
 
 void ttl7474_device::device_reset()
 {
+	// FIXME: remove this - many flipflops aren't connected to system reset
 	init();
 }
 
@@ -128,13 +138,13 @@ void ttl7474_device::update()
 	if (m_output != m_last_output)
 	{
 		m_last_output = m_output;
-		m_output_func(m_output!=0);
+		m_output_func(m_output != 0);
 	}
 	// call callback if any of the outputs changed
 	if (m_output_comp != m_last_output_comp)
 	{
 		m_last_output_comp = m_output_comp;
-		m_comp_output_func(m_output_comp!=0);
+		m_comp_output_func(m_output_comp != 0);
 	}
 }
 
@@ -210,6 +220,7 @@ void ttl7474_device::init()
 	m_d = 1;
 
 	m_output = -1;
+	m_output_comp = -1;
 	m_last_clock = 1;
 	m_last_output = -1;
 	m_last_output_comp = -1;

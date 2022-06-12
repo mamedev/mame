@@ -37,8 +37,8 @@ namespace plib {
 			using ret_type = R;
 			static ret_type per_second() noexcept
 			{
-				static ret_type persec = 0;
-				if (persec == 0)
+				static ret_type per_second = 0;
+				if (per_second == 0)
 				{
 					ret_type x = 0;
 					system_ticks::type t = system_ticks::start();
@@ -48,9 +48,9 @@ namespace plib {
 						e = system_ticks::stop();
 					} while (e - t < system_ticks::per_second() / 100 );
 					x += T :: stop();
-					persec = (ret_type)(double)((double) x * (double) system_ticks::per_second() / double (e - t));
+					per_second = (ret_type)(double)((double) x * (double) system_ticks::per_second() / double (e - t));
 				}
-				return persec;
+				return per_second;
 			}
 		};
 
@@ -110,7 +110,7 @@ namespace plib {
 		#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
 		//
 		// kills performance completely, but is accurate
-		// cpuid serializes, but clobbers ebx and ecx
+		// `cpuid` serializes, but clobbers ebx and ecx
 		//
 
 		struct exact_ticks : public base_ticks<exact_ticks, int64_t>
@@ -163,11 +163,11 @@ namespace plib {
 		template<bool enabled_>
 		struct counter
 		{
-			counter() : m_count(0) { }
+			constexpr counter() : m_count(0) { }
 			using type = uint_least64_t;
-			type operator()() const noexcept { return m_count; }
-			void inc() noexcept { ++m_count; }
-			void reset() noexcept { m_count = 0; }
+			constexpr type operator()() const noexcept { return m_count; }
+			constexpr void inc() noexcept { ++m_count; }
+			constexpr void reset() noexcept { m_count = 0; }
 			constexpr static bool enabled = enabled_;
 		private:
 			type m_count;
@@ -178,18 +178,18 @@ namespace plib {
 		{
 			using type = uint_least64_t;
 			constexpr type operator()() const noexcept { return 0; }
-			void inc() const noexcept { }
-			void reset() const noexcept { }
+			constexpr void inc() const noexcept { }
+			constexpr void reset() const noexcept { }
 			constexpr static bool enabled = false;
 		};
 
 
-		template< typename T, bool enabled_ = true>
+		template <typename T, bool enabled_ = true>
 		struct timer
 		{
 			using type = typename T::type;
 			using ctype = uint_least64_t;
-			constexpr static bool enabled = enabled_;
+			constexpr static const bool enabled = enabled_;
 
 			struct guard_t
 			{
@@ -210,7 +210,7 @@ namespace plib {
 
 			constexpr type operator()() const { return m_time; }
 
-			void reset() noexcept { m_time = 0; m_count = 0; }
+			constexpr void reset() noexcept { m_time = 0; m_count = 0; }
 			constexpr type average() const noexcept { return (m_count == 0) ? 0 : m_time / m_count; }
 			constexpr type total() const noexcept { return m_time; }
 			constexpr ctype count() const noexcept { return m_count; }
@@ -221,7 +221,6 @@ namespace plib {
 
 			constexpr guard_t guard() noexcept { return guard_t(*this); }
 
-			// pause must be followed by cont(inue)
 			void stop() noexcept { m_time += T::stop(); }
 			void start() noexcept { m_time -= T::start(); }
 
@@ -269,10 +268,10 @@ namespace plib {
 	//  Performance tracking
 	//============================================================
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperfcount_t = plib::chrono::counter<enabled_>;
 } // namespace plib
 

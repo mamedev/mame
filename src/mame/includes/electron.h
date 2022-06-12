@@ -63,14 +63,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 protected:
-	enum
-	{
-		TIMER_TAPE_HANDLER,
-		TIMER_SETUP_BEEP,
-		TIMER_SCANLINE_INTERRUPT
-	};
-
 	emu_timer *m_tape_timer = nullptr;
+	emu_timer *m_beep_timer = nullptr;
 	int m_map4[256]{};
 	int m_map16[256]{};
 	emu_timer *m_scanline_timer = nullptr;
@@ -105,8 +99,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irqs;

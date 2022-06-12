@@ -36,10 +36,15 @@ public:
 		, m_z80dart(*this, "z80dart")
 		, m_cassette(*this, "cassette")
 		, m_centronics(*this, "centronics")
+		, m_keyboard(*this, "ROW%u", 0U)
+		, m_joystick(*this, "JOY%u", 0U)
+		, m_joysticks(*this, "JOYSTICKS")
+		, m_reset(*this, "RESET")
+		, m_country(*this, "SWA")
 		, m_ram(*this, RAM_TAG)
-		, m_exp(*this, "exp")
+		, m_exp_int(*this, "exp_int")
+		, m_exp_ext(*this, "exp_ext")
 		, m_extrom(*this, "extrom")
-		, m_rompak(*this, "rompak")
 		, m_rammap_bank1(*this, "rammap_bank1")
 		, m_rammap_bank2(*this, "rammap_bank2")
 		, m_rammap_bank3(*this, "rammap_bank3")
@@ -51,6 +56,8 @@ public:
 	void rs128(machine_config &config);
 	void mtx500(machine_config &config);
 	void mtx512(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 protected:
 	virtual void machine_start() override;
@@ -64,10 +71,15 @@ private:
 	optional_device<z80dart_device> m_z80dart;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
+	required_ioport_array<8> m_keyboard;
+	required_ioport_array<8> m_joystick;
+	required_ioport m_joysticks;
+	required_ioport m_reset;
+	required_ioport m_country;
 	required_device<ram_device> m_ram;
-	required_device<mtx_exp_slot_device> m_exp;
+	required_device<mtx_exp_slot_device> m_exp_int;
+	required_device<mtx_exp_slot_device> m_exp_ext;
 	required_device<generic_slot_device> m_extrom;
-	required_device<generic_slot_device> m_rompak;
 	memory_bank_creator m_rammap_bank1;
 	memory_bank_creator m_rammap_bank2;
 	memory_bank_creator m_rammap_bank3;
@@ -119,7 +131,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	void bankswitch(uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 

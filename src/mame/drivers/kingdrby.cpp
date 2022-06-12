@@ -284,6 +284,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rg
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
 	clip.set(visarea.min_x, 255, 192, visarea.max_y);
+	clip &= cliprect;
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -1154,7 +1155,7 @@ ROM_START( cowrace )
 	ROM_REGION( 0x8000, "slave", ROMREGION_ERASEFF ) // slave z80?
 	/* I've tried the kingdrbb slave CPU rom ... game works until the auto race in attract mode. We need to locate and dump this on the PCB. */
 	ROM_LOAD( "slave.bin", 0x0000, 0x8000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x8000, 0xff ) // <- to remove once that the above is dumped
+	ROM_FILL( 0x0000, 0x0001, 0xc3 ) ROM_FILL(0x0001, 0x7fff, 0x00) // <- to remove once that the above is dumped
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "u94.bin", 0x8000, 0x8000, CRC(945dc115) SHA1(bdd145234e6361c42ed20e8ca4cac64f07332748) )

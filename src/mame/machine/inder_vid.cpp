@@ -108,7 +108,7 @@ void inder_vid_device::device_add_mconfig(machine_config &config)
 	m_tms->set_shiftreg_out_callback(FUNC(inder_vid_device::from_shiftreg));
 
 	screen_device &screen(SCREEN(config, "inder_screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(40'000'000)/12, 424, 0, 338-1, 262, 0, 246-1);
+	screen.set_raw(XTAL(40'000'000)/12, 424, 0, 338, 262, 0, 246);
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
 	PALETTE(config, m_palette).set_entries(256);

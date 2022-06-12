@@ -34,6 +34,9 @@
  *  This first CPU slice only last 3ms, then the GIC sets the CPU's BUSRQ low,
  *  stalling it for 12.36ms, then sets it high for 4.33ms etc...
  *  59.95 times a second - NTSC
+ *
+ *  TODO: Should we add an explicit Reset button like the controller has?
+ *
  ************************************************************************/
 
 #include "emu.h"
@@ -63,12 +66,8 @@ public:
 
 	void unichamp(machine_config &config);
 
-	void init_unichamp();
-
 protected:
 	virtual void machine_start() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cp1610_cpu_device> m_maincpu;
@@ -138,12 +137,6 @@ static INPUT_PORTS_START( unichamp )
 INPUT_PORTS_END
 
 
-void unichamp_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	//TODO should we add an explicit Reset button in there just like the controller?
-}
-
-
 uint8_t unichamp_state::bext_r(offs_t offset)
 {
 	//The BEXT instruction pushes a user-defined nibble out on the four EBCA pins (EBCA0 to EBCA3)
@@ -164,10 +157,6 @@ uint8_t unichamp_state::bext_r(offs_t offset)
 	return (port & offset)>0?1:0;
 }
 
-
-void unichamp_state::init_unichamp()
-{
-}
 
 uint16_t unichamp_state::read_ff()
 {
@@ -290,4 +279,4 @@ ROM_START(unichamp)
 ROM_END
 
 
-CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, init_unichamp, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )
+CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, empty_init, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )

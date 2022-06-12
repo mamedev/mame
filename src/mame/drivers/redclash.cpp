@@ -26,6 +26,7 @@ TODO:
 #include "includes/redclash.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
@@ -36,9 +37,9 @@ void redclash_state::irqack_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-template <unsigned B> void redclash_state::star_w(uint8_t data)
+template <unsigned B> WRITE_LINE_MEMBER(redclash_state::star_w)
 {
-	m_stars->set_speed(BIT(data, 0) << B, 1U << B);
+	m_stars->set_speed(state ? 1 << B : 0, 1U << B);
 }
 
 void redclash_state::zerohour_map(address_map &map)
@@ -51,12 +52,8 @@ void redclash_state::zerohour_map(address_map &map)
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
-	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(FUNC(redclash_state::star_w<0>));
-	map(0x5801, 0x5804).nopw();    /* to sound board */
-	map(0x5805, 0x5805).w(FUNC(redclash_state::star_w<1>));
-	map(0x5806, 0x5806).w(FUNC(redclash_state::star_w<2>));
-	map(0x5807, 0x5807).w(FUNC(redclash_state::flipscreen_w));
+	map(0x5000, 0x5007).w("outlatch1", FUNC(ls259_device::write_d0));    /* to sound board */
+	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
 	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
 	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
@@ -71,12 +68,8 @@ void redclash_state::redclash_map(address_map &map)
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
-	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(FUNC(redclash_state::star_w<0>));
-	map(0x5801, 0x5801).w(FUNC(redclash_state::gfxbank_w));
-	map(0x5805, 0x5805).w(FUNC(redclash_state::star_w<1>));
-	map(0x5806, 0x5806).w(FUNC(redclash_state::star_w<2>));
-	map(0x5807, 0x5807).w(FUNC(redclash_state::flipscreen_w));
+	map(0x5000, 0x5007).w("outlatch1", FUNC(ls259_device::write_d0));    /* to sound board */
+	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6bff).ram().share(m_spriteram);
 	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
@@ -338,25 +331,27 @@ GFXDECODE_END
 void redclash_state::machine_start()
 {
 	save_item(NAME(m_gfxbank));
-}
 
-void redclash_state::machine_reset()
-{
 	m_gfxbank = 0;
 }
 
 void redclash_state::zerohour(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);  /* 4 MHz */
+	Z80(config, m_maincpu, 4_MHz_XTAL);  /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::zerohour_map);
+
+	LS259(config, "outlatch1"); // C1 (CS10 decode)
+
+	ls259_device &outlatch2(LS259(config, "outlatch2")); // C2 (CS11 decode)
+	outlatch2.q_out_cb<0>().set(FUNC(redclash_state::star_w<0>));
+	outlatch2.q_out_cb<5>().set(FUNC(redclash_state::star_w<1>));
+	outlatch2.q_out_cb<6>().set(FUNC(redclash_state::star_w<2>));
+	outlatch2.q_out_cb<7>().set(FUNC(redclash_state::flipscreen_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(redclash_state::screen_update));
 	screen.screen_vblank().set(FUNC(redclash_state::screen_vblank));
 	screen.set_palette(m_palette);
@@ -375,6 +370,8 @@ void redclash_state::redclash(machine_config &config)
 	zerohour(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::redclash_map);
+
+	subdevice<addressable_latch_device>("outlatch2")->q_out_cb<1>().set(FUNC(redclash_state::gfxbank_w));
 }
 
 

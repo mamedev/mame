@@ -33,21 +33,20 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-private:
-	static const device_timer_id TIMER_SNDINT = 0;
+	TIMER_CALLBACK_MEMBER(trigger_int);
 
-	sound_stream *  m_stream;
-	int             m_freq;
-	int             m_enabled;
-	int             m_volume;
-	int             m_incr;
-	int             m_signal;
-	uint8_t           m_ports[3];
-	emu_timer *     m_sndint_timer;
-	devcb_write_line   m_write_sndint;
+private:
+	sound_stream *      m_stream;
+	int                 m_freq;
+	int                 m_enabled;
+	int                 m_volume;
+	int                 m_incr;
+	int                 m_signal;
+	uint8_t             m_ports[3];
+	emu_timer *         m_sndint_timer;
+	devcb_write_line    m_write_sndint;
 };
 
 // device type definition

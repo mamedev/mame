@@ -41,8 +41,6 @@ public:
 
 	void ram_w(offs_t offset, uint8_t data) { m_wave_ram[offset & 0x7ff] = data; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,6 +48,8 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	TIMER_CALLBACK_MEMBER(dsp_tick);
 
 private:
 	uint16_t m_antilog[128];

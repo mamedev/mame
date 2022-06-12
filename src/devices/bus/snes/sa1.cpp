@@ -5,17 +5,17 @@
  SA-1 add-on chip emulation (for SNES/SFC)
 
  Note:
- - SA-1 register description below is based on no$cash docs.
- - about bankswitch handling: no matter what is ROM size, at loading the ROM is mirrored up to 8MB and a
+ - SA-1 register description below is based on nocash docs.
+ - Bankswitch handling: no matter what ROM size is used, at loading the ROM is mirrored up to 8MB and a
    rom_bank_map[0x100] array is built as a lookup table for 256x32KB banks filling the 8MB accessible ROM
-   area; this allows to handle any 0-7 value written to CXB/DXB/EXB/FXB SA-1 registers without any masking!
- - about BWRAM "bitmap mode": in 2bits mode
+   area; this allows any value from 0-7 being written to CXB/DXB/EXB/FXB SA-1 registers without any masking.
+ - about BWRAM "bitmap mode": in 2-bit mode
      600000h.Bit0-1 mirrors to 400000h.Bit0-1
      600001h.Bit0-1 mirrors to 400000h.Bit2-3
      600002h.Bit0-1 mirrors to 400000h.Bit4-5
      600003h.Bit0-1 mirrors to 400000h.Bit6-7
      ...
-   in 4bits mode
+   in 4-bit mode
      600000h.Bit0-3 mirrors to 400000h.Bit0-3
      600001h.Bit0-3 mirrors to 400000h.Bit4-7
      600002h.Bit0-3 mirrors to 400001h.Bit0-3
@@ -24,10 +24,10 @@
    to handle the separate modes, bitmap accesses go to offset + 0x100000
 
  TODO:
- - test case for BWRAM write protect (bsnes does not seem to ever protect either, so it's not implemented
+ - Test case for BWRAM write protect (bsnes does not seem to protect either, so it's not implemented
    for the moment)
- - almost everything CPU related!
- - Bus conflict (also seen: https://github.com/VitorVilela7/SnesSpeedTest)
+ - Almost everything CPU related
+ - Bus conflicts
 
  Compatibility:
     asahishi: plays OK
@@ -61,8 +61,8 @@
     sshogi3: plays OK
     taikyoid: plays OK
     takemiya: plays OK
- [Note: for Igo & Shougi games, "plays OK" means you can get ingame and the CPU replies to your moves... subtle bugs
- might indeed exist...]
+ Note: for Igo & Shougi games, "plays OK" means you can get ingame and the CPU replies to your moves; subtle bugs
+ might indeed exist.
 
  ***********************************************************************************************************/
 
@@ -110,7 +110,7 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 void sns_sa1_device::device_start()
 {
 	m_internal_ram = make_unique_clear<u8[]>(0x800);
-	m_sa1_timer = timer_alloc(TIMER_SA1);
+	m_sa1_timer = timer_alloc(FUNC(sns_sa1_device::timer_tick), this);
 
 	m_scpu_ctrl = 0;
 	m_nmi_vector = 0;
@@ -220,65 +220,59 @@ void sns_sa1_device::device_reset()
 	m_cconv1_dma_active = false;
 	m_cconv2_line = 0;
 
-	// sa-1 CPU starts out not running?
+	// SA-1 CPU starts out not running
 	m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	// timer is run parallely with CPUs
+	// Timer is run in sync with the CPU
 	m_sa1_timer->adjust(m_sa1->clocks_to_attotime(2), 0, m_sa1->clocks_to_attotime(2));
 }
 
-void sns_sa1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sns_sa1_device::timer_tick)
 {
-	switch (id)
+	if (TMC_HVSELB())
 	{
-	case TIMER_SA1:
-		if (TMC_HVSELB())
-		{
-			// 18 bit Linear timer
-			m_hpos++;
-			m_vpos += m_hpos >> 9;
-			m_hpos &= 0x1ff;
-			m_vpos &= 0x1ff;
-		}
-		else
-		{
-			// H/V timer
-			if (++m_hpos >= 341)
-			{
-				m_hpos = 0;
-				if (++m_vpos >= scanlines_r())
-					m_vpos = 0;
-			}
-		}
-		// send timer IRQ
-		if (TMC_HEN() && TMC_VEN()) // both H and V count enabled
-		{
-			if ((m_hpos == m_hcount) && (m_vpos == m_vcount))
-			{
-				m_sa1_flags |= SA1_IRQ_TIMER;
-				recalc_irqs();
-			}
-		}
-		else if (TMC_HEN()) // H count only
-		{
-			if (m_hpos == m_hcount)
-			{
-				m_sa1_flags |= SA1_IRQ_TIMER;
-				recalc_irqs();
-			}
-		}
-		else if (TMC_VEN()) // V count only
-		{
-			if ((m_hpos == 0) && (m_vpos == m_vcount))
-			{
-				m_sa1_flags |= SA1_IRQ_TIMER;
-				recalc_irqs();
-			}
-		}
-		break;
-	// Math & DMA timer here?
-	default:
-		throw emu_fatalerror("Unknown id in sns_sa1_device::device_timer");
+		// 18 bit Linear timer
+		m_hpos++;
+		m_vpos += m_hpos >> 9;
+		m_hpos &= 0x1ff;
+		m_vpos &= 0x1ff;
 	}
+	else
+	{
+		// H/V timer
+		if (++m_hpos >= 341)
+		{
+			m_hpos = 0;
+			if (++m_vpos >= scanlines_r())
+				m_vpos = 0;
+		}
+	}
+	// send timer IRQ
+	if (TMC_HEN() && TMC_VEN()) // both H and V count enabled
+	{
+		if ((m_hpos == m_hcount) && (m_vpos == m_vcount))
+		{
+			m_sa1_flags |= SA1_IRQ_TIMER;
+			recalc_irqs();
+		}
+	}
+	else if (TMC_HEN()) // H count only
+	{
+		if (m_hpos == m_hcount)
+		{
+			m_sa1_flags |= SA1_IRQ_TIMER;
+			recalc_irqs();
+		}
+	}
+	else if (TMC_VEN()) // V count only
+	{
+		if ((m_hpos == 0) && (m_vpos == m_vcount))
+		{
+			m_sa1_flags |= SA1_IRQ_TIMER;
+			recalc_irqs();
+		}
+	}
+
+	// TODO: Math & DMA timer
 }
 
 /*-------------------------------------------------
@@ -309,11 +303,11 @@ void sns_sa1_device::recalc_irqs()
  -------------------------------------------------*/
 
 
-// handle this separately to avoid accessing recursively the regs?
+// TODO: Handle this separately to avoid accessing the regs recursively
 
 u8 sns_sa1_device::var_length_read(offs_t offset)
 {
-	// TODO: memory accessing cycle?
+	// TODO: memory access cycle
 	// handle 0xffea/0xffeb/0xffee/0xffef
 	if ((offset & 0xffffe0) == 0x00ffe0)
 	{
@@ -349,11 +343,9 @@ u8 sns_sa1_device::var_length_read(offs_t offset)
 
 void sns_sa1_device::dma_transfer()
 {
-//  printf("DMA src %08x (%d), dst %08x (%d) cnt %d\n", m_src_addr, m_dma_ctrl & 3, m_dst_addr, m_dma_ctrl & 4, m_dma_cnt);
-
 	while (m_dma_cnt--)
 	{
-		u8 data = 0; // open bus?
+		u8 data = 0; // TODO: open bus
 		const u32 dma_src = m_src_addr++;
 		const u32 dma_dst = m_dst_addr++;
 
@@ -363,7 +355,7 @@ void sns_sa1_device::dma_transfer()
 		if (((DCNT_SD()) == 1) && (DCNT_DD())) continue;
 		if (((DCNT_SD()) == 2) && (!(DCNT_DD()))) continue;
 
-		int cycle = 1; // 1 cycle per memory accessing
+		int cycle = 1; // 1 cycle per memory access
 		switch (DCNT_SD())
 		{
 			case 0: // ROM
@@ -423,7 +415,7 @@ void sns_sa1_device::dma_cctype2_transfer()
 	const u32 ty = (BIT(m_cconv2_line, 0, 3) << 1);
 	const u32 dst_addr = (m_dst_addr & ~((1 << (7 - m_dma_cconv_bits)) - 1)) + tx + ty;
 
-	// TODO: memory access/process cycle?
+	// TODO: memory access/process cycle
 	for (u8 bit = 0; bit < bpp; bit++)
 	{
 		u8 byte = 0;
@@ -462,7 +454,7 @@ u8 sns_sa1_device::host_r(offs_t offset)
 u8 sns_sa1_device::read_regs(offs_t offset)
 {
 	u8 value = 0xff; // unverified
-	offset &= 0x1ff;    // $2200 + offset gives the reg value to compare with docs
+	offset &= 0x1ff; // $2200 + offset gives the reg value to compare with docs
 
 	switch (offset)
 	{
@@ -474,11 +466,11 @@ u8 sns_sa1_device::read_regs(offs_t offset)
 			// H-Count Read Low
 			if (!machine().side_effects_disabled())
 			{
-				//latch counters
+				// latch counters
 				m_hcr = m_hpos;
 				m_vcr = m_vpos;
 			}
-			//then return h-count
+			// return h-count
 			value = (m_hcr >> 0) & 0xff;
 			break;
 		case 0x103:
@@ -494,27 +486,27 @@ u8 sns_sa1_device::read_regs(offs_t offset)
 			value = (m_vcr >> 8) & 0xff;
 			break;
 		case 0x106:
-			// Math Result bits0-7
+			// Math Result bits 0-7
 			value = (u64)(m_math_res >> 0) & 0xff;
 			break;
 		case 0x107:
-			// Math Result bits8-15
+			// Math Result bits 8-15
 			value = (u64)(m_math_res >> 8) & 0xff;
 			break;
 		case 0x108:
-			// Math Result bits16-23
+			// Math Result bits 16-23
 			value = (u64)(m_math_res >> 16) & 0xff;
 			break;
 		case 0x109:
-			// Math Result bits24-31
+			// Math Result bits 24-31
 			value = (u64)(m_math_res >> 24) & 0xff;
 			break;
 		case 0x10a:
-			// Math Result bits32-39
+			// Math Result bits 32-39
 			value = (u64)(m_math_res >> 32) & 0xff;
 			break;
 		case 0x10b:
-			// Math Overflow (above 40bit result)
+			// Math Overflow (above 40-bit result)
 			value = m_math_overflow;
 			break;
 		case 0x10c:
@@ -535,7 +527,7 @@ u8 sns_sa1_device::read_regs(offs_t offset)
 				{
 					if (m_drm)
 					{
-						//auto-increment mode
+						// auto-increment mode
 						m_vbit += m_vlen;
 						m_vda += (m_vbit >> 3);
 						m_vbit &= 7;
@@ -560,20 +552,17 @@ void sns_sa1_device::host_w(offs_t offset, u8 data)
 	{
 		case 0x000:
 			// SA-1 control flags
-//          printf("%02x to SA-1 control\n", data);
 			if (CCNT_SA1_CPU_RDYB() && BIT(data, 5)) // Pull up reset pin
 				m_sa1_reset_flag = true;
 
 			if ((BIT(data, 5, 2) != 0) && (BIT(m_sa1_ctrl, 5, 2) == 0))
 			{
-//              printf("Engaging SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				if (BIT(data, 5)) // Pull up reset pin
 					m_sa1_reset_flag = true;
 			}
 			else if ((BIT(data, 5, 2) == 0) && (BIT(m_sa1_ctrl, 5, 2) != 0))
 			{
-//              printf("Releasing SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				if (m_sa1_reset_flag && (!BIT(data, 5)))
 				{
@@ -594,13 +583,12 @@ void sns_sa1_device::host_w(offs_t offset, u8 data)
 			recalc_irqs();
 			break;
 		case 0x001:
-			// SNES  SIE   00h   SNES CPU Int Enable (W)
+			// SNES CPU Int Enable
 			m_scpu_sie = data;
-//          printf("S-CPU IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x002:
-			// SNES  SIC   00h   SNES CPU Int Clear  (W)
+			// SNES CPU Int Clear
 			if (BIT(data, 7))   // ack IRQ from SA-1
 				m_scpu_flags &= ~SCPU_IRQ_SA1;
 
@@ -610,52 +598,52 @@ void sns_sa1_device::host_w(offs_t offset, u8 data)
 			recalc_irqs();
 			break;
 		case 0x003:
-			// SNES  CRV   -     SA-1 CPU Reset Vector Lsb (W)
+			// SA-1 CPU Reset Vector LSB
 			m_sa1_reset_vector &= 0xff00;
 			m_sa1_reset_vector |= data;
 			break;
 		case 0x004:
-			// SNES  CRV   -     SA-1 CPU Reset Vector Msb (W)
+			// SA-1 CPU Reset Vector MSB
 			m_sa1_reset_vector &= 0x00ff;
 			m_sa1_reset_vector |= (data<<8);
 			break;
 		case 0x005:
-			// SNES  CNV   -     SA-1 CPU NMI Vector Lsb (W)
+			// SA-1 CPU NMI Vector LSB
 			m_sa1_nmi_vector &= 0xff00;
 			m_sa1_nmi_vector |= data;
 			break;
 		case 0x006:
-			// SNES  CNV   -     SA-1 CPU NMI Vector Msb (W)
+			// SA-1 CPU NMI Vector MSB
 			m_sa1_nmi_vector &= 0x00ff;
 			m_sa1_nmi_vector |= (data<<8);
 			break;
 		case 0x007:
-			// SNES  CIV   -     SA-1 CPU IRQ Vector Lsb (W)
+			// SA-1 CPU IRQ Vector LSB
 			m_sa1_irq_vector &= 0xff00;
 			m_sa1_irq_vector |= data;
 			break;
 		case 0x008:
-			// SNES  CIV   -     SA-1 CPU IRQ Vector Msb (W)
+			// SA-1 CPU IRQ Vector MSB
 			m_sa1_irq_vector &= 0x00ff;
 			m_sa1_irq_vector |= (data<<8);
 			break;
 		case 0x020:
-			// SNES  CXB   -     Super MMC Bank C (W)
+			// Super MMC Bank C
 			m_bank_hi[0] = BIT(data, 7); // [00-1f][8000-ffff] is mirror of [c0-cf][0000-ffff] bank or first 1MB of ROM
 			m_bank_rom[0] = data & 0x07; // ROM 1MB bank for [c0-cf]
 			break;
 		case 0x021:
-			// SNES  DXB   -     Super MMC Bank D (W)
+			// Super MMC Bank D
 			m_bank_hi[1] = BIT(data, 7); // [20-3f][8000-ffff] is mirror of [d0-df][0000-ffff] bank or second 1MB of ROM
 			m_bank_rom[1] = data & 0x07; // ROM 1MB bank for [d0-df]
 			break;
 		case 0x022:
-			// SNES  EXB   -     Super MMC Bank E (W)
+			// Super MMC Bank E
 			m_bank_hi[2] = BIT(data, 7); // [80-9f][8000-ffff] is mirror of [e0-ef][0000-ffff] bank or third 1MB of ROM
 			m_bank_rom[2] = data & 0x07; // ROM 1MB bank for [e0-ef]
 			break;
 		case 0x023:
-			// SNES  FXB   -     Super MMC Bank F (W)
+			// Super MMC Bank F
 			m_bank_hi[3] = BIT(data, 7); // [a0-bf][8000-ffff] is mirror of [e0-ef][0000-ffff] bank or fourth 1MB of ROM
 			m_bank_rom[3] = data & 0x07; // ROM 1MB bank for [f0-ff]
 			break;
@@ -675,7 +663,7 @@ void sns_sa1_device::host_w(offs_t offset, u8 data)
 			// enable writing to IRAM from SNES (1 bit for each 0x100 chunk)
 			m_iram_write_snes = data;
 			break;
-		case 0x031: // Both  CDMA  00h   Character Conversion DMA Parameters (W)
+		case 0x031: // Character Conversion DMA Parameters
 		case 0x032: // DMA Source Device Start Address Low
 		case 0x033: // DMA Source Device Start Address Mid
 		case 0x034: // DMA Source Device Start Address High
@@ -702,25 +690,21 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			if (SCNT_SNESCPU_IRQ())
 			{
 				m_scpu_flags |= SCPU_IRQ_SA1;
-//              printf("SA-1 cause S-CPU IRQ\n");
 			}
 
-			// clear IRQ/NMI override flags in flags word
+			// acquire IRQ/NMI override flags from data
 			m_scpu_flags &= ~(SCPU_IRQV_ALT|SCPU_NMIV_ALT);
-
-			// and set them
 			m_scpu_flags |= (data & (SCPU_IRQV_ALT|SCPU_NMIV_ALT));
 
 			recalc_irqs();
 			break;
 		case 0x00a:
-			// SA-1  CIE   00h   SA-1 CPU Int Enable (W)
+			// SA-1 CPU Int Enable
 			m_sa1_sie = data;
-//          printf("SA-1 IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x00b:
-			// SA-1  CIC   00h   SA-1 CPU Int Clear  (W)
+			// SA-1 CPU Int Clear
 			if (BIT(data, 7))
 				m_sa1_flags &= ~SA1_IRQ_SCPU;
 
@@ -736,27 +720,27 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			recalc_irqs();
 			break;
 		case 0x00c:
-			// NMI Vector Low
+			// SA-1 NMI Vector Low
 			m_nmi_vector = (m_nmi_vector & 0xff00) | (data << 0);
 			break;
 		case 0x00d:
-			// NMI Vector High
+			// SA-1 NMI Vector High
 			m_nmi_vector = (m_nmi_vector & 0x00ff) | (data << 8);
 			break;
 		case 0x00e:
-			// IRQ Vector Low
+			// SA-1 IRQ Vector Low
 			m_irq_vector = (m_irq_vector & 0xff00) | (data << 0);
 			break;
 		case 0x00f:
-			// IRQ Vector High
+			// SA-1 IRQ Vector High
 			m_irq_vector = (m_irq_vector & 0x00ff) | (data << 8);
 			break;
 		case 0x010:
-			// SA-1  TMC   00h   H/V Timer Control (W)
+			// H/V Timer Control
 			m_timer_ctrl = data;
 			break;
 		case 0x011:
-			// SA-1  CTR   -     SA-1 CPU Timer Restart (W)
+			// CPU Timer Restart
 			m_hpos = m_vpos = 0;
 			m_sa1_timer->adjust(m_sa1->clocks_to_attotime(2), 0, m_sa1->clocks_to_attotime(2));
 			break;
@@ -778,8 +762,8 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			break;
 		case 0x025:
 			// BWRAM bank & type from SA-1 side
-			m_bwram_sa1_source = BIT(data, 7);  // 0 = normal, 1 = bitmap?
-			m_bwram_sa1 = data & 0x7f;  // up to 128x8K banks here?
+			m_bwram_sa1_source = BIT(data, 7);  // 0 = normal, 1 = bitmap
+			m_bwram_sa1 = data & 0x7f;  // up to 128x8K banks here
 			break;
 		case 0x027:
 			// enable writing to BWRAM from SA-1
@@ -790,11 +774,10 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			m_iram_write_sa1 = data;
 			break;
 		case 0x030:
-			// SA-1  DCNT  00h   DMA Control (W)
-//          printf("%02x to SA-1 DMA control\n", data);
+			// DMA Control (W)
 			m_dma_ctrl = data;
 			break;
-		case 0x031: // Both  CDMA  00h   Character Conversion DMA Parameters (W)
+		case 0x031: // Character Conversion DMA Parameters (W)
 		case 0x032: // DMA Source Device Start Address Low
 		case 0x033: // DMA Source Device Start Address Mid
 		case 0x034: // DMA Source Device Start Address High
@@ -804,18 +787,18 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			shared_regs_w(offset, data);
 			break;
 		case 0x038:
-			// SA-1  DTC   -     DMA Terminal Counter Lsb (W)
+			// DMA Terminal Counter LSB
 			m_dma_cnt &= 0xff00;
 			m_dma_cnt |= data;
 			break;
 		case 0x039:
-			// SA-1  DTC   -     DMA Terminal Counter Msb (W)
+			// DMA Terminal Counter MSB
 			m_dma_cnt &= 0x00ff;
 			m_dma_cnt |= (data<<8);
 			break;
 		case 0x03f:
 			// Format for BWRAM when mapped to bitmap
-			m_bwram_sa1_format = BIT(data, 7);  // 0 = 4bit, 1 = 2bit
+			m_bwram_sa1_format = BIT(data, 7);  // 0 = 4-bit, 1 = 2-bit
 			break;
 		case 0x040:
 		case 0x041:
@@ -839,7 +822,6 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 			{
 				if (DCNT_CDEN() && (!(DCNT_CDSEL())))  // CC DMA Type 2
 				{
-//                  printf("SA-1: CC DMA type 2\n");
 					dma_cctype2_transfer();
 				}
 			}
@@ -865,14 +847,14 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 		case 0x054:
 			// Math B High
 			m_math_b = (data << 8) | (m_math_b & 0x00ff);
-			// After Math B has been written, we do math
+			// After Math B has been written, perform the operation
 			switch (m_math_ctlr)
 			{
-				case 0: //signed multiplication (5 cycle required)
+				case 0: // signed multiplication (5 cycles required)
 					m_math_res = (s16)m_math_a * (s16)m_math_b;
 					m_math_b = 0;
 					break;
-				case 1: //unsigned division (5 cycle required)
+				case 1: // unsigned division (5 cycles required)
 					if (m_math_b == 0)
 						m_math_res = 0;
 					else
@@ -882,7 +864,7 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 						m_math_res = (u64)((remainder << 16) | quotient);
 					}
 					break;
-				case 2: //sigma (accumulative multiplication) (6 cycle required)
+				case 2: // sigma (accumulative multiplication) (6 cycles required)
 				case 3:
 					u64 acum = (s16)m_math_a * (s16)m_math_b;
 					u64 mask = 0xffffffffffU;
@@ -902,7 +884,7 @@ void sns_sa1_device::write_regs(offs_t offset, u8 data)
 
 			if (!m_drm)
 			{
-				//fixed mode
+				// fixed mode
 				m_vbit += m_vlen;
 				m_vda += (m_vbit >> 3);
 				m_vbit &= 7;
@@ -934,7 +916,7 @@ void sns_sa1_device::shared_regs_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x031:
-			// Both  CDMA  00h   Character Conversion DMA Parameters (W)
+			// Character Conversion DMA Parameters (W)
 			m_dma_ccparam = data;
 			m_dma_cconv_size = CDMA_SIZE();
 			m_dma_cconv_bits = CDMA_CB();
@@ -976,7 +958,6 @@ void sns_sa1_device::shared_regs_w(offs_t offset, u8 data)
 			{
 				if ((!(DCNT_CDEN())) && DCNT_DD())  // Normal DMA to BWRAM
 				{
-//                  printf("SA-1: normal DMA to BWRAM\n");
 					dma_transfer();
 				}
 			}
@@ -1013,7 +994,7 @@ u8 sns_sa1_device::read_cconv1_dma(offs_t offset)
 			const u32 tx = tile & ((1 << m_dma_cconv_size) - 1);
 			u32 bwram_src = m_src_addr + ty * 8 * tile_stride + tx * bpp;
 
-			// TODO: memory access/process cycle?
+			// TODO: memory access/process cycle
 			for (u32 y = 0; y < 8; y++)
 			{
 				u64 raw_pixels = 0;
@@ -1062,14 +1043,14 @@ u8 sns_sa1_device::read_bwram(offs_t offset, bool bitmap)
 
 	if (m_bwram_sa1_format)
 	{
-		// 2bits mode
+		// 2-bit mode
 		shift = ((offset & 3) << 1);
 		mask = 0x03;
 		offset >>= 2;
 	}
 	else
 	{
-		// 4bits mode
+		// 4-bit mode
 		shift = ((offset & 1) << 2);
 		mask = 0x0f;
 		offset >>= 1;
@@ -1096,14 +1077,14 @@ void sns_sa1_device::write_bwram(offs_t offset, u8 data, bool bitmap)
 
 	if (m_bwram_sa1_format)
 	{
-		// 2bits mode
+		// 2-bit mode
 		data = (data & 0x03) << ((offset & 3) << 1);
 		mask = 0x03 << ((offset & 3) << 1);
 		offset >>= 2;
 	}
 	else
 	{
-		// 4bits mode
+		// 4-bit mode
 		data = (data & 0x0f) << ((offset & 1) << 2);
 		mask = 0x0f << ((offset & 1) << 2);
 		offset >>= 1;
@@ -1131,9 +1112,9 @@ u8 sns_sa1_device::rom_r(offs_t offset)
 		const u8 slot = (BIT(offset, 23) << 1) | BIT(offset, 21);
 		u8 bank; // 256 banks (64 Mbit limited)
 
-		if (!m_bank_hi[slot])   // when HiROM mapping is disabled, we always access each 1MB here
+		if (!m_bank_hi[slot]) // when HiROM mapping is disabled, we always access each 1MB here
 			bank = BIT(offset, 16, 5) | (slot << 5);
-		else    // when HiROM mapping is enabled, we mirror [(cx,dx,ex,fx)][0000-ffff] bank
+		else // when HiROM mapping is enabled, we mirror [(cx,dx,ex,fx)][0000-ffff] bank
 			bank = BIT(offset, 16, 5) | (m_bank_rom[slot] << 5);
 
 		ret = m_rom[(rom_bank_map[bank] << 15) | (offset & 0x7fff)];
@@ -1174,13 +1155,13 @@ u8 sns_sa1_device::chip_read(offs_t offset)
 	u16 address = offset & 0xffff;
 
 	if (offset < 0x400000 && address >= 0x2200 && address < 0x2400)
-		return host_r(address & 0x1ff);   // SA-1 Regs
+		return host_r(address & 0x1ff); // SA-1 Regs
 
 	if (offset < 0x400000 && address >= 0x3000 && address < 0x3800)
-		return read_iram(address & 0x7ff);  // Internal SA-1 RAM (2K)
+		return read_iram(address & 0x7ff);
 
 	if (offset < 0x400000 && address >= 0x6000 && address < 0x8000)
-		return read_bwram<false>((m_bwram_snes * 0x2000) + (offset & 0x1fff)); // SA-1 BWRAM
+		return read_bwram<false>((m_bwram_snes * 0x2000) + (offset & 0x1fff));
 
 	if (offset >= 0x400000 && offset < 0x500000)
 		return read_bwram<false>(offset & 0xfffff);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
@@ -1194,16 +1175,16 @@ void sns_sa1_device::chip_write(offs_t offset, u8 data)
 	u16 address = offset & 0xffff;
 
 	if (offset < 0x400000 && address >= 0x2200 && address < 0x2400)
-		host_w(address & 0x1ff, data);  // SA-1 Regs
+		host_w(address & 0x1ff, data); // SA-1 Regs
 
 	if (offset < 0x400000 && address >= 0x3000 && address < 0x3800)
 	{
 		if (BIT(m_iram_write_snes, BIT(address, 8, 3)))
-			write_iram(address & 0x7ff, data);  // Internal SA-1 RAM (2K)
+			write_iram(address & 0x7ff, data);
 	}
 
 	if (offset < 0x400000 && address >= 0x6000 && address < 0x8000)
-		write_bwram((m_bwram_snes * 0x2000) + (offset & 0x1fff), data); // SA-1 BWRAM
+		write_bwram((m_bwram_snes * 0x2000) + (offset & 0x1fff), data);
 
 	if (offset >= 0x400000 && offset < 0x500000)
 		write_bwram(offset & 0xfffff, data);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
@@ -1220,7 +1201,7 @@ void sns_sa1_device::chip_write(offs_t offset, u8 data)
 
 u8 sns_sa1_device::sa1_rom_r(offs_t offset)
 {
-	if (bus_conflict_rom()) // bus conflict?
+	if (bus_conflict_rom())
 		m_sa1->adjust_icount(-1); // wait 1 cycle
 
 	return rom_r(offset);
@@ -1228,24 +1209,24 @@ u8 sns_sa1_device::sa1_rom_r(offs_t offset)
 
 u8 sns_sa1_device::sa1_iram_r(offs_t offset)
 {
-	if (bus_conflict_iram()) // bus conflict?
-		m_sa1->adjust_icount(-2); // wait 2 cycle
+	if (bus_conflict_iram())
+		m_sa1->adjust_icount(-2); // wait 2 cycles
 	return read_iram(offset & 0x7ff);
 }
 
 void sns_sa1_device::sa1_iram_w(offs_t offset, u8 data)
 {
-	if (bus_conflict_iram()) // bus conflict?
-		m_sa1->adjust_icount(-2); // wait 2 cycle
+	if (bus_conflict_iram())
+		m_sa1->adjust_icount(-2); // wait 2 cycles
 
 	if (BIT(m_iram_write_sa1, BIT(offset, 8, 3)))
-		write_iram(offset & 0x7ff, data);   // Internal SA-1 RAM (2K)
+		write_iram(offset & 0x7ff, data);
 }
 
 u8 sns_sa1_device::sa1_bwram_r(offs_t offset, bool bitmap)
 {
-	if (bus_conflict_bwram()) // bus conflict?
-		m_sa1->adjust_icount(-3); // wait 3 cycle
+	if (bus_conflict_bwram())
+		m_sa1->adjust_icount(-3); // wait 3 cycles
 	else
 		m_sa1->adjust_icount(-1); // wait 1 cycle
 
@@ -1254,8 +1235,8 @@ u8 sns_sa1_device::sa1_bwram_r(offs_t offset, bool bitmap)
 
 void sns_sa1_device::sa1_bwram_w(offs_t offset, u8 data, bool bitmap)
 {
-	if (bus_conflict_bwram()) // bus conflict?
-		m_sa1->adjust_icount(-3); // wait 3 cycle
+	if (bus_conflict_bwram())
+		m_sa1->adjust_icount(-3); // wait 3 cycles
 	else
 		m_sa1->adjust_icount(-1); // wait 1 cycle
 
@@ -1272,21 +1253,21 @@ u8 sns_sa1_device::sa1_hi_r(offs_t offset)
 		if (address < 0x6000)
 		{
 			if (address < 0x0800)
-				return sa1_iram_r(offset);   // Internal SA-1 RAM (2K)
+				return sa1_iram_r(offset);
 			else if (address >= 0x2200 && address < 0x2400)
-				return read_regs(offset & 0x1ff);    // SA-1 Regs
+				return read_regs(offset & 0x1ff);
 			else if (address >= 0x3000 && address < 0x3800)
-				return sa1_iram_r(offset);   // Internal SA-1 RAM (2K)
+				return sa1_iram_r(offset);
 		}
 		else if (address < 0x8000)
-			return sa1_bwram_r((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source);        // SA-1 BWRAM
+			return sa1_bwram_r((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source);
 		else
-			return sa1_rom_r(offset | 0x800000);   // ROM
+			return sa1_rom_r(offset | 0x800000);
 
-		return 0xff;    // maybe open bus? same as the main system one or diff? (currently not accessible from carts anyway...)
+		return 0xff; // TOOD: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
 	}
 	else
-		return sa1_rom_r(offset | 0xc00000);   // ROM
+		return sa1_rom_r(offset | 0xc00000);
 }
 
 u8 sns_sa1_device::sa1_lo_r(offs_t offset)
@@ -1298,17 +1279,17 @@ u8 sns_sa1_device::sa1_lo_r(offs_t offset)
 		if (address < 0x6000)
 		{
 			if (address < 0x0800)
-				return sa1_iram_r(offset);   // Internal SA-1 RAM (2K)
+				return sa1_iram_r(offset);
 			else if (address >= 0x2200 && address < 0x2400)
-				return read_regs(offset & 0x1ff);    // SA-1 Regs
+				return read_regs(offset & 0x1ff);
 			else if (address >= 0x3000 && address < 0x3800)
-				return sa1_iram_r(offset);   // Internal SA-1 RAM (2K)
+				return sa1_iram_r(offset);
 		}
 		else if (address < 0x8000)
-			return sa1_bwram_r((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source);        // SA-1 BWRAM
+			return sa1_bwram_r((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), m_bwram_sa1_source); // SA-1 BWRAM
 		else
 		{
-			if (bus_conflict_rom()) // bus conflict?
+			if (bus_conflict_rom())
 				m_sa1->adjust_icount(-1); // wait 1 cycle
 
 			if (offset == 0xffee)
@@ -1336,17 +1317,17 @@ u8 sns_sa1_device::sa1_lo_r(offs_t offset)
 				return m_sa1_reset_vector >> 8;
 			}
 			else
-				return rom_r(offset);   // ROM
+				return rom_r(offset);
 		}
 
-		return 0xff;    // maybe open bus? same as the main system one or diff? (currently not accessible from carts anyway...)
+		return 0xff; // TOOD: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
 	}
 	else if (offset < 0x500000)
-		return sa1_bwram_r(offset & 0xfffff, false);      // SA-1 BWRAM (not mirrored above!)
+		return sa1_bwram_r(offset & 0xfffff, false);      // SA-1 BWRAM (not mirrored above)
 	else if (offset >= 0x600000 && offset < 0x700000)
 		return sa1_bwram_r(offset & 0xfffff, true);       // SA-1 BWRAM Bitmap mode
 	else
-		return 0xff;    // nothing should be mapped here, so maybe open bus?
+		return 0xff;    // nothing should be mapped here, so maybe open bus
 }
 
 void sns_sa1_device::sa1_hi_w(offs_t offset, u8 data)
@@ -1357,23 +1338,23 @@ void sns_sa1_device::sa1_hi_w(offs_t offset, u8 data)
 		if (address < 0x6000)
 		{
 			if (address < 0x0800)
-				sa1_iram_w(offset, data);   // Internal SA-1 RAM (2K)
+				sa1_iram_w(offset, data);
 			else if (address >= 0x2200 && address < 0x2400)
-				write_regs(offset & 0x1ff, data);   // SA-1 Regs
+				write_regs(offset & 0x1ff, data);
 			else if (address >= 0x3000 && address < 0x3800)
-				sa1_iram_w(offset, data);   // Internal SA-1 RAM (2K)
+				sa1_iram_w(offset, data);
 		}
 		else if (address < 0x8000)
-			sa1_bwram_w((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), data, m_bwram_sa1_source);        // SA-1 BWRAM
+			sa1_bwram_w((m_bwram_sa1 * 0x2000) + (offset & 0x1fff), data, m_bwram_sa1_source);
 	}
 }
 
 void sns_sa1_device::sa1_lo_w(offs_t offset, u8 data)
 {
 	if (offset >= 0x400000 && offset < 0x500000)
-		sa1_bwram_w(offset & 0xfffff, data, false);        // SA-1 BWRAM (not mirrored above!)
+		sa1_bwram_w(offset & 0xfffff, data, false);	// SA-1 BWRAM (not mirrored above)
 	else if (offset >= 0x600000 && offset < 0x700000)
-		sa1_bwram_w(offset & 0xfffff, data, true);       // SA-1 BWRAM Bitmap mode
+		sa1_bwram_w(offset & 0xfffff, data, true);	// SA-1 BWRAM Bitmap mode
 	else
 		sa1_hi_w(offset, data);
 }

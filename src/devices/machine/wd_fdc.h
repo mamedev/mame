@@ -117,7 +117,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const;
 	virtual int settle_time() const;
@@ -131,9 +130,12 @@ protected:
 	virtual void pll_save_checkpoint() = 0;
 	virtual void pll_retrieve_checkpoint() = 0;
 
-private:
-	enum { TM_GEN, TM_CMD, TM_TRACK, TM_SECTOR };
+	TIMER_CALLBACK_MEMBER(generic_tick);
+	TIMER_CALLBACK_MEMBER(cmd_w_tick);
+	TIMER_CALLBACK_MEMBER(track_w_tick);
+	TIMER_CALLBACK_MEMBER(sector_w_tick);
 
+private:
 	//  State machine general behaviour:
 	//
 	//  There are three levels of state.

@@ -70,15 +70,6 @@ protected:
 	static constexpr uint32_t VRAM_SIZE = 0x40000;
 	static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
 
-	enum
-	{
-		TIMER_IRQ_OFF,
-		TIMER_BEHIND_BEAM_UPDATE,
-		TIMER_BLITTER_DONE,
-		TIMER_DELAYED_Z80_CONTROL,
-		TIMER_BASE_LAST = TIMER_DELAYED_Z80_CONTROL
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
@@ -131,7 +122,6 @@ protected:
 	emu_timer *m_irq_off_timer = nullptr;
 	emu_timer *m_behind_beam_update_timer = nullptr;
 	emu_timer *m_blitter_done_timer = nullptr;
-	emu_timer *m_delayed_z80_control_timer = nullptr;
 	int m_bankxor = 0;
 
 	// common
@@ -221,8 +211,6 @@ protected:
 	void sound3812_external_map(address_map &map);
 	void sound3812_map(address_map &map);
 	void sstrike_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class grmatch_state : public itech8_state
@@ -242,19 +230,12 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	enum
-	{
-		TIMER_PALETTE = TIMER_BASE_LAST+1,
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	void palette_w(uint8_t data);
 	void xscroll_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void palette_update();
+	TIMER_CALLBACK_MEMBER(palette_update);
 
 	emu_timer *m_palette_timer = nullptr;
 	uint8_t m_palcontrol = 0U;

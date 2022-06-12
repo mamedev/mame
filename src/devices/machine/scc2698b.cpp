@@ -364,15 +364,8 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 	write_mpp2(*this),
 	write_mpo(*this)
 {
-
 }
 
-
-
-void scc2698b_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-
-}
 
 
 void scc2698b_device::device_start()
@@ -398,7 +391,6 @@ void scc2698b_device::device_start()
 
 void scc2698b_device::device_reset()
 {
-
 }
 
 

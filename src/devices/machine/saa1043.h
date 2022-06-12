@@ -46,24 +46,24 @@ public:
 
 	enum outputs : uint32_t
 	{
-		BC,
-		FH2,
-		FH3,
-		FH80,
-		PH,
-		NS,
-		RI,
-		WMP,
-		RR,
-		V1,
-		V2,
-		CLP,
-		DL,
-		H1,
-		H2,
-		CB,
-		CS,
-		ID,
+		OUT_BC,
+		OUT_FH2,
+		OUT_FH3,
+		OUT_FH80,
+		OUT_PH,
+		OUT_NS,
+		OUT_RI,
+		OUT_WMP,
+		OUT_RR,
+		OUT_V1,
+		OUT_V2,
+		OUT_CLP,
+		OUT_DL,
+		OUT_H1,
+		OUT_H2,
+		OUT_CB,
+		OUT_CS,
+		OUT_ID,
 
 		OUT_COUNT
 	};
@@ -78,34 +78,34 @@ public:
 
 	void set_type(signal_type type) { m_type = type; }
 
-	auto bc_callback()   { m_outputs_hooked[BC] = true;   return m_outputs[BC].bind(); }
-	auto fh2_callback()  { m_outputs_hooked[FH2] = true;  return m_outputs[FH2].bind(); }
-	auto fh3_callback()  { m_outputs_hooked[FH3] = true;  return m_outputs[FH3].bind(); }
-	auto fh80_callback() { m_outputs_hooked[FH80] = true; return m_outputs[FH80].bind(); }
-	auto ph_callback()   { m_outputs_hooked[PH] = true;   return m_outputs[PH].bind(); }
-	auto ns_callback()   { m_outputs_hooked[NS] = true;   return m_outputs[NS].bind(); }
-	auto ri_callback()   { m_outputs_hooked[RI] = true;   return m_outputs[RI].bind(); }
-	auto wmp_callback()  { m_outputs_hooked[WMP] = true;  return m_outputs[WMP].bind(); }
-	auto rr_callback()   { m_outputs_hooked[RR] = true;   return m_outputs[RR].bind(); }
-	auto v1_callback()   { m_outputs_hooked[V1] = true;   return m_outputs[V1].bind(); }
-	auto v2_callback()   { m_outputs_hooked[V2] = true;   return m_outputs[V2].bind(); }
-	auto clp_callback()  { m_outputs_hooked[CLP] = true;  return m_outputs[CLP].bind(); }
-	auto dl_callback()   { m_outputs_hooked[DL] = true;   return m_outputs[DL].bind(); }
-	auto h1_callback()   { m_outputs_hooked[H1] = true;   return m_outputs[H1].bind(); }
-	auto h2_callback()   { m_outputs_hooked[H2] = true;   return m_outputs[H2].bind(); }
-	auto cb_callback()   { m_outputs_hooked[CB] = true;   return m_outputs[CB].bind(); }
-	auto cs_callback()   { m_outputs_hooked[CS] = true;   return m_outputs[CS].bind(); }
-	auto id_callback()   { m_outputs_hooked[ID] = true;   return m_outputs[ID].bind(); }
+	auto bc_callback()   { return m_outputs[OUT_BC].bind(); }
+	auto fh2_callback()  { return m_outputs[OUT_FH2].bind(); }
+	auto fh3_callback()  { return m_outputs[OUT_FH3].bind(); }
+	auto fh80_callback() { return m_outputs[OUT_FH80].bind(); }
+	auto ph_callback()   { return m_outputs[OUT_PH].bind(); }
+	auto ns_callback()   { return m_outputs[OUT_NS].bind(); }
+	auto ri_callback()   { return m_outputs[OUT_RI].bind(); }
+	auto wmp_callback()  { return m_outputs[OUT_WMP].bind(); }
+	auto rr_callback()   { return m_outputs[OUT_RR].bind(); }
+	auto v1_callback()   { return m_outputs[OUT_V1].bind(); }
+	auto v2_callback()   { return m_outputs[OUT_V2].bind(); }
+	auto clp_callback()  { return m_outputs[OUT_CLP].bind(); }
+	auto dl_callback()   { return m_outputs[OUT_DL].bind(); }
+	auto h1_callback()   { return m_outputs[OUT_H1].bind(); }
+	auto h2_callback()   { return m_outputs[OUT_H2].bind(); }
+	auto cb_callback()   { return m_outputs[OUT_CB].bind(); }
+	auto cs_callback()   { return m_outputs[OUT_CS].bind(); }
+	auto id_callback()   { return m_outputs[OUT_ID].bind(); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(toggle_v2);
 
 private:
 	devcb_write_line::array<OUT_COUNT> m_outputs;
-	bool m_outputs_hooked[OUT_COUNT];
 	emu_timer *m_timers[OUT_COUNT];
 	signal_type m_type;
 

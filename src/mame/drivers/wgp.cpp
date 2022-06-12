@@ -435,21 +435,10 @@ void wgp_state::cpua_ctrl_w(u16 data)/* assumes Z80 sandwiched between 68Ks */
                         INTERRUPTS
 ***********************************************************/
 
-void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wgp_state::trigger_cpu_b_int6)
 {
-	switch (id)
-	{
-	/* 68000 A */
-	case TIMER_INTERRUPT4:
-		m_maincpu->set_input_line(4, HOLD_LINE);
-		break;
 	/* 68000 B */
-	case TIMER_CPUB_INTERRUPT6:
-		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in wgp_state::device_timer");
-	}
+	m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -851,7 +840,7 @@ void wgp_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_cpub_int6_timer = timer_alloc(TIMER_CPUB_INTERRUPT6);
+	m_cpub_int6_timer = timer_alloc(FUNC(wgp_state::trigger_cpu_b_int6), this);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_port_sel));

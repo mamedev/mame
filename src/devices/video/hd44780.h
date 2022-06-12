@@ -58,10 +58,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
+	TIMER_CALLBACK_MEMBER(blink_tick);
 
 	// charset
 	enum
@@ -96,9 +98,6 @@ private:
 	void pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state);
 
 	// internal state
-	static constexpr device_timer_id TIMER_BUSY = 0;
-	static constexpr device_timer_id TIMER_BLINKING = 1;
-
 	emu_timer * m_blink_timer;
 	emu_timer * m_busy_timer;
 

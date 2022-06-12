@@ -28,11 +28,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(musobana_outcoin_flag_r);
 
 private:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	required_device<tmp68301_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -109,5 +104,5 @@ private:
 	void niyanpai_map(address_map &map);
 	void zokumahj_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };

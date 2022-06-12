@@ -30,6 +30,12 @@ public:
 	void set_floppies_4(floppy_connector*, floppy_connector*, floppy_connector*, floppy_connector*);
 
 private:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_resolve_objects() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	required_device<pia6821_device> m_pia;
 	required_device<mc6852_device> m_ssda;
 	emu_timer *m_timer_head_load;
@@ -37,13 +43,13 @@ private:
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;
+
 	DECLARE_WRITE_LINE_MEMBER(handle_irq);
 	DECLARE_WRITE_LINE_MEMBER(handle_nmi);
 
 	uint8_t flip_bits(uint8_t data);
 	uint8_t pia_pa_r();
 	void pia_pa_w(u8 data);
-	int pia_ca1_r();
 	void pia_ca2_w(int state);
 	uint8_t pia_pb_r();
 	void pia_pb_w(u8 data);
@@ -60,7 +66,6 @@ private:
 	u8 m_head_load;
 	u8 m_crc;
 	u8 m_last_crc;
-	u8 m_pia_ca1;
 	u8 m_pia_cb2;
 	u8 m_reset;
 	u8 m_enable_drive_write;
@@ -81,16 +86,12 @@ private:
 	floppy_connector *m_floppy0, *m_floppy1, *m_floppy2, *m_floppy3;
 	floppy_image_device *m_floppy; // Currently selected floppy.
 
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	TIMER_CALLBACK_MEMBER(head_load_update);
+	TIMER_CALLBACK_MEMBER(timeout_expired);
+	TIMER_CALLBACK_MEMBER(general_update);
 
-	enum { TM_HEAD_LOAD, TM_TIMEOUT, TM_GEN };
-
-	enum {
+	enum
+	{
 		// General "doing nothing" state
 		IDLE,
 
@@ -105,7 +106,8 @@ private:
 		WRITE_BITS,
 	};
 
-	struct live_info {
+	struct live_info
+	{
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
 
 		attotime tm;

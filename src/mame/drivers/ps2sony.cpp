@@ -537,7 +537,7 @@ void ps2sony_state::machine_start()
 	save_item(NAME(m_ipu_out_fifo_index));
 
 	if (!m_vblank_timer)
-		m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2sony_state::vblank), this));
+		m_vblank_timer = timer_alloc(FUNC(ps2sony_state::vblank), this);
 }
 
 void ps2sony_state::machine_reset()

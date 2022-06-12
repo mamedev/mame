@@ -32,7 +32,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -80,17 +79,17 @@ private:
 	};
 
 	void update_irq_state();
-	void update_step(struct YMZ280BVoice *voice);
-	void update_volumes(struct YMZ280BVoice *voice);
-	void update_irq_state_timer_common(int voicenum);
-	int generate_adpcm(struct YMZ280BVoice *voice, s16 *buffer, int samples);
-	int generate_pcm8(struct YMZ280BVoice *voice, s16 *buffer, int samples);
-	int generate_pcm16(struct YMZ280BVoice *voice, s16 *buffer, int samples);
+	void update_step(YMZ280BVoice *voice);
+	void update_volumes(YMZ280BVoice *voice);
+	TIMER_CALLBACK_MEMBER(update_irq_state_timer_common);
+	int generate_adpcm(YMZ280BVoice *voice, s16 *buffer, int samples);
+	int generate_pcm8(YMZ280BVoice *voice, s16 *buffer, int samples);
+	int generate_pcm16(YMZ280BVoice *voice, s16 *buffer, int samples);
 	void write_to_register(int data);
 	int compute_status();
 
 	// internal state
-	struct YMZ280BVoice m_voice[8];   /* the 8 voices */
+	YMZ280BVoice m_voice[8];          /* the 8 voices */
 	u8 m_current_register;            /* currently accessible register */
 	u8 m_status_register;             /* current status register */
 	u8 m_irq_state;                   /* current IRQ state */

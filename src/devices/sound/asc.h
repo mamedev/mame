@@ -76,9 +76,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	TIMER_CALLBACK_MEMBER(delayed_stream_update);
 
 	devcb_write_line write_irq;
 

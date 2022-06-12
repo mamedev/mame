@@ -12,14 +12,14 @@
 
 ***************************************************************************/
 
-void simpsons_state::simpsons_eeprom_w(uint8_t data)
+void simpsons_state::eeprom_w(uint8_t data)
 {
 	if (data == 0xff)
 		return;
 
 	ioport("EEPROMOUT")->write(data, 0xff);
 
-	simpsons_video_banking(data & 0x03);
+	video_bank_select(data & 0x03);
 
 	m_firq_enabled = data & 0x04;
 	if (!m_firq_enabled)
@@ -32,7 +32,7 @@ void simpsons_state::simpsons_eeprom_w(uint8_t data)
 
 ***************************************************************************/
 
-void simpsons_state::simpsons_coin_counter_w(uint8_t data)
+void simpsons_state::coin_counter_w(uint8_t data)
 {
 	/* bit 0,1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -45,7 +45,7 @@ void simpsons_state::simpsons_coin_counter_w(uint8_t data)
 	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t simpsons_state::simpsons_sound_interrupt_r()
+uint8_t simpsons_state::sound_interrupt_r()
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff ); // Z80
 	return 0x00;
@@ -78,6 +78,9 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+
+	m_dma_start_timer = timer_alloc(FUNC(simpsons_state::dma_start), this);
+	m_dma_end_timer = timer_alloc(FUNC(simpsons_state::dma_end), this);
 }
 
 void simpsons_state::machine_reset()
@@ -95,5 +98,8 @@ void simpsons_state::machine_reset()
 	/* init the default banks */
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
-	simpsons_video_banking(0);
+	video_bank_select(0);
+
+	m_dma_start_timer->adjust(attotime::never);
+	m_dma_end_timer->adjust(attotime::never);
 }

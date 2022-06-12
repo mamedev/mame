@@ -74,7 +74,7 @@ device_memory_interface::space_config_vector at28c64b_device::memory_space_confi
 
 void at28c64b_device::device_start()
 {
-	m_write_timer = timer_alloc(0);
+	m_write_timer = timer_alloc( FUNC( at28c64b_device::write_complete ), this );
 
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );
@@ -96,10 +96,8 @@ void at28c64b_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	printf("checking for default\n");
 	if (m_default_data.found())
 	{
-		printf("Got default data\n");
 		for( offs_t offs = 0; offs < AT28C64B_DATA_BYTES; offs++ )
 			space(AS_PROGRAM).write_byte(offs, m_default_data[offs]);
 	}
@@ -273,12 +271,7 @@ WRITE_LINE_MEMBER( at28c64b_device::set_oe_12v )
 }
 
 
-void at28c64b_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER( at28c64b_device::write_complete )
 {
-	switch( id )
-	{
-	case 0:
-		m_last_write = -1;
-		break;
-	}
+	m_last_write = -1;
 }

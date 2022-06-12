@@ -27,6 +27,7 @@
 #include "video/sega16sp.h"
 #include "screen.h"
 
+INPUT_PORTS_EXTERN( system16b_generic );
 
 // ======================> segas16b_state
 
@@ -54,6 +55,7 @@ public:
 		, m_cxdio(*this, "cxdio")
 		, m_upd4701a(*this, "upd4701a%u", 1U)
 		, m_workram(*this, "workram")
+		, m_i8751_sync_timer(nullptr)
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_tilemap_type(segaic16_video_device::TILEMAP_16B)
 		, m_custom_io_r(*this)
@@ -188,13 +190,6 @@ protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 
-	// timer IDs
-	enum
-	{
-		TID_INIT_I8751,
-		TID_ATOMICP_SOUND_IRQ
-	};
-
 	// rom board types
 	enum segas16b_rom_board
 	{
@@ -209,9 +204,11 @@ protected:
 
 	// device overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(i8751_sync);
+	TIMER_CALLBACK_MEMBER(atomicp_sound_irq);
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
@@ -253,26 +250,29 @@ protected:
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
 
+	// timers
+	emu_timer *         m_i8751_sync_timer;
+
 	// configuration
 	segas16b_rom_board  m_romboard;
 	int                 m_tilemap_type;
-	read16_delegate   m_custom_io_r;
+	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
 	bool                m_disable_screen_blanking;
-	const uint8_t *       m_i8751_initial_config;
+	const uint8_t *     m_i8751_initial_config;
 	i8751_sim_delegate  m_i8751_vblank_hook;
-	uint8_t               m_atomicp_sound_divisor;
+	uint8_t             m_atomicp_sound_divisor;
 
 	// game-specific state
-	uint8_t               m_atomicp_sound_count;
-	uint8_t               m_hwc_input_value;
+	uint8_t             m_atomicp_sound_count;
+	uint8_t             m_hwc_input_value;
 	optional_ioport     m_hwc_monitor;
 	optional_ioport     m_hwc_left;
 	optional_ioport     m_hwc_right;
 	optional_ioport     m_hwc_left_limit;
 	optional_ioport     m_hwc_right_limit;
-	uint8_t               m_mj_input_num;
-	uint8_t               m_mj_last_val;
+	uint8_t             m_mj_input_num;
+	uint8_t             m_mj_last_val;
 	optional_ioport_array<6> m_mj_inputs;
 	int                 m_spritepalbase;
 
@@ -330,82 +330,6 @@ public:
 private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
-};
-
-
-// ======================> isgsm_state
-
-class isgsm_state : public segas16b_state
-{
-public:
-	// construction/destruction
-	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag)
-		, m_read_xor(0)
-		, m_cart_addrlatch(0)
-		, m_cart_addr(0)
-		, m_data_type(0)
-		, m_data_addr(0)
-		, m_data_mode(0)
-		, m_addr_latch(0)
-		, m_security_value(0)
-		, m_security_latch(0)
-		, m_rle_control_position(8)
-		, m_rle_control_byte(0)
-		, m_rle_latched(false)
-		, m_rle_byte(0)
-	{ }
-
-	void isgsm(machine_config &config);
-
-	// driver init
-	void init_isgsm();
-	void init_shinfz();
-	void init_tetrbx();
-
-private:
-	// read/write handlers
-	void cart_addr_high_w(uint16_t data);
-	void cart_addr_low_w(uint16_t data);
-	uint16_t cart_data_r();
-	void data_w(uint16_t data);
-	void datatype_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void addr_high_w(uint16_t data);
-	void addr_low_w(uint16_t data);
-	void cart_security_high_w(uint16_t data);
-	void cart_security_low_w(uint16_t data);
-	uint16_t cart_security_low_r();
-	uint16_t cart_security_high_r();
-	void sound_reset_w(uint16_t data);
-	void main_bank_change_w(uint16_t data);
-
-	// security callbacks
-	uint32_t shinfz_security(uint32_t input);
-	uint32_t tetrbx_security(uint32_t input);
-
-	// driver overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// configuration
-	uint8_t           m_read_xor;
-	typedef delegate<uint32_t (uint32_t)> security_callback_delegate;
-	security_callback_delegate m_security_callback;
-
-	// internal state
-	uint16_t          m_cart_addrlatch;
-	uint32_t          m_cart_addr;
-	uint8_t           m_data_type;
-	uint32_t          m_data_addr;
-	uint8_t           m_data_mode;
-	uint16_t          m_addr_latch;
-	uint32_t          m_security_value;
-	uint16_t          m_security_latch;
-	uint8_t           m_rle_control_position;
-	uint8_t           m_rle_control_byte;
-	bool            m_rle_latched;
-	uint8_t           m_rle_byte;
-	void isgsm_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SEGAS16B_H

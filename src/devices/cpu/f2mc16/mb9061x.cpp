@@ -41,11 +41,11 @@ void mb9061x_device::device_start()
 {
 	f2mc16_device::device_start();
 
-	m_tbtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::tbtc_tick), this));
+	m_tbtc_timer = timer_alloc(FUNC(mb9061x_device::tbtc_tick), this);
 	m_tbtc_timer->adjust(attotime::never);
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::timer0_tick), this));
+	m_timer[0] = timer_alloc(FUNC(mb9061x_device::timer0_tick), this);
 	m_timer[0]->adjust(attotime::never);
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::timer1_tick), this));
+	m_timer[1] = timer_alloc(FUNC(mb9061x_device::timer1_tick), this);
 	m_timer[1]->adjust(attotime::never);
 }
 

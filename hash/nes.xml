@@ -9079,7 +9079,7 @@ license:CC0
 		<info name="serial" value="DIF-001"/>
 		<info name="alt_title" value="둘리 브라보랜드"/>
 		<part name="cart" interface="nes_cart">
-			<!-- Chip is rather an ASIC UNROM clone with no bus conflict issues(?)  -->
+			<!-- Chip is rather an ASIC UNROM clone with no bus conflict issues(?) -->
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="DAOU-009" />
 			<feature name="mirroring" value="vertical" />
@@ -23216,7 +23216,7 @@ license:CC0
 	</software>
 
 	<software name="watarug">
-		<description>Majin Eiyuu Den Wataru Gaiden (Jpn)</description>
+		<description>Mashin Eiyuuden Wataru Gaiden (Japan)</description>
 		<year>1990</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-V2"/>
@@ -49718,6 +49718,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="oekakids" />
 			<feature name="pcb" value="BANDAI-OEKAKIDS" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="oeka kids - anpanman no hiragana daisuki (japan).prg" size="131072" crc="c3c0811d" sha1="32d71dd6c5a8d78a918fe1b9d6d6c4a570d9652d" offset="00000" status="baddump" />
 			</dataarea>
@@ -53668,7 +53669,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hidchess">
-		<!--  Um Chi (Glommy Chess, Joy Van) in GoodNES, check title -->
+		<!-- Um Chi (Glommy Chess, Joy Van) in GoodNES, check title -->
 		<description>An Qi ~ Hidden Chinese Chess (Tw)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
@@ -54868,7 +54869,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- These have wrong CHR order, probably. Bad dump or different board? I have to investigate....  -->
+<!-- These have wrong CHR order, probably. Bad dump or different board? I have to investigate.... -->
 	<software name="mnq1" cloneof="mnq" supported="no">
 		<description>Mei Nu Quan (Tw, Alt)</description>
 		<year>1990</year>
@@ -55846,7 +55847,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chikbik">
-		<!-- Alt. Title: 三国志-赤壁之战 ? ~ SanGuoZhi - ChiBi Zhi Zhan ?  -->
+		<!-- Alt. Title: 三国志-赤壁之战 ? ~ SanGuoZhi - ChiBi Zhi Zhan ? -->
 		<description>Chik Bik Ji Jin - Saam Gwok Ji (Asia)</description>
 		<year>19??</year>
 		<publisher>NTDEC</publisher>
@@ -56021,6 +56022,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="MGC-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_22110" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="prg" size="262144">
 				<rom name="2-in-1 uzi lightgun (mgc-002).prg" size="262144" crc="7349c91a" sha1="00d0c7a423b9c8c18974022c619d9f3084c4fd8d" status="baddump" />
@@ -56377,6 +56379,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -56393,6 +56399,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56412,8 +56422,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56431,8 +56442,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -57642,6 +57654,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -58426,6 +58442,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="荊軻新傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1001] jing ke xin zhuan (c).chr" size="131072" crc="0024a801" sha1="ba7a408c852c5ec611851f3f1ae75ce6056837f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -58448,6 +58465,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="聖火列傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1002] sheng huo lie zhuan (c).chr" size="131072" crc="7c6f37fc" sha1="3a4da287653ec929adac7362c38687f14ca42080" offset="00000" status="baddump" />
 			</dataarea>
@@ -58580,6 +58598,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="战国风云"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1013] zhan guo feng yun (c).chr" size="131072" crc="4026c277" sha1="31bca971eab6f2c3d9a3e58fd2441730d8e666e1" offset="00000" status="baddump" />
 			</dataarea>
@@ -58602,6 +58621,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="侠客传奇"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1014] xia ke chuan qi (c).chr" size="131072" crc="f6d312af" sha1="3261d2f7f8cf9bb366a9d0361251161dbce81033" offset="00000" status="baddump" />
 			</dataarea>
@@ -60982,7 +61002,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0005"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nanjing" /> <!--  header actually says 164... -->
+			<feature name="slot" value="nanjing" /> <!-- header actually says 164... -->
 			<feature name="pcb" value="UNL-NANJING" />
 			<dataarea name="prg" size="524288">
 				<rom name="ying tao xiao wan zi (g-005) (ch).prg" size="524288" crc="8209ba79" sha1="fa56608d8dcf5a144dd1fc81282cd86fd51060fe" offset="00000" status="baddump" />
@@ -65892,7 +65912,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- This was included in the DVD release of a 2008 Japanese TV show describing the creation of a Famicom game
 It was also distributed in form of Famicom carts, whose checksums (according to the developer's website) match this set
 Also available (in form of IPS patches from the dev) some hacks featuring alt. levels: Mondo21 hack, gg version & Meteor version
-We don't include these hacks because they were not burned into real carts nor sold!  -->
+We don't include these hacks because they were not burned into real carts nor sold! -->
 	<software name="mrsplash">
 		<description>Mr. Splash! (Jpn)</description>
 		<year>2007</year>
@@ -66990,7 +67010,7 @@ We don't include these hacks because they were not burned into real carts nor so
 				<rom name="wukong douju.prg" size="262144" crc="8638454c" sha1="3c7c91c552104c9c24153c00fd603c740715ff51" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
-				<rom name="wukong douju.prg" size="524288" crc="72137bc5" sha1="1533ecf77b9bbc6864a2c62b463dfab34e017797" status="baddump" />
+				<rom name="wukong douju.chr" size="524288" crc="72137bc5" sha1="1533ecf77b9bbc6864a2c62b463dfab34e017797" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -67344,6 +67364,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -67361,6 +67385,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -67376,6 +67404,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -68626,6 +68658,10 @@ All musics were removed in this game.
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -77646,7 +77682,7 @@ Other
 	</software>
 
 
-<!--  These images have been ripped off from later non-NES games (Konami Classics for PC, Zelda for Game Cube, Animal Crossing for Game Cube, GBA e-Reader cards or GBA Famicom Mini).
+<!-- These images have been ripped off from later non-NES games (Konami Classics for PC, Zelda for Game Cube, Animal Crossing for Game Cube, GBA e-Reader cards or GBA Famicom Mini).
 We include them here as reference if they should coincide with later revisions of the games -->
 
 	<software name="balonfgtgba" cloneof="balonfgt">
@@ -79562,7 +79598,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!--  Displays a "Copyright  Hummer Team" message at start -->
+<!-- Displays a "Copyright  Hummer Team" message at start -->
 	<software name="sfz2_97" supported="partial">
 		<description>Street Fighter Zero 2 '97 (Asia)</description>
 		<year>1997</year>
@@ -83476,7 +83512,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!--  also 20-in-1 KY2001, 228-in-1, 999999-in-1 via DipSwitches -->
+<!-- also 20-in-1 KY2001, 228-in-1, 999999-in-1 via DipSwitches -->
 	<software name="mc_4y481" supported="partial">
 		<description>4 in 1 (YH-481)</description>
 		<year>19??</year>
@@ -84122,6 +84158,7 @@ be better to redump them properly. -->
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_830425c" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="1048576">
 				<rom name="super hik 6-in-1 a-030.prg" size="1048576" crc="ee62ac32" sha1="6f7dbfdbdc1633e45c84d2e1b7f833d2ef7741c3" status="baddump" />
 			</dataarea>
@@ -85638,16 +85675,16 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed to check why this is different -->
+<!-- A dump with swapped 256K CHR pages exists (CRC f1310012). It's not clear if this has been properly redumped to determine which is the correct order. -->
 	<software name="mc_mario">
-		<description>Mario 7 in 1 (Bad Dump)</description>
+		<description>Mario 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_mario7in1" />
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="slot" value="bmc_gold7in1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
-				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="f1310012" sha1="42378af64fc6356ec7d85b6e49b934287d2b6f15" offset="00000" status="baddump" />
+				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="29fa219f" sha1="28a77600426a6be233717ec60b84e9eb8a4ba637" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="mario 7-in-1 [p1].prg" size="1048576" crc="c021a8b9" sha1="4fe43bef9d9217881b7c8ece0007dc4cd830fbec" offset="00000" status="baddump" />
@@ -86395,6 +86432,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sgun20in1" />
 			<feature name="pcb" value="BMC-SUPERGUN-20IN1" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="super gun 20-in-1 [p1].chr" size="32768" crc="2d5d160c" sha1="887efc66eca7af81b11c94874d15add6c156da09" offset="00000" status="baddump" />
@@ -86600,7 +86638,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- The UNIF file contained separate PRG banks  -->
+<!-- The UNIF file contained separate PRG banks -->
 	<software name="mc_16sv">
 		<description>Super 128k - 16 in 1</description>
 		<year>19??</year>

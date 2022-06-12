@@ -45,8 +45,7 @@ class emu_timer
 	~emu_timer();
 
 	// allocation and re-use
-	emu_timer &init(running_machine &machine, timer_expired_delegate callback, bool temporary);
-	emu_timer &init(device_t &device, device_timer_id id, bool temporary);
+	emu_timer &init(running_machine &machine, timer_expired_delegate &&callback, bool temporary) ATTR_HOT;
 	emu_timer &release();
 
 public:
@@ -76,7 +75,6 @@ private:
 	void register_save();
 	void schedule_next_period();
 	void dump() const;
-	static void device_timer_expired(emu_timer &timer, s32 param);
 
 	// internal state
 	running_machine *   m_machine;      // reference to the owning machine
@@ -89,8 +87,6 @@ private:
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
-	device_t *          m_device;       // for device timers, a pointer to the device
-	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
 
 
@@ -122,12 +118,10 @@ public:
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback);
+	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]]
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
-	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0) { timer_set(attotime::zero, callback, param); }
-
-	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0);
+	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0)
+	{ m_timer_allocator.alloc()->init(machine(), std::move(callback), true).adjust(attotime::zero, param); }
 
 	// debugging
 	void dump_timers() const;

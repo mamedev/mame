@@ -816,6 +816,19 @@ ROM_START(unkkonmd) // probably Dragon Palace
 	ROM_LOAD("662-unk-2d.bin", 0x000000, 0x080000, CRC(8133c41c) SHA1(c0ee21d3d8def86221ef9be008b910d1a58796b0))
 ROM_END
 
+ROM_START( ggoemon )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "747-a05-2n.bin", 0x000000, 0x080000, CRC(fb9e827d) SHA1(e46cf94a687029ebbce55f1eb240111a2988623b) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "k056832", 0 )
+	ROM_LOAD( "747-a06-14n.bin", 0x000000, 0x080000, CRC(c14d334f) SHA1(df3bf2fbc2d9b9943650e609b0bcfc12b7b076cc) )
+	ROM_LOAD( "747-a07-17n.bin", 0x080000, 0x080000, CRC(f7a2bfc6) SHA1(de02bdb23a348f377949a22af5376dd76845e991) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "747-a01-2f.bin", 0x000000, 0x080000, CRC(375047b3) SHA1(5e446d4ad3be3157173f3e11158c017cc6eee157) )
+	ROM_LOAD( "747-a02-4f.bin", 0x080000, 0x080000, CRC(4a8d6bcc) SHA1(91b0e8a29423de306e3e0f6ac113cc4a69b05249) )
+ROM_END
+
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM
 // at 1st boot press Service1 to initialise NVRAM
 ROM_START( crossmg2 )
@@ -848,6 +861,7 @@ GAME( 1995, kzaurus,  0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0
 GAME( 1996, dobouchn, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, unkkonmd, 0, gs662,    kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1997, koropens, 0, koropens, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, ggoemon,  0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Ganbare Goemon", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )

@@ -186,8 +186,8 @@ void hp98035_io_card_device::device_start()
 	save_item(NAME(m_prev_clock_keys));
 	save_item(NAME(m_clock_key_cnt));
 
-	m_msec_timer = timer_alloc(MSEC_TMR_ID);
-	m_clock_timer = timer_alloc(CLOCK_TMR_ID);
+	m_msec_timer = timer_alloc(FUNC(hp98035_io_card_device::msec_tick), this);
+	m_clock_timer = timer_alloc(FUNC(hp98035_io_card_device::clock_tick), this);
 }
 
 void hp98035_io_card_device::device_reset()
@@ -207,50 +207,51 @@ void hp98035_io_card_device::device_reset()
 	half_init();
 }
 
-void hp98035_io_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp98035_io_card_device::msec_tick)
 {
-	if (id == MSEC_TMR_ID) {
-		// On real hw there's a full 4-bit decimal counter, but only the LSB is used to
-		// generate interrupts
-		m_np_irq = !m_np_irq;
-		update_dc();
-	} else if (id == CLOCK_TMR_ID) {
-		// Update digit multiplexer
-		if (m_clock_state == CLOCK_OFF) {
-			m_clock_mux = 0;
-		} else {
-			m_clock_mux <<= 1;
-			if ((m_clock_mux & 7) == 0) {
-				m_clock_mux = 1;
-			}
+	// On real hw there's a full 4-bit decimal counter, but only the LSB is used to
+	// generate interrupts
+	m_np_irq = !m_np_irq;
+	update_dc();
+}
+
+TIMER_CALLBACK_MEMBER(hp98035_io_card_device::clock_tick)
+{
+	// Update digit multiplexer
+	if (m_clock_state == CLOCK_OFF) {
+		m_clock_mux = 0;
+	} else {
+		m_clock_mux <<= 1;
+		if ((m_clock_mux & 7) == 0) {
+			m_clock_mux = 1;
 		}
-		// Act on clock chip "keys"
-		if (m_clock_keys == 0 || m_clock_keys != m_prev_clock_keys) {
-			m_clock_key_cnt = 0;
-			if (m_clock_keys == 0 && m_clock_state == CLOCK_HHMM) {
-				// Keys released in HHMM state -> turn display off
-				// In real hw there is probably 1 s delay
-				m_clock_state = CLOCK_OFF;
-				regen_clock_image();
-			}
-		} else if (m_clock_key_cnt < KEY_PRESS_LONG) {
-			m_clock_key_cnt++;
-			if (m_clock_key_cnt == KEY_PRESS_SHORT) {
-				/// Short key press
-				clock_short_press();
-			} else if (m_clock_key_cnt == KEY_PRESS_LONG) {
-				// Long key press
-				clock_long_press();
-			}
-		}
-		m_prev_clock_keys = m_clock_keys;
-		// Count seconds
-		m_clock_1s_div++;
-		if (m_clock_1s_div >= DIGIT_MUX_FREQ.value()) {
-			m_clock_1s_div = 0;
-			advance_seconds();
+	}
+	// Act on clock chip "keys"
+	if (m_clock_keys == 0 || m_clock_keys != m_prev_clock_keys) {
+		m_clock_key_cnt = 0;
+		if (m_clock_keys == 0 && m_clock_state == CLOCK_HHMM) {
+			// Keys released in HHMM state -> turn display off
+			// In real hw there is probably 1 s delay
+			m_clock_state = CLOCK_OFF;
 			regen_clock_image();
 		}
+	} else if (m_clock_key_cnt < KEY_PRESS_LONG) {
+		m_clock_key_cnt++;
+		if (m_clock_key_cnt == KEY_PRESS_SHORT) {
+			/// Short key press
+			clock_short_press();
+		} else if (m_clock_key_cnt == KEY_PRESS_LONG) {
+			// Long key press
+			clock_long_press();
+		}
+	}
+	m_prev_clock_keys = m_clock_keys;
+	// Count seconds
+	m_clock_1s_div++;
+	if (m_clock_1s_div >= DIGIT_MUX_FREQ.value()) {
+		m_clock_1s_div = 0;
+		advance_seconds();
+		regen_clock_image();
 	}
 }
 

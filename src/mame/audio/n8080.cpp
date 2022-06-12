@@ -374,9 +374,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(helifire_state::dac_volume_timer)
 
 void spacefev_state::sound_start()
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
-	m_sound_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
+	m_sound_timer[0] = timer_alloc(FUNC(spacefev_state::stop_mono_flop_callback), this);
+	m_sound_timer[1] = timer_alloc(FUNC(spacefev_state::stop_mono_flop_callback), this);
+	m_sound_timer[2] = timer_alloc(FUNC(spacefev_state::stop_mono_flop_callback), this);
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -400,8 +400,8 @@ void spacefev_state::sound_reset()
 
 void sheriff_state::sound_start()
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
+	m_sound_timer[0] = timer_alloc(FUNC(sheriff_state::stop_mono_flop_callback), this);
+	m_sound_timer[1] = timer_alloc(FUNC(sheriff_state::stop_mono_flop_callback), this);
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));

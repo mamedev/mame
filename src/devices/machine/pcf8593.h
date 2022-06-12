@@ -32,7 +32,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }
@@ -43,10 +42,10 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
+	TIMER_CALLBACK_MEMBER(clock_tick);
+
 private:
 	void clear_buffer_rx();
-
-	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
 	// internal state
 	uint8_t       m_data[16];

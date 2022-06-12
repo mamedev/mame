@@ -60,7 +60,7 @@ void watchdog_timer_device::device_start()
 {
 	// initialize the watchdog
 	m_counter = 0;
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(watchdog_timer_device::watchdog_expired), this);
 
 	if (m_vblank_count != 0)
 	{
@@ -87,10 +87,10 @@ void watchdog_timer_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer expiration events
+//  watchdog_expired - handle expired timer
 //-------------------------------------------------
 
-void watchdog_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(watchdog_timer_device::watchdog_expired)
 {
 	watchdog_fired();
 }

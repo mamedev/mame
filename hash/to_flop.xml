@@ -4980,7 +4980,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- selection menu only says "Tetris", but title screen says "Tetris II"  -->
+	<!-- selection menu only says "Tetris", but title screen says "Tetris II" -->
 	<software name="tet2soko">
 		<description>Tetris II &amp; Sokoban</description>
 		<year>19??</year>
@@ -5000,7 +5000,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- selection menu only says "Tetris", but title screen says "Tetris II"  -->
+	<!-- selection menu only says "Tetris", but title screen says "Tetris II" -->
 	<software name="tet2sokoa" cloneof="tet2soko" supported="no">
 		<description>Tetris II &amp; Sokoban (640K Disk)</description>
 		<year>19??</year>

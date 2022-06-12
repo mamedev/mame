@@ -104,7 +104,7 @@ void fga002_device::device_start()
 	m_liack7_cb.resolve_safe(0);
 
 	// Timers
-	fga_timer = timer_alloc(TIMER_ID_FGA);
+	fga_timer = timer_alloc(FUNC(fga002_device::timer_tick), this);
 
 	save_pointer (NAME (m_fga002), sizeof(m_fga002));
 
@@ -143,31 +143,24 @@ void fga002_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer_tick - decrement timer 0
 //-------------------------------------------------
-void fga002_device::device_timer (emu_timer &timer, device_timer_id id, int param)
+
+TIMER_CALLBACK_MEMBER(fga002_device::timer_tick)
 {
-	switch(id)
+	if (m_tim0count-- == 0) // Zero detect
 	{
-	case TIMER_ID_FGA:
-		if (m_tim0count-- == 0) // Zero detect
+		if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_ZERO_STOP) == 0)
 		{
-			if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_ZERO_STOP) == 0)
-			{
-				fga_timer->adjust(attotime::never, TIMER_ID_FGA, attotime::never);
-			}
-			else
-			{
-				if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_AUTOPRELOAD) == 0)
-					m_tim0count &= 0xff;
-				else
-					m_tim0count = m_fga002[FGA_TIM0PRELOAD];
-			}
+			fga_timer->adjust(attotime::never);
 		}
-		break;
-	default:
-		LOG("Unhandled Timer ID %d\n", id);
-		break;
+		else
+		{
+			if ((m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_AUTOPRELOAD) == 0)
+				m_tim0count &= 0xff;
+			else
+				m_tim0count = m_fga002[FGA_TIM0PRELOAD];
+		}
 	}
 }
 
@@ -408,27 +401,27 @@ void fga002_device::do_fga002reg_tim0ctl_w(uint8_t data)
 	if ((data  & REG_TIM0CTL_START_STOP) != (m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_START_STOP))
 	{
 		if ((data & REG_TIM0CTL_START_STOP) == 0)
-			fga_timer->adjust(attotime::never, TIMER_ID_FGA, attotime::never);
+			fga_timer->adjust(attotime::never);
 		else
 		{
 			switch (data & REG_TIM0CTL_CLK_MSK)
 			{
-			case REG_TIM0CTL_CLK_1_MIC: fga_timer->adjust(attotime::from_usec(1), TIMER_ID_FGA, attotime::from_usec(1)); break;
-			case REG_TIM0CTL_CLK_2_MIC: fga_timer->adjust(attotime::from_usec(2), TIMER_ID_FGA, attotime::from_usec(2)); break;
-			case REG_TIM0CTL_CLK_4_MIC: fga_timer->adjust(attotime::from_usec(4), TIMER_ID_FGA, attotime::from_usec(4)); break;
-			case REG_TIM0CTL_CLK_8_MIC: fga_timer->adjust(attotime::from_usec(8), TIMER_ID_FGA, attotime::from_usec(8)); break;
-			case REG_TIM0CTL_CLK_16_MIC: fga_timer->adjust(attotime::from_usec(16), TIMER_ID_FGA, attotime::from_usec(16)); break;
-			case REG_TIM0CTL_CLK_32_MIC: fga_timer->adjust(attotime::from_usec(32), TIMER_ID_FGA, attotime::from_usec(32)); break;
-			case REG_TIM0CTL_CLK_64_MIC: fga_timer->adjust(attotime::from_usec(64), TIMER_ID_FGA, attotime::from_usec(64)); break;
-			case REG_TIM0CTL_CLK_128_MIC: fga_timer->adjust(attotime::from_usec(128), TIMER_ID_FGA, attotime::from_usec(128)); break;
-			case REG_TIM0CTL_CLK_256_MIC: fga_timer->adjust(attotime::from_usec(256), TIMER_ID_FGA, attotime::from_usec(256)); break;
-			case REG_TIM0CTL_CLK_512_MIC: fga_timer->adjust(attotime::from_usec(512), TIMER_ID_FGA, attotime::from_usec(512)); break;
-			case REG_TIM0CTL_CLK_2_MIL: fga_timer->adjust(attotime::from_msec(2), TIMER_ID_FGA, attotime::from_msec(2)); break;
-			case REG_TIM0CTL_CLK_8_MIL: fga_timer->adjust(attotime::from_msec(8), TIMER_ID_FGA, attotime::from_msec(8)); break;
-			case REG_TIM0CTL_CLK_32_MIL: fga_timer->adjust(attotime::from_msec(32), TIMER_ID_FGA, attotime::from_msec(32)); break;
-			case REG_TIM0CTL_CLK_125_MIL: fga_timer->adjust(attotime::from_msec(125), TIMER_ID_FGA, attotime::from_msec(125)); break;
-			case REG_TIM0CTL_CLK_500_MIL: fga_timer->adjust(attotime::from_msec(500), TIMER_ID_FGA, attotime::from_msec(500)); break;
-			case REG_TIM0CTL_CLK_2_SEC: fga_timer->adjust(attotime::from_seconds(2), TIMER_ID_FGA, attotime::from_seconds(2)); break;
+			case REG_TIM0CTL_CLK_1_MIC: fga_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1)); break;
+			case REG_TIM0CTL_CLK_2_MIC: fga_timer->adjust(attotime::from_usec(2), 0, attotime::from_usec(2)); break;
+			case REG_TIM0CTL_CLK_4_MIC: fga_timer->adjust(attotime::from_usec(4), 0, attotime::from_usec(4)); break;
+			case REG_TIM0CTL_CLK_8_MIC: fga_timer->adjust(attotime::from_usec(8), 0, attotime::from_usec(8)); break;
+			case REG_TIM0CTL_CLK_16_MIC: fga_timer->adjust(attotime::from_usec(16), 0, attotime::from_usec(16)); break;
+			case REG_TIM0CTL_CLK_32_MIC: fga_timer->adjust(attotime::from_usec(32), 0, attotime::from_usec(32)); break;
+			case REG_TIM0CTL_CLK_64_MIC: fga_timer->adjust(attotime::from_usec(64), 0, attotime::from_usec(64)); break;
+			case REG_TIM0CTL_CLK_128_MIC: fga_timer->adjust(attotime::from_usec(128), 0, attotime::from_usec(128)); break;
+			case REG_TIM0CTL_CLK_256_MIC: fga_timer->adjust(attotime::from_usec(256), 0, attotime::from_usec(256)); break;
+			case REG_TIM0CTL_CLK_512_MIC: fga_timer->adjust(attotime::from_usec(512), 0, attotime::from_usec(512)); break;
+			case REG_TIM0CTL_CLK_2_MIL: fga_timer->adjust(attotime::from_msec(2), 0, attotime::from_msec(2)); break;
+			case REG_TIM0CTL_CLK_8_MIL: fga_timer->adjust(attotime::from_msec(8), 0, attotime::from_msec(8)); break;
+			case REG_TIM0CTL_CLK_32_MIL: fga_timer->adjust(attotime::from_msec(32), 0, attotime::from_msec(32)); break;
+			case REG_TIM0CTL_CLK_125_MIL: fga_timer->adjust(attotime::from_msec(125), 0, attotime::from_msec(125)); break;
+			case REG_TIM0CTL_CLK_500_MIL: fga_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500)); break;
+			case REG_TIM0CTL_CLK_2_SEC: fga_timer->adjust(attotime::from_seconds(2), 0, attotime::from_seconds(2)); break;
 			default: logerror("REG_TIM0CTL programmer error, please report\n"); break; // Should never happen
 			}
 		}

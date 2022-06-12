@@ -1354,12 +1354,12 @@ void m37710_cpu_device::device_start()
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m37710_cpu_device::m37710_timer_cb), this));
+		m_timers[i] = timer_alloc(FUNC(m37710_cpu_device::m37710_timer_cb), this);
 		m_reload[i] = attotime::never;
 		m_timer_out[i] = 0;
 	}
 
-	m_ad_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m37710_cpu_device::ad_timer_cb), this));
+	m_ad_timer = timer_alloc(FUNC(m37710_cpu_device::ad_timer_cb), this);
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));

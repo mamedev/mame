@@ -25,8 +25,8 @@ namespace netlist
 		, m_R(*this, "R")
 		, m_POS(*this, "POS", false)
 		{
-			register_subalias("1", m_R.P());
-			register_subalias("2", m_R.N());
+			register_sub_alias("1", m_R.P());
+			register_sub_alias("2", m_R.N());
 		}
 
 		NETLIB_RESETI()
@@ -59,10 +59,10 @@ namespace netlist
 		{
 			connect(m_R1.N(), m_R2.N());
 
-			register_subalias("1", m_R1.P());
-			register_subalias("2", m_R2.P());
+			register_sub_alias("1", m_R1.P());
+			register_sub_alias("2", m_R2.P());
 
-			register_subalias("Q", m_R1.N());
+			register_sub_alias("Q", m_R1.N());
 		}
 
 		NETLIB_RESETI();

@@ -29,7 +29,7 @@
 
 /*********************************************/
 /* IF GAME SPECIFIC HACKS ARE REQUIRED THEN  */
-/* USE THE m_gametype MEMBER TO FIND */
+/* USE THE m_gametype MEMBER TO FIND         */
 /* OUT WHAT GAME IS RUNNING                  */
 /*********************************************/
 
@@ -76,7 +76,6 @@ public:
 	void configure_namcos2_sprite_standard(machine_config &config);
 	void configure_namcos2_roz_standard(machine_config &config);
 	void metlhawk(machine_config &config);
-	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
@@ -132,8 +131,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-private:
 
 enum
 	{
@@ -197,7 +194,7 @@ enum
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	uint16_t dpram_word_r(offs_t offset);
-	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, uint8_t data);
 
@@ -247,11 +244,6 @@ enum
 	uint16_t namcos2_finallap_prot_r(offs_t offset); // finalap2, finalap3
 	uint16_t finalap3bl_prot_r(); // finalap3bl
 
-	void GollyGhostUpdateLED_c4(int data);
-	void GollyGhostUpdateLED_c6(int data);
-	void GollyGhostUpdateLED_c8(int data);
-	void GollyGhostUpdateLED_ca(int data);
-	void GollyGhostUpdateDiorama_c0(int data);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
@@ -283,6 +275,28 @@ enum
 	void slave_sgunner_am(address_map &map);
 	void sound_default_am(address_map &map);
 };
+
+class gollygho_state : public namcos2_state
+{
+public:
+	gollygho_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_state(mconfig, type, tag),
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_diorama(*this, "diorama%u", 0U),
+		m_out_gun_recoil(*this, "gun_recoil%u", 0U)
+	{ }
+
+protected:
+	virtual void machine_start() override;
+
+	virtual void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+private:
+	output_finder<8> m_out_digit;
+	output_finder<6> m_out_diorama;
+	output_finder<2> m_out_gun_recoil;
+};
+
 
 /**************************************************************/
 /* Non-shared memory custom IO device - IRQ/Inputs/Outputs   */

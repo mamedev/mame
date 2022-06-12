@@ -8,13 +8,14 @@
     and consists of a multi-board stack in a cage, hence different driver.
 
     This set was assembled from a stack of loose PCBs, so for this game the Modular System cage contains
-    at least 5 main boards and 1 sub board, but there are almost surely more (MOD 21/1? Something else?).
+    at least 6 main boards and 1 sub board, but may be more.
 
     MOD-6/1 - MC68000P10, 4 ROMs, RAMs, 20 MHz XTAL.
     MOD 1/4 - Sound board (Z8400BB1, 2 x YM2203C). 2 8-dips banks + small sub board with OKI M5205.
     MOD 51/1 - Sprite board, has logic + 4 empty ROM sockets. Sprite ROMs are actually on the below board.
     MODULAR SYSTEM 2 MOD 5/1 - red sprite ROM board, 12 sprite ROMs populated (maximum 24 ROMs)
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0477 SOLD) with no chips, just routing along one edge.
+    MOD 21/1 - Logic + 2 PROMs.
 
     TODO:
     - everything,
@@ -181,9 +182,11 @@ ROM_START( badlandsm )
 	ROM_LOAD32_BYTE( "mod-5-1_ba_520.ic20",  0x80001, 0x10000, CRC(f4e132ae) SHA1(c34b4a3b204035e2f4d5209aee48673f758f3ceb) )
 	ROM_LOAD32_BYTE( "mod-5-1_ba_526.ic26",  0x80000, 0x10000, CRC(243a6bc8) SHA1(7f3e6031824c28f37afafc80fc9757bb5f80e660) )
 
-	ROM_REGION( 0x120, "proms", 0 )    // PROMs (function unknown)
+	ROM_REGION( 0x320, "proms", 0 )    // PROMs (function unknown)
 	ROM_LOAD( "mod-1-4_sound_105_82s123.ic20", 0x000, 0x020, CRC(14d72781) SHA1(372dc021d8aaf4aa6fd46e69a3d8f1c68113426f) )
 	ROM_LOAD( "mod-51-1_502_82s129a.ic10",     0x020, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+	ROM_LOAD( "mod_21_1_205_82s129.ic12",      0x120, 0x100, CRC(204a7aee) SHA1(322164134aa65c37a9389024f921364a81d13e88) )
+	ROM_LOAD( "mod_21_1_210_82s129.ic4",       0x220, 0x100, CRC(d3e676aa) SHA1(241a9f9df88e8f796ca8c773ae7930f6e7ce4db8) )
 
 	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
 	ROM_LOAD( "mod-6-1_cpu_644_gal16v8.ic13", 0x000, 0x117, NO_DUMP )

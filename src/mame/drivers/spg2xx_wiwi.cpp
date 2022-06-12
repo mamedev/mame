@@ -48,19 +48,16 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	virtual void device_timer(emu_timer& timer, device_timer_id id, int param) override;
-
 	virtual uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	TIMER_CALLBACK_MEMBER(toggle_tick);
 
 	uint16_t m_prev_porta;
 	uint16_t m_prev_portb;
 	bool m_toggle;
 	emu_timer *m_pulse_timer = nullptr;
-
-private:
-
 };
 
 class spg2xx_game_guitrbus_state : public spg2xx_game_marc101_state
@@ -110,49 +107,32 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	virtual void device_timer(emu_timer& timer, device_timer_id id, int param) override;
-
 	virtual uint16_t porta_r() override;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	TIMER_CALLBACK_MEMBER(toggle2_tick);
 
 private:
 	bool m_toggle2;
 	emu_timer *m_pulse_timer2 = nullptr;
 };
 
-void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg2xx_game_marc101_state::toggle_tick)
 {
-	switch (id)
-	{
-	case 0:
-		m_toggle = !m_toggle;
-		//printf("toggle\n");
-		break;
-	}
+	m_toggle = !m_toggle;
 }
 
-void spg2xx_game_marc250_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg2xx_game_marc250_state::toggle2_tick)
 {
-	switch (id)
-	{
-	case 0:
-		m_toggle = !m_toggle;
-		//printf("toggle\n");
-		break;
-
-	case 1:
-		m_toggle2 = !m_toggle2;
-		//printf("toggle\n");
-		break;
-	}
+	m_toggle2 = !m_toggle2;
 }
 
 
 void spg2xx_game_marc101_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
-	m_pulse_timer = timer_alloc(0);
+	m_pulse_timer = timer_alloc(FUNC(spg2xx_game_marc101_state::toggle_tick), this);
 	m_pulse_timer->adjust(attotime::never);
 
 }
@@ -169,7 +149,7 @@ void spg2xx_game_marc101_state::machine_reset()
 void spg2xx_game_marc250_state::machine_start()
 {
 	spg2xx_game_marc101_state::machine_start();
-	m_pulse_timer2 = timer_alloc(1);
+	m_pulse_timer2 = timer_alloc(FUNC(spg2xx_game_marc250_state::toggle2_tick), this);
 	m_pulse_timer2->adjust(attotime::never);
 
 	// hack, makes x-racer3 and some others more stable, TODO: find out what is really wrong

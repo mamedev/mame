@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -152,7 +152,6 @@ void nes_txc_22110_device::device_start()
 void nes_txc_22110_device::pcb_reset()
 {
 	nes_sxrom_device::pcb_reset();
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_latch0 = 0;
 	m_mode = 0;

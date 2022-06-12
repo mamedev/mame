@@ -36,7 +36,7 @@ private:
 	void options_extract();
 	int write_config(emu_options &options, const char *filename, const game_driver *gamedrv);
 
-	bool try_change_working_directory(std::string &working_directory, const std::string &subdir);;
+	bool try_change_working_directory(std::string &working_directory, const std::string &subdir);
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "netlist/nl_setup.h"
-
 NETLIST_EXTERNAL(segaspeech)
 
 #endif // MAME_AUDIO_NL_SEGASPEECH_H

@@ -214,7 +214,7 @@ void dday_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 	m_text_tilemap->set_transparent_pen(0);
 
-	m_countdown_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dday_state::countdown_timer_callback), this));
+	m_countdown_timer = timer_alloc(FUNC(dday_state::countdown_timer_callback), this);
 
 	start_countdown_timer();
 }

@@ -63,16 +63,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param) override;
+
+	TIMER_CALLBACK_MEMBER(fx4_tick);
+	TIMER_CALLBACK_MEMBER(fr_tick);
+	TIMER_CALLBACK_MEMBER(ft_tick);
 
 private:
-	enum
-	{
-		TIMER_FX4,
-		TIMER_FR,
-		TIMER_FT
-	};
-
 	devcb_write_line   m_fx4_handler;
 	devcb_write_line   m_fr_handler;
 	devcb_write_line   m_ft_handler;

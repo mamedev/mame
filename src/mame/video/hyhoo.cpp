@@ -53,16 +53,9 @@ void hyhoo_state::hyhoo_romsel_w(uint8_t data)
 	}
 }
 
-void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hyhoo_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in hyhoo_state::device_timer");
-	}
+	m_nb1413m3->busyflag_w(1);
 }
 
 void hyhoo_state::hyhoo_gfxdraw()
@@ -221,7 +214,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 
 void hyhoo_state::video_start()
 {
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(hyhoo_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 	save_item(NAME(m_blitter_destx));

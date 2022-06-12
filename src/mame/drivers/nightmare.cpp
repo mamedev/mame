@@ -236,6 +236,11 @@ public:
 	void nightmare(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(clear_reset);
+
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
@@ -243,15 +248,11 @@ protected:
 	void ic10_w(uint8_t data);
 	void unkout_w(uint8_t data);
 
-	void nightmare_map(address_map &map);
-	void nightmare_io_map(address_map &map);
-	void nightmare_sound_map(address_map &map);
-	void nightmare_sound_io_map(address_map &map);
+	void main_map(address_map &map);
+	void io_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_io_map(address_map &map);
 	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cosmac_device> m_soundcpu;
@@ -261,24 +262,19 @@ protected:
 
 	// cpu state
 	int m_reset = 0;
+	emu_timer *m_reset_timer = nullptr;
 };
 
-void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nightmare_state::clear_reset)
 {
-	switch (id)
-	{
-	case TIMER_SET_CPU_MODE:
-		m_reset = 1;
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in nightmare_state::device_timer");
-	}
+	m_reset = 1;
 }
 
 void nightmare_state::machine_start()
 {
 	save_item(NAME(m_reset));
 
+	m_reset_timer = timer_alloc(FUNC(nightmare_state::clear_reset), this);
 }
 
 /* Machine Reset */
@@ -286,7 +282,7 @@ void nightmare_state::machine_start()
 void nightmare_state::machine_reset()
 {
 	m_reset = 0;
-	timer_set(attotime::from_msec(200), TIMER_SET_CPU_MODE);
+	m_reset_timer->adjust(attotime::from_msec(200));
 }
 
 /* CDP1802 Interface */
@@ -339,13 +335,13 @@ void nightmare_state::unkout_w(uint8_t data)
   // J3
 }
 
-void nightmare_state::nightmare_map(address_map &map)
+void nightmare_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x83ff).ram();
 }
 
-void nightmare_state::nightmare_io_map(address_map &map)
+void nightmare_state::io_map(address_map &map)
 {
 	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
 	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
@@ -354,14 +350,13 @@ void nightmare_state::nightmare_io_map(address_map &map)
 	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
 
-void nightmare_state::nightmare_sound_map(address_map &map)
+void nightmare_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 }
 
-void nightmare_state::nightmare_sound_io_map(address_map &map)
+void nightmare_state::sound_io_map(address_map &map)
 {
-
 }
 
 uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -422,8 +417,8 @@ void nightmare_state::nightmare(machine_config &config)
 {
 	/* main cpu */
 	CDP1802(config, m_maincpu, MASTER_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_map);
-	m_maincpu->set_addrmap(AS_IO, &nightmare_state::nightmare_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nightmare_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &nightmare_state::io_map);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(nightmare_state::clear_r));
 	m_maincpu->q_cb().set(FUNC(nightmare_state::q_w));
@@ -433,8 +428,8 @@ void nightmare_state::nightmare(machine_config &config)
 
 	/* sound cpu */
 	CDP1802(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::nightmare_sound_io_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::sound_io_map);
 	m_soundcpu->set_disable();
 
 	/* i/o hardware */

@@ -3272,15 +3272,15 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	m_nand_data_w_cb.resolve();
 #endif
 	for (int i = 0; i < 5; i++)
-		m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp), this));
+		m_pwm.timer[i] = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp), this);
 	for (auto & elem : m_dma)
-		elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_dma_timer_exp), this));
-	m_iic.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_iic_timer_exp), this));
-	m_iis.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_iis_timer_exp), this));
-	m_lcd.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp), this));
-	m_rtc.timer_tick_count = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp), this));
-	m_rtc.timer_update = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp), this));
-	m_wdt.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp), this));
+		elem.timer = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_dma_timer_exp), this);
+	m_iic.timer = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_iic_timer_exp), this);
+	m_iis.timer = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_iis_timer_exp), this);
+	m_lcd.timer = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp), this);
+	m_rtc.timer_tick_count = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp), this);
+	m_rtc.timer_update = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp), this);
+	m_wdt.timer = timer_alloc(FUNC(S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp), this);
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 	int om0 = iface_core_pin_r(S3C24XX_CORE_PIN_OM0);

@@ -39,7 +39,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void reg_w(uint8_t data);
@@ -150,10 +149,6 @@ private:
 		I2C_STATE_DATA_READ,
 		I2C_STATE_DATA_WRITE
 	};
-
-	static constexpr device_timer_id TIMER_INPUT_CLOCK = 0;
-
-	emu_timer *m_input_clock;
 
 	uint8_t m_status;
 	uint8_t m_regs[REG_COUNT];

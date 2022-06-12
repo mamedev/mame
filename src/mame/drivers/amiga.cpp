@@ -150,8 +150,8 @@ protected:
 	virtual void device_start() override
 	{
 		// allocate resources
-		m_c813_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c813_charged), this));
-		m_c814_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c814_charged), this));
+		m_c813_timer = timer_alloc(FUNC(a1000_kbreset_device::c813_charged), this);
+		m_c814_timer = timer_alloc(FUNC(a1000_kbreset_device::c814_charged), this);
 
 		// start in idle state
 		m_kbclk = 1U;

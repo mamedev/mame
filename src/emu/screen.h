@@ -424,15 +424,6 @@ public:
 private:
 	class svg_renderer;
 
-	// timer IDs
-	enum
-	{
-		TID_VBLANK_START,
-		TID_VBLANK_END,
-		TID_SCANLINE0,
-		TID_SCANLINE
-	};
-
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_config_complete() override;
@@ -441,13 +432,14 @@ private:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();
-	void vblank_begin();
-	void vblank_end();
+	TIMER_CALLBACK_MEMBER(vblank_begin);
+	TIMER_CALLBACK_MEMBER(vblank_end);
+	TIMER_CALLBACK_MEMBER(first_scanline_tick);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
 	void update_scan_bitmap_size(int y);

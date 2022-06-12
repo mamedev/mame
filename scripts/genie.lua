@@ -35,33 +35,37 @@ end
 
 function str_to_version(str)
 	local val = 0
-	if (str == nil or str == '') then
+	if not str then
 		return val
 	end
-	local cnt = 10000
-	for word in string.gmatch(str, '([^.]+)') do
-		if(tonumber(word) == nil) then
+	local scale = 10000
+	for word, sep in str:gmatch('([^.-]+)([.-]?)') do
+		local part = tonumber(word)
+		if not part then
 			return val
 		end
-		val = val + tonumber(word) * cnt
-		cnt = cnt / 100
+		val = val + tonumber(word) * scale
+		scale = scale // 100
+		if (scale == 0) or (sep ~= '.') then
+			return val
+		end
 	end
 	return val
 end
 
 function findfunction(x)
 	assert(type(x) == "string")
-	local f=_G
+	local f = _G
 	for v in x:gmatch("[^%.]+") do
-	if type(f) ~= "table" then
-		return nil, "looking for '"..v.."' expected table, not "..type(f)
-	end
-	f=f[v]
+		if type(f) ~= "table" then
+			return nil, "looking for '" .. v .. "' expected table, not " .. type(f)
+		end
+		f = f[v]
 	end
 	if type(f) == "function" then
-	return f
+		return f
 	else
-	return nil, "expected function, not "..type(f)
+		return nil, "expected function, not " .. type(f)
 	end
 end
 
@@ -1059,6 +1063,11 @@ end
 					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 				}
 			end
+			if version >= 140000 then
+				buildoptions {
+					"-Wno-bitwise-instead-of-logical", -- clang 14.0 complains about &, | on bools in asmjit
+				}
+			end
 		else
 			if version < 70000 then
 				print("GCC version 7.0 or later needed")
@@ -1076,9 +1085,9 @@ end
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
 			}
-			if version < 100000 then
+			if version < 100300 then
 				buildoptions_cpp {
-					"-flifetime-dse=1", -- GCC 9 takes issue with Sol's get<std::optional<T> >() otherwise
+					"-flifetime-dse=1", -- GCC 10.2 and earlier take issue with Sol's get<std::optional<T> >() otherwise - possibly an issue with libstdc++ itself
 				}
 			end
 			if version >= 80000 then
@@ -1094,6 +1103,12 @@ end
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
 					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
+				}
+			end
+			if version >= 120000 then
+				buildoptions {
+					"-Wno-error=maybe-uninitialized",
+					"-Wno-error=uninitialized",   -- netlist
 				}
 			end
 		end
@@ -1291,7 +1306,6 @@ configuration { "vs20*" }
 		}
 
 		buildoptions {
-			"/WX",     -- Treats all compiler warnings as errors.
 			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 		}
 

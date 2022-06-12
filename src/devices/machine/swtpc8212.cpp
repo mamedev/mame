@@ -271,12 +271,6 @@ void swtpc8212_device::pia1_pa_w(uint8_t data)
 	m_printer_data = data;
 }
 
-int swtpc8212_device::pia1_ca1_r()
-{
-	// External parallel printer busy input.
-	return 0;
-}
-
 void swtpc8212_device::pia1_ca2_w(int state)
 {
 	// External parallel printer data ready.
@@ -329,14 +323,9 @@ MC6845_UPDATE_ROW(swtpc8212_device::update_row)
 	}
 }
 
-void swtpc8212_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(swtpc8212_device::bell_off)
 {
-	switch (id)
-	{
-	case BELL_TIMER_ID:
-		m_beeper->set_state(0);
-		break;
-	}
+	m_beeper->set_state(0);
 }
 
 void swtpc8212_device::rs232_conn_dcd_w(int state)
@@ -388,7 +377,7 @@ void swtpc8212_device::device_resolve_objects()
 
 void swtpc8212_device::device_start()
 {
-	m_bell_timer = timer_alloc(BELL_TIMER_ID);
+	m_bell_timer = timer_alloc(FUNC(swtpc8212_device::bell_off), this);
 
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_keyboard_data));
@@ -538,7 +527,7 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	// CB2 - Handshake output?
 	PIA6821(config, m_pia1);
 	m_pia1->writepa_handler().set(FUNC(swtpc8212_device::pia1_pa_w));
-	m_pia1->readca1_handler().set(FUNC(swtpc8212_device::pia1_ca1_r));
+	m_pia1->ca1_w(0); // External parallel printer busy input.
 	m_pia1->ca2_handler().set(FUNC(swtpc8212_device::pia1_ca2_w));
 	m_pia1->readpb_handler().set_ioport("DIP_SWITCHES");
 

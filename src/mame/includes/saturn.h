@@ -86,14 +86,14 @@ protected:
 
 	struct {
 		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
-		int       framebuffer_mode = 0;
-		int       framebuffer_double_interlace = 0;
-		int       fbcr_accessed = 0;
-		int       framebuffer_width = 0;
-		int       framebuffer_height = 0;
-		int       framebuffer_current_display = 0;
-		int       framebuffer_current_draw = 0;
-		int       framebuffer_clear_on_next_frame = 0;
+		int         framebuffer_mode = 0;
+		int         framebuffer_double_interlace = 0;
+		int         fbcr_accessed = 0;
+		int         framebuffer_width = 0;
+		int         framebuffer_height = 0;
+		int         framebuffer_current_display = 0;
+		int         framebuffer_current_draw = 0;
+		int         framebuffer_clear_on_next_frame = 0;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
 		std::unique_ptr<uint16_t []> framebuffer[2];
@@ -103,8 +103,10 @@ protected:
 		uint16_t    copr = 0;
 		uint16_t    ewdr = 0;
 
-		int       local_x = 0;
-		int       local_y = 0;
+		int         local_x = 0;
+		int         local_y = 0;
+
+		emu_timer * draw_end_timer = nullptr;
 	}m_vdp1;
 
 	struct {

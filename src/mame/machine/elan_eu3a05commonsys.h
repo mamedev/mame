@@ -31,7 +31,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(unknown_timer_tick);
 
 	required_device<m6502_device> m_cpu;
 	required_device<address_map_bank_device> m_bank;
@@ -63,7 +64,6 @@ private:
 	uint8_t radica_5009_unk_r() { return machine().rand(); }
 
 	emu_timer *m_unk_timer = nullptr;
-	static const device_timer_id TIMER_UNK = 0;
 	int m_whichtimer;
 
 };

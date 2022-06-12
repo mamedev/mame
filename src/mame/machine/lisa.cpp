@@ -43,58 +43,28 @@
 #include "screen.h"
 
 
-/*
-    pointers with RAM & ROM location
-*/
-
 /* up to 2MB of 68k RAM (normally 1MB or 512kb), generally 16kb of ROM */
 
 /* offsets in "maincpu" */
 #define RAM_OFFSET 0x004000
 #define ROM_OFFSET 0x000000
 
-/* 1kb of RAM for 6504 floppy disk controller (shared with 68000), and 4kb of
-ROM (8kb on some boards, but then only one 4kb bank is selected, according to
-the drive type (TWIGGY or 3.5'')) */
-
-/* special ROM (includes S/N) */
-
-
 /*
-    MMU regs
-*/
+    1kb of RAM for 6504 floppy disk controller (shared with 68000), and 4kb of
+    ROM (8kb on some boards, but then only one 4kb bank is selected, according to
+    the drive type (TWIGGY or 3.5''))
 
+    special ROM (includes S/N)
 
-
-
-
-/*
     parity logic - only hard errors are emulated for now, since
     a) the ROMs power-up test only tests hard errors
     b) most memory boards do not use soft errors (i.e. they only generate 1
       parity bit to detect errors, instead of generating several ECC bits to
       fix errors)
-*/
 
-
-
-
-/*
-    video
-*/
-
-
-/*
     2 vias : one is used for communication with COPS ; the other may be used to interface
     a hard disk
 */
-
-/*
-    floppy disk interface
-*/
-
-
-
 
 /*
     lisa model identification
@@ -106,14 +76,6 @@ enum lisa_model_t
 	lisa_210,   /* modified I/O board, and internal 10Meg drive */
 	mac_xl      /* same as above with modified video */
 };
-
-
-
-/*
-    protos
-*/
-
-
 
 
 
@@ -558,7 +520,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
 	m_via0->write_pb6(m_COPS_Ready);
 
 	/* impulsion width : +/- 20us */
-	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(lisa_state::read_COPS_command),this));
+	m_cops_cmd_timer->adjust(attotime::from_usec(20));
 }
 
 void lisa_state::reset_COPS()
@@ -934,11 +896,14 @@ void lisa_state::init_mac_xl()
 
 void lisa_state::machine_start()
 {
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::handle_mouse),this));
+	m_mouse_timer = timer_alloc(FUNC(lisa_state::handle_mouse), this);
 
 	/* read command every ms (don't know the real value) */
-	m_cops_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::set_COPS_ready), this));
+	m_cops_ready_timer = timer_alloc(FUNC(lisa_state::set_COPS_ready), this);
 	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	m_cops_cmd_timer = timer_alloc(FUNC(lisa_state::read_COPS_command), this);
+	m_cops_cmd_timer->adjust(attotime::never);
 
 	m_nvram->set_base(m_fdc_ram, 1024);
 
@@ -989,17 +954,14 @@ void lisa_state::machine_reset()
 
 	/* reset COPS keyboard/mouse controller */
 	init_COPS();
+	m_cops_cmd_timer->adjust(attotime::never);
 
-	{
-		COPS_via_out_ca2(0);    /* VIA core forgets to do so */
-	}
+	COPS_via_out_ca2(0);    /* VIA core forgets to do so */
 
 	/* initialize floppy */
+	if (m_features.floppy_hardware == sony_lisa2)
 	{
-		if (m_features.floppy_hardware == sony_lisa2)
-		{
-			sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
-		}
+		sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
 	}
 }
 

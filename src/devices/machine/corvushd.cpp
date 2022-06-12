@@ -67,6 +67,10 @@
 #include "emu.h"
 #include "machine/corvushd.h"
 
+#define LOG_RESPONSES (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 //
 // Controller Commands
@@ -241,8 +245,6 @@ corvus_hdc_device::corvus_hdc_device(const machine_config &mconfig, const char *
 {
 }
 
-#define VERBOSE 0
-#define VERBOSE_RESPONSES 0
 #define ROM_VERSION 1           // Controller ROM version
 #define MAX_COMMAND_SIZE 4096   // The maximum size of a command packet (the controller only has 5K of RAM...)
 #define SPARE_TRACKS 7          // This is a Rev B drive, so 7 it is
@@ -254,8 +256,7 @@ corvus_hdc_device::corvus_hdc_device(const machine_config &mconfig, const char *
 #define INTERBYTE_DELAY 5       // Inter-byte delay in microseconds communicating between controller and host
 #define INTERSECTOR_DELAY 25000 // 25ms delay between sectors (4800 RPM = 80 Rev/Second.  Maximum 2 sectors transferred / Rev)
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG_BUFFER(p,s) do { if (VERBOSE) dump_buffer(p,s); } while (0)
+#define LOG_BUFFER(p,s) do { if (VERBOSE & LOG_RESPONSES) dump_buffer(p,s); } while (0)
 
 
 
@@ -272,26 +273,26 @@ corvus_hdc_device::corvus_hdc_device(const machine_config &mconfig, const char *
 //      nada
 //
 void corvus_hdc_device::dump_buffer(uint8_t *buffer, uint16_t length) {
-	uint16_t  offset;
-	char    ascii_dump[16];
+	LOGMASKED(LOG_RESPONSES, "dump_buffer: Dump of %d bytes:\n", length);
+	LOGMASKED(LOG_RESPONSES, "Base  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f ASCII\n");
+	LOGMASKED(LOG_RESPONSES, "----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- ----------------");
 
-	logerror("dump_buffer: Dump of %d bytes:\n", length);
-	logerror("Base  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f ASCII\n");
-	logerror("----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- ----------------");
-
-	for(offset=0; offset < length; offset++) {
-		if(offset % 16 == 0) {                  // WHY IS 0 % 16 == 0???
-			if(offset > 0 && offset % 16 == 0)
-				logerror("%16.16s", ascii_dump);
-			logerror("\n%4.4x: %2.2x ", offset, *(buffer + offset));
-		} else {
-			logerror("%2.2x ", *(buffer + offset));
+	char data_buf[128];
+	char ascii_buf[17];
+	for(uint16_t offset = 0; offset < length; offset += 16) {
+		int buf_offset = 0;
+		for(uint8_t byte_idx = 0; byte_idx < 16 && (offset + byte_idx) < length; byte_idx++) {
+			sprintf(data_buf + buf_offset, "%02x ", *(buffer + offset));
+			ascii_buf[byte_idx] = isprint(*(buffer + offset)) ? *(buffer + offset) : '.';
 		}
-		ascii_dump[offset % 16] = isprint(*(buffer + offset)) ? *(buffer + offset) : '.';
+		if((length - offset) < 16) {
+			memset(data_buf + buf_offset, 0, (length - offset) * 3);
+			buf_offset += (length - offset) * 3;
+		}
+		data_buf[buf_offset] = '\0';
+		ascii_buf[16] = '\0';
+		LOGMASKED(LOG_RESPONSES, "%04x: %s%s", offset, data_buf, ascii_buf);
 	}
-	if(offset % 16)
-		logerror("%.*s", (16 - (offset % 16)) * 3, "                                                     ");
-	logerror("%.*s\n", (offset % 16) ? (offset % 16) : 16, ascii_dump);
 }
 
 
@@ -314,7 +315,7 @@ void corvus_hdc_device::dump_buffer(uint8_t *buffer, uint16_t length) {
 bool corvus_hdc_device::parse_hdc_command(uint8_t data) {
 	m_awaiting_modifier = false;               // This is the case by definition
 
-	LOG(("parse_hdc_command: Called with data: 0x%2.2x, Prep mode is: %d\n", data, m_prep_mode));
+	LOG("parse_hdc_command: Called with data: 0x%2.2x, Prep mode is: %d\n", data, m_prep_mode);
 
 	if(!m_prep_mode) {
 		switch(data) {
@@ -340,8 +341,8 @@ bool corvus_hdc_device::parse_hdc_command(uint8_t data) {
 			case PREP_MODE_SELECT:
 				m_recv_bytes = corvus_cmd[data][0].recv_bytes;
 				m_xmit_bytes = corvus_cmd[data][0].xmit_bytes;
-				LOG(("parse_hdc_command: Single byte command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
-					m_recv_bytes, m_xmit_bytes));
+				LOG("parse_hdc_command: Single byte command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
+					m_recv_bytes, m_xmit_bytes);
 				break;
 			//
 			// Double-byte commands
@@ -363,13 +364,13 @@ bool corvus_hdc_device::parse_hdc_command(uint8_t data) {
 		//  case DELACTIVENUM_OMNI_CODE:
 		//  case FINDACTIVE_CODE:
 				m_awaiting_modifier = true;
-				LOG(("parse_hdc_command: Double byte command recognized: 0x%2.2x\n", data));
+				LOG("parse_hdc_command: Double byte command recognized: 0x%2.2x\n", data);
 				break;
 
 			default:                            // This is an INVALID command
 				m_recv_bytes = 1;
 				m_xmit_bytes = 1;
-				LOG(("parse_hdc_command: Invalid command detected: 0x%2.2x\n", data));
+				LOG("parse_hdc_command: Invalid command detected: 0x%2.2x\n", data);
 				return true;
 		}
 	} else {
@@ -386,14 +387,14 @@ bool corvus_hdc_device::parse_hdc_command(uint8_t data) {
 			case PREP_WRITE_FIRMWARE:
 				m_recv_bytes = corvus_prep_cmd[data].recv_bytes;
 				m_xmit_bytes = corvus_prep_cmd[data].xmit_bytes;
-				LOG(("parse_hdc_command: Prep command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
-					m_recv_bytes, m_xmit_bytes));
+				LOG("parse_hdc_command: Prep command recognized: 0x%2.2x, to recv: %d, to xmit: %d\n", data,
+					m_recv_bytes, m_xmit_bytes);
 				break;
 
 			default:                            // This is an INVALID prep command
 				m_recv_bytes = 1;
 				m_xmit_bytes = 1;
-				LOG(("parse_hdc_command: Invalid Prep command detected: 0x%2.2x\n", data));
+				LOG("parse_hdc_command: Invalid Prep command detected: 0x%2.2x\n", data);
 				return true;
 		}
 	}   // if(!prep_mode)
@@ -423,7 +424,7 @@ uint8_t corvus_hdc_device::corvus_write_sector(uint8_t drv, uint32_t sector, uin
 	uint8_t   tbuffer[512];       // Buffer to hold an entire sector
 	uint16_t  cylinder;           // Cylinder this sector resides on
 
-	LOG(("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
+	LOG("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector);
 
 	disk = corvus_hdc_file(drv);
 	if(!disk) {
@@ -454,7 +455,7 @@ uint8_t corvus_hdc_device::corvus_write_sector(uint8_t drv, uint32_t sector, uin
 
 	m_last_cylinder = cylinder;
 
-	LOG(("corvus_write_sector: Full sector dump on a write of %d bytes follows:\n", len));
+	LOG("corvus_write_sector: Full sector dump on a write of %d bytes follows:\n", len);
 	LOG_BUFFER(len == 512 ? buffer : tbuffer, 512);
 
 	return STAT_SUCCESS;
@@ -491,8 +492,8 @@ uint8_t corvus_hdc_device::corvus_write_logical_sector(dadr_t *dadr, uint8_t *bu
 	drv = (dadr->address_msn_and_drive & 0x0f);
 	sector = (dadr->address_msn_and_drive & 0xf0 << 12) | (dadr->address_mid << 8) | dadr->address_lsb;
 
-	LOG(("corvus_write_logical_sector: Writing based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
-		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv));
+	LOG("corvus_write_logical_sector: Writing based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
+		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv);
 
 	// Set m_tracks_per_cylinder and m_sectors_per_track
 	corvus_hdc_file(drv);
@@ -531,7 +532,7 @@ uint8_t corvus_hdc_device::corvus_read_sector(uint8_t drv, uint32_t sector, uint
 	uint8_t   tbuffer[512];       // Buffer to store full sector results in
 	uint16_t  cylinder;
 
-	LOG(("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
+	LOG("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector);
 
 	disk = corvus_hdc_file(drv);
 	if(!disk) {
@@ -551,7 +552,7 @@ uint8_t corvus_hdc_device::corvus_read_sector(uint8_t drv, uint32_t sector, uint
 
 	m_last_cylinder = cylinder;
 
-	LOG(("corvus_read_sector: Data read follows:\n"));
+	LOG("corvus_read_sector: Data read follows:\n");
 	LOG_BUFFER(tbuffer, len);
 
 	return STAT_SUCCESS;
@@ -588,8 +589,8 @@ uint8_t corvus_hdc_device::corvus_read_logical_sector(dadr_t *dadr, uint8_t *buf
 	drv = (dadr->address_msn_and_drive & 0x0f);
 	sector = (dadr->address_msn_and_drive & 0xf0 << 12) | (dadr->address_mid << 8) | dadr->address_lsb;
 
-	LOG(("corvus_read_logical_sector: Reading based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
-		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv));
+	LOG("corvus_read_logical_sector: Reading based on DADR: 0x%6.6x, logical sector: 0x%5.5x, drive: %d\n",
+		dadr->address_msn_and_drive << 16 | dadr->address_lsb << 8 | dadr->address_mid, sector, drv);
 
 	// Set up m_tracks_per_cylinder and m_sectors_per_track
 	corvus_hdc_file(drv);
@@ -887,7 +888,7 @@ uint8_t corvus_hdc_device::corvus_get_drive_parameters(uint8_t drv) {
 	m_buffer.drive_param_response.physical_capacity.midb = (raw_capacity & 0x00ff00) >> 8;
 	m_buffer.drive_param_response.physical_capacity.lsb = (raw_capacity & 0x0000ff);
 
-	LOG(("corvus_get_drive_parameters: Drive Parameter packet follows:\n"));
+	LOG("corvus_get_drive_parameters: Drive Parameter packet follows:\n");
 	LOG_BUFFER(m_buffer.raw_data, 110);
 
 	return STAT_SUCCESS;
@@ -907,7 +908,7 @@ uint8_t corvus_hdc_device::corvus_get_drive_parameters(uint8_t drv) {
 //      status: Status of read operation
 //
 uint8_t corvus_hdc_device::corvus_read_boot_block(uint8_t block) {
-	LOG(("corvus_read_boot_block: Reading boot block: %d\n", block));
+	LOG("corvus_read_boot_block: Reading boot block: %d\n", block);
 
 	return corvus_read_sector(1, 25 + block, m_buffer.read_512_response.data, 512);
 }
@@ -957,7 +958,7 @@ uint8_t corvus_hdc_device::corvus_enter_prep_mode(uint8_t drv, uint8_t *prep_blo
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}
 
-	LOG(("corvus_enter_prep_mode: Prep mode entered for drive %d, prep block follows:\n", drv));
+	LOG("corvus_enter_prep_mode: Prep mode entered for drive %d, prep block follows:\n", drv);
 	LOG_BUFFER(prep_block, 512);
 
 	m_prep_mode = true;
@@ -976,7 +977,7 @@ uint8_t corvus_hdc_device::corvus_enter_prep_mode(uint8_t drv, uint8_t *prep_blo
 //      Status of command (always success)
 //
 uint8_t corvus_hdc_device::corvus_exit_prep_mode() {
-	LOG(("corvus_exit_prep_mode: Prep mode exited\n"));
+	LOG("corvus_exit_prep_mode: Prep mode exited\n");
 	m_prep_mode = false;
 	m_prep_drv = 0;
 	return STAT_SUCCESS;
@@ -1002,8 +1003,8 @@ uint8_t corvus_hdc_device::corvus_read_firmware_block(uint8_t head, uint8_t sect
 
 	relative_sector = head * m_sectors_per_track + sector;
 
-	LOG(("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
-		head, sector, relative_sector));
+	LOG("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
+		head, sector, relative_sector);
 
 	status = corvus_read_sector(m_prep_drv, relative_sector, m_buffer.read_512_response.data, 512);
 	return status;
@@ -1030,8 +1031,8 @@ uint8_t corvus_hdc_device::corvus_write_firmware_block(uint8_t head, uint8_t sec
 
 	relative_sector = head * m_sectors_per_track + sector;
 
-	LOG(("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
-		head, sector, relative_sector));
+	LOG("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
+		head, sector, relative_sector);
 
 	status = corvus_write_sector(m_prep_drv, relative_sector, buffer, 512);
 	return status;
@@ -1069,7 +1070,7 @@ uint8_t corvus_hdc_device::corvus_format_drive(uint8_t *pattern, uint16_t len) {
 		pattern = tbuffer;
 	}
 
-	LOG(("corvus_format_drive: Formatting drive with 0x%5.5x sectors, pattern buffer (passed length: %d) follows\n", max_sector, 512));
+	LOG("corvus_format_drive: Formatting drive with 0x%5.5x sectors, pattern buffer (passed length: %d) follows\n", max_sector, 512);
 	LOG_BUFFER(pattern, 512);
 
 	for(sector = 0; sector <= max_sector; sector++) {
@@ -1124,7 +1125,7 @@ hard_disk_file *corvus_hdc_device::corvus_hdc_file(int drv) {
 	m_tracks_per_cylinder = info.heads;
 	m_cylinders_per_drive = info.cylinders;
 
-	LOG(("corvus_hdc_file: Attached to drive %u image: H:%d, C:%d, S:%d\n", drv, info.heads, info.cylinders, info.sectors));
+	LOG("corvus_hdc_file: Attached to drive %u image: H:%d, C:%d, S:%d\n", drv, info.heads, info.cylinders, info.sectors);
 
 	return file;
 }
@@ -1143,11 +1144,8 @@ hard_disk_file *corvus_hdc_device::corvus_hdc_file(int drv) {
 //      Nothing
 //
 void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag) {
-	if (VERBOSE_RESPONSES)
-	{
-		LOG(("corvus_hdc_data_w: Complete packet received.  Dump follows:\n"));
-		LOG_BUFFER(m_buffer.raw_data, m_offset);
-	}
+	LOGMASKED(LOG_RESPONSES, "corvus_hdc_data_w: Complete packet received.  Dump follows:\n");
+	LOG_BUFFER(m_buffer.raw_data, m_offset);
 
 	if(!invalid_command_flag) {
 		if(!m_prep_mode) {
@@ -1266,12 +1264,9 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 					logerror("corvus_hdc_data_w: Unimplemented Prep command %02x, returning FATAL FAULT status!\n", m_buffer.command.code);
 			}
 		}
-		if (VERBOSE_RESPONSES)
-		{
-			LOG(("corvus_hdc_data_w: Command execution complete, status: 0x%2.2x.  Response dump follows:\n",
-				m_buffer.single_byte_response.status));
-			LOG_BUFFER(m_buffer.raw_data, m_xmit_bytes);
-		}
+		LOGMASKED(LOG_RESPONSES, "corvus_hdc_data_w: Command execution complete, status: 0x%2.2x.  Response dump follows:\n",
+			m_buffer.single_byte_response.status);
+		LOG_BUFFER(m_buffer.raw_data, m_xmit_bytes);
 
 	} // if(!invalid_command_flag)
 
@@ -1292,12 +1287,11 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 	//
 	m_offset = 0;                                  // Point to beginning of buffer for response
 
-	LOG(("corvus_hdc_data_w: Setting one-time mame timer of %d microseconds to simulate disk function\n", m_delay));
+	LOG("corvus_hdc_data_w: Setting one-time mame timer of %d microseconds to simulate disk function\n", m_delay);
 
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	//machine.scheduler().timer_set(attotime::from_usec(m_delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
 	m_cmd_timer->adjust(attotime::from_usec(m_delay), CALLBACK_CTH_MODE);
 	m_timeout_timer->enable(0);            // We've received enough data, disable the timeout timer
 
@@ -1305,54 +1299,51 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 }
 
 
+//-------------------------------------------------
+//  process_timeout - handle a command timeout
+//-------------------------------------------------
 
-//
-// Corvus_HDC_Callback
-//
-// Callback routine for completion of controller functions
-//
-// Pass:
-//      Callback Function
-//
-// Returns:
-//      Nothing
-//
-void corvus_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
+TIMER_CALLBACK_MEMBER(corvus_hdc_device::process_timeout) {
+	if(m_offset < m_recv_bytes || (m_offset > m_recv_bytes && m_recv_bytes != 0)) {
+		m_buffer.single_byte_response.status = STAT_TIMEOUT;
+		m_status |= CONTROLLER_DIRECTION;
+		m_status &= ~(CONTROLLER_BUSY);
+		m_recv_bytes = 0;
+		m_xmit_bytes = 1;
+		logerror("corvus_hdc_callback: Exceeded four-second timeout for data from host, resetting communications\n");
+	} else { // if(m_recv_bytes == 0)                 This was a variable-size command
+		LOG("corvus_hdc_callback: Executing variable-length command via four-second timeout\n");
+		corvus_process_command_packet(0);          // Process the command
+	}
+}
+
+//-------------------------------------------------
+//  complete_function - callback to complete a
+//  controller function
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(corvus_hdc_device::complete_function) {
 	int function = param;
 
-	switch(function) {
+	switch (param) {
 		case CALLBACK_CTH_MODE:
 			m_status |= CONTROLLER_DIRECTION;              // Set to Controller-to-Host, Ready mode
 			m_status &= ~(CONTROLLER_BUSY);
 
-			LOG(("corvus_hdc_callback: Callback executed with function CALLBACK_CTH_MODE\n"));
-
+			LOG("corvus_hdc_callback: Callback executed with function CALLBACK_CTH_MODE\n");
 			break;
+
 		case CALLBACK_HTC_MODE:
 			m_status &= ~(CONTROLLER_DIRECTION |
 				CONTROLLER_BUSY);                           // Set to Host-to-Controller, Ready mode
 
-			LOG(("corvus_hdc_callback: Callback executed with function CALLBACK_HTC_MODE\n"));
-
+			LOG("corvus_hdc_callback: Callback executed with function CALLBACK_HTC_MODE\n");
 			break;
+
 		case CALLBACK_SAME_MODE:
 			m_status &= ~(CONTROLLER_BUSY);                // Set the controller to Ready mode
+			break;
 
-			break;
-		case CALLBACK_TIMEOUT:                              // We reached a four-second timeout threshold
-			if(m_offset < m_recv_bytes || (m_offset > m_recv_bytes && m_recv_bytes != 0)) {
-				m_buffer.single_byte_response.status = STAT_TIMEOUT;
-				m_status |= CONTROLLER_DIRECTION;
-				m_status &= ~(CONTROLLER_BUSY);
-				m_recv_bytes = 0;
-				m_xmit_bytes = 1;
-				logerror("corvus_hdc_callback: Exceeded four-second timeout for data from host, resetting communications\n");
-			} else { // if(m_recv_bytes == 0)                 This was a variable-size command
-				LOG(("corvus_hdc_callback: Executing variable-length command via four-second timeout\n"));
-				corvus_process_command_packet(0);          // Process the command
-			}
-			break;
 		default:
 			logerror("corvus_hdc_callback: FATAL ERROR -- Unknown callback function: %d\n", function);
 			assert(0);
@@ -1383,11 +1374,12 @@ void corvus_hdc_device::device_start() {
 	m_xmit_bytes = 0;                          // We don't have anything to say to the host
 	m_recv_bytes = 0;                          // We aren't waiting on additional data from the host
 
-	m_timeout_timer = timer_alloc(TIMER_TIMEOUT);  // Set up a timer to handle the four-second host-to-controller timeout
-	m_timeout_timer->adjust(attotime::from_seconds(4), CALLBACK_TIMEOUT);
+	// Set up a timer to handle the four-second host-to-controller timeout
+	m_timeout_timer = timer_alloc(FUNC(corvus_hdc_device::process_timeout), this);
+	m_timeout_timer->adjust(attotime::from_seconds(4));
 	m_timeout_timer->enable(0);        // Start this timer out disabled
 
-	m_cmd_timer = timer_alloc(TIMER_COMMAND);
+	m_cmd_timer = timer_alloc(FUNC(corvus_hdc_device::complete_function), this);
 
 	//
 	// Define all of the packet sizes for the commands
@@ -1487,7 +1479,7 @@ void corvus_hdc_device::device_start() {
 	corvus_prep_cmd[PREP_WRITE_FIRMWARE].recv_bytes = 514;
 	corvus_prep_cmd[PREP_WRITE_FIRMWARE].xmit_bytes = 1;
 
-	LOG(("corvus_hdc_init: Drive structures initialized\n"));
+	LOG("corvus_hdc_init: Drive structures initialized\n");
 }
 
 
@@ -1537,7 +1529,7 @@ uint8_t corvus_hdc_device::read() {
 	result = m_buffer.raw_data[m_offset++];
 
 	if(m_offset == m_xmit_bytes) {
-		LOG(("corvus_hdc_data_r: Finished transmitting %d bytes of data.  Returning to idle mode.\n", m_xmit_bytes));
+		LOG("corvus_hdc_data_r: Finished transmitting %d bytes of data.  Returning to idle mode.\n", m_xmit_bytes);
 
 		m_offset = 0;          // We've reached the end of valid data
 		m_xmit_bytes = 0;      // We don't have anything more to say
@@ -1589,12 +1581,12 @@ void corvus_hdc_device::write(uint8_t data) {
 	// We're supposed to be paying attention.  Make a decision about the data received
 	//
 	if(m_offset == 0)  {                                                   // First byte of a packet
-		LOG(("corvus_hdc_data_w: Received a byte with m_offset == 0.  Processing as command: 0x%2.2x\n", data));
+		LOG("corvus_hdc_data_w: Received a byte with m_offset == 0.  Processing as command: 0x%2.2x\n", data);
 		m_invalid_command_flag = parse_hdc_command(data);
 		m_timeout_timer->reset((attotime::from_seconds(4)));
 		m_timeout_timer->enable(1);                                // Start our four-second timer
 	} else if(m_offset == 1 && m_awaiting_modifier) {                     // Second byte of a packet
-		LOG(("corvus_hdc_data_w: Received a byte while awaiting modifier with m_offset == 0.  Processing as modifier: 0x%2.2x\n", data));
+		LOG("corvus_hdc_data_w: Received a byte while awaiting modifier with m_offset == 0.  Processing as modifier: 0x%2.2x\n", data);
 		m_awaiting_modifier = false;
 		m_recv_bytes = corvus_cmd[m_buffer.command.code][data].recv_bytes;
 		m_xmit_bytes = corvus_cmd[m_buffer.command.code][data].xmit_bytes;

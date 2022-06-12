@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "sound/discrete.h"
 
 class avalnche_state : public driver_device
@@ -39,6 +40,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(credit_2_lamp_w);
 	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
 	virtual void machine_start() override;
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_16v);
 	uint32_t screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void avalnche_noise_amplitude_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud0_w);

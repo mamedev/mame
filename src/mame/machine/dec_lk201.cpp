@@ -523,10 +523,10 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
-	m_count = timer_alloc(1);
+	m_count = timer_alloc(FUNC(lk201_device::timer_irq), this);
 	m_tx_handler.resolve_safe();
 
-	m_beeper = timer_alloc(2);
+	m_beeper = timer_alloc(FUNC(lk201_device::beeper_off), this);
 
 	m_led_wait.resolve();
 	m_led_compose.resolve();
@@ -572,27 +572,19 @@ void lk201_device::device_reset()
 	m_led_hold = 0;    // led11
 }
 
-void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(lk201_device::timer_irq)
 {
-	switch (id)
-	{
-	case 1:
-		m_timer.tsr |= TSR_OCFL;
+	m_timer.tsr |= TSR_OCFL;
 
-		if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL))
-			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-		break;
-
-	case 2:
-		m_speaker->set_output_gain(0, 0);
-		m_speaker->set_state(0);
-		break;
-
-	default:
-		break;
-	}
+	if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL))
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
 }
 
+TIMER_CALLBACK_MEMBER(lk201_device::beeper_off)
+{
+	m_speaker->set_output_gain(0, 0);
+	m_speaker->set_state(0);
+}
 
 void lk201_device::rcv_complete()
 {

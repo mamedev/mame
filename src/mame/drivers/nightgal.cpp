@@ -765,7 +765,7 @@ INPUT_PORTS_END
 
 void nightgal_state::machine_start()
 {
-	m_z80_wait_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb), this));
+	m_z80_wait_ack_timer = timer_alloc(FUNC(nightgal_state::z80_wait_ack_cb), this);
 
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));

@@ -58,7 +58,7 @@ void epic12_device::device_start()
 
 	m_ram16_copy = std::make_unique<u16[]>(m_main_ramsize / 2);
 
-	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
+	m_blitter_delay_timer = timer_alloc(FUNC(epic12_device::blitter_delay_callback), this);
 	m_blitter_delay_timer->adjust(attotime::never);
 
 	m_firmware_pos = 0;

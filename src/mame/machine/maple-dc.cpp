@@ -38,7 +38,7 @@ void maple_dc_device::register_port(int port, maple_device *device)
 void maple_dc_device::device_start()
 {
 	logerror("maple_dc_device started\n");
-	timer = timer_alloc(0);
+	timer = timer_alloc(FUNC(maple_dc_device::dma_timer_tick), this);
 	irq_cb.resolve_safe();
 
 	mdstar = 0;
@@ -68,10 +68,8 @@ void maple_dc_device::device_reset()
 	dma_endflag = false;
 }
 
-void maple_dc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(maple_dc_device::dma_timer_tick)
 {
-	timer.adjust(attotime::never);
-
 	switch(dma_state) {
 	case DMA_WAIT_REPLY:
 		dma_state = DMA_TIMEOUT;
