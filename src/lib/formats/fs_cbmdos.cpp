@@ -107,7 +107,6 @@ private:
 };
 
 // methods
-bool validate_filename(std::string_view name);
 std::string_view strtrimright_cbm(std::string_view str);
 template<size_t N> std::string_view strtrimright_cbm(const char(&str)[N]);
 
@@ -225,20 +224,10 @@ std::unique_ptr<filesystem_t> fs::cbmdos_image::mount(fsblk_t &blockdev) const
 
 
 //-------------------------------------------------
-//  validate_filename
+//  strtrimright_cbm
 //-------------------------------------------------
 
 namespace {
-
-bool validate_filename(std::string_view name)
-{
-	return true;
-}
-
-
-//-------------------------------------------------
-//  strtrimright_cbm
-//-------------------------------------------------
 
 std::string_view strtrimright_cbm(std::string_view str)
 {
