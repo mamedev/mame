@@ -4,25 +4,22 @@
  PGM 022 + 025 PGM protection emulation
 
  this file contains the game / pgm specifc hookups for the IGS022/IGS025
- protection chips, actual simulation is in igs025_igs022.c
+ protection chips, actual simulation is in igs022.cpp/igs025.cpp
 
- sed by
+ Used by:
 
  The Killing Blade
  Dragon World 3
  Dragon World 3 EX
 
- ----
-
-
-
- ***********************************************************************/
+************************************************************************/
 
 #include "emu.h"
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs025_igs022.h"
 
-/* The IGS022 is an MCU which performs encrypted DMA used by
+/*
+ The IGS022 is an MCU which performs encrypted DMA used by:
  - The Killing Blade
  - Dragon World 3
  - Dragon World 3 Ex
@@ -32,7 +29,7 @@
 */
 
 
-/* NON-device stuff, game specific, keep here */
+// NON-device stuff, game specific, keep here
 
 void pgm_022_025_state::pgm_dw3_decrypt()
 {
@@ -337,7 +334,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
 void pgm_022_025_state::igs025_to_igs022_callback( void )
 {
 //  printf("igs025_to_igs022_callback\n");
-	m_igs022->IGS022_handle_command();
+	m_igs022->handle_command();
 }
 
 
@@ -380,7 +377,6 @@ void pgm_022_025_state::pgm_022_025(machine_config &config)
 	m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs022_callback));
 
 	IGS022(config, m_igs022, 0);
-
 }
 
 void pgm_022_025_state::pgm_022_025_dw3(machine_config &config)
@@ -415,6 +411,7 @@ INPUT_PORTS_START( killbld )
 	PORT_DIPSETTING(      0x0021, DEF_STR( World ) )
 INPUT_PORTS_END
 
+
 INPUT_PORTS_START( dw3 )
 	PORT_INCLUDE ( pgm )
 
@@ -428,7 +425,6 @@ INPUT_PORTS_START( dw3 )
 	PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 	PORT_CONFSETTING(      0x0007, "Singapore" )
-
 INPUT_PORTS_END
 
 
@@ -445,5 +441,4 @@ INPUT_PORTS_START( dw3j ) // for dw3100 set
 //  PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
 //  PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 //  PORT_CONFSETTING(      0x0007, "Singapore" )
-
 INPUT_PORTS_END

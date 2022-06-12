@@ -796,18 +796,18 @@ void device_ti99_peribox_card_interface::interface_config_complete()
 
 bool device_ti99_peribox_card_interface::in_dsr_space(offs_t offset, bool amadec)
 {
-	if (amadec)
-		return (offset & 0x7e000)==0x74000;
-	else
-		return (offset & 0x0e000)==0x04000;
+	if (amadec && !amabc_is_set(offset)) return false;
+	return (offset & 0x0e000)==0x04000;
 }
 
-bool device_ti99_peribox_card_interface::in_cart_space(offs_t offset, bool amadec)
+/*
+    Some cards do not decode the additional address lines AMA, AMB, AMC.
+    This leads to errors when using the card with Genmod. The typical procedure
+    to decode the lines is the same for each card.
+*/
+bool device_ti99_peribox_card_interface::amabc_is_set(offs_t offset)
 {
-	if (amadec)
-		return (offset & 0x7e000)==0x76000;
-	else
-		return (offset & 0x0e000)==0x06000;
+	return (((offset >> 16)&0x07)==0x07);
 }
 
 } // end namespace bus::ti99::peb
