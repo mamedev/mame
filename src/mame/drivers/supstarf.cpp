@@ -7,10 +7,6 @@ Super Star (Recreativos Franco)
 Skeleton driver for 8085-based pinball hardware.
 
 TODO:
-- The ROM for the sound cpu is a bad dump. The 8035 should set itself up,
-  then signal a rst(call 0024) to the 8085 which in turn sets up key
-  indicators in RAM and enabling the machine to begin. With the bad dump,
-  none of that can happen.
 - Display circuits: i8259, 74164, 74159 and other bits.
 - Default layout
 - Outputs (solenoids, lamps)
@@ -263,11 +259,21 @@ INPUT_PORTS_END
 
 ROM_START(supstarf)
 	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("m31-a-01187.ic19", 0x0000, 0x4000, CRC(ab8b1148) SHA1(496d3c9664386ae64e94462db2fdd36811a68a87))
+	// IC14 for second program ROM is unpopulated
+
+	ROM_REGION(0x1000, "soundcpu", 0)
+	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(d6d7eee2) SHA1(60e497c8845320eea01662d894d0b16349ebb7e4))
+ROM_END
+
+ROM_START(supstarfa)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("27c128.ic19", 0x0000, 0x4000, CRC(9a440461) SHA1(e2f8dcf95084f755d3a34d77ba2649602687a610))
 	// IC14 for second program ROM is unpopulated
 
 	ROM_REGION(0x1000, "soundcpu", 0)
-	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15) BAD_DUMP) // D6 stuck high and probably totally garbage
+	ROM_LOAD("2532.ic4", 0x0000, 0x1000, BAD_DUMP CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15)) // D6 stuck high and probably totally garbage
 ROM_END
 
-GAME( 1986, supstarf, 0, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarf,  0,        supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarfa, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
