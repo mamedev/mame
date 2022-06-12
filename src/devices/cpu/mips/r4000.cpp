@@ -1248,7 +1248,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if (SCACHE)
 		{
 			// Get physical address and extract tag
-			// TODO: translation type for CACHE instruction?
+			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 physical_address = ADDR(m_r[RSREG], s16(op));
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
@@ -1262,7 +1262,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 				// Decode entry and marshal each field to the TagLo register
 				// TODO: Load the ECC register here
 				u32 const cs = (tag & SCACHE_CS) >> 22;
-				u32 const stag = (tag & SCACHE_STAG);
+				u32 const stag = tag & SCACHE_STAG;
 				u32 const pidx = (tag & SCACHE_PIDX) >> 19;
 				m_cp0[CP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
 			}
@@ -1280,7 +1280,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if (SCACHE)
 		{
 			// Get virtual and physical addresses
-			// TODO: translation type for CACHE instruction?
+			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
 			u64 physical_address = virtual_address;
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
