@@ -51,28 +51,38 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(iteagle_com_default)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_38400)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_38400)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 void iteagle_fpga_device::device_add_mconfig(machine_config &config)
 {
 	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
 	// RS232 serial ports
-	// The console terminal (com1) operates at 38400 baud
 	SCC85C30(config, m_scc1, 7.3728_MHz_XTAL);
 	m_scc1->configure_channels((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0);
 	m_scc1->out_int_callback().set(FUNC(iteagle_fpga_device::serial_interrupt));
 	m_scc1->out_txda_callback().set(COM2_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(COM1_TAG, FUNC(rs232_port_device::write_txd));
 
+	// The console terminal (com1) operates at 38400 baud
 	rs232_port_device &com1(RS232_PORT(config, COM1_TAG, default_rs232_devices, nullptr));
 	com1.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxb_w));
 	com1.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcdb_w));
 	com1.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsb_w));
+	com1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(iteagle_com_default));
 
 	rs232_port_device &com2(RS232_PORT(config, COM2_TAG, default_rs232_devices, nullptr));
 	com2.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxa_w));
 	com2.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcda_w));
 	com2.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsa_w));
+	com2.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(iteagle_com_default));
 }
 
 void iteagle_fpga_device::device_start()
@@ -103,7 +113,7 @@ void iteagle_fpga_device::device_start()
 	// RAM defaults to base address 0x000e0000
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(iteagle_fpga_device::assert_vblank_irq), this);
 
 	// Switch IO
 	m_in_cb.resolve_all_safe(0xffff);
@@ -205,9 +215,10 @@ void iteagle_fpga_device::update_sequence_eg1(uint32_t data)
 }
 
 //-------------------------------------------------
-//  device_timer - called when our device timer expires
+//  assert_vblank_irq -
 //-------------------------------------------------
-void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+
+TIMER_CALLBACK_MEMBER(iteagle_fpga_device::assert_vblank_irq)
 {
 	//int beamy = m_screen->vpos();
 	//const rectangle &visarea = m_screen->visible_area();
@@ -219,7 +230,7 @@ void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, in
 	m_fpga_regs[0x04 / 4] |= 0x00080000;
 	m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
 	if (LOG_FPGA)
-		logerror("%s:fpga device_timer Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+		logerror("%s:fpga assert_vblank_irq Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
 }
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)

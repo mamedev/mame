@@ -549,7 +549,7 @@ void vsnes_state::init_vsdual()
 //**********************************************************************************
 // Vs. Super Mario Bros (Bootleg)
 
-void vsnes_state::vsnes_bootleg_scanline(int scanline, int vblank, int blanked)
+void vsnes_state::vsnes_bootleg_scanline(int scanline, bool vblank, bool blanked)
 {
 	// Z80 IRQ is controlled by two factors:
 	// - bit 6 of current (next) scanline number

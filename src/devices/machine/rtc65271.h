@@ -55,7 +55,8 @@ private:
 	uint8_t m_cur_xram_page;
 
 	/* update timer: called every second */
-	emu_timer *m_update_timer;
+	emu_timer *m_begin_update_timer = nullptr;
+	emu_timer *m_end_update_timer = nullptr;
 
 	/* SQW timer: called every periodic clock half-period */
 	emu_timer *m_SQW_timer;

@@ -108,7 +108,9 @@ protected:
 	/* Optional information overrides */
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(raise_drq);
+	TIMER_CALLBACK_MEMBER(raise_int1);
 
 	u16 ReadDmaParameter(smioc_dma_parameter_t param);
 	int DmaParameterAddress(smioc_dma_parameter_t param);

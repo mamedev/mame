@@ -50,23 +50,23 @@ namespace factory {
 
 	struct properties
 	{
-		properties(const pstring &defparam, plib::source_location &&sourceloc)
-		: m_defparam(defparam)
-		, m_sourceloc(std::move(sourceloc))
+		properties(const pstring &default_parameter, plib::source_location &&location)
+		: m_default_parameter(default_parameter)
+		, m_location(std::move(location))
 		, m_type(element_type::BUILTIN)
 		{ }
 
 		~properties() = default;
 		PCOPYASSIGNMOVE(properties, default)
 
-		pstring defparam() const noexcept
+		pstring default_parameter() const noexcept
 		{
-			return m_defparam;
+			return m_default_parameter;
 		}
 
 		plib::source_location source() const noexcept
 		{
-			return m_sourceloc;
+			return m_location;
 		}
 
 		element_type type() const noexcept { return m_type; }
@@ -77,8 +77,8 @@ namespace factory {
 			return *this;
 		}
 	private:
-		pstring m_defparam;
-		plib::source_location m_sourceloc;
+		pstring m_default_parameter;
+		plib::source_location m_location;
 		element_type m_type;
 	};
 
@@ -104,7 +104,7 @@ namespace factory {
 			const pstring &name) = 0;
 
 		pstring name() const noexcept { return m_name; }
-		pstring param_desc() const noexcept { return m_properties.defparam(); }
+		pstring param_desc() const noexcept { return m_properties.default_parameter(); }
 		plib::source_location source() const noexcept { return m_properties.source(); }
 		element_type type() const noexcept { return m_properties.type(); }
 	private:
@@ -129,7 +129,6 @@ namespace factory {
 							const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
 		{
 			return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
-			//return anetlist.make_pool_object<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
 		}
 
 		dev_uptr make_device(device_arena &pool,
@@ -144,7 +143,6 @@ namespace factory {
 			const pstring &name) override
 		{
 			return make_device(pool, anetlist, name, m_args);
-			//return pool.make_unique<C>(anetlist, name);
 		}
 
 		static uptr create(const pstring &name, properties &&props, Args&&... args)

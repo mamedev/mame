@@ -131,18 +131,11 @@ void metro_state::cpu_space_map(address_map &map)
 }
 
 
-void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(metro_state::mouja_irq)
 {
-	switch (id)
-	{
-	case TIMER_MOUJA_IRQ:
-		if (m_vdp) m_vdp->set_irq(0);
-		if (m_vdp2) m_vdp2->set_irq(0);
-		if (m_vdp3) m_vdp3->set_irq(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in metro_state::device_timer");
-	}
+	if (m_vdp) m_vdp->set_irq(0);
+	if (m_vdp2) m_vdp2->set_irq(0);
+	if (m_vdp3) m_vdp3->set_irq(0);
 }
 
 WRITE_LINE_MEMBER(metro_state::vblank_irq)
@@ -210,7 +203,7 @@ WRITE_LINE_MEMBER(metro_state::ext_irq5_enable_w)
 	m_ext_irq_enable = state;
 }
 
-void metro_state::mouja_irq_timer_ctrl_w(uint16_t data)
+void metro_state::mouja_irq_timer_ctrl_w(u16 data)
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2; /* 0xff=58Hz, 0x80=116Hz? */
 
@@ -414,7 +407,7 @@ void metro_state::coin_lockout_1word_w(u8 data)
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
 // TODO: maybe the counter also controls lockout?
-void metro_state::coin_lockout_4words_w(offs_t offset, uint16_t data)
+void metro_state::coin_lockout_4words_w(offs_t offset, u16 data)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
@@ -458,11 +451,11 @@ void metro_state::ymf278_map(address_map &map)
 ***************************************************************************/
 
 /* Really weird way of mapping 3 DSWs */
-uint16_t metro_state::balcube_dsw_r(offs_t offset)
+u16 metro_state::balcube_dsw_r(offs_t offset)
 {
-	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
-	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
-	uint16_t dsw3 = ioport("IN2")->read();
+	u16 dsw1 = ioport("DSW0")->read() >> 0;
+	u16 dsw2 = ioport("DSW0")->read() >> 8;
+	u16 dsw3 = ioport("IN2")->read();
 
 	switch (offset * 2)
 	{
@@ -721,9 +714,9 @@ void metro_state::gakusai_oki_bank_lo_w(u8 data)
 }
 
 
-uint16_t metro_state::gakusai_input_r()
+u16 metro_state::gakusai_input_r()
 {
-	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
+	u16 input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
 	if (input_sel & 0x0002) return ioport("KEY0")->read();
 	if (input_sel & 0x0004) return ioport("KEY1")->read();
@@ -1040,7 +1033,7 @@ void metro_state::mouja_okimap(address_map &map)
                                 Puzzlet
 ***************************************************************************/
 
-void metro_state::puzzlet_irq_enable_w(uint8_t data)
+void metro_state::puzzlet_irq_enable_w(u8 data)
 {
 	m_vdp2->irq_enable_w(data ^ 0xff);
 }
@@ -1070,7 +1063,7 @@ void metro_state::puzzlet_map(address_map &map)
 }
 
 
-void metro_state::puzzlet_portb_w(uint16_t data)
+void metro_state::puzzlet_portb_w(u16 data)
 {
 //  popmessage("PORTB %02x", data);
 }
@@ -5422,7 +5415,7 @@ void metro_state::init_vmetal()
 
 void metro_state::init_mouja()
 {
-	m_mouja_irq_timer = timer_alloc(TIMER_MOUJA_IRQ);
+	m_mouja_irq_timer = timer_alloc(FUNC(metro_state::mouja_irq), this);
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 

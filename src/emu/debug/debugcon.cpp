@@ -388,7 +388,9 @@ CMDERR debugger_console::internal_parse_command(std::string_view command, bool e
 		{
 			try
 			{
-				parsed_expression(visible_symtable(), command_or_expr).execute();
+				parsed_expression expr(visible_symtable(), command_or_expr);
+				if (execute)
+					expr.execute();
 			}
 			catch (expression_error &err)
 			{

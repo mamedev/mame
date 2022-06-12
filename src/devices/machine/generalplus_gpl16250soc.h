@@ -360,7 +360,8 @@ private:
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(unknown_tick);
 
 	inline uint16_t read_space(uint32_t offset);
 	inline void write_space(uint32_t offset, uint16_t data);

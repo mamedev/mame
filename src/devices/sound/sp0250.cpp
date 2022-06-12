@@ -25,6 +25,7 @@ DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SP0250, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_timer(nullptr),
 	m_pwm_mode(false),
 	m_pwm_index(PWM_CLOCKS),
 	m_pwm_count(0),
@@ -72,7 +73,8 @@ void sp0250_device::device_start()
 	{
 		m_drq(ASSERT_LINE);
 		attotime period = attotime::from_hz(frame_rate);
-		timer_alloc()->adjust(period, 0, period);
+		m_timer = timer_alloc(FUNC(sp0250_device::delayed_stream_update), this);
+		m_timer->adjust(period, 0, period);
 	}
 
 	// PWM state
@@ -108,7 +110,7 @@ void sp0250_device::device_reset()
 	load_values();
 }
 
-void sp0250_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sp0250_device::delayed_stream_update)
 {
 	m_stream->update();
 }

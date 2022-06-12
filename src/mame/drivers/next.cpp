@@ -660,7 +660,7 @@ void next_state::phy_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 }
 
-void next_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(next_state::timer_tick)
 {
 	irq_set(29, true);
 	timer_data = timer_next_data;
@@ -862,7 +862,7 @@ void next_state::machine_start()
 		save_item(NAME(dma_slots[i].drq), i);
 	}
 
-	timer_tm = timer_alloc(0);
+	timer_tm = timer_alloc(FUNC(next_state::timer_tick), this);
 }
 
 void next_state::machine_reset()

@@ -1,12 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct.h
- *
- */
+
+///
+/// \file nld_ms_direct.h
+///
+///
 #if 0
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
+
+// Names
+// spell-checker: words Seidel,Crout
+
 
 #include "solver/nld_solver.h"
 #include "solver/nld_matrix_solver.h"
@@ -38,7 +43,7 @@ public:
 
 	unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	int vsolve_non_dynamic(bool newton_raphson);
+	int upstream_solve_non_dynamic(bool newton_raphson);
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
@@ -132,11 +137,11 @@ protected:
 	nl_double delta(const nl_double * RESTRICT V);
 	void store(const nl_double * RESTRICT V);
 
-	/* bring the whole system to the current time
-	 * Don't schedule a new calculation time. The recalculation has to be
-	 * triggered by the caller after the netlist element was changed.
-	 */
-	nl_double compute_next_timestep();
+	// bring the whole system to the current time
+	// Don't schedule a new calculation time. The recalculation has to be
+	// triggered by the caller after the netlist element was changed.
+
+	nl_double compute_next_time_step();
 
 	template <typename T1, typename T2>
 	nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
@@ -164,65 +169,64 @@ matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 }
 
 template <unsigned m_N, unsigned storage_N>
-nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
+nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_time_step()
 {
-	nl_double new_solver_timestep = m_params.m_max_timestep;
+	nl_double new_solver_time_step = m_params.m_max_time_step;
 
 	if (m_params.m_dynamic_ts)
 	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
+		//
+		// FIXME: We should extend the logic to use either all nets or
+		//        only output nets.
 		for (unsigned k = 0, iN=N(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
 
 			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
-			const nl_double hn = current_timestep();
+			const nl_double hn = current_time_step();
 
 			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
-			nl_double new_net_timestep;
+			nl_double new_net_time_step;
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
 			if (plib::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / plib::abs(NL_FCONST(0.5)*DD2));
+				new_net_time_step = std::sqrt(m_params.m_dynamic_lte / plib::abs(NL_FCONST(0.5)*DD2));
 			else
-				new_net_timestep = m_params.m_max_timestep;
+				new_net_time_step = m_params.m_max_time_step;
 
-			if (new_net_timestep < new_solver_timestep)
-				new_solver_timestep = new_net_timestep;
+			if (new_net_time_step < new_solver_time_step)
+				new_solver_time_step = new_net_time_step;
 		}
-		if (new_solver_timestep < m_params.m_min_timestep)
-			new_solver_timestep = m_params.m_min_timestep;
-		if (new_solver_timestep > m_params.m_max_timestep)
-			new_solver_timestep = m_params.m_max_timestep;
+		if (new_solver_time_step < m_params.m_min_time_step)
+			new_solver_time_step = m_params.m_min_time_step;
+		if (new_solver_time_step > m_params.m_max_time_step)
+			new_solver_time_step = m_params.m_max_time_step;
 	}
-	//if (new_solver_timestep > 10.0 * hn)
-	//    new_solver_timestep = 10.0 * hn;
-	return new_solver_timestep;
+	//#if (new_solver_time_step > 10.0 * hn)
+	//#    new_solver_time_step = 10.0 * hn;
+	return new_solver_time_step;
 }
 
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
-	if (term->m_otherterm->net().isRailNet())
+	if (term->m_other_terminal->net().isRailNet())
 	{
 		m_rails_temp[k].add(term, -1, false);
 	}
 	else
 	{
-		int ot = get_net_idx(&term->m_otherterm->net());
+		int ot = get_net_idx(&term->m_other_terminal->net());
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
 		}
-		/* Should this be allowed ? */
+		// Should this be allowed ?
 		else // if (ot<0)
 		{
 			m_rails_temp[k].add(term, ot, true);
-			netlist().error("found term with missing othernet {1}\n", term->name());
+			netlist().error("found term with missing other net {1}\n", term->name());
 		}
 	}
 }
@@ -244,7 +248,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k]->m_railstart = m_terms[k]->count();
+		m_terms[k]->m_rail_start = m_terms[k]->count();
 		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].connected_net_idx()[i], false);
 
@@ -254,32 +258,32 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 #if 1
 
-	/* Sort in descending order by number of connected matrix voltages.
-	 * The idea is, that for Gauss-Seidel algo the first voltage computed
-	 * depends on the greatest number of previous voltages thus taking into
-	 * account the maximum amout of information.
-	 *
-	 * This actually improves performance on popeye slightly. Average
-	 * GS computations reduce from 2.509 to 2.370
-	 *
-	 * Smallest to largest : 2.613
-	 * Unsorted            : 2.509
-	 * Largest to smallest : 2.370
-	 *
-	 * Sorting as a general matrix pre-conditioning is mentioned in
-	 * literature but I have found no articles about Gauss Seidel.
-	 *
-	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
-	 *
-	 */
+	// Sort in descending order by number of connected matrix voltages.
+	// The idea is, that for Gauss-Seidel algo the first voltage computed
+	// depends on the greatest number of previous voltages thus taking into
+	// account the maximum amount of information.
+	//
+	// This actually improves performance on popeye slightly. Average
+	// GS computations reduce from 2.509 to 2.370
+	//
+	// Smallest to largest : 2.613
+	// Unsorted            : 2.509
+	// Largest to smallest : 2.370
+	//
+	// Sorting as a general matrix pre-conditioning is mentioned in
+	// literature but I have found no articles about Gauss Seidel.
+	//
+	// For Gaussian Elimination however increasing order is better suited.
+	// FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	//
+	//
 
 	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
 
 	for (unsigned k = 0; k < N() / 2; k++)
 		for (unsigned i = 0; i < N() - 1; i++)
 		{
-			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
+			if ((m_terms[i]->m_rail_start - m_terms[i+1]->m_rail_start) * sort_order < 0)
 			{
 				std::swap(m_terms[i],m_terms[i+1]);
 				std::swap(m_nets[i], m_nets[i+1]);
@@ -291,19 +295,18 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		int *other = m_terms[k]->connected_net_idx();
 		for (unsigned i = 0; i < m_terms[k]->count(); i++)
 			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_other_terminal->net());
 	}
 
 #endif
 
-	/* create a list of non zero elements right of the diagonal
-	 * These list anticipate the population of array elements by
-	 * Gaussian elimination.
-	 */
+	// create a list of non zero elements right of the diagonal
+	// These list anticipate the population of array elements by
+	// Gaussian elimination.
+
 	for (unsigned k = 0; k < N(); k++)
 	{
 		terms_for_net_t * t = m_terms[k];
-		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
 		t->m_nz.clear();
@@ -325,7 +328,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 		for (unsigned j = 0; j < N(); j++)
 		{
-			for (unsigned i = 0; i < t->m_railstart; i++)
+			for (unsigned i = 0; i < t->m_rail_start; i++)
 			{
 				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
 					t->m_nzrd.add(other[i]);
@@ -349,9 +352,10 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 			log("\n");
 		}
 
-	/*
-	 * save states
-	 */
+	//
+	// save states
+	//
+
 	save(NLNAME(m_RHS));
 	save(NLNAME(m_last_V));
 
@@ -378,7 +382,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 
 		nl_double akk  = 0.0;
 		const unsigned terms_count = m_terms[k]->count();
-		const unsigned railstart =  m_terms[k]->m_railstart;
+		const unsigned rail_start =  m_terms[k]->m_rail_start;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
@@ -388,7 +392,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 
 		A(k,k) += akk;
 
-		for (unsigned i = 0; i < railstart; i++)
+		for (unsigned i = 0; i < rail_start; i++)
 			A(k, net_other[i]) -= go[i];
 	}
 }
@@ -410,8 +414,8 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 		for (int i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
-			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
+		for (int i = m_terms[k]->m_rail_start; i < terms_count; i++)
+			//#rhsk = rhsk + go[i] * terms[i]->m_other_terminal->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
 		rhs[k] = rhsk_a + rhsk_b;
@@ -438,7 +442,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 		for (j=0;j<kN;j++)
 			if ((temp=fabs(m_A[i][j])) > big)
 				big=temp;
-		//if (big == 0.0) nrerror("Singular matrix in routine LUDCMP");
+		//#if (big == 0.0) nrerror("Singular matrix in routine LUDCMP");
 		vv[i]=1.0/big;
 	}
 #endif
@@ -489,7 +493,6 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 				m_A[imax][k]=m_A[j][k];
 				m_A[j][k]=dum;
 			}
-			//*d = -(*d);
 			vv[imax]=vv[j];
 		}
 		indx[j]=imax;
@@ -509,7 +512,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 {
 	const unsigned kN = N();
 
-	/* back substitution */
+	// back substitution
 
 	// int ip;
 	// ii=-1
@@ -541,10 +544,9 @@ template <unsigned m_N, unsigned storage_N>
 nl_double matrix_solver_direct_t<m_N, storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
-	 * need a revaluation of the right hand side after voltages have been updated
-	 * and thus belong into a different calculation. This applies to all solvers.
-	 */
+	// FIXME: Ideally we should also include currents (RHS) here. This would
+	// need a revaluation of the right hand side after voltages have been updated
+	// and thus belong into a different calculation. This applies to all solvers.
 
 	const unsigned iN = this->N();
 	nl_double cerr = 0;
@@ -587,7 +589,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(bool newton_r
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::upstream_solve_non_dynamic(bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_RHS);
@@ -621,5 +623,5 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	} //namespace devices
 } // namespace netlist
 
-#endif /* NLD_MS_DIRECT_H_ */
+#endif // NLD_MS_DIRECT_H_
 #endif

@@ -235,7 +235,7 @@ public:
 	void mpu4base(machine_config &config);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(update_ic24);
 
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
@@ -363,11 +363,6 @@ protected:
 	output_finder<144> m_digits;
 
 	output_finder<8> m_triacs;
-
-	enum
-	{
-		TIMER_IC24
-	};
 
 	int m_mod_number = 0;
 	int m_mmtr_data = 0;

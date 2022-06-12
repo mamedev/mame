@@ -161,7 +161,7 @@ void news_38xx_state::machine_start()
 	save_item(NAME(m_inten));
 	save_item(NAME(m_int_state));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_38xx_state::timer), this));
+	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 
 	m_intst = 0;
 	m_inten = 0x6d;

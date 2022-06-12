@@ -158,7 +158,7 @@ void kr2376_device::device_start()
 	change_output_lines();
 
 	/* create the timers */
-	m_scan_timer = timer_alloc(TIMER_SCAN_TICK);
+	m_scan_timer = timer_alloc(FUNC(kr2376_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	/* register for state saving */
@@ -263,16 +263,11 @@ void kr2376_device::detect_keypress()
 	}
 }
 
-void kr2376_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(kr2376_device::perform_scan)
 {
-	switch (id)
-		{
-			case TIMER_SCAN_TICK:
-				change_output_lines();
-				clock_scan_counters();
-				detect_keypress();
-			break;
-		}
+	change_output_lines();
+	clock_scan_counters();
+	detect_keypress();
 }
 
 /* Keyboard Data */

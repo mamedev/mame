@@ -34,6 +34,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void plus3_update_memory() override;
+	virtual bool is_contended(offs_t offset) override;
 
 private:
 	void rom_w(offs_t offset, uint8_t data);
@@ -47,6 +48,8 @@ private:
 
 	void plus3_io(address_map &map);
 	void plus3_mem(address_map &map);
+
+	static void floppy_formats(format_registration &fr);
 
 	optional_device<upd765a_device> m_upd765;
 	optional_device_array<floppy_connector, 2> m_flop;

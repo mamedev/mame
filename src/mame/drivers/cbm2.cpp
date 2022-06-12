@@ -139,7 +139,7 @@ public:
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER( tod_tick );
 
 	DECLARE_MACHINE_START( cbm2 );
 	DECLARE_MACHINE_START( cbm2_ntsc );
@@ -2043,10 +2043,10 @@ void cbm2_state::ext_cia_pb_w(uint8_t data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  tod_tick - advance the TOD clock
 //-------------------------------------------------
 
-void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cbm2_state::tod_tick)
 {
 	m_tpi1->i0_w(m_todclk);
 
@@ -2065,7 +2065,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	// allocate timer
 	int todclk = (m_ntsc ? 60 : 50) * 2;
 
-	m_todclk_timer = timer_alloc();
+	m_todclk_timer = timer_alloc(FUNC(cbm2_state::tod_tick), this);
 	m_todclk_timer->adjust(attotime::from_hz(todclk), 0, attotime::from_hz(todclk));
 
 	// state saving

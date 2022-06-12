@@ -39,16 +39,19 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual void execute_run() override;
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -132,6 +135,10 @@ private:
 	emu_timer *m_timeout_timer;
 	emu_timer *m_byte_timer;
 	emu_timer *m_f_timer;
+
+	TIMER_CALLBACK_MEMBER(timeout_tick);
+	TIMER_CALLBACK_MEMBER(byte_tick);
+	TIMER_CALLBACK_MEMBER(f_tick);
 
 	void set_output();
 	unsigned selected_drive() const;

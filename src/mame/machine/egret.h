@@ -96,9 +96,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	required_device<cpu_device> m_maincpu;
+	TIMER_CALLBACK_MEMBER(seconds_tick);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	required_device<cpu_device> m_maincpu;
 
 private:
 	uint8_t ddrs[3]{};
@@ -107,14 +107,20 @@ private:
 	uint8_t timer_ctrl = 0;
 	uint8_t timer_counter = 0;
 	uint8_t onesec = 0;
-	uint8_t xcvr_session = 0, via_full = 0, sys_session = 0, via_data = 0, via_clock = 0, last_adb = 0;
+	uint8_t xcvr_session = 0;
+	uint8_t via_full = 0;
+	uint8_t sys_session = 0;
+	uint8_t via_data = 0;
+	uint8_t via_clock = 0;
+	uint8_t last_adb = 0;
 	uint64_t last_adb_time = 0;
 	bool egret_controls_power = false;
 	bool adb_in = false;
 	int reset_line = 0;
 	int m_adb_dtime = 0;
 	emu_timer *m_timer = nullptr;
-	uint8_t pram[0x100]{}, disk_pram[0x100]{};
+	uint8_t pram[0x100]{};
+	uint8_t disk_pram[0x100]{};
 	bool pram_loaded = false;
 
 	#if USE_BUS_ADB

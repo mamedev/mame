@@ -325,7 +325,7 @@ void lnw80_state::machine_start()
 
 	m_reg_load=1;
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lnw80_state::cassette_data_callback),this));
+	m_cassette_data_timer = timer_alloc(FUNC(lnw80_state::cassette_data_callback), this);
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 }
 

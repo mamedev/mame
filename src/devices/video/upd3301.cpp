@@ -152,9 +152,8 @@ void upd3301_device::device_start()
 	m_attr_fetch_cb.resolve();
 
 	// allocate timers
-	m_hrtc_timer = timer_alloc(TIMER_HRTC);
-	m_vrtc_timer = timer_alloc(TIMER_VRTC);
-	m_drq_timer = timer_alloc(TIMER_DRQ);
+	m_hrtc_timer = timer_alloc(FUNC(upd3301_device::hrtc_update), this);
+	m_vrtc_timer = timer_alloc(FUNC(upd3301_device::vrtc_update), this);
 
 	// state saving
 	save_item(NAME(m_y));
@@ -223,7 +222,7 @@ void upd3301_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
 // this snipped was inside screen_update fn
@@ -254,45 +253,37 @@ inline void upd3301_device::reset_fifo_vrtc()
 	m_bitmap.fill(0, screen().visible_area());
 }
 
-void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd3301_device::hrtc_update)
 {
-	switch (id)
+	LOGHRTC("HRTC: %u at beam %d x %d\n", param, screen().hpos(), screen().vpos());
+
+	m_write_hrtc(param);
+	m_hrtc = param;
+
+	update_hrtc_timer(param);
+}
+
+TIMER_CALLBACK_MEMBER(upd3301_device::vrtc_update)
+{
+	LOGINT("VRTC: %u at y %d\n", param, screen().vpos());
+
+	m_write_vrtc(param);
+	m_vrtc = param;
+
+	update_vrtc_timer(param);
+	if (!get_display_status())
+		return;
+
+	if (!param)
 	{
-		case TIMER_HRTC:
-			LOGHRTC("HRTC: %u at beam %d x %d\n", param, screen().hpos(), screen().vpos());
+		reset_fifo_vrtc();
+		set_drq(1);
+	}
 
-			m_write_hrtc(param);
-			m_hrtc = param;
-
-			update_hrtc_timer(param);
-			break;
-
-		case TIMER_VRTC:
-			LOGINT("VRTC: %u at y %d\n", param, screen().vpos());
-
-			m_write_vrtc(param);
-			m_vrtc = param;
-
-			update_vrtc_timer(param);
-			if(!get_display_status())
-				break;
-
-			if (!param)
-			{
-				reset_fifo_vrtc();
-				set_drq(1);
-			}
-
-			if (param && !m_me)
-			{
-				m_status |= STATUS_E;
-				set_interrupt(1);
-			}
-
-			break;
-
-		case TIMER_DRQ:
-			break;
+	if (param && !m_me)
+	{
+		m_status |= STATUS_E;
+		set_interrupt(1);
 	}
 }
 
@@ -604,15 +595,11 @@ int upd3301_device::vrtc_r()
 UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 {
 	const u8 attr_max_size = 80;
-	std::array<u16, attr_max_size> attr_extend_info;
+	std::array<u16, attr_max_size> attr_extend_info = {0};
 
 	// elthlead (pc8801) uses b&w no attributes/no special control mode
-	// 0-fill buffer seems enough
 	if (m_gfx_mode == 1)
-	{
-		std::fill(attr_extend_info.begin(), attr_extend_info.end(), 0x00);
 		return attr_extend_info;
-	}
 
 	// TODO: may actually fetch in LIFO order
 	// Some edge cases in pc8801 N88 Basic (status on bottom), jettermi and play6lim backs up this theory.

@@ -72,9 +72,9 @@ u8 dcheese_state::iack_r(offs_t offset)
 }
 
 
-void dcheese_state::signal_irq(u8 which)
+TIMER_CALLBACK_MEMBER(dcheese_state::signal_irq)
 {
-	m_irq_state[which] = 1;
+	m_irq_state[param] = 1;
 	update_irq_state();
 }
 

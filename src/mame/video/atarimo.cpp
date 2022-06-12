@@ -326,7 +326,7 @@ void atari_motion_objects_device::device_start()
 		m_gfxlookup[i] = m_gfxindex;
 
 	// allocate a timer to periodically force update
-	m_force_update_timer = timer_alloc(TID_FORCE_UPDATE);
+	m_force_update_timer = timer_alloc(FUNC(atari_motion_objects_device::force_update), this);
 	m_force_update_timer->adjust(screen().time_until_pos(0));
 
 	// register for save states
@@ -352,23 +352,17 @@ void atari_motion_objects_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer: Handle device-specific timer
-//  calbacks
+//  force_update - periodically force an update
 //-------------------------------------------------
 
-void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(atari_motion_objects_device::force_update)
 {
-	switch (id)
-	{
-		case TID_FORCE_UPDATE:
-			if (param > 0)
-				screen().update_partial(param - 1);
-			param += 64;
-			if (param >= screen().visible_area().bottom())
-				param = 0;
-			timer.adjust(screen().time_until_pos(param), param);
-			break;
-	}
+	if (param > 0)
+		screen().update_partial(param - 1);
+	param += 64;
+	if (param >= screen().visible_area().bottom())
+		param = 0;
+	m_force_update_timer->adjust(screen().time_until_pos(param), param);
 }
 
 

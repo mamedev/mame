@@ -21,7 +21,6 @@
 TODO:
     - 0x01ee: should this move sign extend?  otherwise the test-against-minus means nothing.
     - Restore only the proper bits upon loop termination!
-    - BFCLR has some errata in the docs that may need to be applied.
 */
 
 /************************/
@@ -1818,6 +1817,7 @@ static size_t dsp56156_op_dec24(dsp56156_core* cpustate, const uint16_t op_byte,
 	/* TODO: I wonder if workBits24 should be signed? */
 	workBits24 = ((*((uint64_t*)D.addr)) & 0x000000ffffff0000U) >> 16;
 	workBits24--;
+	bool carry(workBits24 & 0x01000000);
 	workBits24 &= 0x00ffffff;       /* Solves -x issues */
 
 	/* Set the D bits with the dec result */
@@ -1829,9 +1829,10 @@ static size_t dsp56156_op_dec24(dsp56156_core* cpustate, const uint16_t op_byte,
 
 	/* S L E U N Z V C */
 	/* * * * * * ? * * */
-	/* TODO: S, L, E, U, V, C */
+	/* TODO: S, L, E, U, V */
 	if ( *((uint64_t*)D.addr) & 0x0000008000000000U)       DSP56156_N_SET(); else DSP56156_N_CLEAR();
 	if ((*((uint64_t*)D.addr) & 0x000000ffffff0000U) == 0) DSP56156_Z_SET(); else DSP56156_Z_CLEAR();
+	if (carry)                                             DSP56156_C_SET(); else DSP56156_C_CLEAR();
 
 	cycles += 2;        /* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -2185,12 +2186,12 @@ static size_t dsp56156_op_andi(dsp56156_core* cpustate, const uint16_t op, uint8
 			SR &= ((immediate << 8) | 0x00ff);
 			break;
 
-		case 0x02:  /* CCR */
-			SR &= (immediate | 0xff00);
+		case 0x02:  /* OMR */
+			OMR &= (uint8_t)(immediate);
 			break;
 
-		case 0x03:  /* OMR */
-			OMR &= (uint8_t)(immediate);
+		case 0x03:  /* CCR */
+			SR &= (immediate | 0xff00);
 			break;
 
 		default:
@@ -2342,7 +2343,7 @@ static size_t dsp56156_op_bfop(dsp56156_core* cpustate, const uint16_t op, const
 		case 0x12:  /* BFCHG */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x04:  /* BFCLR */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousValue) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x18:  /* BFSET */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x10:  /* BFTSTH */
@@ -2408,7 +2409,7 @@ static size_t dsp56156_op_bfop_1(dsp56156_core* cpustate, const uint16_t op, con
 		case 0x12:  /* BFCHG */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x04:  /* BFCLR */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousValue) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x18:  /* BFSET */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x10:  /* BFTSTH */
@@ -2478,7 +2479,7 @@ static size_t dsp56156_op_bfop_2(dsp56156_core* cpustate, const uint16_t op, con
 		case 0x12:  /* BFCHG */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x04:  /* BFCLR */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousValue) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x18:  /* BFSET */
 			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x10:  /* BFTSTH */
@@ -2855,7 +2856,8 @@ static size_t dsp56156_op_do_2(dsp56156_core* cpustate, const uint16_t op, const
 	/* HACK */
 	if (lValue >= 0xfff0)
 	{
-		cpustate->device->logerror("Dsp56156 : DO_2 operation changed %04x to 0000.\n", lValue);
+		cpustate->device->logerror("Dsp56156 : DO_2 operation changed %04x to 0000, pc:%04x ppc:%04x.\n", lValue, cpustate->PCU.pc, cpustate->ppc);
+		cpustate->device->machine().debug_break();
 		lValue = 0x0000;
 	}
 
@@ -2887,6 +2889,8 @@ static size_t dsp56156_op_do_2(dsp56156_core* cpustate, const uint16_t op, const
 		/* Third instruction cycle */
 		LF_bit_set(cpustate, 1);
 
+		/* Undocumented, but it must be true to nest Dos in DoForevers */
+		FV_bit_set(cpustate, 0);
 
 		/* S L E U N Z V C */
 		/* - * - - - - - - */

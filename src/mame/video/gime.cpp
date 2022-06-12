@@ -159,7 +159,7 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void gime_device::device_start(void)
+void gime_device::device_start()
 {
 	if (!m_ram->started())
 		throw device_missing_dependencies();
@@ -180,7 +180,7 @@ void gime_device::device_start(void)
 	m_firq = 0x00;
 
 	// allocate timer
-	m_gime_clock_timer = timer_alloc(TIMER_GIME_CLOCK);
+	m_gime_clock_timer = timer_alloc(FUNC(gime_device::timer_elapsed), this);
 
 	// setup banks
 	assert(std::size(m_read_banks) == std::size(m_write_banks));
@@ -228,7 +228,7 @@ void gime_device::device_start(void)
 //  update_rgb_palette
 //-------------------------------------------------
 
-void gime_device::update_rgb_palette(void)
+void gime_device::update_rgb_palette()
 {
 	for (int color = 0; color < 64; color++)
 	{
@@ -242,7 +242,7 @@ void gime_device::update_rgb_palette(void)
 //  update_composite_palette
 //-------------------------------------------------
 
-void gime_device::update_composite_palette(void)
+void gime_device::update_composite_palette()
 {
 	for (int color = 0; color < 64; color++)
 	{
@@ -304,7 +304,7 @@ inline gime_device::pixel_t gime_device::get_rgb_color(int color)
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void gime_device::device_reset(void)
+void gime_device::device_reset()
 {
 	/* Tepolt verifies that the GIME registers are all cleared on initialization */
 	memset(m_gime_registers, 0, sizeof(m_gime_registers));
@@ -336,26 +336,6 @@ void gime_device::device_reset(void)
 
 	update_memory();
 	reset_timer();
-}
-
-
-
-//-------------------------------------------------
-//  device_timer - handle timer callbacks
-//-------------------------------------------------
-
-void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case TIMER_GIME_CLOCK:
-			timer_elapsed();
-			break;
-
-		default:
-			super::device_timer(timer, id, param);
-			break;
-	}
 }
 
 
@@ -426,7 +406,7 @@ ioport_constructor gime_device::device_input_ports() const
 //  timer_type
 //-------------------------------------------------
 
-gime_device::timer_type_t gime_device::timer_type(void)
+gime_device::timer_type_t gime_device::timer_type()
 {
 	// wraps the GIME register access and returns an enumeration
 	return (m_gime_registers[0x01] & 0x20) ? GIME_TIMER_279NSEC : GIME_TIMER_63USEC;
@@ -438,7 +418,7 @@ gime_device::timer_type_t gime_device::timer_type(void)
 //  timer_type_string
 //-------------------------------------------------
 
-const char *gime_device::timer_type_string(void)
+const char *gime_device::timer_type_string()
 {
 	const char *result;
 	switch(timer_type())
@@ -461,7 +441,7 @@ const char *gime_device::timer_type_string(void)
 //  timer_elapsed
 //-------------------------------------------------
 
-void gime_device::timer_elapsed(void)
+TIMER_CALLBACK_MEMBER(gime_device::timer_elapsed)
 {
 	/* reset the timer; give her another run! */
 	reset_timer();
@@ -480,7 +460,7 @@ void gime_device::timer_elapsed(void)
 //  reset_timer
 //-------------------------------------------------
 
-void gime_device::reset_timer(void)
+void gime_device::reset_timer()
 {
 	/* value is from 0-4095 */
 	m_timer_value = ((m_gime_registers[0x04] & 0x0F) << 8) | m_gime_registers[0x05];
@@ -522,7 +502,7 @@ void gime_device::reset_timer(void)
 //  update_memory
 //-------------------------------------------------
 
-inline void gime_device::update_memory(void)
+inline void gime_device::update_memory()
 {
 	for (int bank = 0; bank <= 8; bank++)
 	{
@@ -662,7 +642,7 @@ void gime_device::pia_write(offs_t offset, uint8_t data)
 //  update_cart_rom
 //-------------------------------------------------
 
-void gime_device::update_cart_rom(void)
+void gime_device::update_cart_rom()
 {
 	m_cart_rom = m_cart_device->get_cart_base();
 	m_cart_size = m_cart_device->get_cart_size();
@@ -775,7 +755,7 @@ inline uint8_t gime_device::read_palette_register(offs_t offset)
 //  read_floating_bus
 //-------------------------------------------------
 
-inline uint8_t gime_device::read_floating_bus(void)
+inline uint8_t gime_device::read_floating_bus()
 {
 	return m_read_floating_bus(0);
 }
@@ -1225,7 +1205,7 @@ void gime_device::change_gime_firq(uint8_t data)
 //  John Kowalski confirms this behavior
 //-------------------------------------------------
 
-inline offs_t gime_device::get_video_base(void)
+inline offs_t gime_device::get_video_base()
 {
 	offs_t result;
 	uint8_t ff9d_mask, ff9e_mask;
@@ -1257,10 +1237,10 @@ inline offs_t gime_device::get_video_base(void)
 //  new_frame
 //-------------------------------------------------
 
-void gime_device::new_frame(void)
+TIMER_CALLBACK_MEMBER(gime_device::new_frame)
 {
 	/* call inherited function */
-	super::new_frame();
+	super::new_frame(param);
 
 	/* latch in legacy video value */
 	bool legacy_video_changed = update_value(&m_legacy_video, m_gime_registers[0] & 0x80 ? true : false);
@@ -1280,9 +1260,9 @@ void gime_device::new_frame(void)
 //  horizontal_sync_changed
 //-------------------------------------------------
 
-void gime_device::horizontal_sync_changed(bool line)
+TIMER_CALLBACK_MEMBER(gime_device::horizontal_sync_changed)
 {
-	set_interrupt_value(INTERRUPT_HBORD, line);
+	set_interrupt_value(INTERRUPT_HBORD, (bool)param);
 }
 
 
@@ -1291,7 +1271,7 @@ void gime_device::horizontal_sync_changed(bool line)
 //  enter_bottom_border
 //-------------------------------------------------
 
-void gime_device::enter_bottom_border(void)
+void gime_device::enter_bottom_border()
 {
 	set_interrupt_value(INTERRUPT_VBORD, true);
 	set_interrupt_value(INTERRUPT_VBORD, false);
@@ -1354,7 +1334,7 @@ void gime_device::record_border_scanline(uint16_t physical_scanline)
 //  get_lines_per_row
 //-------------------------------------------------
 
-inline uint16_t gime_device::get_lines_per_row(void)
+inline uint16_t gime_device::get_lines_per_row()
 {
 	uint16_t lines_per_row;
 	if (m_legacy_video)
@@ -1652,7 +1632,7 @@ void gime_device::record_partial_body_scanline(uint16_t physical_scanline, uint1
 //  update_geometry
 //-------------------------------------------------
 
-void gime_device::update_geometry(void)
+void gime_device::update_geometry()
 {
 	uint16_t top_border_scanlines, body_scanlines;
 

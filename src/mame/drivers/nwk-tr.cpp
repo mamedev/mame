@@ -507,7 +507,7 @@ void nwktr_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_work_ram);
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
+	m_sound_irq_timer = timer_alloc(FUNC(nwktr_state::sound_irq), this);
 
 	m_exrgb = false;
 

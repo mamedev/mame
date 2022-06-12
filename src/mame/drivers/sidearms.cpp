@@ -654,11 +654,11 @@ void sidearms_state::sidearms(machine_config &config)
 void sidearms_state::turtship(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); /* 4 MHz (?) */
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::turtship_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* 4 MHz (?) */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2); // strangely it runs double the clock of the main CPU, but verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -667,7 +667,7 @@ void sidearms_state::turtship(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(61.0338);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
@@ -683,14 +683,14 @@ void sidearms_state::turtship(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.25);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL / 4));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
@@ -922,9 +922,9 @@ ROM_END
 
 ROM_START( turtship )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
-	ROM_LOAD( "t-3.bin",   0x00000, 0x08000, CRC(b73ed7f2) SHA1(bb98fe41b989d6568fe8cf1900a0d15c176b61a0) )
-	ROM_LOAD( "t-2.3g",    0x08000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
-	ROM_LOAD( "t-1.bin",   0x10000, 0x08000, CRC(a258ffec) SHA1(caa689607ebe450a68736933dbfaf6bf9b6d3487) )
+	ROM_LOAD( "t-3.5g",   0x00000, 0x08000, CRC(b73ed7f2) SHA1(bb98fe41b989d6568fe8cf1900a0d15c176b61a0) )
+	ROM_LOAD( "t-2.3g",   0x08000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
+	ROM_LOAD( "t-1.3e",   0x10000, 0x08000, CRC(a258ffec) SHA1(caa689607ebe450a68736933dbfaf6bf9b6d3487) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-4.8a",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
@@ -944,14 +944,117 @@ ROM_START( turtship )
 	ROM_LOAD( "t-9.3a",    0x60000, 0x10000, CRC(44762916) SHA1(3427066fc02d1b9b71a59ac41d3332d5cd8d1423) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "t-13.1i",   0x00000, 0x10000, CRC(599f5246) SHA1(b7e5bbff3b6117613744970c8680b7bc171516bd) ) /* sprites */
-	ROM_LOAD( "t-15.bin",  0x10000, 0x10000, CRC(6489b7b4) SHA1(438d088db131f5bb4ef2124eee814b25c92115e3) )
-	ROM_LOAD( "t-12.1g",   0x20000, 0x10000, CRC(fb54cd33) SHA1(49f7b728a4de8b93f5fd929f59a65509e4556161) )
-	ROM_LOAD( "t-14.bin",  0x30000, 0x10000, CRC(1b67b674) SHA1(a77ef1b4ba4d544aa230acf779f9c339d0fc55db) )
+	ROM_LOAD( "t-13.1i",  0x00000, 0x10000, CRC(599f5246) SHA1(b7e5bbff3b6117613744970c8680b7bc171516bd) ) /* sprites */
+	ROM_LOAD( "t-15.3i",  0x10000, 0x10000, CRC(6489b7b4) SHA1(438d088db131f5bb4ef2124eee814b25c92115e3) )
+	ROM_LOAD( "t-12.1g",  0x20000, 0x10000, CRC(fb54cd33) SHA1(49f7b728a4de8b93f5fd929f59a65509e4556161) )
+	ROM_LOAD( "t-14.3g",  0x30000, 0x10000, CRC(1b67b674) SHA1(a77ef1b4ba4d544aa230acf779f9c339d0fc55db) )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "t-16.9f",   0x00000, 0x08000, CRC(1a5a45d7) SHA1(51ceeae938fbda207c3f8ce65593d271dc8c4a41) )
+
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.11p", 0x000, 0x100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) // vertical timing
+	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
+	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
+
+/***************************************************************************
+
+Turtle Ship (Philko / Pacific Games license (Japan region), 1988)
+Hardware info by Guru
+
+Philko's hardware is very bootleg-like and most probably
+made in the same factory that made other bootlegs.
+The sound circuit looks very close to the sound circuit
+on Sidearms and 1943. You could say the entire Turtle
+Ship board is a bootleg of Side Arms with different
+graphics. They disguised the board by shuffling parts
+around and putting the video board on top to make it
+look like different hardware. However a dump of the
+bi-polar PROMs reveals they are the same as Side Arms
+which makes this just another bootleg ;-)
+
+PCB Layout
+----------
+
+CPU Board
+
+20-40-2 PHILKO
+|---------------------------------------------------|
+|LA4460 VOL YM3014     YM2203    T-4.8A    LC3517(1)|
+|  VOL LM324   YM3014  YM2203                       |
+|                                Z80A               |
+|ULN2003                                       16MHz|
+|     Z80B   T-1.3E    HY6264           82S123.9E   |
+|            T-2.3G    T-3.5G                       |
+|                                                   |
+|J                      HY6264                      |
+|A           LC3517(2)                              |
+|M                               T-5.8K             |
+|M           LC3517(2)                              |
+|A                                                  |
+|  DIP-SW1                                          |
+|  DIP-SW2         PAL16L8                82S129.11P|
+|                                         82S129.11R|
+|--------------------|---------|-----|---------|----|
+                     |---------|     |---------|
+Notes:
+        Z80A - ZILOG Z80A CPU. Clock 4.000MHz [16/4] (sound CPU)
+        Z80B - ZILOG Z80B CPU. Clock 8.000MHz [16/2] (main CPU)
+      YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 4.000MHz [16/4]
+      YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.3333MHz [16/4/3]
+   HY6264(1) - Hyundai HY6264 8kBx8-bit SRAM (main program RAM)
+   HY6264(2) - Hyundai HY6264 8kBx8-bit SRAM (character/text layer RAM)
+   LC3517(1) - Sanyo LC3517 2kBx8-bit SRAM (sound CPU RAM)
+   LC3517(2) - Sanyo LC3517 2kBx8-bit SRAM (color RAM)
+      LA4460 - Sanyo LA4460 12W AF Audio Power Amplifier
+       LM324 - Texas Instruments LM324 Quad Operational Amplifier
+       SW1/2 - 8-position DIP switch labelled on the board as 'DIP-SW1' and 'DIP-SW2'
+       HSync - 15.6246kHz. Measured on horizontal timing PROM at 11R
+       VSync - 61.0338Hz. Measured on vertical timing PROM at 11P
+      T-1.3E \
+      T-2.3G | 27256 OTP EPROM (main program)
+      T-3.5G /
+      T-4.8A - 27256 OTP EPROM (sound program)
+      T-5.8K - 27256 OTP EPROM (characters / text layer). A14 is tied high on the PCB
+               effectively making this chip a 27128
+   82S123.9E - Signetics 82S123 32x8-bit Bi-Polar PROM (sound CPU-related)
+               The address lines are tied to the sound CPU and when removed there is no sound.
+  82S129.11P - Signetics 82S129 256x4-bit Bi-Polar PROM (vertical timing PROM)
+  82S129.11R - Signetics 82S129 256x4-bit Bi-Polar PROM (horizontal timing PROM)
+
+
+Top Board
+
+20-41-1
+|-----------------------------------|
+|T-6.1A T-8.1D       T-12.1G T-13.1I|
+|  T-7.1B            T-14.3G T-15.3I|
+|T-9.3A T-11.3D                     |
+|  T-10.3B                          |
+|                                   |
+|                                   |
+|                  T-16.9F          |
+|                         2018 2018 |
+|                                   |
+|                                   |
+|                                   |
+|                |------|           |
+|    LC3517      |PK8808|           |
+|    LC3517      |      |           |
+|    LC3517      |------|           |
+|----|---------|-----|---------|----|
+     |---------|     |---------|
+Notes:
+      PK8808 - Altera EP1800LC Erasable Programmable Logic Device (EPLD in PLCC68 package) acting as the sprite generator chip.
+               This is clearly a clone of Capcom's custom 86S105 sprite chip but without the internal RAM.
+      LC3517 - Sanyo LC3517 2kBx8-bit SRAM (sprite RAM for the PK8808 i.e. the internal RAM on the 86S105)
+        2018 - Toshiba TMM2018 2kBx8-bit SRAM (sprite RAM)
+T-12 to T-15 - 27512 OTP EPROM (sprites)
+   T6 to T11 - 27512 OTP EPROM (tiles)
+         T16 - 27256 OTP EPROM (background tiles)
+
+***************************************************************************/
 
 ROM_START( turtshipj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
@@ -985,6 +1088,11 @@ ROM_START( turtshipj )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "t-16.9f",   0x00000, 0x08000, CRC(1a5a45d7) SHA1(51ceeae938fbda207c3f8ce65593d271dc8c4a41) )
+
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.11p", 0x000, 0x100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) // vertical timing
+	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
+	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
 
 ROM_START( turtshipk )
@@ -1017,6 +1125,11 @@ ROM_START( turtshipk )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "turtship.016",  0x00000, 0x08000, CRC(affd51dd) SHA1(3338aa1fdd6b9926acc215f7f3656d70803f1832) )
+
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.11p", 0x000, 0x100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) // vertical timing
+	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
+	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
 
 ROM_START( turtshipko )
@@ -1050,6 +1163,11 @@ ROM_START( turtshipko )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "t-16.f9", 0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
+
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.11p", 0x000, 0x100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) // vertical timing
+	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
+	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
 
 ROM_START( turtshipkn )
@@ -1083,6 +1201,11 @@ ROM_START( turtshipkn )
 
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "t-16.f9", 0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
+
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.11p", 0x000, 0x100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) ) // vertical timing
+	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
+	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
 
 

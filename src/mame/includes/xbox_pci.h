@@ -228,9 +228,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void config_map(address_map &map) override;
+
+	TIMER_CALLBACK_MEMBER(usb_update);
 
 private:
 	ohci_usb_controller *ohci_usb;
@@ -296,9 +297,10 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void config_map(address_map &map) override;
+
+	TIMER_CALLBACK_MEMBER(audio_update);
 
 private:
 	required_device<device_memory_interface> cpu;

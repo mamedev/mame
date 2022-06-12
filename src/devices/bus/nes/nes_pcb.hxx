@@ -678,8 +678,6 @@ void nes_cart_slot_device::call_load_pcb()
 				m_cart->set_mmc1_type(mmc1_type::MMC1A);
 			else if (!strncmp(type, "MMC1B", 5)) // common prefix of several variants
 				m_cart->set_mmc1_type(mmc1_type::MMC1B);
-			else if (!strcmp(type, "MMC1C"))
-				m_cart->set_mmc1_type(mmc1_type::MMC1C);
 		}
 	}
 

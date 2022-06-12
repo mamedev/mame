@@ -184,7 +184,7 @@ void mos6530_device_base::device_start()
 	m_out_pb_cb.resolve_all_safe();
 
 	// allocate timer
-	t_gen = timer_alloc(0);
+	t_gen = timer_alloc(FUNC(mos6530_device_base::update), this);
 
 	// state saving
 	save_item(NAME(m_pa_in));
@@ -239,10 +239,10 @@ void mos6530_device_base::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update - update the current device state
 //-------------------------------------------------
 
-void mos6530_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mos6530_device_base::update)
 {
 	live_sync();
 	live_run();

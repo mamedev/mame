@@ -75,7 +75,7 @@ private:
 
 void mdt60_state::machine_start()
 {
-	m_baud_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdt60_state::baud_timer), this));
+	m_baud_timer = timer_alloc(FUNC(mdt60_state::baud_timer), this);
 	m_baud_timer->adjust(attotime::zero);
 
 	save_item(NAME(m_keyin));

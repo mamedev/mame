@@ -8,7 +8,7 @@ class md_boot_state : public md_base_state
 {
 public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
+	: md_base_state(mconfig, type, tag) { m_protcount = 0; }
 
 	void megadrvb(machine_config &config);
 	void md_bootleg(machine_config &config);
@@ -28,7 +28,6 @@ public:
 	void init_barekch();
 	void init_bk3ssrmb();
 	void init_sonic2mb();
-	void init_sonic3mb();
 	void init_twinktmb();
 	void init_jparkmb();
 	void init_sbubsm();
@@ -40,7 +39,6 @@ private:
 	uint16_t aladmdb_r();
 	uint16_t barek2mb_r();
 	uint16_t jparkmb_r();
-	uint16_t sonic3mb_r();
 	uint16_t twinktmb_r();
 	uint16_t dsw_r(offs_t offset);
 	uint16_t topshoot_200051_r();
@@ -58,6 +56,27 @@ private:
 	int m_aladmdb_mcu_port = 0;
 
 	int m_protcount;
+};
+
+class md_sonic3bl_state : public md_boot_state
+{
+public:
+	md_sonic3bl_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_boot_state(mconfig, type, tag)
+	, m_in_coin(*this, "COIN")
+	, m_in_mcu(*this, "MCU")
+	{ }
+
+	void init_sonic3mb();
+
+private:
+	required_ioport m_in_coin;
+	required_ioport m_in_mcu;
+
+	void prot_w(u8 data);
+	uint16_t prot_r();
+
+	u8 m_prot_cmd = 0;
 };
 
 class md_boot_6button_state : public md_boot_state

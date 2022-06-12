@@ -76,7 +76,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -291,7 +292,7 @@ void popper_state::popper_palette(palette_device &palette) const
 //  VIDEO EMULATION
 //**************************************************************************
 
-void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(popper_state::scanline_tick)
 {
 	int y = m_screen->vpos();
 
@@ -514,7 +515,7 @@ void popper_state::machine_start()
 	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer
-	m_scanline_timer = timer_alloc(0);
+	m_scanline_timer = timer_alloc(FUNC(popper_state::scanline_tick), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states

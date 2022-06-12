@@ -1041,7 +1041,7 @@ void m6801_cpu_device::device_start()
 {
 	m6800_cpu_device::device_start();
 
-	m_sci_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m6801_cpu_device::sci_tick),this));
+	m_sci_timer = timer_alloc(FUNC(m6801_cpu_device::sci_tick), this);
 
 	m_irq_state[M6801_IS_LINE] = 0;
 	m_port_ddr[3] = 0;

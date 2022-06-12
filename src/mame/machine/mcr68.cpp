@@ -20,9 +20,16 @@
  *
  *************************************/
 
+void mcr68_state::machine_start()
+{
+	m_493_on_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_callback), this);
+	m_493_off_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_off_callback), this);
+}
+
 void mcr68_state::machine_reset()
-{   /* for the most part all MCR/68k games are the same */
-	m_v493_callback = timer_expired_delegate(FUNC(mcr68_state::mcr68_493_callback),this);
+{
+	m_493_on_timer->adjust(attotime::never);
+	m_493_off_timer->adjust(attotime::never);
 }
 
 
@@ -47,7 +54,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mcr68_state::scanline_cb )
 		/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 		/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 		/* VBLANK and 493 using counter 2 */
-		machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback);
+		m_493_on_timer->adjust(attotime::from_hz(30) - m_timing_factor);
 	}
 
 	// HSYNC
@@ -72,7 +79,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_off_callback)
 TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
 {
 	m_maincpu->set_input_line(1, ASSERT_LINE);
-	machine().scheduler().timer_set(m_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback),this));
+	m_493_off_timer->adjust(m_screen->scan_period());
 
 	if (VERBOSE)
 		logerror("--- (INT1) ---\n");

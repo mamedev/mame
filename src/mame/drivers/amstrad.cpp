@@ -106,6 +106,7 @@ Some bugs left :
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 #include "formats/msx_dsk.h"
+#include "formats/ipf_dsk.h"
 
 #include "machine/ram.h"
 #include "softlist.h"
@@ -764,25 +765,6 @@ static INPUT_PORTS_START( aleste )
 INPUT_PORTS_END
 
 
-#if 0
-
-static const gfx_layout asic_sprite_layout =
-{
-	16,16,
-	16,
-	4,
-	{ 4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	16*16*8
-};
-
-static GFXDECODE_START( asic_sprite )
-	GFXDECODE_ENTRY( "user1", 0, asic_sprite_layout, 32, 1 )
-GFXDECODE_END
-#endif
-
-
 
 /*************************************
  *
@@ -813,6 +795,12 @@ static void amstrad_floppies(device_slot_interface &device)
 {
 	device.option_add("3ssdd", FLOPPY_3_SSDD);
 	device.option_add("35ssdd", FLOPPY_35_DD);
+}
+
+void amstrad_state::amstrad_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IPF_FORMAT);
 }
 
 static void aleste_floppies(device_slot_interface &device)
@@ -1005,8 +993,8 @@ void amstrad_state::cpc664(machine_config &config)
 {
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
@@ -1024,8 +1012,8 @@ void amstrad_state::cpc6128(machine_config &config)
 {
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
@@ -1111,8 +1099,8 @@ void amstrad_state::cpcplus(machine_config &config)
 
 	cpcplus_cartslot(config);
 
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", amstrad_state::amstrad_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 40_MHz_XTAL / 10, cpcplus_exp_cards, nullptr));

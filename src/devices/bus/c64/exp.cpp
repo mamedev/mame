@@ -368,6 +368,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "westermann.h"
 #include "xl80.h"
 #include "zaxxon.h"
+#include "z80videopak.h"
 
 void c64_expansion_cards(device_slot_interface &device)
 {
@@ -443,4 +444,5 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add_internal("westermann", C64_WESTERMANN);
 	device.option_add_internal("zaxxon", C64_ZAXXON);
 	device.option_add_internal("xl80", C64_XL80);
+	device.option_add_internal("z80videopak", C64_Z80VIDEOPAK);
 }

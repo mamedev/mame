@@ -95,7 +95,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer);
 
 private:
 	void dig0_w(u8 data);
@@ -124,7 +125,7 @@ private:
 	bool m_data_ok = false;
 	u8 m_lamp_data = 0;
 	emu_timer* m_irq_timer = nullptr;
-	static const device_timer_id TIMER_IRQ = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s6_sound_device> m_s6sound;
 	required_device<pia6821_device> m_pia22;
@@ -440,7 +441,7 @@ void s6_state::machine_start()
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(s6_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
@@ -451,26 +452,21 @@ void s6_state::machine_reset()
 		m_io_outputs[i] = 0;
 }
 
-void s6_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s6_state::irq_timer)
 {
-	switch(id)
+	if(param == 1)
 	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,3580000/4),0);
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
-		}
-		else
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
+		m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(32,3580000/4),0);
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 }
 
@@ -775,20 +771,20 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, lzbal_l2,   0,        s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, lzbal_l2sp, lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2, PROM sound)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, lzbal_t2,   lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, scrpn_l1,   0,        s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, scrpn_t1,   scrpn_l1, s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, blkou_l1,   0,        s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, blkou_t1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (T-1)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, blkou_f1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, grgar_l1,   0,        s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, grgar_t1,   grgar_l1, s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, frpwr_l6,   0,        s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-6)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, frpwr_t6,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (T-6)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, frpwr_l2,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, algar_l1,   0,        s6a, algar, s6_state, empty_init, ROT0, "Williams", "Algar (L-1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, alpok_l6,   0,        s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, alpok_l2,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, alpok_f6,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, lzbal_l2,   0,        s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, lzbal_l2sp, lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (L-2, PROM sound)",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, lzbal_t2,   lzbal_l2, s6,  lzbal, s6_state, empty_init, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scrpn_l1,   0,        s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scrpn_t1,   scrpn_l1, s6,  scrpn, s6_state, empty_init, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, blkou_l1,   0,        s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, blkou_t1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (T-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, blkou_f1,   blkou_l1, s6,  blkou, s6_state, empty_init, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, grgar_l1,   0,        s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, grgar_t1,   grgar_l1, s6,  grgar, s6_state, empty_init, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, frpwr_l6,   0,        s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-6)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, frpwr_t6,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (T-6)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, frpwr_l2,   frpwr_l6, s6,  frpwr, s6_state, empty_init, ROT0, "Williams", "Firepower (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, algar_l1,   0,        s6a, algar, s6_state, empty_init, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, alpok_l6,   0,        s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, alpok_l2,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, alpok_f6,   alpok_l6, s6a, alpok, s6_state, empty_init, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

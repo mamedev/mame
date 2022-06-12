@@ -222,15 +222,11 @@ public:
 	void racingb(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_TAITOZ_INTERRUPT6,
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(trigger_int6);
 
 private:
 	u16 sci_steer_input_r(offs_t offset);
@@ -248,8 +244,9 @@ private:
 	void racingb_map(address_map &map);
 	void racingb_cpub_map(address_map &map);
 
-	int      m_sci_spriteframe = 0;
-	s32      m_sci_int6 = 0;
+	int        m_sci_spriteframe = 0;
+	s32        m_sci_int6 = 0;
+	emu_timer *m_int6_timer = nullptr;
 };
 
 

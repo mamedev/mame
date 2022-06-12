@@ -26,14 +26,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
 private:
-	void queue(void);
+	TIMER_CALLBACK_MEMBER(update_queue);
 
 	required_ioport m_rs232_txbaud;
 	required_ioport m_rs232_rxbaud;

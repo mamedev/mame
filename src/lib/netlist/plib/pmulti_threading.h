@@ -36,8 +36,8 @@ namespace plib {
 	{
 	public:
 		inline pspin_mutex() noexcept = default;
-		static inline void lock() /*const*/ noexcept { }
-		static inline void unlock() /*const*/ noexcept { }
+		static inline void lock() noexcept { }
+		static inline void unlock() noexcept { }
 	};
 
 	class psemaphore

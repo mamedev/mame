@@ -199,7 +199,7 @@ void segahang_state::sync_ppi_w(offs_t offset, uint8_t data)
 {
 	// the port C handshaking signals control the Z80 NMI,
 	// so we have to sync whenever we access this PPI
-	synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(segahang_state::ppi_sync), this), ((offset & 3) << 8) | data);
 }
 
 
@@ -299,7 +299,19 @@ void segahang_state::i8751_p1_w(uint8_t data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_reset - reset the state of the machine
+//  machine_start
+//-------------------------------------------------
+
+void segahang_state::machine_start()
+{
+	m_lamps.resolve();
+
+	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
+}
+
+
+//-------------------------------------------------
+//  machine_reset
 //-------------------------------------------------
 
 void segahang_state::machine_reset()
@@ -308,7 +320,7 @@ void segahang_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// queue up a timer to boost interleave
-	synchronize(TID_INIT_I8751);
+	m_i8751_sync_timer->adjust(attotime::zero);
 
 	// reset global state
 	m_adc_select = 0;
@@ -316,24 +328,19 @@ void segahang_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  timer events
 //-------------------------------------------------
 
-void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(segahang_state::i8751_sync)
 {
-	switch (id)
-	{
-		// crank the interleave
-		case TID_INIT_I8751:
-			if (m_mcu != nullptr)
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
-			break;
+	if (m_mcu != nullptr)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+}
 
-		// synchronize writes to the 8255 PPI
-		case TID_PPI_WRITE:
-			m_i8255_1->write(param >> 8, param & 0xff);
-			break;
-	}
+TIMER_CALLBACK_MEMBER(segahang_state::ppi_sync)
+{
+	// synchronize writes to the 8255 PPI
+	m_i8255_1->write(param >> 8, param & 0xff);
 }
 
 

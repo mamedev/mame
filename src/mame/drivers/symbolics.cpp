@@ -104,6 +104,7 @@ private:
 	//uint16_t ram_parity_hack_r(offs_t offset);
 	//void ram_parity_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	//bool m_parity_error_has_occurred[0x20000];
+	//emu_timer *m_outfifo_timer = nullptr;
 
 	// overrides
 	virtual void machine_start() override;
@@ -111,7 +112,7 @@ private:
 
 	void m68k_mem(address_map &map);
 
-	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	//TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 };
 
 uint16_t symbolics_state::buserror_r()
@@ -281,19 +282,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-/*void symbolics_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-    switch (id)
-    {
-    case TIMER_OUTFIFO_READ:
-        outfifo_read_cb(param);
-        break;
-    default:
-        throw emu_fatalerror("Unknown id in symbolics_state::device_timer");
-    }
-}
-
-TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
+/*TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 {
     uint16_t data;
 }
@@ -308,6 +297,7 @@ void symbolics_state::init_symbolics()
 void symbolics_state::machine_start()
 {
 	//save_item(NAME(m_parity_error_has_occurred));
+	//m_outfifo_timer = timer_alloc(FUNC(symbolics_state::outfifo_read_cb), this);
 }
 
 /* reset */

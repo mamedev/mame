@@ -336,7 +336,7 @@ void alfaskop_s41_keyboard_device::alfaskop_s41_kb_mem(address_map &map)
 	 * c3 <- 0x01 <- 0-00 1 == 0800-0fff, 4800-4fff // 1100 0011
 	 * c3 <- 0x00 <- 0-00 0 == 0000-07ff, 4000-47ff // 1100 0011
 	 */
-	map(0x0080, 0xffff).lrw8(NAME([this](address_space &space, offs_t offset) -> uint8_t
+	map(0x0080, 0xffff).lrw8(NAME([this](offs_t offset) -> uint8_t
 				{
 					uint16_t addr = offset + 0x80;
 					uint8_t index = 0x10 | ((((addr & 0x8000) | ((addr & 0x3800) << 1)) >> 12) & 0x000f); // 0x10 | (((A15 | A13 | A12 | A11) >> 12)
@@ -350,7 +350,7 @@ void alfaskop_s41_keyboard_device::alfaskop_s41_kb_mem(address_map &map)
 						break;
 					case 0xd3:
 						LOGIO(" - I/O read mc6846 %04x", addr & 0x07);
-						ret = m_mc6846->read(space, (offs_t)(addr & 0x07));
+						ret = m_mc6846->read((offs_t)(addr & 0x07));
 						LOGIO(": %02x\n", ret);
 						break;
 					case 0xc3:
@@ -360,7 +360,7 @@ void alfaskop_s41_keyboard_device::alfaskop_s41_kb_mem(address_map &map)
 					}
 					return ret;
 				}),
-				NAME( [this](address_space &space, offs_t offset, uint8_t data)
+				NAME( [this](offs_t offset, uint8_t data)
 				{
 					uint16_t addr = offset + 0x80;
 					uint8_t index = 0x10 | ((((addr & 0x8000) | ((addr & 0x3800) << 1)) >> 12) & 0x000f); // 0x10 | (((A15 | A13 | A12 | A11) >> 12)
@@ -369,7 +369,7 @@ void alfaskop_s41_keyboard_device::alfaskop_s41_kb_mem(address_map &map)
 					{
 					case 0xd3:
 						LOGIO(" - I/O write mc6846 %04x, %02x\n", addr & 0x07, data);
-						m_mc6846->write(space, (offs_t)(addr & 0x07), data);
+						m_mc6846->write((offs_t)(addr & 0x07), data);
 						break;
 					case 0xcb: // Leds
 						if (m_leds != data)

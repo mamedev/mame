@@ -31,12 +31,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(transfer_tick);
 
 private:
-	// internal device state goes here
-	static const device_timer_id TIMER_TRANSFER = 0;
-
 	int get_scsi_cmd_len(uint8_t cbyte);
 	//void set_ints(uint8_t flag);
 

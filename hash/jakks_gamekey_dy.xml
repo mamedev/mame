@@ -7,8 +7,8 @@ license:CC0
 
 	<!-- This list is for the 'DY' coded Game Keys, for Disney base systems (not Disney Princess) -->
 
-	<!--  One of them doesn't use the /OE signal from the game, and has 16 10K resistors tying the data lines high.
-	   Silkscreened onto both PCBs is the text A1 A2 A3 A4 with 2 boxes next to each with H and L.  Both PCBs are marked A1 H A3 L. -->
+	<!-- One of them doesn't use the /OE signal from the game, and has 16 10K resistors tying the data lines high.
+	     Silkscreened onto both PCBs is the text A1 A2 A3 A4 with 2 boxes next to each with H and L.  Both PCBs are marked A1 H A3 L. -->
 
 	<software name="sbwlgoof" supported="no"> <!-- AT24C04 SEEPROM -->
 		<description>Sports Bowling &amp; Goofy's Underwater Adventure (V1.31 - JUN 15 2005)</description>

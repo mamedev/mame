@@ -726,7 +726,7 @@ INPUT_PORTS_END
 /* Common configurations */
 void mpu3_state::machine_start()
 {
-	m_ic21_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),this));
+	m_ic21_timer = timer_alloc(FUNC(mpu3_state::ic21_timeout), this);
 
 	m_triac.resolve();
 	m_digit.resolve();

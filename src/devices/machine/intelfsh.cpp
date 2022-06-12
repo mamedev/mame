@@ -113,7 +113,7 @@ DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device,      "sharp_l
 DEFINE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device,        "intel_te28f320",        "Intel TE28F320 Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_lh28f320bf",      "Sharp LH28F320BFHE-PBTL Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
-DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash" )
+DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
 
 DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
@@ -258,6 +258,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_SST_39SF040:
 		m_bits = 8;
 		m_size = 0x80000;
+		m_addrmask = 0x7fff;
 		m_maker_id = MFG_SST;
 		m_device_id = 0xb7;
 		m_sector_is_4k = true;
@@ -530,7 +531,7 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 void intelfsh_device::device_start()
 {
 	m_data = std::make_unique<uint8_t []>(m_size);
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_flash_mode) );
@@ -540,10 +541,10 @@ void intelfsh_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  delay_tick - handle delayed commands/events
 //-------------------------------------------------
 
-void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 {
 	switch( m_flash_mode )
 	{

@@ -173,7 +173,7 @@ void news_r3k_state::machine_start()
 	save_item(NAME(m_lcd_enable));
 	save_item(NAME(m_lcd_dim));
 
-	m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r3k_state::itimer), this));
+	m_itimer = timer_alloc(FUNC(news_r3k_state::itimer), this);
 
 	for (bool &int_state : m_int_state)
 		int_state = false;

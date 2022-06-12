@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker,Sandro Ronco
 /***************************************************************************
 
-  z88.c
+  z88.cpp
 
   Functions to emulate the video hardware of the Cambridge Z88
 
@@ -16,23 +16,6 @@ inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t c
 {
 	if (x < Z88_SCREEN_WIDTH)
 		bitmap.pix(y, x) = color;
-}
-
-// convert absolute offset into correct address to get data from
-inline uint8_t* z88_state::convert_address(uint32_t offset)
-{
-	if (offset < 0x080000) // rom
-		return m_bios + (offset & 0x7ffff);
-	else if (offset < 0x100000) // slot0
-		return m_ram_base + (offset & 0x7ffff);
-	else if (offset < 0x200000) // slot1
-		return m_carts[1]->get_cart_base() + (offset & 0xfffff);
-	else if (offset < 0x300000) // slot2
-		return m_carts[2]->get_cart_base() + (offset & 0xfffff);
-	else if (offset < 0x400000) // slot3
-		return m_carts[3]->get_cart_base() + (offset & 0xfffff);
-
-	return nullptr;
 }
 
 /***************************************************************************
@@ -49,11 +32,11 @@ void z88_state::z88_palette(palette_device &palette) const
 
 /* temp - change to gfxelement structure */
 
-void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx)
+void z88_state::vh_render_8x8(address_space &space, bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint32_t offset)
 {
 	for (int h = 0; h < 8; h++)
 	{
-		uint8_t data = gfx[h];
+		const uint8_t data = space.read_byte(offset + h);
 
 		for (int b = 0; b < 8; b++)
 		{
@@ -62,11 +45,11 @@ void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0,
 	}
 }
 
-void z88_state::vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx)
+void z88_state::vh_render_6x8(address_space &space, bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint32_t offset)
 {
 	for (int h = 0; h < 8; h++)
 	{
-		uint8_t data = gfx[h] << 2;
+		const uint8_t data = space.read_byte(offset + h) << 2;
 
 		for (int b = 0; b < 6; b++)
 		{
@@ -92,7 +75,8 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 	}
 	else
 	{
-		uint8_t *vram = convert_address(sbf << 11);
+		address_space &space = m_banks[0]->space();
+		const uint32_t vram = sbf << 11;
 
 		for (int y = 0; y < (Z88_SCREEN_HEIGHT >> 3); y++)
 		{
@@ -100,8 +84,8 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 
 			while (x < Z88_SCREEN_WIDTH)
 			{
-				uint8_t byte0 = vram[(y * 0x100) + c];
-				uint8_t byte1 = vram[(y * 0x100) + c + 1];
+				const uint8_t byte0 = space.read_byte(vram + (y * 0x100) + c);
+				const uint8_t byte1 = space.read_byte(vram + (y * 0x100) + c + 1);
 
 				// inverted graphics?
 				uint16_t pen0 = 0;
@@ -120,17 +104,17 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 					// low-res 6x8
 					const uint16_t ch = (byte0 | (byte1 << 8)) & 0x1ff;
 
-					uint8_t *char_gfx;
+					uint32_t char_offset;
 					if ((ch & 0x01c0) == 0x01c0)
-						char_gfx = convert_address(lores0 << 9) + ((ch & 0x3f) << 3);
+						char_offset = (lores0 << 9) + ((ch & 0x3f) << 3);
 					else
-						char_gfx = convert_address(lores1 << 12) + (ch << 3);
+						char_offset = (lores1 << 12) + (ch << 3);
 
 					// cursor flash
 					if (flash && (byte1 & Z88_SCR_HW_CURS) == Z88_SCR_HW_CURS)
-						vh_render_6x8(bitmap, x, y << 3, pen1, pen0, char_gfx);
+						vh_render_6x8(space, bitmap, x, y << 3, pen1, pen0, char_offset);
 					else
-						vh_render_6x8(bitmap, x, y << 3, pen0, pen1, char_gfx);
+						vh_render_6x8(space, bitmap, x, y << 3, pen0, pen1, char_offset);
 
 					// underline?
 					if (byte1 & Z88_SCR_HW_UND)
@@ -143,17 +127,17 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 					// high-res 8x8
 					const uint16_t ch = (byte0 | (byte1 << 8)) & 0x3ff;
 
-					uint8_t *char_gfx;
+					uint32_t char_offset;
 					if (BIT(ch, 8))
-						char_gfx = convert_address(hires1 << 11) + ((ch & 0xff) << 3);
+						char_offset = (hires1 << 11) + ((ch & 0xff) << 3);
 					else
-						char_gfx = convert_address(hires0 << 13) + ((ch & 0xff) << 3);
+						char_offset = (hires0 << 13) + ((ch & 0xff) << 3);
 
 					// flash
 					if ((byte1 & Z88_SCR_HW_FLS) && flash)
 						pen0 = pen1 = 0;
 
-					vh_render_8x8(bitmap, x, y << 3, pen0, pen1, char_gfx);
+					vh_render_8x8(space, bitmap, x, y << 3, pen0, pen1, char_offset);
 
 					x += 8;
 				}

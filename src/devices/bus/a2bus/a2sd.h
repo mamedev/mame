@@ -36,7 +36,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// overrides of standard a2bus slot functions
 	virtual u8 read_c0nx(u8 offset) override;
@@ -49,6 +48,7 @@ protected:
 	// SPI 4-wire interface
 	WRITE_LINE_MEMBER(spi_miso_w) { m_in_bit = state; }
 
+	TIMER_CALLBACK_MEMBER(shift_tick);
 private:
 	required_device<at28c64b_device> m_flash;
 	required_device<spi_sdcard_device> m_sdcard;

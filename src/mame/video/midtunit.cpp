@@ -182,7 +182,7 @@ void midtunit_video_device::device_start()
 	m_logged_rom.reset();
 	m_log_png = false;
 
-	m_dma_timer = timer_alloc(TIMER_DMA);
+	m_dma_timer = timer_alloc(FUNC(midtunit_video_device::dma_done), this);
 
 	/* reset all the globals */
 	m_gfxbank_offset[0] = 0x000000;
@@ -617,17 +617,10 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midtunit_video_device::dma_done)
 {
-	switch (id)
-	{
-	case TIMER_DMA:
-		m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in midtunit_video_device::device_timer");
-	}
+	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 

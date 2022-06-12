@@ -77,7 +77,7 @@ void k053250ps_device::device_start()
 	save_item(NAME(m_dmairq_on));
 
 	m_dmairq_cb.resolve_safe();
-	m_timer_lvcdma = timer_alloc(0);
+	m_timer_lvcdma = timer_alloc(FUNC(k053250ps_device::handle_od_wait), this);
 }
 
 void k053250ps_device::device_reset()
@@ -498,7 +498,7 @@ uint16_t k053250ps_device::reg_r(offs_t offset)
 }
 
 
-void k053250ps_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(k053250ps_device::handle_od_wait)
 {
 	switch(m_timer_lvcdma_state)
 	{

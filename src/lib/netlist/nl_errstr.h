@@ -53,7 +53,7 @@ namespace netlist
 	PERRMSGV(MF_TT_LINE_WITHOUT_HEAD,               0, "TT_LINE found without TT_HEAD")
 	PERRMSGV(MF_LOCAL_SOURCE_NOT_FOUND_1,           1, "Local source not found: <{1}>")
 	PERRMSGV(MF_EXTERNAL_SOURCE_IS_LOCAL_1,         1, "External lib entry appears as a local one: <{1}>")
-	PERRMSGV(MF_TRUTHTABLE_NOT_FOUND_1,             1, "Truthtable not found: <{1}>")
+	PERRMSGV(MF_TRUTHTABLE_NOT_FOUND_1,             1, "Truth table not found: <{1}>")
 
 	// nl_setup.cpp
 
@@ -99,7 +99,7 @@ namespace netlist
 	PERRMSGV(MW_CONNECTING_1_TO_ITSELF,             1, "Connecting net {1} to itself.")
 	PERRMSGV(MI_CONNECTING_1_TO_2_SAME_NET,         3, "Connecting terminals {1} and {2} which are already both on net {3}. "
 		"It is ok if you read this warning and it relates to pin which is connected internally to GND and the schematics "
-		"show an external connection as well. Onde example is the CD4538. In other cases this warning may indicate "
+		"show an external connection as well. One example is the CD4538. In other cases this warning may indicate "
 		"an error in your netlist.")
 	PERRMSGV(ME_NC_PIN_1_WITH_CONNECTIONS,          1, "Found NC (not connected) terminal {1} with connections")
 	PERRMSGV(MI_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS,1, "Found analog output {1} without connections")
@@ -119,7 +119,7 @@ namespace netlist
 		"but has been forced to act as a logic output. Parameter "
 		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
 
-	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}."
+	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to rail terminals {2}/{3}."
 		" This may reflect the schematic - but as well be an error. Please review.")
 
 	PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
@@ -140,7 +140,7 @@ namespace netlist
 	// nld_matrix_solver.cpp
 
 	PERRMSGV(MF_UNHANDLED_ELEMENT_1_FOUND,          1, "setup_base:unhandled element <{1}> found")
-	PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,   1, "found term with missing othernet {1}")
+	PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,   1, "found term with missing other net {1}")
 
 	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3, 3, "NEWTON_LOOPS exceeded resolution invoked {1} times on net {2} at {3} us")
 	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2,     2, "NEWTON_LOOPS exceeded resolution failed on net {1} ... reschedule  at {2} us")

@@ -35,18 +35,11 @@ protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
-private:
-	enum
-	{
-		TIMER_CLOCK
-		//TIMER_TP,
-		//TIMER_DATA_OUT,
-		//TIMER_TEST_MODE
-	};
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
+private:
 	emu_timer *m_timer_clock;
 	u8 m_rtc_regs[8];
 	u8 m_address;

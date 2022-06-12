@@ -183,7 +183,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
 
 	uint8_t pia_u17_pa_r();
-	DECLARE_READ_LINE_MEMBER( pia_u17_pca_r );
 	void pia_u17_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
@@ -434,15 +433,6 @@ uint8_t arachnid_state::pia_u17_pa_r()
 	return data;
 }
 
-READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
-{
-	// CA1 - 1000 HZ Input
-
-	uint8_t data = 1;
-
-	return data;
-}
-
 void arachnid_state::pia_u4_pa_w(uint8_t data)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part I
@@ -521,7 +511,7 @@ void arachnid_state::arachnid(machine_config &config)
 
 	PIA6821(config, m_pia_u17, 0);
 	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
-	m_pia_u17->readca1_handler().set(FUNC(arachnid_state::pia_u17_pca_r));
+	m_pia_u17->ca1_w(1); // CA1 - 1000 HZ Input
 	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
 	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 

@@ -245,6 +245,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("suspend",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1));
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1));
 	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1));
+	m_console.register_command("time",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_time, this, _1));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
 	m_console.register_command("//",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
@@ -1381,12 +1382,18 @@ void debugger_commands::execute_go_branch(bool sense, const std::vector<std::str
 void debugger_commands::execute_go_next_instruction(const std::vector<std::string> &params)
 {
 	u64 count = 1;
+	static constexpr u64 MAX_COUNT = 512;
 
 	// if we have a parameter, use it instead */
 	if (params.size() > 0 && !validate_number_parameter(params[0], count))
 		return;
 	if (count == 0)
 		return;
+	if (count > MAX_COUNT)
+	{
+		m_console.printf("Too many instructions (must be %d or fewer)\n", MAX_COUNT);
+		return;
+	}
 
 	device_state_interface *stateintf;
 	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
@@ -1669,6 +1676,15 @@ void debugger_commands::execute_cpulist(const std::vector<std::string> &params)
 		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
 			m_console.printf("[%s%d] %s\n", &exec.device() == m_console.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
 	}
+}
+
+//-------------------------------------------------
+//  execute_time - execute the time command
+//-------------------------------------------------
+
+void debugger_commands::execute_time(const std::vector<std::string> &params)
+{
+	m_console.printf("%s\n", m_machine.time().as_string());
 }
 
 /*-------------------------------------------------

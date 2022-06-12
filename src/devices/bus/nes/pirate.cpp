@@ -47,12 +47,12 @@ DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
-nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_AGCI_50282, tag, owner, clock)
 {
 }
 
-nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_DREAMTECH01, tag, owner, clock)
 {
 }
@@ -72,7 +72,7 @@ nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const 
 {
 }
 
-nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_DAOU306, tag, owner, clock)
 {
 }
@@ -112,10 +112,8 @@ nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char
 
 void nes_dreamtech_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(8);
-	chr8(0, m_chr_source);
 }
 
 void nes_fukutake_device::device_start()
@@ -129,7 +127,6 @@ void nes_fukutake_device::device_start()
 
 void nes_fukutake_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -163,18 +160,24 @@ void nes_daou306_device::device_start()
 
 void nes_daou306_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 2);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_LOW);
 
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
+}
+
+void nes_cc21_device::pcb_reset()
+{
+	prg32(0);
+	chr4_0(0, CHRROM);
+	chr4_4(0, CHRROM);
+	set_nt_mirroring(PPU_MIRROR_LOW);
 }
 
 void nes_xiaozy_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 }
@@ -187,7 +190,6 @@ void nes_edu2k_device::device_start()
 
 void nes_edu2k_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -223,7 +225,6 @@ void nes_43272_device::device_start()
 
 void nes_43272_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 
@@ -290,12 +291,12 @@ void nes_agci_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_dreamtech_device::write_l(offs_t offset, uint8_t data)
+void nes_dreamtech_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("dreamtech write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
-	if (offset == 0x1020)   /* 0x5020 */
+	offset += 0x100;
+	if (offset >= 0x1000)
 		prg16_89ab(data);
 }
 
@@ -371,7 +372,7 @@ uint8_t nes_fukutake_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_futuremedia_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	//  if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -576,7 +577,7 @@ uint8_t nes_edu2k_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_jy830623c_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_jy830623c_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -732,7 +733,6 @@ void nes_fujiya_device::device_start()
 
 void nes_fujiya_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);

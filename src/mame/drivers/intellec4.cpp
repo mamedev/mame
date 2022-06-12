@@ -639,7 +639,7 @@ INPUT_CHANGED_MEMBER(intellec4_state::sw_do_enable)
 
 void intellec4_state::driver_start()
 {
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intellec4_state::reset_expired), this));
+	m_reset_timer = timer_alloc(FUNC(intellec4_state::reset_expired), this);
 
 	m_led_address.resolve();
 	m_led_instruction.resolve();
@@ -1170,7 +1170,7 @@ void mod4_state::driver_start()
 
 	m_led_status_cpu.resolve();
 
-	m_one_shot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mod4_state::one_shot_expired), this));
+	m_one_shot_timer = timer_alloc(FUNC(mod4_state::one_shot_expired), this);
 
 	save_item(NAME(m_one_shot));
 
@@ -1400,7 +1400,7 @@ void mod40_state::driver_start()
 
 	m_led_status_run.resolve();
 
-	m_single_step_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mod40_state::single_step_expired), this));
+	m_single_step_timer = timer_alloc(FUNC(mod40_state::single_step_expired), this);
 
 	save_item(NAME(m_stp_ack));
 	save_item(NAME(m_single_step));

@@ -226,19 +226,19 @@ void wpc_flip2_state::wpc_flip2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_flip2_state::wpc_flip2_map);
 
 	WPCASIC(config, m_wpc, 0);
-	m_wpc->irq_callback().set(FUNC(wpc_flip2_state::wpc_irq_w));
-	m_wpc->firq_callback().set(FUNC(wpc_flip2_state::wpc_firq_w));
-	m_wpc->bank_write().set(FUNC(wpc_flip2_state::wpc_rombank_w));
+	m_wpc->irq_callback().set(FUNC(wpc_flip2_state::irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_flip2_state::firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_flip2_state::rombank_w));
 	m_wpc->sound_ctrl_read().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_r));
 	m_wpc->sound_ctrl_write().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_w));
 	m_wpc->sound_data_read().set(m_wpcsnd, FUNC(wpcsnd_device::data_r));
 	m_wpc->sound_data_write().set(m_wpcsnd, FUNC(wpcsnd_device::data_w));
-	m_wpc->dmdbank_write().set(FUNC(wpc_flip2_state::wpc_dmdbank_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_flip2_state::dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
 	WPCSND(config, m_wpcsnd);
 	m_wpcsnd->set_romregion("sound1");
-	m_wpcsnd->reply_callback().set(FUNC(wpc_flip2_state::wpcsnd_reply_w));
+	m_wpcsnd->reply_callback().set(FUNC(wpc_flip2_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

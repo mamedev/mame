@@ -285,10 +285,10 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
 
-	m_cmd_timer = timer_alloc(COMMAND_ID);
-	m_rtc_timer = timer_alloc(RTC_ID);
-	m_intback_timer = timer_alloc(INTBACK_ID);
-	m_sndres_timer = timer_alloc(SNDRES_ID);
+	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
+	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
+	m_intback_timer = timer_alloc(FUNC(smpc_hle_device::intback_continue_request), this);
+	m_sndres_timer = timer_alloc(FUNC(smpc_hle_device::sound_reset), this);
 
 	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
 	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);
@@ -564,132 +564,119 @@ void smpc_hle_device::command_register_w(uint8_t data)
 }
 
 
-void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 {
-	switch(id)
+	switch(m_comreg)
 	{
-		case COMMAND_ID:
-		{
-			switch(m_comreg)
-			{
-				case 0x00: // MSHON
-					// enable Master SH2
-					m_mshres(m_comreg & 1);
-					break;
+		case 0x00: // MSHON
+			// enable Master SH2
+			m_mshres(m_comreg & 1);
+			break;
 
-				case 0x02: // SSHON
-				case 0x03: // SSHOFF
-					// enable or disable Slave SH2
-					m_sshres(m_comreg & 1);
-					break;
+		case 0x02: // SSHON
+		case 0x03: // SSHOFF
+			// enable or disable Slave SH2
+			m_sshres(m_comreg & 1);
+			break;
 
-				case 0x06: // SNDON
-				case 0x07: // SNDOFF
-					// enable or disable 68k
-					m_sndres(m_comreg & 1);
-					break;
+		case 0x06: // SNDON
+		case 0x07: // SNDOFF
+			// enable or disable 68k
+			m_sndres(m_comreg & 1);
+			break;
 
-				case 0x08: // CDON
-				case 0x09: // CDOFF
-					// ...
-					m_command_in_progress = false;
-					m_oreg[31] = m_comreg;
-					// TODO: diagnostic also wants this to have bit 3 high
-					sf_ack(true); //set hand-shake flag
-					return;
-
-				case 0x0a: // NETLINKON
-					// TODO: understand where NetLink actually lies and implement delegation accordingly
-					// (is it really an SH1 device like suggested by the space access or it overlays on CS2 bus?)
-					popmessage("%s: NetLink enabled", this->tag());
-					 [[fallthrough]];
-				case 0x0b: // NETLINKOFF
-					break;
-
-				case 0x0d: // SYSRES
-					// send a 1 -> 0 to device reset lines
-					m_sysres(1);
-					m_sysres(0);
-
-					// send a 1 -> 0 transition to reset line (was PULSE_LINE)
-					m_mshres(1);
-					m_mshres(0);
-					break;
-
-				case 0x0e: // CKCHG352
-				case 0x0f: // CKCHG320
-					m_dotsel(m_comreg & 1);
-
-					// assert Slave SH2 line
-					m_sshres(1);
-					// clear PLL system halt
-					m_syshalt(0);
-
-					// setup the new dot select
-					m_cur_dotsel = (m_comreg & 1) ^ 1;
-
-					// send a NMI to Master SH2 if enabled
-					// it is unconditionally requested:
-					// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
-					//if(m_NMI_reset == false)
-					master_sh2_nmi();
-					break;
-
-				case 0x10: // INTBACK
-					resolve_intback();
-					return;
-
-				case 0x16: // SETTIME
-				{
-					for(int i=0;i<7;i++)
-						m_rtc_data[i] = m_ireg[i];
-					break;
-				}
-
-				case 0x17: // SETSMEM
-				{
-					for(int i=0;i<4;i++)
-						m_smem[i] = m_ireg[i];
-
-					// clear the SETIME variable, simulate a cr2032 battery alive in the system
-					m_smem[4] = 0xff;
-					break;
-				}
-
-				case 0x18: // NMIREQ
-					// NMI is unconditionally requested
-					master_sh2_nmi();
-					break;
-
-				case 0x19: // RESENAB
-				case 0x1a: // RESDISA
-					m_NMI_reset = m_comreg & 1;
-					break;
-
-				default:
-					logerror("%s: unemulated %02x command\n",this->tag(),m_comreg);
-					return;
-			}
-
+		case 0x08: // CDON
+		case 0x09: // CDOFF
+			// ...
 			m_command_in_progress = false;
 			m_oreg[31] = m_comreg;
-			sf_ack(false);
+			// TODO: diagnostic also wants this to have bit 3 high
+			sf_ack(true); //set hand-shake flag
+			return;
+
+		case 0x0a: // NETLINKON
+			// TODO: understand where NetLink actually lies and implement delegation accordingly
+			// (is it really an SH1 device like suggested by the space access or it overlays on CS2 bus?)
+			popmessage("%s: NetLink enabled", this->tag());
+			 [[fallthrough]];
+		case 0x0b: // NETLINKOFF
+			break;
+
+		case 0x0d: // SYSRES
+			// send a 1 -> 0 to device reset lines
+			m_sysres(1);
+			m_sysres(0);
+
+			// send a 1 -> 0 transition to reset line (was PULSE_LINE)
+			m_mshres(1);
+			m_mshres(0);
+			break;
+
+		case 0x0e: // CKCHG352
+		case 0x0f: // CKCHG320
+			m_dotsel(m_comreg & 1);
+
+			// assert Slave SH2 line
+			m_sshres(1);
+			// clear PLL system halt
+			m_syshalt(0);
+
+			// setup the new dot select
+			m_cur_dotsel = (m_comreg & 1) ^ 1;
+
+			// send a NMI to Master SH2 if enabled
+			// it is unconditionally requested:
+			// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
+			//if(m_NMI_reset == false)
+			master_sh2_nmi();
+			break;
+
+		case 0x10: // INTBACK
+			resolve_intback();
+			return;
+
+		case 0x16: // SETTIME
+		{
+			for(int i=0;i<7;i++)
+				m_rtc_data[i] = m_ireg[i];
 			break;
 		}
 
-		case INTBACK_ID: intback_continue_request(); break;
-		case RTC_ID: handle_rtc_increment(); break;
+		case 0x17: // SETSMEM
+		{
+			for(int i=0;i<4;i++)
+				m_smem[i] = m_ireg[i];
 
-		// from m68k reset opcode trigger
-		case SNDRES_ID:
-			m_sndres(1);
-			m_sndres(0);
+			// clear the SETIME variable, simulate a cr2032 battery alive in the system
+			m_smem[4] = 0xff;
+			break;
+		}
+
+		case 0x18: // NMIREQ
+			// NMI is unconditionally requested
+			master_sh2_nmi();
+			break;
+
+		case 0x19: // RESENAB
+		case 0x1a: // RESDISA
+			m_NMI_reset = m_comreg & 1;
 			break;
 
 		default:
-			printf("%d\n",id);
-			break;
+			logerror("%s: unemulated %02x command\n",this->tag(),m_comreg);
+			return;
 	}
+
+	m_command_in_progress = false;
+	m_oreg[31] = m_comreg;
+	sf_ack(false);
+}
+
+TIMER_CALLBACK_MEMBER(smpc_hle_device::sound_reset)
+{
+	// from m68k reset opcode trigger
+	m_sndres(1);
+	m_sndres(0);
 }
 
 void smpc_hle_device::resolve_intback()
@@ -749,7 +736,7 @@ void smpc_hle_device::resolve_intback()
 		m_intback_stage = (m_intback_buf[1] & 8) >> 3; // first peripheral
 		sr_set(0x40);
 		m_oreg[31] = 0x10;
-		intback_continue_request();
+		intback_continue_request(0);
 	}
 	else
 	{
@@ -759,7 +746,7 @@ void smpc_hle_device::resolve_intback()
 	}
 }
 
-void smpc_hle_device::intback_continue_request()
+TIMER_CALLBACK_MEMBER(smpc_hle_device::intback_continue_request)
 {
 	if( m_has_ctrl_ports == true )
 		read_saturn_ports();
@@ -801,7 +788,7 @@ int smpc_hle_device::DectoBCD(int num)
 //  RTC handling
 //**************************************************************************
 
-void smpc_hle_device::handle_rtc_increment()
+TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_rtc_increment)
 {
 	const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int year_num, year_count;

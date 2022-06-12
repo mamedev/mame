@@ -694,15 +694,10 @@ void powervr2_device::tex_get_info(texinfo *t)
 	int miptype = 0;
 
 	t->textured    = texture;
-
-	// not textured, abort.
-//  if (!t->textured) return;
-
 	t->address     = textureaddress;
 	t->pf          = pixelformat;
 	t->palette     = 0;
-
-	t->mode = (vqcompressed<<1);
+	t->mode        = (vqcompressed<<1);
 
 	// scanorder is ignored for palettized textures (palettized textures are ALWAYS twiddled)
 	// (the same bits are used for palette select instead)
@@ -716,7 +711,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	}
 
 	/* When scan order is 1 (non-twiddled) mipmap is ignored */
-	t->mipmapped  = t->mode & 1 ? 0 : mipmapped;
+	t->mipmapped = t->mode & 1 ? 0 : mipmapped;
 
 	// Mipmapped textures are always square, ignore v size
 	if (t->mipmapped)
@@ -745,7 +740,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->cd = dilatechose[t->sizes];
 	t->palbase = 0;
 	t->vqbase = t->address;
-	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
+	t->blend = ignoretexalpha ? bl10 : blend_functions[t->blend_mode];
 
 	t->coltype = coltype;
 	t->tsinstruction = tsinstruction;
@@ -1817,7 +1812,7 @@ void powervr2_device::process_ta_fifo()
 		volume=(objcontrol >> 6) & 1;
 		coltype=(objcontrol >> 4) & 3;
 		texture=(objcontrol >> 3) & 1;
-		offset_color_enable=(objcontrol >> 2) & 1;
+		offset_color_enable=texture ? (objcontrol >> 2) & 1 : 0;
 		gouraud=(objcontrol >> 1) & 1;
 		uv16bit=(objcontrol >> 0) & 1;
 	}
@@ -1905,19 +1900,19 @@ void powervr2_device::process_ta_fifo()
 		switch (tafifo_listtype)
 		{
 			case DISPLAY_LIST_OPAQUE:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this));
+				opaque_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_OPAQUE_MOD:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this));
+				opaque_modifier_volume_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_TRANS:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this));
+				translucent_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_TRANS_MOD:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this));
+				translucent_modifier_volume_irq_timer->adjust(attotime::from_usec(100));
 				break;
 			case DISPLAY_LIST_PUNCH_THROUGH:
-				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this));
+				punch_through_irq_timer->adjust(attotime::from_usec(100));
 				break;
 		}
 		tafifo_listtype = DISPLAY_LIST_NONE; // no list being received
@@ -1993,6 +1988,13 @@ void powervr2_device::process_ta_fifo()
 
 				LOGTATILE(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
 			}
+			if (use_alpha == 0)
+			{
+				// Alpha value in base/offset color is to be treated as 1.0/0xFF.
+				poly_base_color[0] = 1.0;
+				if (offset_color_enable)
+					poly_offs_color[0] = 1.0;
+			}
 			if (paratype == 4)
 			{
 				LOGTATILE(" %s\n",
@@ -2033,24 +2035,24 @@ void powervr2_device::process_ta_fifo()
 					u2f(tafifo_buff[10]), u2f(tafifo_buff[11])
 				);
 
-				if (texture == 1)
+				if (rd->verts_size <= (MAX_VERTS - 6) && grp->strips_size < MAX_STRIPS)
 				{
-					if (rd->verts_size <= (MAX_VERTS - 6) && grp->strips_size < MAX_STRIPS)
+					vert * const tv = &rd->verts[rd->verts_size];
+					tv[0].x = u2f(tafifo_buff[0x1]);
+					tv[0].y = u2f(tafifo_buff[0x2]);
+					tv[0].w = u2f(tafifo_buff[0x3]);
+					tv[1].x = u2f(tafifo_buff[0x4]);
+					tv[1].y = u2f(tafifo_buff[0x5]);
+					tv[1].w = u2f(tafifo_buff[0x6]);
+					tv[3].x = u2f(tafifo_buff[0x7]);
+					tv[3].y = u2f(tafifo_buff[0x8]);
+					tv[3].w = u2f(tafifo_buff[0x9]);
+					tv[2].x = u2f(tafifo_buff[0xa]);
+					tv[2].y = u2f(tafifo_buff[0xb]);
+					tv[2].w = tv[0].w+tv[3].w-tv[1].w;
+
+					if (texture == 1)
 					{
-						strip *ts;
-						vert *tv = &rd->verts[rd->verts_size];
-						tv[0].x = u2f(tafifo_buff[0x1]);
-						tv[0].y = u2f(tafifo_buff[0x2]);
-						tv[0].w = u2f(tafifo_buff[0x3]);
-						tv[1].x = u2f(tafifo_buff[0x4]);
-						tv[1].y = u2f(tafifo_buff[0x5]);
-						tv[1].w = u2f(tafifo_buff[0x6]);
-						tv[3].x = u2f(tafifo_buff[0x7]);
-						tv[3].y = u2f(tafifo_buff[0x8]);
-						tv[3].w = u2f(tafifo_buff[0x9]);
-						tv[2].x = u2f(tafifo_buff[0xa]);
-						tv[2].y = u2f(tafifo_buff[0xb]);
-						tv[2].w = tv[0].w+tv[3].w-tv[1].w;
 						tv[0].u = u2f(tafifo_buff[0xd] & 0xffff0000);
 						tv[0].v = u2f(tafifo_buff[0xd] << 16);
 						tv[1].u = u2f(tafifo_buff[0xe] & 0xffff0000);
@@ -2059,22 +2061,20 @@ void powervr2_device::process_ta_fifo()
 						tv[3].v = u2f(tafifo_buff[0xf] << 16);
 						tv[2].u = tv[0].u+tv[3].u-tv[1].u;
 						tv[2].v = tv[0].v+tv[3].v-tv[1].v;
-
-						int idx;
-						for (idx = 0; idx < 4; idx++) {
-							memcpy(tv[idx].b, poly_base_color,
-								   sizeof(tv[idx].b));
-							memcpy(tv[idx].o, poly_offs_color,
-								   sizeof(tv[idx].o));
-						}
-
-						ts = &grp->strips[grp->strips_size++];
-						tex_get_info(&ts->ti);
-						ts->svert = rd->verts_size;
-						ts->evert = rd->verts_size + 3;
-
-						rd->verts_size += 4;
 					}
+
+					for (int idx = 0; idx < 4; idx++)
+					{
+						memcpy(tv[idx].b, poly_base_color, sizeof(tv[idx].b));
+						memcpy(tv[idx].o, poly_offs_color, sizeof(tv[idx].o));
+					}
+
+					strip * const ts = &grp->strips[grp->strips_size++];
+					tex_get_info(&ts->ti);
+					ts->svert = rd->verts_size;
+					ts->evert = rd->verts_size + 3;
+
+					rd->verts_size += 4;
 				}
 			}
 			else if (global_paratype == 4)
@@ -3879,10 +3879,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	// TODO: accurate timing
-	machine().scheduler().timer_set(
-		state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4),
-		timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this)
-	);
+	dma_irq_timer->adjust(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4));
 }
 
 INPUT_PORTS_START( powervr2 )
@@ -3918,14 +3915,21 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-//  vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-//  vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
-	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
-	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
+//  vbout_timer = timer_alloc(FUNC(powervr2_device::vbout), this);
+//  vbin_timer = timer_alloc(FUNC(powervr2_device::vbin), this);
+	hbin_timer = timer_alloc(FUNC(powervr2_device::hbin), this);
+	yuv_timer_end = timer_alloc(FUNC(powervr2_device::yuv_convert_end), this);
 
-	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
-	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
-	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
+	endofrender_timer_isp = timer_alloc(FUNC(powervr2_device::endofrender_isp), this);
+	endofrender_timer_tsp = timer_alloc(FUNC(powervr2_device::endofrender_tsp), this);
+	endofrender_timer_video = timer_alloc(FUNC(powervr2_device::endofrender_video), this);
+
+	opaque_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_list_irq), this);
+	opaque_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this);
+	translucent_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_list_irq), this);
+	translucent_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this);
+	punch_through_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_punch_through_list_irq), this);
+	dma_irq_timer = timer_alloc(FUNC(powervr2_device::pvr_dma_irq), this);
 
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 

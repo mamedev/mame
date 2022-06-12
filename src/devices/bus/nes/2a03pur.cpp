@@ -51,8 +51,6 @@ void nes_2a03pur_device::device_start()
 
 void nes_2a03pur_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 	// register content is not touched by reset
 }
 

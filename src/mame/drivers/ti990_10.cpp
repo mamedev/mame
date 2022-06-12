@@ -88,33 +88,34 @@ public:
 		, m_intlines(0)
 		, m_ckon_state(0) { }
 
-	void init_ti990_10();
-
 	void ti990_10(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+	void main_map(address_map &map);
+	void io_map(address_map &map);
+
 	WRITE_LINE_MEMBER( key_interrupt );
 	WRITE_LINE_MEMBER( line_interrupt );
 	WRITE_LINE_MEMBER( tape_interrupt );
-	WRITE_LINE_MEMBER(ti990_set_int13);
-	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
-	uint8_t ti990_panel_read(offs_t offset);
-	void ti990_panel_write(uint8_t data);
+	WRITE_LINE_MEMBER( set_int13 );
+	WRITE_LINE_MEMBER( ckon_ckof_callback );
+	uint8_t panel_read(offs_t offset);
+	void panel_write(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(clear_load);
 
-	void ti990_hold_load();
-	void ti990_set_int_line(int line, int state);
+	void hold_load();
+	void set_int_line(int line, int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vdt911_device> m_terminal;
 	uint16_t m_intlines;
 	int m_ckon_state;
-	void ti990_10_io(address_map &map);
-	void ti990_10_memmap(address_map &map);
+	emu_timer*  m_load_timer = nullptr;
 };
 
 
@@ -122,7 +123,7 @@ private:
     Interrupt priority encoder.  Actually part of the CPU board.
 */
 
-void ti990_10_state::ti990_set_int_line(int line, int state)
+void ti990_10_state::set_int_line(int line, int state)
 {
 	int level;
 
@@ -143,9 +144,9 @@ void ti990_10_state::ti990_set_int_line(int line, int state)
 }
 
 
-WRITE_LINE_MEMBER(ti990_10_state::ti990_set_int13)
+WRITE_LINE_MEMBER(ti990_10_state::set_int13)
 {
-	ti990_set_int_line(13, state);
+	set_int_line(13, state);
 }
 
 /*
@@ -157,10 +158,10 @@ TIMER_CALLBACK_MEMBER(ti990_10_state::clear_load)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void ti990_10_state::ti990_hold_load()
+void ti990_10_state::hold_load()
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(ti990_10_state::clear_load),this));
+	m_load_timer->adjust(attotime::from_msec(100));
 }
 
 /*
@@ -173,14 +174,14 @@ WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
 {
 	// set_int10(state);
 	if (m_ckon_state)
-		ti990_set_int_line(5, 1);
+		set_int_line(5, 1);
 }
 
-WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
+WRITE_LINE_MEMBER(ti990_10_state::ckon_ckof_callback)
 {
 	m_ckon_state = state;
 	if (! m_ckon_state)
-		ti990_set_int_line(5, 0);
+		set_int_line(5, 0);
 }
 
 
@@ -230,7 +231,7 @@ WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
     F: flag (according to 990 handbook)
 */
 
-uint8_t ti990_10_state::ti990_panel_read(offs_t offset)
+uint8_t ti990_10_state::panel_read(offs_t offset)
 {
 	if (offset == 1)
 		return 0x48;
@@ -238,14 +239,25 @@ uint8_t ti990_10_state::ti990_panel_read(offs_t offset)
 	return 0;
 }
 
-void ti990_10_state::ti990_panel_write(uint8_t data)
+void ti990_10_state::panel_write(uint8_t data)
 {
 }
 
+void ti990_10_state::machine_start()
+{
+	m_load_timer = timer_alloc(FUNC(ti990_10_state::clear_load), this);
+
+#if 0
+	/* load specific ti990/12 rom page */
+	const int page = 3;
+
+	memmove(memregion("maincpu")->base() + 0x1ffc00, memregion("maincpu")->base() + 0x1ffc00 + page * 0x400, 0x400);
+#endif
+}
 
 void ti990_10_state::machine_reset()
 {
-	ti990_hold_load();
+	hold_load();
 }
 
 /*
@@ -259,7 +271,7 @@ void ti990_10_state::rset_callback)
 void ti990_10_state::lrex_callback)
 {
     // right???
-    ti990_hold_load();
+    hold_load();
 }
 */
 
@@ -278,7 +290,7 @@ WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
   Memory map - see description above
 */
 
-void ti990_10_state::ti990_10_memmap(address_map &map)
+void ti990_10_state::main_map(address_map &map)
 {
 
 	map(0x000000, 0x0fffff).ram();     /* let's say we have 1MB of RAM */
@@ -296,16 +308,16 @@ void ti990_10_state::ti990_10_memmap(address_map &map)
   CRU map
 */
 
-void ti990_10_state::ti990_10_io(address_map &map)
+void ti990_10_state::io_map(address_map &map)
 {
 	map(0x10, 0x11).r(m_terminal, FUNC(vdt911_device::cru_r));
 	map(0x80, 0x8f).w(m_terminal, FUNC(vdt911_device::cru_w));
 	map(0x1fa, 0x1fb).noprw(); // .r(FUNC(ti990_10_state::ti990_10_mapper_cru_r));
 	map(0x1fc, 0x1fd).noprw(); // .r(FUNC(ti990_10_state::ti990_10_eir_cru_r));
-	map(0x1fe, 0x1ff).r(FUNC(ti990_10_state::ti990_panel_read));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_10_state::panel_read));
 	map(0xfd0, 0xfdf).noprw(); // .w(FUNC(ti990_10_state::ti990_10_mapper_cru_w));
 	map(0xfe0, 0xfef).noprw(); // .w(FUNC(ti990_10_state::ti990_10_eir_cru_w));
-	map(0xff0, 0xfff).w(FUNC(ti990_10_state::ti990_panel_write));
+	map(0xff0, 0xfff).w(FUNC(ti990_10_state::panel_write));
 
 }
 
@@ -322,8 +334,8 @@ void ti990_10_state::ti990_10(machine_config &config)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	TI990_10(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::ti990_10_memmap);
-	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::ti990_10_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::io_map);
 
 	// VDT 911 terminal
 	VDT911(config, m_terminal, 0);
@@ -333,7 +345,7 @@ void ti990_10_state::ti990_10(machine_config &config)
 	// Hard disk
 	ti990_hdc_device &hdc(TI990_HDC(config, "hdc", 0));
 	hdc.set_memory_space(m_maincpu, AS_PROGRAM);
-	hdc.int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
+	hdc.int_cb().set(FUNC(ti990_10_state::set_int13));
 
 	// Tape controller
 	tap_990_device &tpc(TI990_TAPE_CTRL(config, "tpc", 0));
@@ -386,15 +398,5 @@ ROM_START(ti990_10)
 
 ROM_END
 
-void ti990_10_state::init_ti990_10()
-{
-#if 0
-	/* load specific ti990/12 rom page */
-	const int page = 3;
-
-	memmove(memregion("maincpu")->base()+0x1FFC00, memregion("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
-#endif
-}
-
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY              FULLNAME                               FLAGS
-COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, init_ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY              FULLNAME                               FLAGS
+COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, empty_init, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

@@ -72,10 +72,12 @@ Victorian games (none are dumped) use either VLC or QCOM depending on the game a
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
-#include "machine/ins8250.h"
 #include "machine/eepromser.h"
+#include "machine/ins8250.h"
 #include "emupal.h"
 #include "screen.h"
+
+namespace {
 
 class aristmk6_state : public driver_device
 {
@@ -578,7 +580,7 @@ typically at around 0x3100-0x3200, 0x3600-0x3700 for Left/Right BIOS dumps (2 fi
 	ROM_LOAD32_WORD_BIOS( 20, "14011605_right.u83", 0x0000000, 0x0200000, CRC(2bec5b74) SHA1(854733cada75e632f01f7096d4740ed4941a3d5b) ) /* From Moon Fire - Jackpot Carnival */ \
 	ROM_LOAD32_WORD_BIOS( 20, "14011605_left.u70",  0x0000002, 0x0200000, CRC(cd26d4f0) SHA1(40822714abf08aeb08d827dbd8cd099f86803754) ) \
 	ROM_SYSTEM_BIOS( 21, "au-qld5",   "Aristocrat MK6 Base (04041205, Queensland)" ) \
-	ROM_LOAD32_WORD_BIOS( 21, "04041205_right.u83", 0x0000000, 0x0100000, CRC(ca6bc86c) SHA1(69fe7fc35694e4cd7f861bff4ec3a6165a81df6e) ) \
+	ROM_LOAD32_WORD_BIOS( 21, "04041205_right.u83", 0x0000000, 0x0100000, CRC(ca6bc86c) SHA1(69fe7fc35694e4cd7f861bff4ec3a6165a81df6e) ) /* From Choy Sun Doa - Jackpot Carnival & Spring Carnival - Jackpot Carnival */ \
 	ROM_LOAD32_WORD_BIOS( 21, "04041205_left.u70",  0x0000002, 0x0100000, CRC(dfb9a119) SHA1(814a5a7877392aec4e4871d7f0e19d2fbd717409) ) \
 	ROM_SYSTEM_BIOS( 22, "au-qld6",   "Aristocrat MK6 Base (03130334, Queensland)" ) \
 	ROM_LOAD32_WORD_BIOS( 22, "03130334_right.u83", 0x0000000, 0x0200000, CRC(bce3d97f) SHA1(da36377cc1465022a2434703adee63bf48c71a9c) ) \
@@ -589,7 +591,7 @@ typically at around 0x3100-0x3200, 0x3600-0x3700 for Left/Right BIOS dumps (2 fi
 	ROM_LOAD64_WORD_BIOS( 23, "01040505.u83", 0x0000004, 0x0100000, CRC(90f32169) SHA1(228be8b4a9eb6b2acf7f7a7561bd194009936026) ) \
 	ROM_LOAD64_WORD_BIOS( 23, "01040505.u70", 0x0000006, 0x0100000, CRC(b9ddea66) SHA1(f4bfdeada39a3f0094d6468b7374a34f88f5df7f) ) \
 	ROM_SYSTEM_BIOS( 24, "us1",   "Aristocrat MK6 Base (01.04.11, US)" ) \
-	ROM_LOAD32_WORD_BIOS( 24, "01.04.11_right.u83", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) \
+	ROM_LOAD32_WORD_BIOS( 24, "01.04.11_right.u83", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) /* From Centurion */ \
 	ROM_LOAD32_WORD_BIOS( 24, "01.04.11_left.u70",  0x0000002, 0x0200000, CRC(787f2b07) SHA1(2548289e44f4b935346b759afb5383bdbac04c3e) ) \
 	ROM_SYSTEM_BIOS( 25, "us2",   "Aristocrat MK6 Base (01.04.10, US)" ) \
 	ROM_LOAD32_WORD_BIOS( 25, "01.04.10_right.u83", 0x0000000, 0x0200000, CRC(82ce2fcc) SHA1(4c8fb3db084a67e99d1420b3f895a06ce9ef5ec2) ) \
@@ -607,13 +609,13 @@ typically at around 0x3100-0x3200, 0x3600-0x3700 for Left/Right BIOS dumps (2 fi
 	ROM_LOAD32_WORD_BIOS( 29, "01.03.17_right.u83", 0x0000000, 0x0200000, CRC(1582714b) SHA1(92d0a15314ffe526159bef9a364898dd1ebdfde7) ) \
 	ROM_LOAD32_WORD_BIOS( 29, "01.03.17_left.u70",  0x0000002, 0x0200000, CRC(a88193dc) SHA1(c9e1d483edaecd318d2e5fc8a54e84516c93e0ca) ) \
 	ROM_SYSTEM_BIOS( 30, "us7",   "Aristocrat MK6 Base (01.03.14, US)" ) \
-	ROM_LOAD32_WORD_BIOS( 30, "01.03.14_right.u83", 0x0000000, 0x0200000, CRC(889ffd82) SHA1(9c98c9cdcf5f7d05095f11006418133029e9f0f8) ) /* From 5 Dragons US */ \
+	ROM_LOAD32_WORD_BIOS( 30, "01.03.14_right.u83", 0x0000000, 0x0200000, CRC(889ffd82) SHA1(9c98c9cdcf5f7d05095f11006418133029e9f0f8) ) /* From 5 Dragons */ \
 	ROM_LOAD32_WORD_BIOS( 30, "01.03.14_left.u70",  0x0000002, 0x0200000, CRC(7138fec4) SHA1(f81331d1875ac574d3e6c98be218ff25c6c7be5a) ) \
 	ROM_SYSTEM_BIOS( 31, "us8",   "Aristocrat MK6 Base (01.03.07, US)" ) \
 	ROM_LOAD32_WORD_BIOS( 31, "01.03.07_right.u83", 0x0000000, 0x0200000, CRC(2ebccc4e) SHA1(9342724e4451e9ab24ceae208284b50abd4f0be3) ) \
 	ROM_LOAD32_WORD_BIOS( 31, "01.03.07_left.u70",  0x0000002, 0x0200000, CRC(a3632da4) SHA1(1c96a88e86095b81801ab88e36a4cdfa4b893265) ) \
 	ROM_SYSTEM_BIOS( 32, "us9",   "Aristocrat MK6 Base (01.03.06, US)" ) \
-	ROM_LOAD32_WORD_BIOS( 32, "01.03.06_right.u83", 0x0000000, 0x0200000, CRC(bd48ca55) SHA1(8fb1576cbeb1c64c358880714740195d2e73e03e) ) /* From Diamond Eyes US */ \
+	ROM_LOAD32_WORD_BIOS( 32, "01.03.06_right.u83", 0x0000000, 0x0200000, CRC(bd48ca55) SHA1(8fb1576cbeb1c64c358880714740195d2e73e03e) ) /* From Diamond Eyes */ \
 	ROM_LOAD32_WORD_BIOS( 32, "01.03.06_left.u70",  0x0000002, 0x0200000, CRC(2f9d9a29) SHA1(fdebfaca9a579d7249379f19aef22fbfd66bf943) ) \
 	ROM_SYSTEM_BIOS( 33, "us10",   "Aristocrat MK6 Base (01.03.05, US)" ) \
 	ROM_LOAD32_WORD_BIOS( 33, "01.03.05_right.u83", 0x0000000, 0x0200000, CRC(2c7f1ec3) SHA1(d03167f43ed6f9596080d91472695829378cef0a) ) \
@@ -684,6 +686,7 @@ ROM_END
 
 // 0152309 / US211
 // 5 Dragons / Local / A - 01/09/07
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.899% 99
 //    89.935% 01
@@ -1442,6 +1445,29 @@ ROM_START( canaryrc )
 ROM_END
 
 
+// 0152314 / US248
+// Centurion / Local / A - 11/27/07
+// Variations (% and NO):
+//    88.002% 99 (Reel 1)    88.002% 99 (Reels 1-2)    88.002% 99 (Reels 1-3)    88.009% 99 (Reels 1-4)    88.060% 99 (Reels 1-5)
+//    90.115% 01 (Reel 1)    90.115% 01 (Reels 1-2)    90.115% 01 (Reels 1-3)    90.160% 01 (Reels 1-4)    90.167% 01 (Reels 1-5)
+//    92.086% 02 (Reel 1)    92.086% 02 (Reels 1-2)    92.086% 02 (Reels 1-3)    92.108% 02 (Reels 1-4)    92.124% 02 (Reels 1-5)
+//    94.857% 03 (Reel 1)    94.857% 03 (Reels 1-2)    94.857% 03 (Reels 1-3)    94.850% 03 (Reels 1-4)    94.859% 03 (Reels 1-5)
+ROM_START( centrion )
+	ARISTMK6_BIOS
+	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	/*
+	0152314-U86 Series 01 M27v322 Mk6USA   CENTURION   1U18E4FC S2008-1113-04   D02E-C7AE / 1DBBC97A / 815E6FBB   Copyright © 2004-2007 Aristocrat Technologies Australia Pty Ltd.
+	0152314-U73 Series 01 M27v322 Mk6USA   CENTURION   5AC05PD1 S2008-1113-02   25C7-C0A3 / 1DB7DD52 / 8501620A   Copyright © 2004-2007 Aristocrat Technologies Australia Pty Ltd.
+	0152314-U85 Series 01 M27v322 Mk6USA   CENTURION   6315BC51 S2008-1113-03   E825-8175 / 1BBE24D3 / 0DF79B23   Copyright © 2004-2007 Aristocrat Technologies Australia Pty Ltd.
+	0152314-U72 Series 01 M27v322 Mk6USA   CENTURION   6996EA9H S2008-1113-01   A5D5-434A / 1B96E0FA / FA022A59   Copyright © 2004-2007 Aristocrat Technologies Australia Pty Ltd.
+	*/
+	ROM_LOAD32_WORD("0152314.u86", 0x0000000, 0x0400000, CRC(fd72e607) SHA1(3af0c7b9f30e061d80de1d2f29e0e356354ee4b4) )
+	ROM_LOAD32_WORD("0152314.u73", 0x0000002, 0x0400000, CRC(c55629d1) SHA1(c154bb63cb75b9fa0aba857f6bc175a27b7ca625) )
+	ROM_LOAD32_WORD("0152314.u85", 0x0800000, 0x0400000, CRC(7d57fe03) SHA1(1a6c94cce462ea6bb67785cfa87f10ffc6ca2f19) )
+	ROM_LOAD32_WORD("0152314.u72", 0x0800002, 0x0400000, CRC(b038e439) SHA1(697f41ed1694c6211c0b0174ff5ab206bd3d18ad) )
+ROM_END
+
+
 // 30194711 / MG0007
 // Cashman Tonight / B - 25/05/05
 // 4-in-1 game containing African Dusk, Arctic Wins, King Galah and Wild Cougar
@@ -1571,6 +1597,7 @@ ROM_END
 
 // 30149511 / 688
 // Choy Sun Doa Cash Express / Local / E - 03/02/03
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    82.00% 05 (Hyperlink)
 ROM_START( csdce )
@@ -1587,11 +1614,20 @@ ROM_END
 
 // 20156611 / 688
 // Choy Sun Doa - Jackpot Carnival / QCOM / G - 04/12/03
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.00% 05 (Hyperlink)
 ROM_START( csdjc )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	/*
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U86
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U73
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U85
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U72
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U84
+	20156611 QCOM   CHOY SUN DOA - J/C HYP   688    4MB    6 eproms   Aristocrat © 2004    P    U71
+	*/
 	ROM_LOAD32_WORD("20156611.u86", 0x0000000, 0x0400000, CRC(85f8338a) SHA1(c32cfcbc67fd753f9fa7bcb3e53a44f6315d297d) )
 	ROM_LOAD32_WORD("20156611.u73", 0x0000002, 0x0400000, CRC(354fb92d) SHA1(6974de53cb9ec87d3ac3147a315ffaa79b65f058) )
 	ROM_LOAD32_WORD("20156611.u85", 0x0800000, 0x0400000, CRC(37c104b6) SHA1(0616eabb5191fd089671ab7183cf24880dcaadfd) )
@@ -1787,6 +1823,7 @@ ROM_END
 // 0152039 / JB012/20
 // Diamond Eyes / Local / J - 01/22/04
 // Same date string as parent
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.893% 99
 //    90.139% 01
@@ -1958,6 +1995,7 @@ ROM_END
 
 // 0151126 / US021
 // Eagle Rock CE / Local / C - 5/25/04
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.813% 99
 //    90.115% 01
@@ -1997,6 +2035,7 @@ ROM_END
 
 // 0151117 / US052
 // EASTER ISLAND / Local / B - 02/22/04
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.773% 99
 //    90.693% 01
@@ -2031,6 +2070,7 @@ ROM_END
 
 // 0151084
 // Enchanted Forest CE
+// Cash Express Hyperlink game
 ROM_START( efce )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
@@ -2108,6 +2148,7 @@ ROM_END
 
 // 0351025 / MV4091/3
 // Flame of Olympus / USA / A - 2/18/02
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.928% 99
 //    90.511% 01
@@ -2128,6 +2169,7 @@ ROM_END
 // 0251048 / MV4091/3
 // Flame of Olympus / USA / A - 2/18/02
 // Same date string as flamolce
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    87.928% 99
 //    90.511% 01
@@ -2241,6 +2283,7 @@ ROM_END
 
 // 0351033 / MV4091/2
 // Geisha / USA / B - 10/18/01
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    87.928% 99
 //    90.511% 01
@@ -2389,6 +2432,7 @@ ROM_END
 
 // 10130811 / 683/1
 // Golden Pyramids Special Edition / Local / A - 21/10/02
+// Maximillions Hyperlink game
 // Variations (% and NO):
 //    82.05% 05 (Hyperlink)
 ROM_START( goldpym )
@@ -2604,6 +2648,7 @@ ROM_END
 
 // 20109411 / 628/10
 // Indian Dreaming / Local / A - 12/07/02
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    82.11% 99 (Hyperlink)
 ROM_START( indremce )
@@ -2661,6 +2706,7 @@ ROM_END
 
 // 10130711 / 628/12
 // Indian Dreaming / Local / A - 17/01/03
+// Maximillions Hyperlink game
 // Variations (% and NO):
 //    82.11% 99 (Hyperlink)
 ROM_START( indremmm )
@@ -3121,11 +3167,19 @@ ROM_END
 
 // 30164211 / 628/3
 // Moon Fire Jackpot Carnival / QCOM / E - 27/01/04
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.05% 99 (Hyperlink)
 ROM_START( moonfire )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	/*
+	30164211 QCOM   MOON FIRE -J/C HYP   628/3    4MB    4 eproms   Aristocrat © 2014    P    U86
+	30164211 QCOM   MOON FIRE -J/C HYP   628/3    4MB    4 eproms   Aristocrat © 2014    P    U73
+	30164211 QCOM   MOON FIRE -J/C HYP   628/3    4MB    4 eproms   Aristocrat © 2014    P    U85
+	30164211 QCOM   MOON FIRE -J/C HYP   628/3    4MB    4 eproms   Aristocrat © 2014    P    U72
+	    Labels marked 2014 despite being a 2004 game
+	*/
 	ROM_LOAD32_WORD("30164211.u86", 0x0000000, 0x0400000, CRC(9d60754d) SHA1(ab62e0f92191821b8e76dbaf3bd37303cb94187e) )
 	ROM_LOAD32_WORD("30164211.u73", 0x0000002, 0x0400000, CRC(56a5ea19) SHA1(2f89527fe3dfdcab088cd3a7ab51a26816fe14dc) )
 	ROM_LOAD32_WORD("30164211.u85", 0x0800000, 0x0400000, CRC(01d1f670) SHA1(efca261e4810f683084baa1cac03304cdd233ef9) )
@@ -3380,6 +3434,7 @@ ROM_END
 
 // 0251031 / US022
 // Paris Lights JC / Local / A - 07/03/02
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    87.893% 99
 //    90.143% 01
@@ -3449,6 +3504,7 @@ ROM_END
 
 // 10226711 / 778/2
 // Pelican Pete - Jackpot Carnival / QCOM / E - 23/05/06
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.08% 05 (Hyperlink)
 ROM_START( pelipetejc )
@@ -3507,6 +3563,7 @@ ROM_END
 // 0151120 / US055
 // Penquin Pays / Local / A- 4/14/03
 // Penguin Pays title is misspelled in the ROM
+// Cash Express Hyperlink game
 // Variations (% and NO):
 //    87.634% 99
 //    90.445% 01
@@ -3856,7 +3913,7 @@ ROM_END
 // Multigame XTREME HYPERLINK
 // Conflicting title, 'Player's World - Super', but ROM says 'Multigame XTREME HYPERLINK'
 // No date strings whatsoever
-// 4-in-1 Cash Express game containing 5 Dragons, Tiki Torch, Turtle Treasure, and Where's The Gold
+// 4-in-1 Cash Express Hyperlink game containing 5 Dragons, Tiki Torch, Turtle Treasure, and Where's The Gold
 // Variations (% and NO):
 //    87.194% 05 (Hyperlink)
 // 5 Dragons / MV4280/4
@@ -3993,6 +4050,7 @@ ROM_END
 
 // 10203811 / 602/23
 // Queen of The Nile Money Train II / QCOM / E - 17/11/05
+// Money Train II Hyperlink game
 // Variations (% and NO):
 //    82.06% 05 (Hyperlink)
 ROM_START( qnilemt2 )
@@ -4036,6 +4094,7 @@ ROM_END
 
 // 20123911 / 683/1
 // Queen of The Nile Special Edition / Local / A - 21/10/02
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.05% 05 (Hyperlink)
 ROM_START( qnilejc )
@@ -4051,6 +4110,7 @@ ROM_END
 // 20123911 / 683/1
 // Queen of The Nile Special Edition / Local / A - 21/10/02
 // SHOW PROGRAM
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.05% 05 (Hyperlink)
 // Identified as 201239AD in the Machine Identification menu, rather than 201239AV from the qnilejc set
@@ -4118,6 +4178,7 @@ ROM_END
 
 // 10160711 / 709
 // Red Baron / QCOM / E - 04/12/03
+// Fast Lane Hyperlink game
 // Variations (% and NO):
 //    82.10% 05 (Hyperlink)
 ROM_START( redbarfl )
@@ -4133,6 +4194,7 @@ ROM_END
 // 10160911 / 709
 // Red Baron / QCOM / E - 04/12/03
 // Same date string as redbarfl
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    82.10% 05 (Hyperlink)
 ROM_START( redbarjc )
@@ -4150,6 +4212,7 @@ ROM_END
 // 10298611 / 628/2
 // Reelin-n-Rockin Fast Lane / QCOM / E - 20/12/00
 // Date string unchanged from MK5 version
+// Fast Lane Hyperlink game
 // Variations (% and NO):
 //    82.05% 05 (Hyperlink)
 ROM_START( reelrkfl )
@@ -4303,6 +4366,7 @@ ROM_END
 
 // 0251029 / US024
 // Seal The Deal / USA / A - 06/20/02
+// Jackpot Carnival Hyperlink game
 // Variations (% and NO):
 //    87.508% 99
 //    90.363% 01
@@ -4467,6 +4531,27 @@ ROM_START( spgcarn )
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10000311.u86", 0x0000000, 0x0400000, CRC(f7783fea) SHA1(4e7b86c0d2728ebc317dce14827a4873402d9bbb) )
 	ROM_LOAD32_WORD("10000311.u73", 0x0000002, 0x0400000, CRC(033653f5) SHA1(40705ffb653ad4c6f3cd36c8879c48303c3845f8) )
+ROM_END
+
+
+// 10032721 / 642
+// Spring Carnival / QLD QCOM / F - 21/09/01
+// Jackpot Carnival Hyperlink game
+// Variations (% and NO):
+//    82.19% 05 (Hyperlink) (9 line)    82.09% 05 (Hyperlink) (20 line)
+ROM_START( spgcarnjc )
+	ARISTMK6_BIOS
+	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	/*
+	10032721 QCOM   SPRING CARNIVAL - J/P HYP   642    4MB    4 eproms   Aristocrat © 2003    P    U86
+	10032721 QCOM   SPRING CARNIVAL - J/P HYP   642    4MB    4 eproms   Aristocrat © 2003    P    U73
+	10032721 QCOM   SPRING CARNIVAL - J/P HYP   642    4MB    4 eproms   Aristocrat © 2003    P    U85
+	10032721 QCOM   SPRING CARNIVAL - J/P HYP   642    4MB    4 eproms   Aristocrat © 2003    P    U72
+	*/
+	ROM_LOAD32_WORD("10032721.u86", 0x0000000, 0x0400000, CRC(5027111e) SHA1(aca962df77ea19a386cc7a88397d7629d53e2e20) )
+	ROM_LOAD32_WORD("10032721.u73", 0x0000002, 0x0400000, CRC(e1b78c98) SHA1(78dfd4aa21169077d796e84c69b2f769e614a03c) )
+	ROM_LOAD32_WORD("10032721.u85", 0x0800000, 0x0400000, CRC(671e70e1) SHA1(42879e248895d819af8f7968933ee09122cb694c) )
+	ROM_LOAD32_WORD("10032721.u72", 0x0800002, 0x0400000, CRC(5689fe18) SHA1(5801ca7bb9a896bdaa42834055967638c5ae62ea) )
 ROM_END
 
 
@@ -5091,7 +5176,7 @@ ROM_END
 
 // 0151075 / US054
 // WhiteWater / Local / A - 4/11/03
-// 'White Water' on artwork, 'whiteWater' in ROM
+// 'White Water' on artwork, 'WhiteWater' in ROM
 // Variations (% and NO):
 //    87.813% 99
 //    90.115% 01
@@ -5123,6 +5208,7 @@ ROM_END
 
 // 0351083 / MV4076
 // Wild Africa ML / Local / D - 5/08/02
+// Millioniser Hyperlink game
 // Variations (% and NO):
 //    82.306% 05 (Hyperlink)
 //    82.306% 07 (same RTP, different variation)
@@ -5391,6 +5477,8 @@ ROM_START( zorroa6u )
 	ROM_LOAD32_WORD("0151372.u71", 0x1000002, 0x0400000, CRC(ff5a8592) SHA1(03d452133d30d780312066bada8e21566255209f) )
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 2000, aristmk6,   0,        aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "MK6 System Software/Setchips",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT)
 
@@ -5400,7 +5488,7 @@ GAME( 2004, 5drag,      aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2004, 5dragsp,    5drag,    aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "5 Dragons (20161011, NSW/ACT, Show Program)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 744,    C - 14/01/04
 GAME( 2007, 5dragce,    5drag,    aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "5 Dragons - Cash Express (0152309, US)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US211,    A - 01/09/07
 GAME( 2007, 5koipp,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "5 Koi - Power Pay (10250711, NSW/ACT)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 744/2,    C - 25/10/07
-GAME( 2004, 15lions,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "15 Lions (10166211, Queensland)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717/3, B - 23/03/04
+GAME( 2004, 15lions,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "15 Lions (10166211, Queensland)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717/3,    B - 23/03/04
 GAME( 2002, 50lions,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "50 Lions (10120511, NSW/ACT)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717,    A - 11/10/02
 GAME( 2003, 50lionsm,   50lions,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "50 Lions (10156111, Malaysia)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717,    D - 20/10/03
 GAME( 2012, 50lionrr,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "50 Lions - Roaring Riches (20301311, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1049,    B - 20/08/12
@@ -5422,7 +5510,7 @@ GAME( 2008, beavbuk,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2003, betzoo,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Betting Zoo - Mr. Cashman (0251064, US)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US037,    B - 01/28/03
 GAME( 2003, bigben,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Ben (30126911, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 710,    B - 17/07/03
 GAME( 2003, bigbena,    bigben,   aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Ben (20126911, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 710,    B - 17/07/03
-GAME( 2005, bigbenq,    bigben,   aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Ben (20201111, Queensland)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 710/3, C - 09/08/05
+GAME( 2005, bigbenq,    bigben,   aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Ben (20201111, Queensland)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 710/3,    C - 09/08/05
 GAME( 1999, bigheart,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Hearted (10000511, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 637,    D - 15/11/99
 GAME( 2002, bigred,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Red (2J009211, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB015,    D - 27/09/02
 GAME( 2002, bigreda,    bigred,   aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Big Red (1J009211, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB015,    D - 27/09/02
@@ -5444,11 +5532,12 @@ GAME( 2007, callwld,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2005, calyking,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Calypso King (20197111, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 772/1,    B - 25/07/05
 GAME( 2006, canaryrc,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Canary Riches (10218211, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 809,    A - 30/03/06
 GAME( 2005, cmtonig,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Cashman Tonight (30194711, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0007,    B - 25/05/05
+GAME( 2007, centrion,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Centurion (0152314, US)",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US248,    A - 11/27/07
 GAME( 2004, cinhell,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Chance in Hell - Lil' Lucy (0251125, US)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US119,    A - 06/30/04
 GAME( 2002, csd,        aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (10104011, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 23/04/02
 GAME( 2002, csdsp,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (20104011, NSW/ACT, Show Program)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 23/04/02
 GAME( 2003, csdm,       csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (20131511, Malaysia)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 23/01/03
-GAME( 2002, csdq,       csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (10121111, Queensland)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688, C - 05/07/02
+GAME( 2002, csdq,       csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (10121111, Queensland)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    C - 05/07/02
 GAME( 2003, csdce,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa - Cash Express (30149511, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 03/02/03
 GAME( 2003, csdjc,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa - Jackpot Carnival (20156611, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    G - 04/12/03
 GAME( 2006, csret,      aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Returns (20212211, NSW/ACT)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 744/2,    B - 15/08/06
@@ -5467,7 +5556,7 @@ GAME( 2007, diamhrts,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2003, dinosa6,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Dinosaur (10118811, NSW/ACT)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 731,    C - 08/08/03
 GAME( 2005, dblagent,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Double Agent (0152082, US)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US180,    A - 12/09/05
 GAME( 2000, dbldolph,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Double Dolphins (20000211, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 647,    C - 18/04/00
-GAME( 2000, dbldolphq,  dbldolph, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Double Dolphins (40003211, Queensland)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 647, F - 17/11/00
+GAME( 2000, dbldolphq,  dbldolph, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Double Dolphins (40003211, Queensland)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 647,    F - 17/11/00
 GAME( 2004, drgnlord,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Dragon Lord (10173511, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 761,    A - 22/06/04
 GAME( 2006, drgnmgic,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Dragon Magic (2J015711, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB051,    E - 05/07/06
 GAME( 2003, drmcatch,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Dream Catcher (10126721, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 704,    F - 23/06/03
@@ -5513,7 +5602,7 @@ GAME( 2001, indream,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2002, indremce,   indream,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Dreaming - Cash Express (20109411, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/10,    A - 12/07/02
 GAME( 2003, indremll,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Dreaming - Lady Luck (20151911, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 742,    C - 15/10/03
 GAME( 2003, indrem2c,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Dreaming 2nd Chance (10150611, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 753,    B - 08/12/03
-GAME( 2003, indremmm,   indream,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Dreaming - Maximillions (10130711, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/12, A - 17/01/03
+GAME( 2003, indremmm,   indream,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Dreaming - Maximillions (10130711, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/12,    A - 17/01/03
 GAME( 2001, indgldcm,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Gold - Mr. Cashman (10102511, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 674/1,    A- 21/11/01
 GAME( 2004, indprncs,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Indian Princess (10174111, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 764,    A - 07/04/04
 GAME( 2002, jailbrk,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Jailbreak (10125611, NSW/ACT)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 716,    A - 14/11/02
@@ -5537,7 +5626,7 @@ GAME( 2005, magforst,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2003, magmerm,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Magic Mermaid (0251331, US)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB013/20,    F - 10/13/03
 GAME( 2006, magician,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "The Magician (20210111, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 801,     C - 01/03/06
 GAME( 2008, mchilli,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "More Chilli (20248711, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 844,    B - 21/01/08
-GAME( 2010, mchilliq,   mchilli,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "More Chilli (20289311, Queensland)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 844/2, B - 14/12/10
+GAME( 2010, mchilliq,   mchilli,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "More Chilli (20289311, Queensland)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 844/2,    B - 14/12/10
 GAME( 2007, metestrm,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Meteor Storm (0152162, US)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US217,    A - 03/19/07
 GAME( 2007, milkin,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Milkin' It (10251911, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 816,    B - 13/08/07
 GAME( 2000, mnytree,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Money Tree (10001211, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 657,    E - 06/11/00
@@ -5571,7 +5660,7 @@ GAME( 2006, pcbydem,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2008, pcmostw,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's Choice - Most Wanted (20234911, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0010,    C - 09/11/06
 GAME( 2010, pcgold,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's Choice - Gold Edition (30291411, New Zealand)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0047,    A - 09/04/10
 GAME( 2009, pcplat,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's Choice - Platinum (20282111, New Zealand)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0031,    B - 04/02/09
-GAME( 2004, pcorig,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's Choice - Original (30143011, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG001, C - 12/01/04
+GAME( 2004, pcorig,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's Choice - Original (30143011, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG001,    C - 12/01/04
 GAME( 200?, pwsuper,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Player's World - Super (0154019, US)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0016,    (no data)
 GAME( 2001, pompeia6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Pompeii (10002211, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/5,    A - 22/01/01
 GAME( 2005, pompeia6u,  pompeia6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Pompeii (0151158, US)",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US161,    A - 04/15/05
@@ -5579,7 +5668,7 @@ GAME( 2002, pompeia6ua, pompeia6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2005, prideaf,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Pride of Africa (10208511, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/9,    J - 06/12/05
 GAME( 2004, prophecy,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Prophecy (20173411, NSW/ACT)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 734,    B - 10/08/04
 GAME( 2005, qnilea6,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile (3J011111, NSW/ACT)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB027,    C - 16/02/05
-GAME( 2005, qnilemt2,   qnilea6,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile - Money Train II (10203811, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 602/23, E - 17/11/05
+GAME( 2005, qnilemt2,   qnilea6,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile - Money Train II (10203811, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 602/23,    E - 17/11/05
 GAME( 2001, qnilese,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile Special Edition (20102811, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683,    A - 06/12/01
 GAME( 2001, qnilesea,   qnilese,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile Special Edition (10102811, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683,    A - 06/12/01
 GAME( 2002, qnilejc,    qnilese,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Queen of the Nile Special Edition - Jackpot Carnival (20123911, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683/1,    A - 21/10/02
@@ -5590,7 +5679,7 @@ GAME( 2002, redbara6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2003, redbarfl,   redbara6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Red Baron - Fast Lane (10160711, Queensland)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 709,    E - 04/12/03
 GAME( 2003, redbarjc,   redbara6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Red Baron - Jackpot Carnival (10160911, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 709,    E - 04/12/03, same date string as above
 // The following set is clearly not a year 2000 game (an ID of #2986 would be from around 2010, note similar ID number region to buckstop/werewildq), the date string is unchanged from the original MK5 20 line version which actually was released in 2000.
-GAME( 201?, reelrkfl,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Reelin-n-Rockin - Fast Lane (10298611, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/2, E - 20/12/00
+GAME( 201?, reelrkfl,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Reelin-n-Rockin - Fast Lane (10298611, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/2,    E - 20/12/00
 GAME( 2002, retsama6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Return of the Samurai (10117211, NSW/ACT)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/10,    A - 26/08/02
 GAME( 2002, ruprup,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Roll Up! Roll Up!! (10115911, NSW/ACT)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 642/5,    A - 22/08/02
 GAME( 2002, rubymag,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Ruby Magic (10125711, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 698,    C - 12/11/02
@@ -5608,7 +5697,8 @@ GAME( 2006, silkrda6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2002, silgola6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Silver & Gold (20100721, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 672/1,    G - 08/07/02
 GAME( 2008, skydnca6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Sky Dancer (10272711, NSW/ACT)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB091/2,    A - 28/08/08
 GAME( 1999, spgcarn,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Spring Carnival (10000311, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 642,    C - 15/11/99
-GAME( 2001, spgcarnq,   spgcarn,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Spring Carnival (10008011, Queensland)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 642, E - 27/02/01
+GAME( 2001, spgcarnq,   spgcarn,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Spring Carnival (10008011, Queensland)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 642,    E - 27/02/01
+GAME( 2003, spgcarnjc,  spgcarn,  aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Spring Carnival - Jackpot Carnival (10032721, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 642,    F - 21/09/01
 GAME( 2008, spgfest,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Spring Festival (20262311, Queensland)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB040, C - 03/06/08
 GAME( 2003, stardrft,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Star Drifter (20150811, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 717/2,    A - 15/09/03
 GAME( 2004, stardrftu,  stardrft, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Star Drifter (0451341, US)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MV4204/1,    A - 02/16/04
@@ -5635,7 +5725,7 @@ GAME( 2006, turtreas,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2002, venetian,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Venetian Nights (1J008911, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB016/1,    D - 05/08/02
 GAME( 2004, venice,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Venice (0151355, US)",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB016/20,    F - 07/06/04
 GAME( 2009, werewild,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Werewolf Wild (10288711, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 939,    A - 03/12/09
-GAME( 2010, werewildq,  werewild, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Werewolf Wild (20290711, Queensland)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 939, C - 14/10/10
+GAME( 2010, werewildq,  werewild, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Werewolf Wild (20290711, Queensland)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 939,    C - 14/10/10
 GAME( 2002, whalecsh,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Whales of Cash (20155711, Malaysia)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 695,    A - 14/06/02
 GAME( 2003, whalecshu,  whalecsh, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Whales of Cash (0451311, US)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MV4174,    A - 03/31/03
 GAME( 2004, wheregld,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Where's The Gold (10124811, NSW/ACT)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 756,    B - 26/02/04

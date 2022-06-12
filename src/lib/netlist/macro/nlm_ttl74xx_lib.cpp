@@ -939,7 +939,7 @@ NETLIST_END()
 //- Title: DM54LS73A/DM74LS73A Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
 //- Pinalias: CLK1,CLR1,K1,VCC,CLK2,CLR2,J2,QQ2,Q2,K2,GND,Q1,QQ1,J1
 //- Package: DIP
-//- NamingConvention: Naming conventions follow National Semicouductor datasheet
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
 //-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006372.PDF
 //-
@@ -1411,7 +1411,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006367.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006367.PDF
 //-
 //-         +------+-----+---+---++---+----+
 //-         | CLRQ | CLK | J | K || Q | QQ |
@@ -1686,7 +1686,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   pdf.datasheetcatalog.com/datasheets/166/375388_DS.pdf
+//-   http://pdf.datasheetcatalog.com/datasheets/166/375388_DS.pdf
 //-
 //-         +---+-------+-------------+
 //-         | E | A0 A1 | O0 O1 O2 O3 |
@@ -2658,7 +2658,7 @@ static NETLIST_START(TTL_9312_DIP)
 	)
 NETLIST_END()
 
-// FIXME: Documenation
+// FIXME: Documentation
 static NETLIST_START(TTL_9314_DIP)
 	TTL_9314(A)
 
@@ -2750,7 +2750,7 @@ static NETLIST_START(TTL_9321_DIP)
 NETLIST_END()
 
 
-//FIXME: Documenation
+//FIXME: Documentation
 static NETLIST_START(TTL_9334_DIP)
 	TTL_9334(A)
 

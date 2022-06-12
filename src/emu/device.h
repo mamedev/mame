@@ -468,10 +468,6 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 class device_missing_dependencies : public emu_exception { };
 
 
-// timer IDs for devices
-typedef u32 device_timer_id;
-
-
 /// \brief Base class for devices
 ///
 /// The base class for all device implementations in MAME's modular
@@ -696,19 +692,17 @@ public:
 	// clock/timing accessors
 	u32 clock() const { return m_clock; }
 	u32 unscaled_clock() const { return m_unscaled_clock; }
-	void set_unscaled_clock(u32 clock);
-	void set_unscaled_clock(const XTAL &xtal) { set_unscaled_clock(xtal.value()); }
-	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock); } // non-overloaded name because binding to overloads is ugly
+	void set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain = false);
+	void set_unscaled_clock(const XTAL &xtal, bool sync_on_new_clock_domain = false) { set_unscaled_clock(xtal.value(), sync_on_new_clock_domain); }
+	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock, false); } // non-overloaded name because binding to overloads is ugly
+	void set_unscaled_clock_int_sync(u32 clock) { set_unscaled_clock(clock, true); } // non-overloaded name because binding to overloads is ugly
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(u64 clocks) const noexcept;
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
-	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
-	void timer_expired(emu_timer &timer, device_timer_id id, int param) { device_timer(timer, id, param); }
+	template <typename... T> emu_timer *timer_alloc(T &&... args);
 
 	/// \brief Register data for save states
 	///
@@ -834,7 +828,7 @@ protected:
 	void debug_setup();
 	void pre_save();
 	void post_load();
-	void notify_clock_changed();
+	void notify_clock_changed(bool sync_on_new_clock_domain = false);
 	finder_base *register_auto_finder(finder_base &autodev);
 	void register_callback(devcb_base &callback);
 
@@ -976,7 +970,6 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	//------------------- end derived class overrides
 
@@ -1182,7 +1175,7 @@ public:
 	/// \sa interface_pre_save device_t::device_post_load
 	virtual void interface_post_load() ATTR_COLD;
 
-	virtual void interface_clock_changed();
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain);
 	virtual void interface_debug_setup();
 
 private:

@@ -611,9 +611,9 @@ void gamecom_state::gamecom_update_timers(uint8_t data)
 
 void gamecom_state::init_gamecom()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
-	m_sound0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound0_timer_callback),this));
-	m_sound1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound1_timer_callback),this));
+	m_clock_timer = timer_alloc(FUNC(gamecom_state::gamecom_clock_timer_callback), this);
+	m_sound0_timer = timer_alloc(FUNC(gamecom_state::gamecom_sound0_timer_callback), this);
+	m_sound1_timer = timer_alloc(FUNC(gamecom_state::gamecom_sound1_timer_callback), this);
 	m_sound0_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_sound1_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_p_ram = m_share_maincpu; // required here because pio_w gets called before machine_reset

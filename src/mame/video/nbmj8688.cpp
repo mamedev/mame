@@ -261,16 +261,9 @@ void nbmj8688_state::writeram_high(int x, int y, int color)
 	update_pixel(x, y);
 }
 
-void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nbmj8688_state::clear_busy_flag)
 {
-	switch (id)
-	{
-	case TIMER_BLITTER:
-		m_nb1413m3->busyflag_w(1);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in nbmj8688_state::device_timer");
-	}
+	m_nb1413m3->busyflag_w(1);
 }
 
 void nbmj8688_state::gfxdraw(int gfxtype)
@@ -541,7 +534,7 @@ void nbmj8688_state::gfxdraw(int gfxtype)
 
 void nbmj8688_state::common_video_start()
 {
-	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+	m_blitter_timer = timer_alloc(FUNC(nbmj8688_state::clear_busy_flag), this);
 
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 256);
 	m_videoram = make_unique_clear<uint16_t[]>(512 * 256);

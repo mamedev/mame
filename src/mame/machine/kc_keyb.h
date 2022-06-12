@@ -37,15 +37,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(transmit_pulse);
 
 	void add_pulse_to_transmit_buffer(int pulse_state, int pulse_number = 1);
 	void add_bit(int bit);
 	void transmit_scancode(uint8_t scan_code);
 
 private:
-	static constexpr device_timer_id TIMER_TRANSMIT_PULSE = 1;
-
 	// internal state
 	emu_timer *        m_timer_transmit_pulse;
 	devcb_write_line   m_write_out;

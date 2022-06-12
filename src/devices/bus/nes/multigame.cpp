@@ -574,7 +574,6 @@ void nes_rumblestat_device::device_start()
 
 void nes_rumblestat_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -592,7 +591,6 @@ void nes_svision16_device::device_start()
 void nes_svision16_device::pcb_reset()
 {
 	prg32(0);
-	chr8(0, CHRRAM);
 
 	m_latch1 = 0;
 	m_latch2 = 0;
@@ -608,7 +606,6 @@ void nes_farid_unrom_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_reg &= 0x87;    // only middle four bits cleared on soft reset
 }
@@ -624,16 +621,12 @@ void nes_kn42_device::pcb_reset()
 	m_latch ^= 0x10;
 	prg16_89ab(m_latch);
 	prg16_cdef(m_latch | 0x0f);    // fixed to last bank for either game
-	chr8(0, CHRRAM);
 }
 
 void nes_a65as_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(7);
-	set_nt_mirroring(PPU_MIRROR_VERT);
-	chr8(0, m_chr_source);
 }
 
 void nes_t262_device::device_start()
@@ -646,7 +639,6 @@ void nes_t262_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -656,7 +648,6 @@ void nes_sgun20in1_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, CHRROM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 }
 
 void nes_vt5201_device::device_start()
@@ -684,8 +675,6 @@ void nes_bmc_80013b_device::device_start()
 
 void nes_bmc_80013b_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	m_latch = 0x80;
 	m_reg[0] = m_reg[1] = 0;
 	update_prg();
@@ -708,8 +697,6 @@ void nes_bmc_830425c_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(0x0f);
-	chr8(0, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_latch = 0;
 }
@@ -724,7 +711,6 @@ void nes_bmc_830928c_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -739,7 +725,6 @@ void nes_bmc_850437c_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_reg[0] = m_reg[1] = 0;
 }
@@ -754,7 +739,6 @@ void nes_bmc_970630c_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -810,7 +794,6 @@ void nes_bmc_gn91b_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -819,14 +802,12 @@ void nes_bmc_k3036_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 }
 
 void nes_bmc_k3046_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 }
 
 void nes_bmc_k3071_device::pcb_reset()
@@ -846,7 +827,6 @@ void nes_bmc_s009_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_reg = 0;
 }
@@ -884,7 +864,6 @@ void nes_bmc_th2348_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -897,7 +876,6 @@ void nes_bmc_ws_device::device_start()
 
 void nes_bmc_ws_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -927,7 +905,6 @@ void nes_bmc_8157_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(0);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -948,7 +925,6 @@ void nes_bmc_ball11_device::device_start()
 void nes_bmc_ball11_device::pcb_reset()
 {
 	prg32(0);
-	chr8(0, CHRRAM);
 
 	m_reg[0] = 2;
 	m_reg[1] = 0;
@@ -975,7 +951,6 @@ void nes_bmc_22games_device::pcb_reset()
 		set_nt_mirroring(PPU_MIRROR_VERT);
 		m_reset = 1;
 	}
-	chr8(0, CHRRAM);
 }
 
 void nes_bmc_64y2k_device::device_start()
@@ -1004,7 +979,6 @@ void nes_bmc_420y2k_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(7);
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 	m_reg = 0;
@@ -1024,7 +998,6 @@ void nes_bmc_12in1_device::pcb_reset()
 
 void nes_bmc_35in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -1032,7 +1005,6 @@ void nes_bmc_35in1_device::pcb_reset()
 
 void nes_bmc_36in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 1);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -1040,7 +1012,6 @@ void nes_bmc_36in1_device::pcb_reset()
 
 void nes_bmc_64in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -1054,7 +1025,6 @@ void nes_bmc_70in1_device::device_start()
 
 void nes_bmc_70in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	chr8(0, m_chr_source);
 
 	m_latch[0] = m_latch[1] = 0;
@@ -1076,7 +1046,6 @@ void nes_bmc_76in1_device::device_start()
 void nes_bmc_76in1_device::pcb_reset()
 {
 	prg32(0);
-	chr8(0, CHRRAM);
 
 	m_reg[0] = m_reg[1] = 0;
 }
@@ -1096,7 +1065,6 @@ void nes_bmc_1200in1_device::device_start()
 
 void nes_bmc_1200in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -1131,7 +1099,6 @@ void nes_bmc_42in1reset_device::pcb_reset()
 {
 	m_latch ^= 0x20;
 	prg32(m_latch >> 1);
-	chr8(0, CHRRAM);
 }
 
 void nes_vram_protect_device::device_start()
@@ -1143,7 +1110,6 @@ void nes_vram_protect_device::device_start()
 void nes_vram_protect_device::pcb_reset()
 {
 	prg32(0);
-	chr8(0, CHRRAM);
 	m_vram_protect = false;
 }
 

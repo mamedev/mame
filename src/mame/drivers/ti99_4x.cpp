@@ -162,7 +162,7 @@ private:
 
 	// Used by EVPC
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(gromclk_tick);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -722,7 +722,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::gromclk_in )
 /*
     Used by the EVPC
 */
-void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ti99_4x_state::gromclk_tick)
 {
 	// Pulse it
 	if (m_datamux != nullptr)
@@ -863,7 +863,7 @@ void ti99_4x_state::driver_start()
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
 	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
 	if (m_model == MODEL_4EV)
-		m_gromclk_timer = timer_alloc(0);
+		m_gromclk_timer = timer_alloc(FUNC(ti99_4x_state::gromclk_tick), this);
 
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_check_alphalock));

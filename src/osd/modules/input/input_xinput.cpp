@@ -6,29 +6,17 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
+#include "emu.h"
+
+#include "input_xinput.h"
+
 // standard windows headers
 #include <windows.h>
 
-// XInput header
-#include <xinput.h>
-
-#undef interface
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "winutil.h"
-#include "winmain.h"
-
-#include "input_common.h"
-#include "input_windows.h"
-#include "input_xinput.h"
 
 #define XINPUT_LIBRARIES { "xinput1_4.dll", "xinput9_1_0.dll" }
 
@@ -309,6 +297,8 @@ void xinput_joystick_device::configure()
 }
 
 #else // defined(OSD_WINDOWS)
+
+#include "input_module.h"
 
 MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput")
 

@@ -73,22 +73,17 @@ void cmi_music_keyboard_device::device_resolve_objects()
 
 void cmi_music_keyboard_device::device_start()
 {
-	m_cmi10_scnd_timer = timer_alloc(TIMER_CMI10_SCND);
-
+	m_cmi10_scnd_timer = timer_alloc(FUNC(cmi_music_keyboard_device::scnd_update), this);
 	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
+
 	m_scnd = 0;
 }
 
-void cmi_music_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cmi_music_keyboard_device::scnd_update)
 {
-	switch (id)
-	{
-	case TIMER_CMI10_SCND:
-		m_cmi10_pia_u20->ca1_w(m_scnd);
-		m_scnd ^= 1;
-		m_cmi10_pia_u21->ca1_w(m_scnd);
-		break;
-	}
+	m_cmi10_pia_u20->ca1_w(m_scnd);
+	m_scnd ^= 1;
+	m_cmi10_pia_u21->ca1_w(m_scnd);
 }
 
 /*

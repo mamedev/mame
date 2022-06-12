@@ -127,16 +127,9 @@ uint8_t bublbobl_state::tokiob_mcu_r()
 }
 
 
-void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(bublbobl_state::irq_ack)
 {
-	switch (id)
-	{
-	case TIMER_M68705_IRQ_ACK:
-		m_mcu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in bublbobl_state::device_timer");
-	}
+	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 void bublbobl_state::bublbobl_soundcpu_reset_w(uint8_t data)
@@ -331,7 +324,7 @@ uint8_t bublbobl_state::boblbobl_ic43_b_r(offs_t offset)
 INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 {
 	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
-	timer_set(attotime::from_msec(1000/60), TIMER_M68705_IRQ_ACK); /* TODO: understand how this is ack'ed */
+	m_irq_ack_timer->adjust(attotime::from_msec(1000/60)); /* TODO: understand how this is ack'ed */
 }
 
 

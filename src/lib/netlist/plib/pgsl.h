@@ -29,7 +29,8 @@
 		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 	#endif
 #elif defined(__GNUC__) && !(defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ))
-	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	//#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	#define gsl_Expects(e) (__builtin_expect(!!(e), 1) ? static_cast<void>(0) : __builtin_unreachable())
 #elif defined(_MSC_VER)
 	#define gsl_Expects(e) __assume(e)
 #else
@@ -118,9 +119,8 @@ namespace plib {
 
 	/// \brief cast to void *
 	///
-	/// The purpose here is to help identifiy casts to void in the code.
-	/// These case usuallyindicate some wizard assumptioms which should be easily
-	/// be easy to identify.
+	/// The purpose of void_ptr_cast is to help identify casts to void in the code.
+	///
 	template <typename T>
 	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
 

@@ -558,14 +558,6 @@ INPUT_PORTS_END
 
 
 /****************************************
-*      Graphics Decode Information      *
-****************************************/
-
-//static GFXDECODE_START( 4enlinea )
-//GFXDECODE_END
-
-
-/****************************************
 *          Machine Start/Reset          *
 ****************************************/
 

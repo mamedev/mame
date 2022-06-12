@@ -3,11 +3,13 @@
 #include "emu.h"
 #include "osdnet.h"
 
-device_network_interface::device_network_interface(const machine_config &mconfig, device_t &device, float bandwidth)
+device_network_interface::device_network_interface(const machine_config &mconfig, device_t &device, u32 bandwidth, u32 mtu)
 	: device_interface(device, "network")
 {
 	m_promisc = false;
-	m_bandwidth = bandwidth;
+	// Convert to Mibps to Bps
+	m_bandwidth = bandwidth << (20 - 3);
+	m_mtu = mtu;
 	set_mac("\0\0\0\0\0\0");
 	m_intf = -1;
 	m_loopback_control = false;
@@ -44,7 +46,7 @@ int device_network_interface::send(u8 *buf, int len, int fcs)
 		if (result)
 		{
 			// schedule receive complete callback
-			m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+			m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth), result);
 		}
 	}
 	else if (m_dev)
@@ -56,7 +58,7 @@ int device_network_interface::send(u8 *buf, int len, int fcs)
 	}
 
 	// schedule transmit complete callback
-	m_send_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+	m_send_timer->adjust(attotime::from_ticks(len, m_bandwidth), result);
 
 	return result;
 }
@@ -84,7 +86,7 @@ void device_network_interface::recv_cb(u8 *buf, int len)
 			m_dev->stop();
 
 		// schedule receive complete callback
-		m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+		m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth), result);
 	}
 }
 
@@ -113,7 +115,8 @@ void device_network_interface::set_interface(int id)
 {
 	if(m_dev)
 		m_dev->stop();
-	m_dev.reset(open_netdev(id, this, (int)(m_bandwidth*1000000/8.0f/1500)));
+	// Set device polling time to transfer time for one mtu
+	m_dev.reset(open_netdev(id, this, (int)(m_bandwidth / m_mtu)));
 	if(!m_dev) {
 		device().logerror("Network interface %d not found\n", id);
 		id = -1;

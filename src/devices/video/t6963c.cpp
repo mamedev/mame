@@ -323,14 +323,17 @@ void t6963c_device::set_md(u8 data)
 
 uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int offs;
 	bitmap.fill(0, cliprect);
 
 	// Text layer
 	if (BIT(m_display_mode, 3))
+	{
+		offs = m_text_home;
 		for(int y=0; y<m_number_lines; y++)
 			for(int x=0; x<m_text_area; x++)
 			{
-				u8 c = m_display_ram->read_byte(m_text_home + y * m_number_cols + x);
+				u8 c = m_display_ram->read_byte(offs++);
 
 				for(int cy=0; cy<8; cy++)
 				{
@@ -349,13 +352,15 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						bitmap.pix(y * 8 + cy, x * m_font_size + cx) = BIT(data, m_font_size - 1 - cx);
 				}
 			}
-
+	}
 	// Graphic layer
 	if (BIT(m_display_mode, 2))
+	{
+		offs = m_graphic_home;
 		for(int y=0; y<m_number_lines*8; y++)
 			for(int x=0; x<m_graphic_area; x++)
 			{
-				u8 data = m_display_ram->read_byte(m_graphic_home + y * m_number_cols + x);
+				u8 data = m_display_ram->read_byte(offs++);
 				for(int i=0; i<m_font_size; i++)
 				{
 					int pix = BIT(data, m_font_size - 1 - i);
@@ -376,7 +381,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					}
 				}
 			}
-
+	}
 	return 0;
 }
 

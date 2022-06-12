@@ -84,6 +84,10 @@ public:
 	void microtrol(machine_config &config);
 
 protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t fdc_aux_r(offs_t offset);
@@ -95,22 +99,16 @@ protected:
 	uint8_t kbd_get();
 	void kbd_put(u8 data);
 
-	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia1_ca2_r);
-	DECLARE_READ_LINE_MEMBER(pia1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
 	void eurocom2_map(address_map &map);
 
-	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(toggle_sst);
 
 	emu_timer *m_sst = nullptr;
 
 	floppy_image_device *m_floppy = nullptr;
-	bool m_sst_state = false, m_kbd_ready = false;
+	bool m_sst_state = false;
 	bitmap_ind16 m_tmpbmp;
 
 	uint8_t m_vico[2]{};
@@ -142,8 +140,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
 
 	void pia3_pb_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(pia3_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia3_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
 
 	uint8_t waveterm_adc();
@@ -225,36 +221,17 @@ void eurocom2_state::vico_w(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER(eurocom2_state::pia1_ca2_r)
-{
-	LOGDBG("PIA1 CA2 == %d (SST Q14)\n", m_sst_state);
-
-	return m_sst_state;
-}
-
-READ_LINE_MEMBER(eurocom2_state::pia1_cb1_r)
-{
-	LOGDBG("PIA1 CB1 == %d (SST Q6)\n", m_sst_state);
-
-	return m_sst_state;
-}
-
 WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 {
 	LOG("PIA1 CB2 <- %d (SST reset)\n", state);
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(eurocom2_state::toggle_sst)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);
-}
-
-
-READ_LINE_MEMBER(eurocom2_state::pia1_ca1_r)
-{
-	return m_kbd_ready;
+	m_pia1->cb1_w(m_sst_state);
 }
 
 /* bit 7 may be connected to something else -- see section 6.2 of Eurocom manual */
@@ -265,7 +242,6 @@ uint8_t eurocom2_state::kbd_get()
 
 void eurocom2_state::kbd_put(u8 data)
 {
-	m_kbd_ready = true;
 	m_kbd_data = data;
 	m_pia1->ca1_w(false);
 	m_pia1->ca1_w(true);
@@ -407,7 +383,7 @@ INPUT_PORTS_END
 
 void eurocom2_state::machine_reset()
 {
-	m_kbd_ready = false;
+	m_pia1->ca1_w(false);
 	m_floppy = nullptr;
 
 	if (ioport("S1")->read() & 0x80)
@@ -418,7 +394,7 @@ void eurocom2_state::machine_reset()
 
 void eurocom2_state::machine_start()
 {
-	m_sst = timer_alloc(0);
+	m_sst = timer_alloc(FUNC(eurocom2_state::toggle_sst), this);
 	m_tmpbmp.allocate(VC_DISP_HORZ, VC_DISP_VERT);
 	m_kbd_data = 0;
 }
@@ -452,9 +428,8 @@ void eurocom2_state::eurocom2(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
 	PIA6821(config, m_pia1, 0);
-	m_pia1->readca1_handler().set(FUNC(eurocom2_state::pia1_ca1_r));  // keyboard strobe
-	m_pia1->readca2_handler().set(FUNC(eurocom2_state::pia1_ca2_r));  // SST output Q14
-	m_pia1->readcb1_handler().set(FUNC(eurocom2_state::pia1_cb1_r));  // SST output Q6
+	m_pia1->ca2_w(m_sst_state); // SST output Q14
+	m_pia1->cb1_w(m_sst_state); // SST output Q6
 	m_pia1->cb2_handler().set(FUNC(eurocom2_state::pia1_cb2_w)); // SST reset input
 	m_pia1->readpa_handler().set(FUNC(eurocom2_state::kbd_get));
 //  m_pia1->readpb_handler().set(FUNC(eurocom2_state::kbd_get));
@@ -493,8 +468,6 @@ void waveterm_state::waveterm(machine_config &config)
 //  m_pia3->readpa_handler().set(FUNC(waveterm_state::pia3_pa_r));
 //  m_pia3->writepa_handler().set(FUNC(waveterm_state::pia3_pa_w));
 	m_pia3->writepb_handler().set(FUNC(waveterm_state::pia3_pb_w));
-//  m_pia3->readca1_handler().set(FUNC(waveterm_state::pia3_ca1_r));
-//  m_pia3->readca2_handler().set(FUNC(waveterm_state::pia3_ca2_r));
 	m_pia3->readcb1_handler().set_ioport("FP");
 //  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 

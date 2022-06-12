@@ -32,15 +32,12 @@ void snes_miracle_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  strobe_tick - increment strobe counter
 //-------------------------------------------------
 
-void snes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(snes_miracle_device::strobe_tick)
 {
-	if (id == TIMER_STROBE_ON)
-	{
-		m_strobe_clock++;
-	}
+	m_strobe_clock++;
 }
 
 //**************************************************************************
@@ -70,7 +67,7 @@ snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const ch
 
 void snes_miracle_device::device_start()
 {
-	strobe_timer = timer_alloc(TIMER_STROBE_ON);
+	strobe_timer = timer_alloc(FUNC(snes_miracle_device::strobe_tick), this);
 	strobe_timer->adjust(attotime::never);
 	save_item(NAME(m_strobe_on));
 	save_item(NAME(m_sent_bits));

@@ -116,12 +116,12 @@ void n64_periphs::poll_reset_button(bool button)
 
 void n64_periphs::device_start()
 {
-	ai_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::ai_timer_callback),this));
-	pi_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::pi_dma_callback),this));
-	si_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::si_dma_callback),this));
-	vi_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::vi_scanline_callback),this));
-	dp_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::dp_delay_callback),this));
-	reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::reset_timer_callback),this));
+	ai_timer = timer_alloc(FUNC(n64_periphs::ai_timer_callback), this);
+	pi_dma_timer = timer_alloc(FUNC(n64_periphs::pi_dma_callback), this);
+	si_dma_timer = timer_alloc(FUNC(n64_periphs::si_dma_callback), this);
+	vi_scanline_timer = timer_alloc(FUNC(n64_periphs::vi_scanline_callback), this);
+	dp_delay_timer = timer_alloc(FUNC(n64_periphs::dp_delay_callback), this);
+	reset_timer = timer_alloc(FUNC(n64_periphs::reset_timer_callback), this);
 	m_n64 = machine().driver_data<n64_state>();
 }
 

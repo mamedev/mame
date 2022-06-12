@@ -85,8 +85,8 @@ private:
 
 void sawatte_state::machine_start()
 {
-	m_irq3_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sawatte_state::irq3_timer), this));
-	m_irq4_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sawatte_state::irq4_timer), this));
+	m_irq3_timer = timer_alloc(FUNC(sawatte_state::irq3_timer), this);
+	m_irq4_timer = timer_alloc(FUNC(sawatte_state::irq4_timer), this);
 
 	save_item(NAME(m_data_bank));
 	save_item(NAME(m_prog_bank));

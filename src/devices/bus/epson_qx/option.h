@@ -170,7 +170,7 @@ protected:
 	devcb_read8  m_dmaf_r_cb;
 
 	devcb_write_line m_eopf_cb;
-	devcb_write_line m_eops_cb;;
+	devcb_write_line m_eops_cb;
 
 	int m_slot;
 };

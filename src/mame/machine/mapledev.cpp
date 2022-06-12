@@ -14,7 +14,7 @@ void maple_device::device_start()
 {
 	host->register_port(host_port, this);
 
-	timer = timer_alloc(TIMER_ID);
+	timer = timer_alloc(FUNC(maple_device::reply_ready), this);
 
 	save_item(NAME(reply_buffer));
 	save_item(NAME(reply_size));
@@ -26,15 +26,6 @@ void maple_device::maple_reset()
 	device_reset();
 }
 
-void maple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if(id != TIMER_ID)
-		return;
-
-	timer.adjust(attotime::never);
-	reply_ready();
-}
-
 void maple_device::reply_ready_with_delay()
 {
 	// Arbitrary delay to avoid instant replies
@@ -43,7 +34,7 @@ void maple_device::reply_ready_with_delay()
 	timer->adjust(attotime::from_usec(100));
 }
 
-void maple_device::reply_ready()
+TIMER_CALLBACK_MEMBER(maple_device::reply_ready)
 {
 	host->end_of_reply();
 }

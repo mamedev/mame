@@ -98,7 +98,6 @@ void nes_namcot3433_device::device_start()
 
 void nes_namcot3433_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 2);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -114,7 +113,6 @@ void nes_namcot3446_device::device_start()
 
 void nes_namcot3446_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -131,7 +129,6 @@ void nes_namcot3425_device::device_start()
 
 void nes_namcot3425_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -143,7 +140,7 @@ void nes_namcot3425_device::pcb_reset()
 void nes_namcot340_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot340_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -156,7 +153,6 @@ void nes_namcot340_device::device_start()
 
 void nes_namcot340_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -169,7 +165,7 @@ void nes_namcot340_device::pcb_reset()
 void nes_namcot175_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot175_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -183,7 +179,6 @@ void nes_namcot175_device::device_start()
 
 void nes_namcot175_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -197,7 +192,7 @@ void nes_namcot175_device::pcb_reset()
 void nes_namcot163_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot163_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -231,7 +226,6 @@ void nes_namcot163_device::device_start()
 
 void nes_namcot163_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -403,17 +397,14 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_namcot340_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
-				set_irq_line(ASSERT_LINE);
-			else
-				m_irq_count++;
-		}
+		if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
+			set_irq_line(ASSERT_LINE);
+		else
+			m_irq_count++;
 	}
 }
 

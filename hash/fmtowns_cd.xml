@@ -335,7 +335,6 @@ Orient Express                                                Gyousei           
 Oryx Blue Wave: Eikou e no Kiseki                             Data West                         1995/10    SET(CD+FD)
 Otto Anime-kun                                                Nihon Micom Hanbai                1990/3     CD
 Petit Collage                                                 Pandora Box                       1994/3     CD
-Pocky 1-2 & Ponyon                                            Ponytail Soft                     1994/6     CD
 Powers of Ten                                                 Datt Japan                        1995/10    CD
 Present                                                       Orange House                      1991/6     ?
 Primary Health Care System                                    Raison                            1990/9     CD
@@ -412,7 +411,6 @@ Tenshi-tachi no Gogo: Tenkousei                               JAST              
 The Book of MIDI                                              Fujitsu                           1992/9     CD
 The Lost Secret                                               DynEd Japan                       1993/7     SET(CD+FD)
 The Manhole 2                                                 Sun Denshi                        1993/5     ?
-The Playroom                                                  Fujitsu                           1995/2     CD
 The Sea in Your Eyes: Umi wo Mitsumete                        Inter Limited Logic               1995/4     CD
 The Yachtman                                                  Raison                            1989/11    CD
 Think Read: Chuugaku Series                                   Catena                            ?          SET(CD+FD)
@@ -1601,6 +1599,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="day in the life of 2049, a - file 1 - 38-man kilo no kokuu (japan)" sha1="13cef87d7fbbf6d281517098337acde661baaade" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="94nicegal">
+		<!--
+		Origin: redump.org
+		<rom name="'94-nen Nice Gal - Natsu no Soukessan (Japan) (Track 1).bin" size="69254640" crc="b348695f" sha1="41caaa277ffeea98fac53afe065574bbbc71a7ce"/>
+		<rom name="'94-nen Nice Gal - Natsu no Soukessan (Japan) (Track 2).bin" size="127360800" crc="1657ddf3" sha1="6288036f83878dfdab8479243707d3d6e9c48793"/>
+		<rom name="'94-nen Nice Gal - Natsu no Soukessan (Japan).cue" size="260" crc="19fb2851" sha1="18a8812c13cabca559a882a6155682962ba99805"/>
+		-->
+		<description>'94-nen Nice Gal - Natsu no Soukessan</description>
+		<year>1994</year>
+		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="serial" value="MTC-1106"/>
+		<info name="alt_title" value="’９４年　ナイス・ギャル　夏の総決算" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="'94-nen nice gal - natsu no soukessan (japan)" sha1="a9a4fa081d8dee0a5f23fb3ce78aba9d82de0f8b" />
 			</diskarea>
 		</part>
 	</software>
@@ -12378,6 +12396,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="iitabi">
+		<!--
+		 Origin: redump.org
+		<rom name="Ii Tabi Ii Aji Goannai - Furusato Kodzutsumi &amp; Kanpo no Yado - Heisei Gannendo-ban (Japan).bin" size="248371200" crc="88916279" sha1="004370f769d2c816207ca0751c999805c2ae2c05"/>
+		<rom name="Ii Tabi Ii Aji Goannai - Furusato Kodzutsumi &amp; Kanpo no Yado - Heisei Gannendo-ban (Japan).cue" size="156" crc="d69f2568" sha1="30d8bb6aced94c021cf898c5f3d13ef385962944"/>
+		 -->
+		<description>Ii Tabi Ii Aji Goannai - Furusato Kodzutsumi &amp; Kanpo no Yado - Heisei Gannendo-ban</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMA-501"/>
+		<info name="alt_title" value="いい旅いい味ご案内　〈ふるさと小包＆かんぽの宿〉　平成元年度版" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ii tabi ii aji goannai - furusato kodzutsumi &amp; kanpo no yado - heisei gannendo-ban (japan)" sha1="2c15f864bcff84ce81104d179539bd1e37bcde6a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ilhyakka">
 		<!--
 		Origin: redump.org
@@ -20894,6 +20931,26 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="playroom">
+		<!--
+		Origin: redump.org
+		<rom name="Playroom, The (Japan).bin" size="10231200" crc="a7fd6236" sha1="310c3a4ff32ac36ec9c23b33d55bfdfcf2893e90"/>
+		<rom name="Playroom, The (Japan).cue" size="87" crc="6600e981" sha1="a3c206b9d98a13b8be4ec6695a300569de8beba0"/>
+		-->
+		<description>The Playroom</description>
+		<year>1995</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMF-159 / A2760590 / TSC460"/>
+		<info name="alt_title" value="プレイルーム" />
+		<info name="release" value="199502xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="playroom, the (japan)" sha1="2d1d9b0111219c0b50b5613e818385759987c736" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pleasure">
 		<!--
 		Origin: redump.org
@@ -20967,6 +21024,25 @@ User/save disks that can be created from the game itself are not included.
 			<feature name="part_id" value="Dream On Bang2 Project" />
 			<diskarea name="cdrom">
 				<disk name="dream on bang2 project (japan)" sha1="d576aeb5737c63644852c41b1cdab5316e3f0b4f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pocky">
+		<!--
+		Origin: redump.org
+		<rom name="Pocky 1-2 + Ponyon (Japan).bin" size="12705504" crc="eba102dc" sha1="cb905849897630998d97f7d3bb4c6ac319654778"/>
+		<rom name="Pocky 1-2 + Ponyon (Japan).cue" size="115" crc="0f42bc89" sha1="b377b6fdfc688390c986824bb713e83c0d75b577"/>
+		-->
+		<description>Pocky 1-2 + Ponyon</description>
+		<year>1994</year>
+		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
+		<info name="alt_title" value="ポッキー／ポッキー２／ポニオン" />
+		<info name="release" value="199406xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pocky 1-2 + ponyon (japan)" sha1="b937eb22f7d30c8481983072850d448b293ac828" />
 			</diskarea>
 		</part>
 	</software>
@@ -21635,6 +21711,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="psydet4d">
+		<!--
+		Origin: redump.org
+		<rom name="Psychic Detective Series Vol. 4 - Orgel (Japan) (Demo).bin" size="10066560" crc="8401de2c" sha1="3004aba65bae2041705e9229e6b727c1d25f8abd"/>
+		<rom name="Psychic Detective Series Vol. 4 - Orgel (Japan) (Demo).cue" size="120" crc="7acea0cb" sha1="24a25add53bacc71f603d77beadbc5637edebcb7"/>
+		-->
+		<description>Psychic Detective Series Vol. 4 - Orgel (Demo)</description>
+		<year>1991</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="HMC-902"/>
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.4　オルゴール" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 4 - orgel (japan) (demo)" sha1="5149e7e3f8e2c9f220ccceeed9014c9dd7e14348" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
 	<software name="psydet4r">
 		<!--
@@ -21794,6 +21889,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series final - solitude gekan (japan)" sha1="46604431b9b01b8041114000cf4b2d88ee4c47fc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydetf2d">
+		<!--
+		Origin: redump.org
+		<rom name="Psychic Detective Series Final - Solitude Gekan (Japan) (Demo).bin" size="13580448" crc="7361bd59" sha1="7498b181224fb4adf6bf55ed712e4132235482a4"/>
+		<rom name="Psychic Detective Series Final - Solitude Gekan (Japan) (Demo).cue" size="128" crc="57ae6f5b" sha1="3b7aad1eaeb85256772a7379cd0ce3658024afb5"/>
+		-->
+		<description>Psychic Detective Series Final - Solitude Gekan (Demo)</description>
+		<year>1993</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="DWFT3907"/>
+		<info name="alt_title" value="サイキック・ディテクティヴシリーズ・ファイナル　「ソリチュード（下巻）」" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series final - solitude gekan (japan) (demo)" sha1="e6c11cd2e3cfebe49c8b179714d802024c72bfa7" />
 			</diskarea>
 		</part>
 	</software>
@@ -29530,7 +29644,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Rev A) (Track 24).bin" size="48298320" crc="b2387930" sha1="370a0ec9fecb03608aae2ad91f21926925155ddb"/>
 		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Rev A).cue" size="3774" crc="db8b3998" sha1="423e0b8a4cd48d7fc2dbe8d98223cababbc13d3d"/>
 		-->
-		<description>Zak McKracken and The Alien Mindbenders</description>
+		<description>Zak McKracken and The Alien Mindbenders (HMB-218A)</description>
 		<year>1991</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="HMB-218A / A2760090 / TSC100"/>
@@ -29539,6 +29653,48 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zak mckracken and the alien mindbenders (japan) (en,ja) (rev a)" sha1="b815f0592ae756a58cf5b8bd34b630b55279c6e9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zako" cloneof="zak">
+		<!--
+		Origin: redump.org
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 01).bin" size="54331200" crc="90215765" sha1="b32664d9507c55dc53024267d7b5220afc42a82b"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 02).bin" size="7056000" crc="5994daa3" sha1="becde6067305b81a7db6b9068c06e710bf38559c"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 03).bin" size="43387344" crc="fb888724" sha1="0b89294fa22f37dcbaddef05734307ca48e267c0"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 04).bin" size="43989456" crc="6e5cbcae" sha1="57c37cb5e59319461ec8ca6c62e1d31b88618900"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 05).bin" size="18357360" crc="d8a4de39" sha1="6b4e2945b82f7ee2e16c69f183d63b2b251435d4"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 06).bin" size="15186864" crc="c8c5d1a4" sha1="13ffdb215f6df564ad01503f14b343fde0fb7f08"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 07).bin" size="42495936" crc="9246bf93" sha1="0a141efb01df808e3fbde595e355b69fa153d737"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 08).bin" size="29023680" crc="96c93f4c" sha1="0ddeb09512026e82c48a9d044e7362253f8af658"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 09).bin" size="32986800" crc="02352519" sha1="e1b594dc3b87e857c82e540fad8ac00c1f9dee29"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 10).bin" size="43547280" crc="42f34de9" sha1="467b6f636f075735f30cca3ecc87821e394990f3"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 11).bin" size="46903584" crc="b8299964" sha1="4be54bfcf728aba70af4fe2c4eb559cdeacbd3d6"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 12).bin" size="12336240" crc="ecb4a4b6" sha1="3c3cb350d88993df2ab363366dcb60a82bbf6f67"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 13).bin" size="12554976" crc="42403889" sha1="1e001b7dab873e956e31e1fac267be24f500abcc"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 14).bin" size="6543264" crc="99a22562" sha1="add87b9436c9a89972b2b99d513f70b24b109f77"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 15).bin" size="27254976" crc="811bfe62" sha1="4f294dc4046991989754872abe307d2daae7b3f6"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 16).bin" size="20902224" crc="6ee16814" sha1="49b436b637663e826ab829406324f949616a3ae5"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 17).bin" size="33770016" crc="e1eee765" sha1="3505b171bf31708ba05db0eb0a8f1bf312e02d92"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 18).bin" size="43806000" crc="2b95ece0" sha1="8d5889cc442ff07cf808aa26de8a164ce2729512"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 19).bin" size="43664880" crc="fb126fae" sha1="5e166f97b9ec8eea98345bc96d803f907cd0bd09"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 20).bin" size="26848080" crc="2d9166d5" sha1="96dc65217e7057237a71356dd4beea844416896f"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 21).bin" size="45287760" crc="7de176e9" sha1="ef142da314f2e181736e95358b6322a92cec7fc1"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 22).bin" size="25312224" crc="257ac051" sha1="cc851d62b1b864e70743fc9c0264ec950cd6727e"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 23).bin" size="6545616" crc="51c01a0f" sha1="cada4bce11139d39cba9f464a8cc95dc47017679"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja) (Track 24).bin" size="48298320" crc="9798260d" sha1="c6c9ae01e024f0d3d3816b3b84036376a10d5da5"/>
+		<rom name="Zak McKracken and the Alien Mindbenders (Japan) (En,Ja).cue" size="3582" crc="9f12271d" sha1="09b4387adaf02897f99cd781eedf9735b4af81cb"/>
+		-->
+		<description>Zak McKracken and The Alien Mindbenders (HMB-218)</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMB-218 / A2760090 / TSC100"/>
+		<info name="release" value="199102xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zak mckracken and the alien mindbenders (japan) (en,ja)" sha1="ee2f77e37f629005cc613343a643adb7214f0903" />
 			</diskarea>
 		</part>
 	</software>

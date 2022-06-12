@@ -120,14 +120,14 @@ DEFINE_DEVICE_TYPE(MOS5710,  mos5710_device,  "mos5710",  "MOS 5710 CIA")
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  DEVICE FUNCTIONS
 //**************************************************************************
 
 //-------------------------------------------------
 //  update_pa - update port A
 //-------------------------------------------------
 
-inline void mos6526_device::update_pa()
+void mos6526_device::update_pa()
 {
 	uint8_t pa = m_pra | (m_pa_in & ~m_ddra);
 
@@ -143,7 +143,7 @@ inline void mos6526_device::update_pa()
 //  update_pb - update port B
 //-------------------------------------------------
 
-inline void mos6526_device::update_pb()
+void mos6526_device::update_pb()
 {
 	uint8_t pb = m_prb | (m_pb_in & ~m_ddrb);
 
@@ -175,7 +175,7 @@ inline void mos6526_device::update_pb()
 //  set_cra - control register A write
 //-------------------------------------------------
 
-inline void mos6526_device::set_cra(uint8_t data)
+void mos6526_device::set_cra(uint8_t data)
 {
 	if (!CRA_STARTED && (data & CRA_START))
 	{
@@ -205,7 +205,7 @@ inline void mos6526_device::set_cra(uint8_t data)
 //  set_crb - control register B write
 //-------------------------------------------------
 
-inline void mos6526_device::set_crb(uint8_t data)
+void mos6526_device::set_crb(uint8_t data)
 {
 	if (!CRB_STARTED && (data & CRB_START))
 	{
@@ -221,7 +221,7 @@ inline void mos6526_device::set_crb(uint8_t data)
 //  bcd_increment -
 //-------------------------------------------------
 
-inline uint8_t mos6526_device::bcd_increment(uint8_t value)
+uint8_t mos6526_device::bcd_increment(uint8_t value)
 {
 	value++;
 
@@ -236,7 +236,7 @@ inline uint8_t mos6526_device::bcd_increment(uint8_t value)
 //  clock_tod - time-of-day clock pulse
 //-------------------------------------------------
 
-inline void mos6526_device::clock_tod()
+void mos6526_device::clock_tod()
 {
 	uint8_t subsecond = (uint8_t) (m_tod >>  0);
 	uint8_t second    = (uint8_t) (m_tod >>  8);
@@ -290,7 +290,7 @@ inline void mos6526_device::clock_tod()
 //  clock_tod - time-of-day clock pulse
 //-------------------------------------------------
 
-inline void mos8520_device::clock_tod()
+void mos8520_device::clock_tod()
 {
 	m_tod++;
 	m_tod &= 0xffffff;
@@ -301,7 +301,7 @@ inline void mos8520_device::clock_tod()
 //  read_tod - time-of-day read
 //-------------------------------------------------
 
-inline uint8_t mos6526_device::read_tod(int offset)
+uint8_t mos6526_device::read_tod(int offset)
 {
 	int shift = 8 * offset;
 
@@ -320,7 +320,7 @@ inline uint8_t mos6526_device::read_tod(int offset)
 //  write_tod - time-of-day write
 //-------------------------------------------------
 
-inline void mos6526_device::write_tod(int offset, uint8_t data)
+void mos6526_device::write_tod(int offset, uint8_t data)
 {
 	int shift = 8 * offset;
 
@@ -339,7 +339,7 @@ inline void mos6526_device::write_tod(int offset, uint8_t data)
 //  serial_input -
 //-------------------------------------------------
 
-inline void mos6526_device::serial_input()
+void mos6526_device::serial_input()
 {
 	m_shift <<= 1;
 	m_bits++;
@@ -360,7 +360,7 @@ inline void mos6526_device::serial_input()
 //  clock_ta - clock timer A
 //-------------------------------------------------
 
-inline void mos6526_device::clock_ta()
+void mos6526_device::clock_ta()
 {
 	if (m_count_a3)
 	{
@@ -394,7 +394,7 @@ inline void mos6526_device::clock_ta()
 //  serial_output -
 //-------------------------------------------------
 
-inline void mos6526_device::serial_output()
+void mos6526_device::serial_output()
 {
 	if (m_ta_out && CRA_SPMODE)
 	{
@@ -438,7 +438,7 @@ inline void mos6526_device::serial_output()
 //  clock_tb - clock timer B
 //-------------------------------------------------
 
-inline void mos6526_device::clock_tb()
+void mos6526_device::clock_tb()
 {
 	if (m_count_b3)
 	{
@@ -472,7 +472,7 @@ inline void mos6526_device::clock_tb()
 //  update_interrupt -
 //-------------------------------------------------
 
-inline void mos6526_device::update_interrupt()
+void mos6526_device::update_interrupt()
 {
 	if (!m_irq && m_ir1)
 	{
@@ -498,7 +498,7 @@ inline void mos6526_device::update_interrupt()
 //  clock_pipeline - clock pipeline
 //-------------------------------------------------
 
-inline void mos6526_device::clock_pipeline()
+void mos6526_device::clock_pipeline()
 {
 	// timer A pipeline
 	m_count_a3 = m_count_a2;
@@ -556,7 +556,7 @@ inline void mos6526_device::clock_pipeline()
 //  synchronize -
 //-------------------------------------------------
 
-inline void mos6526_device::synchronize()
+void mos6526_device::synchronize()
 {
 	if (!m_pc)
 	{
@@ -642,9 +642,9 @@ void mos6526_device::device_start()
 	m_write_pb.resolve_safe();
 
 	// allocate timer
-	if (m_tod_clock > 0)
+	if (m_tod_clock != 0)
 	{
-		m_tod_timer = timer_alloc();
+		m_tod_timer = timer_alloc(FUNC(mos6526_device::advance_tod_clock), this);
 		m_tod_timer->adjust(attotime::from_hz(m_tod_clock), 0, attotime::from_hz(m_tod_clock));
 	}
 
@@ -758,11 +758,7 @@ void mos6526_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mos6526_device::advance_tod_clock)
 {
 	tod_w(1);
 	tod_w(0);

@@ -13,7 +13,7 @@
 #include "../nl_setup.h"
 
 #ifdef RES_R
-#warning "Do not include rescap.h in a netlist environment"
+#warning "Do not include `rescap.h` in a netlist environment"
 #endif
 #ifndef RES_R
 #define RES_R(res) (res)
@@ -30,5 +30,6 @@
 
 #include "../generated/nld_devinc.h"
 
+NETLIST_EXTERNAL(base_lib)
 
 #endif // NET_LIB_H

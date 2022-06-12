@@ -18,7 +18,6 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void tra_callback() override;
@@ -26,8 +25,6 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	static constexpr int TIMER_RESPONSE = 1;
-
 	enum jvc_xvd701_media_type : uint32_t
 	{
 		JVC_MEDIA_VCD = 0,
@@ -41,7 +38,7 @@ private:
 		STATUS_PAUSE = 2,
 	};
 
-	void send_response();
+	TIMER_CALLBACK_MEMBER(send_response);
 	unsigned char sum(unsigned char *buffer, int length);
 	void create_packet(unsigned char status, const unsigned char response[6]);
 

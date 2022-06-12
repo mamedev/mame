@@ -132,8 +132,8 @@ ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, dev
 
 void ef9345_device::device_start()
 {
-	m_busy_timer = timer_alloc(BUSY_TIMER);
-	m_blink_timer = timer_alloc(BLINKING_TIMER);
+	m_busy_timer = timer_alloc(FUNC(ef9345_device::clear_busy_flag), this);
+	m_blink_timer = timer_alloc(FUNC(ef9345_device::blink_tick), this);
 
 	m_videoram = &space(0);
 
@@ -192,20 +192,17 @@ void ef9345_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
-void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-		case BUSY_TIMER:
-			m_bf = 0;
-			break;
 
-		case BLINKING_TIMER:
-			m_blink = !m_blink;
-			break;
-	}
+TIMER_CALLBACK_MEMBER(ef9345_device::clear_busy_flag)
+{
+	m_bf = 0;
+}
+
+TIMER_CALLBACK_MEMBER(ef9345_device::blink_tick)
+{
+	m_blink = !m_blink;
 }
 
 

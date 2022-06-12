@@ -63,7 +63,9 @@ void cheekyms_state::port_80_w(uint8_t data)
 	*m_port_80 = data;
 
 	/* d2 - interrupt enable */
-	m_irq_mask = data & 4;
+	m_irq_mask = BIT(data, 2);
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

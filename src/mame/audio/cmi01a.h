@@ -41,11 +41,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	static const device_timer_id TIMER_ZX = 0;
-	static const device_timer_id TIMER_EOSI = 1;
-	static const device_timer_id TIMER_BCAS = 2;
 
 	required_device<input_merger_device> m_irq_merger;
 	required_device_array<pia6821_device, 2> m_pia;
@@ -58,7 +53,7 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(cmi01a_irq);
 
-	void bcas_tick();
+	TIMER_CALLBACK_MEMBER(bcas_tick);
 	void reset_bcas_counter();
 
 	void clock_envelope();
@@ -73,8 +68,8 @@ private:
 	void wpe_w(int state);
 	void load_w(int state);
 
-	void zx_timer_cb();
-	void eosi_timer_cb();
+	TIMER_CALLBACK_MEMBER(zx_timer_cb);
+	TIMER_CALLBACK_MEMBER(eosi_timer_cb);
 	void run_voice();
 	void update_wave_addr(int inc);
 

@@ -73,8 +73,8 @@ void m68sfdc_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	m_timer_head_load = timer_alloc(TM_HEAD_LOAD);
-	m_timer_timeout = timer_alloc(TM_TIMEOUT);
+	m_timer_head_load = timer_alloc(FUNC(m68sfdc_device::head_load_update), this);
+	m_timer_timeout = timer_alloc(FUNC(m68sfdc_device::timeout_expired), this);
 	save_item(NAME(m_select_0));
 	save_item(NAME(m_select_1));
 	save_item(NAME(m_select_2));
@@ -86,7 +86,6 @@ void m68sfdc_device::device_start()
 	save_item(NAME(m_head_load));
 	save_item(NAME(m_crc));
 	save_item(NAME(m_last_crc));
-	save_item(NAME(m_pia_ca1));
 	save_item(NAME(m_pia_cb2));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_enable_drive_write));
@@ -98,7 +97,7 @@ void m68sfdc_device::device_start()
 
 	m_floppy = nullptr;
 
-	t_gen = timer_alloc(TM_GEN);
+	t_gen = timer_alloc(FUNC(m68sfdc_device::general_update), this);
 }
 
 void m68sfdc_device::device_reset()
@@ -114,7 +113,6 @@ void m68sfdc_device::device_reset()
 	m_head_load = 0;
 	m_crc = 0;
 	m_last_crc = 0;
-	m_pia_ca1 = 0;
 	m_pia_cb2 = 0;
 	m_reset = 1;
 	m_enable_drive_write = 0;
@@ -150,36 +148,28 @@ WRITE_LINE_MEMBER(m68sfdc_device::handle_nmi)
 	m_nmi_handler(state);
 }
 
-void m68sfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m68sfdc_device::head_load_update)
 {
-	switch (id)
+	live_sync();
+	m_head_load2 = 0;
+	u8 head_load = m_head_load1 && m_head_load2;
+	if (head_load != m_head_load)
 	{
-	case TM_HEAD_LOAD:
-	{
-		live_sync();
-		m_head_load2 = 0;
-		u8 head_load = m_head_load1 && m_head_load2;
-		if (head_load != m_head_load)
-		{
-			// TODO sound?
-			m_head_load = head_load;
-		}
-		break;
+		// TODO sound?
+		m_head_load = head_load;
 	}
-	case TM_TIMEOUT:
-	{
-		live_sync();
-		m_pia->ca1_w(0);
-		m_pia_ca1 = 0;
-		break;
-	}
-	case TM_GEN:
-		live_sync();
-		live_run();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in m68sfdc_device::device_timer");
-	}
+}
+
+TIMER_CALLBACK_MEMBER(m68sfdc_device::timeout_expired)
+{
+	live_sync();
+	m_pia->ca1_w(0);
+}
+
+TIMER_CALLBACK_MEMBER(m68sfdc_device::general_update)
+{
+	live_sync();
+	live_run();
 }
 
 
@@ -386,11 +376,6 @@ void m68sfdc_device::pia_pa_w(u8 data)
 	}
 }
 
-int m68sfdc_device::pia_ca1_r()
-{
-	return m_pia_ca1;
-}
-
 void m68sfdc_device::pia_ca2_w(int state)
 {
 	if (m_floppy)
@@ -493,7 +478,6 @@ void m68sfdc_device::pia_cb2_w(int state)
 	{
 		// Trigger the timeout timer on a high to low transition of CB2
 		m_pia->ca1_w(1);
-		m_pia_ca1 = 1;
 		m_timer_timeout->reset(attotime::from_msec(800));
 	}
 	m_pia_cb2 = state;
@@ -854,7 +838,7 @@ void m68sfdc_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(m68sfdc_device::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(m68sfdc_device::pia_pa_w));
-	m_pia->readca1_handler().set(FUNC(m68sfdc_device::pia_ca1_r));
+	m_pia->ca1_w(0);
 	m_pia->ca2_handler().set(FUNC(m68sfdc_device::pia_ca2_w));
 	m_pia->readpb_handler().set(FUNC(m68sfdc_device::pia_pb_r));
 	m_pia->writepb_handler().set(FUNC(m68sfdc_device::pia_pb_w));

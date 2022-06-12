@@ -293,7 +293,6 @@
 enum
 {
 	INDEX_TM = 0,
-	SPINUP_TM,
 	SEEK_TM,
 	CACHE_TM
 };
@@ -350,10 +349,10 @@ mfm_harddisk_device::~mfm_harddisk_device()
 
 void mfm_harddisk_device::device_start()
 {
-	m_index_timer = timer_alloc(INDEX_TM);
-	m_spinup_timer = timer_alloc(SPINUP_TM);
-	m_seek_timer = timer_alloc(SEEK_TM);
-	m_cache_timer = timer_alloc(CACHE_TM);
+	m_index_timer = timer_alloc(FUNC(mfm_harddisk_device::index_timer), this);
+	m_spinup_timer = timer_alloc(FUNC(mfm_harddisk_device::recalibrate), this);
+	m_seek_timer = timer_alloc(FUNC(mfm_harddisk_device::seek_update), this);
+	m_cache_timer = timer_alloc(FUNC(mfm_harddisk_device::cache_update), this);
 
 	m_rev_time = attotime::from_hz(m_rpm/60);
 	m_index_timer->adjust(attotime::from_hz(m_rpm/60), 0, attotime::from_hz(m_rpm/60));
@@ -628,78 +627,18 @@ attotime mfm_harddisk_device::track_end_time()
 	return endtime;
 }
 
-void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mfm_harddisk_device::index_timer)
 {
-	switch (id)
+	// Simple index hole handling. We assume that there is only a short pulse.
+	m_revolution_start_time = machine().time();
+	if (!m_index_pulse_cb.isnull())
 	{
-	case INDEX_TM:
-		// Simple index hole handling. We assume that there is only a short pulse.
-		m_revolution_start_time = machine().time();
-		if (!m_index_pulse_cb.isnull())
-		{
-			m_index_pulse_cb(this, ASSERT_LINE);
-			m_index_pulse_cb(this, CLEAR_LINE);
-		}
-		break;
-
-	case SPINUP_TM:
-		recalibrate();
-		break;
-
-	case CACHE_TM:
-		m_cache->write_back_one();
-		break;
-
-	case SEEK_TM:
-		switch (m_step_phase)
-		{
-		case STEP_COLLECT:
-			// Collect timer has expired; start moving head
-			head_move();
-			break;
-		case STEP_MOVING:
-			// Head has reached final position
-			// Check whether we have a new delta
-			if (m_track_delta == 0)
-			{
-				// Start the settle timer
-				m_step_phase = STEP_SETTLE;
-				m_seek_timer->adjust(m_settle_time);
-				LOGMASKED(LOG_STEPSDETAIL, "Arrived at target cylinder %d, settling ...\n", m_current_cylinder);
-			}
-			else
-			{
-				// need to move the head again
-				head_move();
-			}
-			break;
-		case STEP_SETTLE:
-			// Do we have new step pulses?
-			if (m_track_delta != 0) head_move();
-			else
-			{
-				// Seek completed
-				if (!m_recalibrated)
-				{
-					m_ready = true;
-					m_recalibrated = true;
-					LOGMASKED(LOG_CONFIG, "Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", m_current_cylinder);
-					if (!m_ready_cb.isnull()) m_ready_cb(this, ASSERT_LINE);
-				}
-				else
-				{
-					LOGMASKED(LOG_SIGNALS, "Settling done at cylinder %d, seek complete\n", m_current_cylinder);
-				}
-				m_seek_complete = true;
-				if (!m_seek_complete_cb.isnull()) m_seek_complete_cb(this, ASSERT_LINE);
-				m_step_phase = STEP_COLLECT;
-			}
-			break;
-		}
+		m_index_pulse_cb(this, ASSERT_LINE);
+		m_index_pulse_cb(this, CLEAR_LINE);
 	}
 }
 
-void mfm_harddisk_device::recalibrate()
+TIMER_CALLBACK_MEMBER(mfm_harddisk_device::recalibrate)
 {
 	LOGMASKED(LOG_STEPS, "Recalibrate to track 0\n");
 	direction_in_w(CLEAR_LINE);
@@ -708,6 +647,60 @@ void mfm_harddisk_device::recalibrate()
 		step_w(ASSERT_LINE);
 		step_w(CLEAR_LINE);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(mfm_harddisk_device::seek_update)
+{
+	switch (m_step_phase)
+	{
+	case STEP_COLLECT:
+		// Collect timer has expired; start moving head
+		head_move();
+		break;
+	case STEP_MOVING:
+		// Head has reached final position
+		// Check whether we have a new delta
+		if (m_track_delta == 0)
+		{
+			// Start the settle timer
+			m_step_phase = STEP_SETTLE;
+			m_seek_timer->adjust(m_settle_time);
+			LOGMASKED(LOG_STEPSDETAIL, "Arrived at target cylinder %d, settling ...\n", m_current_cylinder);
+		}
+		else
+		{
+			// need to move the head again
+			head_move();
+		}
+		break;
+	case STEP_SETTLE:
+		// Do we have new step pulses?
+		if (m_track_delta != 0) head_move();
+		else
+		{
+			// Seek completed
+			if (!m_recalibrated)
+			{
+				m_ready = true;
+				m_recalibrated = true;
+				LOGMASKED(LOG_CONFIG, "Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", m_current_cylinder);
+				if (!m_ready_cb.isnull()) m_ready_cb(this, ASSERT_LINE);
+			}
+			else
+			{
+				LOGMASKED(LOG_SIGNALS, "Settling done at cylinder %d, seek complete\n", m_current_cylinder);
+			}
+			m_seek_complete = true;
+			if (!m_seek_complete_cb.isnull()) m_seek_complete_cb(this, ASSERT_LINE);
+			m_step_phase = STEP_COLLECT;
+		}
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mfm_harddisk_device::cache_update)
+{
+	m_cache->write_back_one();
 }
 
 void mfm_harddisk_device::head_move()

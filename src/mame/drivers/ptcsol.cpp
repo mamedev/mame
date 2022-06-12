@@ -164,19 +164,22 @@ public:
 	void sol20(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_SOL20_CASSETTE_TC,
-	};
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	struct cass_data_t
 	{
-		struct {
+		struct
+		{
 			int length = 0;     /* time cassette level is at input.level */
 			int level = 0;      /* cassette level */
 			int bit = 0;        /* bit being read */
 		} input;
-		struct {
+		struct
+		{
 			int length = 0;     /* time cassette level is at output.level */
 			int level = 0;      /* cassette level */
 			int bit = 0;        /* bit to output */
@@ -195,12 +198,6 @@ private:
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	u8 m_sol20_fa = 0U;
 	u8 m_sol20_fc = 0U;
 	u8 m_sol20_fe = 0U;
@@ -240,19 +237,6 @@ cassette_image_device *sol20_state::cassette_device_image()
 		return m_cass2;
 	else
 		return m_cass1;
-}
-
-
-void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SOL20_CASSETTE_TC:
-		sol20_cassette_tc(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in sol20_state::device_timer");
-	}
 }
 
 
@@ -347,7 +331,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 
 u8 sol20_state::sol20_f8_r()
 {
-// d7 - TBMT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
+	// d7 - TBMT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
 	u8 data = 0;
 
 	m_uart_s->write_swe(0);
@@ -563,7 +547,7 @@ INPUT_PORTS_END
 
 void sol20_state::machine_start()
 {
-	m_cassette_timer = timer_alloc(TIMER_SOL20_CASSETTE_TC);
+	m_cassette_timer = timer_alloc(FUNC(sol20_state::sol20_cassette_tc), this);
 	save_item(NAME(m_sol20_fa));
 	save_item(NAME(m_sol20_fc));
 	save_item(NAME(m_sol20_fe));

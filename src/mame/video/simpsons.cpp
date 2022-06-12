@@ -45,17 +45,17 @@ K053246_CB_MEMBER(simpsons_state::sprite_callback)
 
 ***************************************************************************/
 
-uint8_t simpsons_state::simpsons_k052109_r(offs_t offset)
+uint8_t simpsons_state::k052109_r(offs_t offset)
 {
 	return m_k052109->read(offset + 0x2000);
 }
 
-void simpsons_state::simpsons_k052109_w(offs_t offset, uint8_t data)
+void simpsons_state::k052109_w(offs_t offset, uint8_t data)
 {
 	m_k052109->write(offset + 0x2000, data);
 }
 
-uint8_t simpsons_state::simpsons_k053247_r(offs_t offset)
+uint8_t simpsons_state::k053247_r(offs_t offset)
 {
 	int offs = offset >> 1;
 
@@ -65,7 +65,7 @@ uint8_t simpsons_state::simpsons_k053247_r(offs_t offset)
 		return(m_spriteram[offs] >> 8);
 }
 
-void simpsons_state::simpsons_k053247_w(offs_t offset, uint8_t data)
+void simpsons_state::k053247_w(offs_t offset, uint8_t data)
 {
 	int offs = offset >> 1;
 
@@ -75,7 +75,7 @@ void simpsons_state::simpsons_k053247_w(offs_t offset, uint8_t data)
 		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
 }
 
-void simpsons_state::simpsons_video_banking( int bank )
+void simpsons_state::video_bank_select( int bank )
 {
 	if(bank & 1)
 		m_palette_view.select(0);
@@ -92,7 +92,7 @@ void simpsons_state::simpsons_video_banking( int bank )
 
 ***************************************************************************/
 
-uint32_t simpsons_state::screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t simpsons_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3], bg_colorbase;
 

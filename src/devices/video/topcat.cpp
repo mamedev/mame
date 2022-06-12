@@ -25,7 +25,7 @@ topcat_device::topcat_device(const machine_config &mconfig, const char *tag, dev
 void topcat_device::device_start()
 {
 	m_int_write_func.resolve_safe();
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback), this));
+	m_cursor_timer = timer_alloc(FUNC(topcat_device::cursor_callback), this);
 	m_cursor_timer->adjust(attotime::from_hz(3));
 
 	save_item(NAME(m_vblank));

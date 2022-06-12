@@ -94,9 +94,7 @@ private:
 	uint8_t m_u11a = 0U;
 	uint8_t m_u11b = 0U;
 	bool m_u10_ca2 = false;
-	bool m_u10_cb1 = false;
 	bool m_u10_cb2 = false;
-	bool m_u11_ca1 = false;
 	bool m_u11_cb2 = false;
 	uint8_t m_segment[6]{};
 	uint8_t m_lamp_decode = 0U;
@@ -132,11 +130,8 @@ private:
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
@@ -561,10 +556,6 @@ READ_LINE_MEMBER( by17_state::u10_ca1_r )
 {
 	return m_io_test->read() & 0x01;
 }
-READ_LINE_MEMBER( by17_state::u10_cb1_r )
-{
-	return m_u10_cb1;
-}
 
 WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 {
@@ -593,17 +584,6 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 		m_lamp_decode = m_u10a & 0x0f;
 
 	m_u10_cb2 = state;
-}
-
-READ_LINE_MEMBER( by17_state::u11_ca1_r )
-{
-	return m_u11_ca1;
-}
-
-READ_LINE_MEMBER( by17_state::u11_cb1_r )
-{
-	/* Pin 32 on MPU J5 AID connector tied low */
-	return 0;
 }
 
 WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
@@ -825,8 +805,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
 
 	m_zero_crossing_active_timer->adjust(attotime::from_usec(700));
 
-	m_u10_cb1 = true;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(true);
 
 	/*** Zero Crossing - power to all Lamp SCRs is cut off and reset ***/
 
@@ -837,8 +816,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
 
-	m_u10_cb1 = false;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(false);
 }
 
 // 555 timer for display refresh
@@ -853,14 +831,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
 
 	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
-	m_u11_ca1 = true;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(true);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 {
-	m_u11_ca1 = false;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(false);
 }
 
 
@@ -992,9 +968,7 @@ void by17_state::machine_start()
 	save_item(NAME(m_u11a));
 	save_item(NAME(m_u11b));
 	save_item(NAME(m_u10_ca2));
-	save_item(NAME(m_u10_cb1));
 	save_item(NAME(m_u10_cb2));
-	save_item(NAME(m_u11_ca1));
 	save_item(NAME(m_u11_cb2));
 	save_item(NAME(m_segment));
 	save_item(NAME(m_lamp_decode));
@@ -1038,7 +1012,7 @@ void by17_state::by17(machine_config &config)
 	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
 	m_pia_u10->writepb_handler().set(FUNC(by17_state::u10_b_w));
 	m_pia_u10->readca1_handler().set(FUNC(by17_state::u10_ca1_r));
-	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
+	m_pia_u10->cb1_w(false);
 	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
 	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
@@ -1050,8 +1024,8 @@ void by17_state::by17(machine_config &config)
 	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
-	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
-	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
+	m_pia_u11->ca1_w(false);
+	m_pia_u11->cb1_w(0); /* Pin 32 on MPU J5 AID connector tied low */
 	m_pia_u11->ca2_handler().set_output("led0");
 	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);

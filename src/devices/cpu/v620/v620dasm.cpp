@@ -56,6 +56,8 @@ static const char *const s_index_tags[2] =
 static const char *const s_reg_names[8] =
 {
 	"A", "B", "X", "R3", "R4", "R5", "R6", "R7"
+	// A, B and X are legacy names for V75's R0, R1 and R2. These may also be written as plain
+	// numbers, though 1 = R2 and 2 = R1 to remain compatible with older indexing syntax.
 };
 
 static const char *const s_reg_mem_ops[4] =

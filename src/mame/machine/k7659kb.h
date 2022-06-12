@@ -39,16 +39,18 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	TIMER_CALLBACK_MEMBER(scan_keyboard);
+
 	emu_timer *m_timer = nullptr;
 
 private:
+	required_ioport_array<12> m_keys;
 	uint8_t key_pos(uint8_t val);
 	uint8_t m_lookup = 0;
 	uint8_t m_key = 0;

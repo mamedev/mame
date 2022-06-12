@@ -559,7 +559,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_reg = 0;
+	u8 m_reg;
 };
 
 
@@ -620,7 +620,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_latch = 0;
+	u8 m_latch;
 };
 
 

@@ -105,6 +105,8 @@
 #include "emu.h"
 #include "pinsnd88.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '88 Audio Board")
 
@@ -159,31 +161,17 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 
-void pinsnd88_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pinsnd88_device::sync_callback)
 {
-	switch(id)
-	{
-		case TIMER_SYNC:
-			if (!m_syncq_cb.isnull())
-			{
-				logerror("pinsnd88 sync cleared!\n");
-				m_syncq_cb(ASSERT_LINE);
-				m_sync_timer->adjust(attotime::never);
-			}
-		break;
-	}
+	LOG("pinsnd88 sync cleared!\n");
+	m_syncq_cb(ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(pinsnd88_device::deferred_sync_w)
 {
-	if (!m_syncq_cb.isnull())
-	{
-		logerror("pinsnd88 sync asserted!\n");
-		m_syncq_cb(CLEAR_LINE);
-		m_sync_timer->adjust(attotime::from_usec(2));
-	}
-	else
-		logerror("pinsnd88 sync writeback called, but callback is not registered!\n");
+	LOG("pinsnd88 sync asserted!\n");
+	m_syncq_cb(CLEAR_LINE);
+	m_sync_timer->adjust(attotime::from_usec(2));
 }
 
 void pinsnd88_device::sync_w(uint8_t data)
@@ -205,7 +193,7 @@ WRITE_LINE_MEMBER(pinsnd88_device::resetq_w)
 {
 	if ((m_old_resetq_state != CLEAR_LINE) && (state == CLEAR_LINE))
 	{
-		logerror("PINSND88 device received reset request\n");
+		LOG("PINSND88 device received reset request\n");
 		common_reset();
 	}
 	m_old_resetq_state = state;
@@ -237,10 +225,12 @@ void pinsnd88_device::device_start()
 	u8 *rom = memregion("cpu")->base();
 	m_cpubank->configure_entries(0, 8, &rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
+
 	/* resolve lines */
-	m_syncq_cb.resolve();
+	m_syncq_cb.resolve_safe();
+
 	/* timer */
-	m_sync_timer = timer_alloc(TIMER_SYNC);
+	m_sync_timer = timer_alloc(FUNC(pinsnd88_device::sync_callback), this);
 	m_sync_timer->adjust(attotime::never);
 	save_item(NAME(m_old_resetq_state));
 	save_item(NAME(m_data_in));

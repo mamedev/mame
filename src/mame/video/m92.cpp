@@ -46,17 +46,10 @@
 
 /*****************************************************************************/
 
-void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m92_state::spritebuffer_done)
 {
-	switch (id)
-	{
-	case TIMER_SPRITEBUFFER:
-		m_sprite_buffer_busy = 1;
-		m_upd71059c->ir1_w(1);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in m92_state::device_timer");
-	}
+	m_sprite_buffer_busy = 1;
+	m_upd71059c->ir1_w(1);
 }
 
 
@@ -243,7 +236,7 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 VIDEO_START_MEMBER(m92_state,m92)
 {
-	m_spritebuffer_timer = timer_alloc(TIMER_SPRITEBUFFER);
+	m_spritebuffer_timer = timer_alloc(FUNC(m92_state::spritebuffer_done), this);
 
 	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
 	m_videocontrol = 0;

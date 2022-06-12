@@ -4870,6 +4870,7 @@ void i386_device::x87_fsave(uint8_t modrm)
 
 	for (int i = 0; i < 8; ++i)
 		WRITE80(ea + i*10, ST(i));
+	x87_reset();
 
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }

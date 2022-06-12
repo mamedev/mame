@@ -62,7 +62,7 @@ nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag,
 void nes_ffe4_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_ffe4_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_exram));
@@ -76,7 +76,6 @@ void nes_ffe4_device::device_start()
 
 void nes_ffe4_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(7);
 	chr8(0, m_chr_source);
@@ -92,7 +91,6 @@ void nes_ffe4_device::pcb_reset()
 
 void nes_ffe8_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0xff);
 	chr8(0, m_chr_source);
@@ -143,21 +141,18 @@ void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_ffe4_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (m_irq_count == 0xffff)
 		{
-			if (m_irq_count == 0xffff)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = 0;
-				m_irq_enable = 0;
-			}
-			else
-				m_irq_count++;
+			set_irq_line(ASSERT_LINE);
+			m_irq_count = 0;
+			m_irq_enable = 0;
 		}
+		else
+			m_irq_count++;
 	}
 }
 

@@ -52,6 +52,7 @@ modified by Hau
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -64,38 +65,37 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_ram(*this, "ram"),
-		m_bg_scroll(*this, "bg_scroll"),
+		m_vram_bank(*this, "vram_bank"),
+		m_vram(*this, "vram", 0x1000, ENDIANNESS_LITTLE),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void safarir(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
-	required_shared_ptr<uint8_t> m_ram;
-	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_memory_bank m_vram_bank;
+	memory_share_creator<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	std::unique_ptr<uint8_t[]> m_ram_1;
-	std::unique_ptr<uint8_t[]> m_ram_2;
-	uint8_t m_ram_bank = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_port_last = 0;
 	uint8_t m_port_last2 = 0;
 
-	void ram_w(offs_t offset, uint8_t data);
-	uint8_t ram_r(offs_t offset);
-	void ram_bank_w(uint8_t data);
-	void safarir_audio_w(uint8_t data);
+	void vram_w(offs_t offset, uint8_t data);
+	void vram_bank_w(uint8_t data);
+	void audio_w(uint8_t data);
+	void bg_scroll_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void safarir_palette(palette_device &palette) const;
-	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
 };
@@ -107,26 +107,16 @@ private:
  *
  *************************************/
 
-void safarir_state::ram_w(offs_t offset, uint8_t data)
+void safarir_state::vram_w(offs_t offset, uint8_t data)
 {
-	if (m_ram_bank)
-		m_ram_2[offset] = data;
-	else
-		m_ram_1[offset] = data;
+	((uint8_t*)m_vram_bank->base())[offset] = data;
 
 	((offset & 0x0400) ? m_bg_tilemap : m_fg_tilemap)->mark_tile_dirty(offset & 0x03ff);
 }
 
-
-uint8_t safarir_state::ram_r(offs_t offset)
+void safarir_state::vram_bank_w(uint8_t data)
 {
-	return m_ram_bank ? m_ram_2[offset] : m_ram_1[offset];
-}
-
-
-void safarir_state::ram_bank_w(uint8_t data)
-{
-	m_ram_bank = data & 0x01;
+	m_vram_bank->set_entry(data & 1);
 
 	machine().tilemap().mark_all_dirty();
 }
@@ -169,10 +159,10 @@ void safarir_state::safarir_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
-	uint8_t code = ram_r(tile_index | 0x400);
+	uint8_t code = ((uint8_t*)m_vram_bank->base())[tile_index | 0x400];
 
 	if (code & 0x80)
-		color = 6;  /* yellow */
+		color = 6; // yellow
 	else
 	{
 		color = ((~tile_index & 0x04) >> 2) | ((tile_index & 0x04) >> 1);
@@ -190,10 +180,10 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
-	uint8_t code = ram_r(tile_index);
+	uint8_t code = ((uint8_t*)m_vram_bank->base())[tile_index];
 
 	if (code & 0x80)
-		color = 7;  /* white */
+		color = 7; // white
 	else
 		color = (~tile_index & 0x04) | ((tile_index >> 1) & 0x03);
 
@@ -212,15 +202,21 @@ void safarir_state::video_start()
 }
 
 
-uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t safarir_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, *m_bg_scroll);
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
+
+
+void safarir_state::bg_scroll_w(uint8_t data)
+{
+	m_bg_tilemap->set_scrollx(0, data);
+}
+
+
 
 /*************************************
  *
@@ -248,7 +244,7 @@ uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind1
 #define CHANNEL_SOUND6      5
 
 
-void safarir_state::safarir_audio_w(uint8_t data)
+void safarir_state::audio_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_last;
 
@@ -322,15 +318,9 @@ void safarir_state::safarir_audio(machine_config &config)
 
 void safarir_state::machine_start()
 {
-	m_ram_1 = std::make_unique<uint8_t[]>(m_ram.bytes());
-	m_ram_2 = std::make_unique<uint8_t[]>(m_ram.bytes());
-	m_port_last = 0;
-	m_port_last2 = 0;
+	m_vram_bank->configure_entries(0, 2, m_vram, 0x800);
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1), m_ram.bytes());
-	save_pointer(NAME(m_ram_2), m_ram.bytes());
-	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));
 }
@@ -346,10 +336,10 @@ void safarir_state::machine_start()
 void safarir_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x2000, 0x27ff).rw(FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
-	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(FUNC(safarir_state::ram_bank_w));
-	map(0x2c00, 0x2c00).mirror(0x03ff).nopr().writeonly().share("bg_scroll");
-	map(0x3000, 0x3000).mirror(0x03ff).w(FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
+	map(0x2000, 0x27ff).bankrw(m_vram_bank).w(FUNC(safarir_state::vram_w));
+	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(FUNC(safarir_state::vram_bank_w));
+	map(0x2c00, 0x2c00).mirror(0x03ff).nopr().w(FUNC(safarir_state::bg_scroll_w));
+	map(0x3000, 0x3000).mirror(0x03ff).w(FUNC(safarir_state::audio_w));    /* goes to SN76477 */
 	map(0x3400, 0x3400).mirror(0x03ff).nopw();  /* cleared at the beginning */
 	map(0x3800, 0x3800).mirror(0x03ff).portr("INPUTS").nopw();
 	map(0x3c00, 0x3c00).mirror(0x03ff).portr("DSW").nopw();
@@ -418,7 +408,7 @@ void safarir_state::safarir(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
 	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(safarir_state::screen_update_safarir));
+	screen.set_screen_update(FUNC(safarir_state::screen_update));
 	screen.set_palette("palette");
 
 	/* audio hardware */
@@ -503,5 +493,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir,  0,       safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, empty_init, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -32,7 +32,7 @@ iop_sio2_device::~iop_sio2_device()
 void iop_sio2_device::device_start()
 {
 	if (!m_response_timer)
-		m_response_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iop_sio2_device::response_timer), this));
+		m_response_timer = timer_alloc(FUNC(iop_sio2_device::response_timer), this);
 
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_curr_byte));

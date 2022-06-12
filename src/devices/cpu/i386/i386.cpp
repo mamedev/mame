@@ -3333,10 +3333,36 @@ void pentium3_device::device_reset()
 
 	// [ 0:0] FPU on chip
 	// [ 4:4] Time Stamp Counter
+	// [ 8:8] CMPXCHG8B instruction
 	// [ D:D] PTE Global Bit
-	m_feature_flags = 0x00002011;       // TODO: enable relevant flags here
+	// [15:15] CMOV and FCMOV
+	// [18:18] PSN (Processor Serial Number, P3 only)
+	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
+}
+
+void pentium3_device::opcode_cpuid()
+{
+	switch (REG32(EAX))
+	{
+		case 0x00000003:
+		{
+			// TODO: lower part of 96 bits s/n for Pentium III processors only (ditched in 4)
+			// (upper 32-bits part is in EAX=1 EAX return)
+			// NB: if this is triggered from an Arcade system then there's a very good chance
+			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
+			logerror("CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
+			REG32(EAX) = 0x00000000;
+			REG32(EBX) = 0x00000000;
+			REG32(ECX) = 0x01234567;
+			REG32(EDX) = 0x89abcdef;
+			CYCLES(CYCLES_CPUID);
+			break;
+		}
+		default:
+			pentium_pro_device::opcode_cpuid();
+	}
 }
 
 /*****************************************************************************/
@@ -3402,7 +3428,9 @@ void pentium4_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	m_feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	// [ 8:8] CMPXCHG8B instruction
+	// [15:15] CMOV and FCMOV
+	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }

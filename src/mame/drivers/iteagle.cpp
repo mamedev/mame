@@ -168,10 +168,10 @@ void iteagle_state::machine_reset()
 void iteagle_state::iteagle(machine_config &config)
 {
 	/* basic machine hardware */
-	VR4310LE(config, m_maincpu, 166666666);
+	VR4310LE(config, m_maincpu, 133'333'333);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(8192);
-	m_maincpu->set_system_clock(66666667);
+	m_maincpu->set_system_clock(66'666'666);
 
 	PCI_ROOT(config, "pci", 0);
 
@@ -292,10 +292,6 @@ void iteagle_state::bbhcotw(machine_config &config)
 void iteagle_state::virtpool(machine_config &config)
 {
 	iteagle(config);
-	// Not sure what the actual value should be
-	// Setting a lower frequency helps delay the tutorial screen premature cut-out
-	m_maincpu->set_clock(99999999);
-	m_maincpu->set_system_clock(33333333);
 
 	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(4);

@@ -182,7 +182,7 @@ enum
 class device_nes_cart_interface : public device_interface
 {
 public:
-	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B, MMC1C };
+	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B };
 
 	// construction/destruction
 	virtual ~device_nes_cart_interface();
@@ -251,8 +251,8 @@ public:
 	uint32_t get_misc_rom_size() const { return m_misc_rom_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
-	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
-	virtual void scanline_irq(int scanline, int vblank, int blanked) {}
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) {}
+	virtual void scanline_irq(int scanline, bool vblank, bool blanked) {}
 
 	virtual void pcb_reset() {} // many pcb expect specific PRG/CHR banking at start
 	virtual void pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted);

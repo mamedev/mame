@@ -155,7 +155,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	cpu_device* _maincpu {};
 	uint8_t multiwin_opcode_r(offs_t offset);
 
 	void multiwin_opcodes_map(address_map& map);
@@ -171,7 +170,6 @@ public:
 	void driver_init() override;
 
 private:
-	cpu_device* _maincpu {};
 	uint8_t royalcrdf_opcode_r(offs_t offset);
 
 	void royalcrdf_map(address_map& map);

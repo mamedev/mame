@@ -146,10 +146,10 @@ void gridlee_state::machine_start()
 	save_item(NAME(m_last_analog_input));
 	save_item(NAME(m_last_analog_output));
 
-	m_irq_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::irq_off_tick),this));
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::irq_timer_tick),this));
-	m_firq_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::firq_off_tick),this));
-	m_firq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::firq_timer_tick),this));
+	m_irq_off = timer_alloc(FUNC(gridlee_state::irq_off_tick), this);
+	m_irq_timer = timer_alloc(FUNC(gridlee_state::irq_timer_tick), this);
+	m_firq_off = timer_alloc(FUNC(gridlee_state::firq_off_tick), this);
+	m_firq_timer = timer_alloc(FUNC(gridlee_state::firq_timer_tick), this);
 }
 
 

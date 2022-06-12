@@ -271,8 +271,12 @@ struct RARegMask {
   }
 
   template<class Operator>
-  inline void op(RegGroup group, uint32_t input) noexcept {
-    _masks[group] = Operator::op(_masks[group], input);
+  inline void op(RegGroup group, RegMask mask) noexcept {
+    _masks[group] = Operator::op(_masks[group], mask);
+  }
+
+  inline void clear(RegGroup group, RegMask mask) noexcept {
+    _masks[group] = _masks[group] & ~mask;
   }
 
   //! \}

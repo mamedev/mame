@@ -51,11 +51,10 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
-	static constexpr device_timer_id TIMER_TRANSFER = 0;
-
 	uint8_t scsi_regs[32];
 	uint8_t fifo[16];
 	uint8_t fptr;

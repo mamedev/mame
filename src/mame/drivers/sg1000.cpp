@@ -479,9 +479,6 @@ void sg1000_state::machine_start()
 
 void sc3000_state::machine_start()
 {
-	/* toggle light gun crosshair */
-	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
-
 	if (m_cart && m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
 								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
 								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))

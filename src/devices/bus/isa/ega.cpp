@@ -507,23 +507,23 @@ ROM_END
 
 INPUT_PORTS_START( ega )
 	PORT_START( "config" )
-	PORT_CONFNAME( 0x0f, 0x09, "dipswitches" )
-	PORT_CONFSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )                            /* DIAG: ?? 40 cols, RGBI */
-	PORT_CONFSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )                            /* DIAG: ?? 80 cols, RGBI */
-	PORT_CONFSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )           /* DIAG: ?? 80 cols, RGBI */
-	PORT_CONFSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )                         /* DIAG: Color Display 40 cols, RrGgBb */
-	PORT_CONFSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
-	PORT_CONFSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
-	PORT_CONFSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )                          /* DIAG: Color Display 40 cols, RGBI */
-	PORT_CONFSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )                          /* DIAG: Color Display 80 cols, RGBI */
-	PORT_CONFSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )         /* DIAG: Color Display 80 cols, RGBI */
-	PORT_CONFSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )                       /* DIAG: Color Display 40 cols, RrGgBb */
-	PORT_CONFSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
-	PORT_CONFSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
-	PORT_CONFSETTING( 0x03, "1100 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x0b, "1101 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x07, "1110 - RESERVED" )                                                 /* ??, RGBI */
-	PORT_CONFSETTING( 0x0f, "1111 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPNAME( 0x0f, 0x09, "Display Type" )
+	PORT_DIPSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )                            /* DIAG: ?? 40 cols, RGBI */
+	PORT_DIPSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )                            /* DIAG: ?? 80 cols, RGBI */
+	PORT_DIPSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )           /* DIAG: ?? 80 cols, RGBI */
+	PORT_DIPSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )                         /* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_DIPSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
+	PORT_DIPSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )                           /* DIAG: ??, Mono RGBI */
+	PORT_DIPSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )                          /* DIAG: Color Display 40 cols, RGBI */
+	PORT_DIPSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )                          /* DIAG: Color Display 80 cols, RGBI */
+	PORT_DIPSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )         /* DIAG: Color Display 80 cols, RGBI */
+	PORT_DIPSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )                       /* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_DIPSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
+	PORT_DIPSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )                                  /* DIAG: Monochrome display, Mono RGBI */
+	PORT_DIPSETTING( 0x03, "1100 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x0b, "1101 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x07, "1110 - RESERVED" )                                                 /* ??, RGBI */
+	PORT_DIPSETTING( 0x0f, "1111 - RESERVED" )                                                 /* ??, RGBI */
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -554,6 +554,7 @@ void isa8_ega_device::device_add_mconfig(machine_config &config)
 	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
 	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
 	m_crtc_ega->res_out_vblank_callback().set(FUNC(isa8_ega_device::vblank_changed));
+	m_crtc_ega->res_out_irq_callback().set([this](int state) { m_irq = state; m_isa->irq2_w(state); });
 }
 
 //-------------------------------------------------
@@ -587,7 +588,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
-	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
+	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_irq(0), m_video_mode(0),
 	m_palette(*this, "palette")
 {
 }
@@ -636,6 +637,15 @@ void isa8_ega_device::device_start()
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
 
+	save_item(STRUCT_MEMBER(m_graphics_controller, index));
+	save_item(STRUCT_MEMBER(m_graphics_controller, data));
+	save_item(STRUCT_MEMBER(m_sequencer, index));
+	save_item(STRUCT_MEMBER(m_sequencer, data));
+	save_item(STRUCT_MEMBER(m_attribute, index));
+	save_item(STRUCT_MEMBER(m_attribute, data));
+	save_item(STRUCT_MEMBER(m_attribute, index_write));
+	save_pointer(NAME(m_vram), 256 * 1024);
+
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
 	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
 	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
@@ -659,6 +669,7 @@ void isa8_ega_device::device_reset()
 	m_vsync = 0;
 	m_vblank = 0;
 	m_display_enable = 0;
+	m_irq = 0;
 
 	install_banks();
 
@@ -744,12 +755,12 @@ void isa8_ega_device::install_banks()
 	}
 }
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::ega_update_row )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::ega_update_row )
 {
 	if (m_video_mode == EGA_MODE_GRAPHICS)
-		pc_ega_graphics(bitmap, cliprect, ma, ra, y, x_count, cursor_x);
+		pc_ega_graphics(bitmap, cliprect, ma, ra, y, x, cursor_x);
 	else if (m_video_mode == EGA_MODE_TEXT)
-		pc_ega_text(bitmap, cliprect, ma, ra, y, x_count, cursor_x);
+		pc_ega_text(bitmap, cliprect, ma, ra, y, x, cursor_x);
 }
 
 
@@ -781,33 +792,30 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 }
 
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
-	uint16_t  *p = &bitmap.pix(y);
+	uint16_t  *p = &bitmap.pix(y, x * 8);
 
-	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
+	LOG("%s: y = %d, x = %d, ma = %d, ra = %d\n", FUNCNAME, y, x, ma, ra );
 
 	if ( m_graphics_controller.data[5] & 0x10 )
 	{
 		// Odd/Even mode (CGA compatible)
 
-		for ( int i = 0; i < x_count; i++ )
-		{
-			uint16_t offset = ( ( ma + i ) & 0x1fff ) | ( ( y & 1 ) << 12 );
-			uint8_t data = m_plane[0][offset];
+		uint16_t offset = ( ma & 0x1fff ) | ( ( y & 1 ) << 12 );
+		uint8_t data = m_plane[BIT(m_misc_output, 5) ? 2 : 0][offset];
 
-			*p = m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = m_attribute.data[   data        & 0x03 ]; p++;
+		*p = m_attribute.data[ ( data >> 6 )        ]; p++;
+		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+		*p = m_attribute.data[   data        & 0x03 ]; p++;
 
-			data = m_plane[1][offset];
+		data = m_plane[BIT(m_misc_output, 5) ? 3 : 1][offset];
 
-			*p = m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = m_attribute.data[   data        & 0x03 ]; p++;
-		}
+		*p = m_attribute.data[ ( data >> 6 )        ]; p++;
+		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+		*p = m_attribute.data[   data        & 0x03 ]; p++;
 	}
 	else
 	{
@@ -815,86 +823,89 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 
 		uint8_t mask = m_attribute.data[0x12] & 0x0f;
 
-		for ( int i = 0; i < x_count; i++ )
+		uint16_t offset = ma;
+		uint16_t data0 = m_plane[0][offset];
+		uint16_t data1 = m_plane[1][offset] << 1;
+		uint16_t data2 = m_plane[2][offset] << 2;
+		uint16_t data3 = m_plane[3][offset] << 3;
+
+		for ( int j = 7; j >= 0; j-- )
 		{
-			uint16_t offset = ma + i;
-			uint16_t data0 = m_plane[0][offset];
-			uint16_t data1 = m_plane[1][offset] << 1;
-			uint16_t data2 = m_plane[2][offset] << 2;
-			uint16_t data3 = m_plane[3][offset] << 3;
+			uint16_t col = ( data0 & 0x01 ) | ( data1 & 0x02 ) | ( data2 & 0x04 ) | ( data3 & 0x08 );
 
-			for ( int j = 7; j >= 0; j-- )
-			{
-				uint16_t col = ( data0 & 0x01 ) | ( data1 & 0x02 ) | ( data2 & 0x04 ) | ( data3 & 0x08 );
+			col &= mask;
 
-				col &= mask;
-
+			if ( m_misc_output & 0x80 )
 				p[j] = m_attribute.data[col];
-
-				data0 >>= 1;
-				data1 >>= 1;
-				data2 >>= 1;
-				data3 >>= 1;
+			else
+			{
+				p[j] = m_attribute.data[col] | (BIT(m_attribute.data[col], 4) ? 0x38 : 0);
+				if ( p[j] == 6 )
+					p[j] = 0x14;
 			}
-			p += 8;
+
+			data0 >>= 1;
+			data1 >>= 1;
+			data2 >>= 1;
+			data3 >>= 1;
 		}
 	}
 }
 
 
-CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
+CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 {
-	uint16_t  *p = &bitmap.pix(y);
+	uint16_t  *p = &bitmap.pix(y, x * ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 ) );
 
-	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
+	LOG("%s: y = %d, x = %d, ma = %d, ra = %d\n", FUNCNAME, y, x, ma, ra );
 
-	for ( int i = 0; i < x_count; i++ )
+	uint16_t  offset = ma;
+	uint8_t   chr = m_plane[0][ offset ];
+	uint8_t   attr = m_plane[1][ offset ];
+	uint8_t   data;
+	uint16_t  fg = m_attribute.data[ attr & 0x07 ];
+	uint16_t  bg = m_attribute.data[ ( attr >> 4 ) & 0x07 ];
+
+	/* If character set A and B are equal attribute bit 3 is used as intensity */
+	if ( m_charA == m_charB )
 	{
-		uint16_t  offset = ma + i;
-		uint8_t   chr = m_plane[0][ offset ];
-		uint8_t   attr = m_plane[1][ offset ];
-		uint8_t   data;
-		uint16_t  fg = m_attribute.data[ attr & 0x07 ];
-		uint16_t  bg = m_attribute.data[ ( attr >> 4 ) & 0x07 ];
-
-		/* If character set A and B are equal attribute bit 3 is used as intensity */
-		if ( m_charA == m_charB )
-		{
-			/* intensity selector */
-			data = m_charB[ chr * 32 + ra ];
-			fg += ( attr & 0x08 ) ? 0x38 : 0x00;
-		}
-		else
-		{
-			/* character set selector */
-			data = ( attr & 0x08 ) ? m_charA[ chr * 32 + ra ] : m_charB[ chr * 32 + ra ];
-		}
-
-		if ( i == cursor_x )
-		{
-			if ( m_frame_cnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
-		else
-		{
-			/* Check for blinking */
-			if ( ( m_attribute.data[0x10] & 0x08 ) && ( attr & 0x80 ) && ( m_frame_cnt & 0x10 ) )
-			{
-				data = 0x00;
-			}
-		}
-
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		/* intensity selector */
+		data = m_charB[ chr * 32 + ra ];
+		if ( !( m_attribute.data[0x10] & 0x08 ) )
+			fg = m_attribute.data[ attr & 0x0f ];
 	}
+	else
+	{
+		/* character set selector */
+		data = ( attr & 0x08 ) ? m_charA[ chr * 32 + ra ] : m_charB[ chr * 32 + ra ];
+	}
+
+	if ( x == cursor_x )
+	{
+		if ( m_frame_cnt & 0x08 )
+		{
+			data = 0xFF;
+		}
+	}
+	else
+	{
+		/* Check for blinking */
+		if ( ( m_attribute.data[0x10] & 0x08 ) && ( attr & 0x80 ) && ( m_frame_cnt & 0x10 ) )
+		{
+			data = 0x00;
+		}
+	}
+
+	*p = ( data & 0x80 ) ? fg : bg; p++;
+	*p = ( data & 0x40 ) ? fg : bg; p++;
+	*p = ( data & 0x20 ) ? fg : bg; p++;
+	*p = ( data & 0x10 ) ? fg : bg; p++;
+	*p = ( data & 0x08 ) ? fg : bg; p++;
+	*p = ( data & 0x04 ) ? fg : bg; p++;
+	*p = ( data & 0x02 ) ? fg : bg; p++;
+	*p = ( data & 0x01 ) ? fg : bg; p++;
+	if ( !( m_sequencer.data[0x01] & 0x01 ) )
+		*p = ( m_attribute.data[0x10] & 0x04 ) ? *(p - 1) : bg;
 }
 
 
@@ -922,10 +933,10 @@ void isa8_ega_device::change_mode()
 		m_video_mode = EGA_MODE_TEXT;
 
 		/* Set character maps */
-		if ( m_sequencer.data[0x04] & 0x02 )
+		if ( m_sequencer.data[0x04] & 0x01 )
 		{
-			m_charA = m_plane[2] + ( ( m_sequencer.data[0x03] & 0x0c ) >> 1 ) * 0x2000;
-			m_charB = m_plane[2] + ( m_sequencer.data[0x03] & 0x03 ) * 0x2000;
+			m_charA = m_plane[2] + ( ( m_sequencer.data[0x03] & 0x0c ) >> 2 ) * 0x4000;
+			m_charB = m_plane[2] + ( m_sequencer.data[0x03] & 0x03 ) * 0x4000;
 		}
 		else
 		{
@@ -954,7 +965,7 @@ uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().side_effects_disabled() && ! ( m_sequencer.data[4] & 0x04 ) )
+	if ( !machine().side_effects_disabled() && !( m_graphics_controller.data[5] & 0x10 ) )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -972,15 +983,22 @@ uint8_t isa8_ega_device::read(offs_t offset)
 	else
 	{
 		// Read mode #0
-		if ( m_sequencer.data[4] & 0x04 )
+		if ( !( m_graphics_controller.data[5] & 0x10 ) )
 		{
 			// Normal addressing mode
-			data = m_plane[ m_graphics_controller.data[4] & 0x03 ][offset & 0xffff];
+			if ( m_graphics_controller.data[6] & 2 )
+			{
+				data = m_plane[ m_graphics_controller.data[4] & 0x03 ][offset & 0xfffe];
+			}
+			else
+			{
+				data = m_plane[ m_graphics_controller.data[4] & 0x03 ][offset & 0xffff];
+			}
 		}
 		else
 		{
 			// Odd/Even addressing mode
-			data = m_plane[offset & 1][(offset & 0xffff) >> 1];
+			data = m_plane[offset & 1][offset & 0xfffe];
 		}
 	}
 
@@ -1058,7 +1076,7 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		alu[2] = m_read_latch[2];
 		alu[3] = m_read_latch[3];
 		target_mask = 0xff;
-		return;
+		break;
 
 	case 2:     // Write mode 2
 		d[0] = ( data & 0x01 ) ? 0xff : 0x00;
@@ -1117,8 +1135,7 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		if ( offset & 1 )
 		{
 			// Odd addresses go to planes 1 and 3
-
-			offset >>= 1;
+			offset &= ~1;
 
 			if ( m_sequencer.data[2] & 0x02 )
 			{
@@ -1136,8 +1153,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		else
 		{
 			// Even addresses go to planes 0 and 2
-
-			offset >>= 1;
 
 			if ( m_sequencer.data[2] & 0x01 )
 			{
@@ -1275,7 +1290,7 @@ uint8_t isa8_ega_device::pc_ega8_3c0_r(offs_t offset)
 
 			data = ( data & 0x0f );
 			data |= ( ( m_feature_control & 0x03 ) << 5 );
-			data |= ( m_vsync ? 0x00 : 0x80 );
+			data |= ( m_irq ? 0x00 : 0x80 );
 			data |= ( ( ( dips >> ( ( ( m_misc_output & 0x0c ) >> 2 ) ) ) & 0x01 ) << 4 );
 		}
 		break;

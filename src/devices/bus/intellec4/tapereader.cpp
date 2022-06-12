@@ -85,7 +85,7 @@ void imm4_90_device::call_unload()
 
 void imm4_90_device::device_start()
 {
-	m_step_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(imm4_90_device::step), this));
+	m_step_timer = timer_alloc(FUNC(imm4_90_device::step), this);
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_ready));

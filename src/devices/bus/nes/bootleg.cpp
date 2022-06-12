@@ -249,7 +249,6 @@ void nes_sc127_device::device_start()
 
 void nes_sc127_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0xff);
 	chr8(0, m_chr_source);
 
@@ -260,7 +259,7 @@ void nes_sc127_device::pcb_reset()
 void nes_mbaby_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_mbaby_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -271,7 +270,6 @@ void nes_mbaby_device::device_start()
 void nes_mbaby_device::pcb_reset()
 {
 	prg32((m_prg_chunks - 1) >> 1);
-	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -286,7 +284,6 @@ void nes_asn_device::device_start()
 
 void nes_asn_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 
@@ -296,7 +293,7 @@ void nes_asn_device::pcb_reset()
 void nes_smb3p_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_smb3p_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -319,7 +316,7 @@ void nes_smb3p_device::pcb_reset()
 void nes_batmanfs_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_batmanfs_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -349,7 +346,6 @@ void nes_btl_dn_device::device_start()
 
 void nes_btl_dn_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -360,7 +356,7 @@ void nes_btl_dn_device::pcb_reset()
 void nes_smb2j_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_smb2j_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -382,7 +378,7 @@ void nes_smb2j_device::pcb_reset()
 void nes_smb2ja_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_smb2ja_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -404,7 +400,7 @@ void nes_smb2ja_device::pcb_reset()
 void nes_smb2jb_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_smb2jb_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -418,7 +414,6 @@ void nes_smb2jb_device::pcb_reset()
 	prg8_ab(0x09);
 	prg8_cd(0);    // switchable bank
 	prg8_ef(0x0b);
-	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -443,7 +438,6 @@ void nes_0353_device::device_start()
 void nes_0353_device::pcb_reset()
 {
 	prg32((m_prg_chunks >> 1) - 1);    // fixed 32K bank
-	chr8(0, CHRRAM);
 
 	m_reg = 0;
 }
@@ -451,7 +445,7 @@ void nes_0353_device::pcb_reset()
 void nes_09034a_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_09034a_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -461,7 +455,6 @@ void nes_09034a_device::device_start()
 
 void nes_09034a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -473,7 +466,7 @@ void nes_09034a_device::pcb_reset()
 void nes_l001_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_l001_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_count));
@@ -498,7 +491,6 @@ void nes_palthena_device::pcb_reset()
 	prg8_89(0x0c);
 	// 0xa000-0xbfff switchable bank
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, CHRRAM);
 
 	m_reg = 0;
 }
@@ -511,9 +503,7 @@ void nes_tobidase_device::device_start()
 
 void nes_tobidase_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(2);
-	chr8(0, m_chr_source);
 
 	m_latch = 0;
 }
@@ -526,7 +516,6 @@ void nes_whirlwind_device::device_start()
 
 void nes_whirlwind_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks >> 1) - 1);      // upper PRG: banks are always fixed
 	chr8(0, m_chr_source);
 
@@ -541,8 +530,6 @@ void nes_lh32_device::device_start()
 
 void nes_lh32_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg32((m_prg_chunks - 1) >> 1);
 	// 0xc000-0xdfff reads/writes WRAM
 	m_latch = 0xf;
@@ -600,7 +587,7 @@ void nes_lh51_device::pcb_reset()
 void nes_lh53_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_lh53_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -610,8 +597,6 @@ void nes_lh53_device::device_start()
 
 void nes_lh53_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg8_89(0xc);
 	prg8_ab(0xd);   // last 2K are overlaid by WRAM
 	prg8_cd(0xe);   // first 6K are overlaid by WRAM
@@ -629,8 +614,6 @@ void nes_2708_device::device_start()
 
 void nes_2708_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg32(7);
 	// the upper PRG banks never change, but there are 8K of WRAM overlaid to the ROM area based on reg1
 	m_reg[0] = 0;
@@ -645,8 +628,6 @@ void nes_ac08_device::device_start()
 
 void nes_ac08_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 	prg32(0xff);
 	m_latch = 0xff;
 }
@@ -664,7 +645,7 @@ void nes_rt01_device::pcb_reset()
 void nes_yung08_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_yung08_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_count));
@@ -700,7 +681,7 @@ void nes_yung08_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_sc127_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE && m_irq_enable)
 	{
@@ -770,17 +751,14 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_mbaby_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0x7fff;  // unverified 15-bit counter based on FCEUX
+		m_irq_count = (m_irq_count + 1) & 0x7fff;  // unverified 15-bit counter based on FCEUX
 
-			if (m_irq_count >= 0x6000)
-				set_irq_line(ASSERT_LINE);
-		}
+		if (m_irq_count >= 0x6000)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -857,16 +835,13 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_smb3p_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
-	{
-		// counter does not stop when interrupts are disabled
-		if (m_irq_count != 0xffff)
-			m_irq_count++;
-		else if (m_irq_enable)
-			set_irq_line(ASSERT_LINE);
-	}
+	// counter does not stop when interrupts are disabled
+	if (m_irq_count != 0xffff)
+		m_irq_count++;
+	else if (m_irq_enable)
+		set_irq_line(ASSERT_LINE);
 }
 
 void nes_smb3p_device::write_h(offs_t offset, u8 data)
@@ -962,7 +937,7 @@ void nes_btl_cj_device::write_h(offs_t offset, u8 data)
  -------------------------------------------------*/
 
 /* Scanline based IRQ ? */
-void nes_btl_dn_device::hblank_irq(int scanline, int vblank, int blanked )
+void nes_btl_dn_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (!m_irq_count || ++m_irq_count < 240)
 		return;
@@ -1059,7 +1034,7 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 	if (offset >= 0x6000)
 	{
 		m_reg = data;
-		chr8(data & (m_vrom_chunks - 1), m_chr_source);
+		chr8(data, m_chr_source);
 	}
 }
 
@@ -1075,16 +1050,13 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 
  -------------------------------------------------*/
 
-void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_smb2j_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0xfff;
-			if (!m_irq_count)
-				set_irq_line(ASSERT_LINE);
-		}
+		m_irq_count = (m_irq_count + 1) & 0xfff;
+		if (!m_irq_count)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -1162,18 +1134,15 @@ u8 nes_smb2j_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_smb2ja_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0x1fff;    // 13-bit counter
-			if (BIT(m_irq_count, 12))
-				set_irq_line(ASSERT_LINE);
-			else if (!m_irq_count)
-				set_irq_line(CLEAR_LINE);            // CD4020 acknowledges on overflow
-		}
+		m_irq_count = (m_irq_count + 1) & 0x1fff;    // 13-bit counter
+		if (BIT(m_irq_count, 12))
+			set_irq_line(ASSERT_LINE);
+		else if (!m_irq_count)
+			set_irq_line(CLEAR_LINE);            // CD4020 acknowledges on overflow
 	}
 }
 
@@ -1217,15 +1186,12 @@ u8 nes_smb2ja_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_smb2jb_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			if (BIT(++m_irq_count, 12))
-				set_irq_line(ASSERT_LINE);
-		}
+		if (BIT(++m_irq_count, 12))
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -1366,16 +1332,13 @@ void nes_0353_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_09034a_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0x0fff;
-			if (!m_irq_count)
-				set_irq_line(ASSERT_LINE);
-		}
+		m_irq_count = (m_irq_count + 1) & 0x0fff;
+		if (!m_irq_count)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -1438,15 +1401,12 @@ u8 nes_09034a_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_l001_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_l001_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (BIT(m_irq_count, 15))
 	{
-		if (BIT(m_irq_count, 15))
-		{
-			if (++m_irq_count == 0)
-				set_irq_line(ASSERT_LINE);
-		}
+		if (++m_irq_count == 0)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -1489,15 +1449,12 @@ void nes_l001_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_batmanfs_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
-	{
-		// 10-bit counter does not stop when interrupts are disabled
-		m_irq_count = (m_irq_count + 1) & 0x3ff;
-		if (m_irq_enable && !m_irq_count)
-			set_irq_line(ASSERT_LINE);
-	}
+	// 10-bit counter does not stop when interrupts are disabled
+	m_irq_count = (m_irq_count + 1) & 0x3ff;
+	if (m_irq_enable && !m_irq_count)
+		set_irq_line(ASSERT_LINE);
 }
 
 void nes_batmanfs_device::write_h(offs_t offset, u8 data)
@@ -1869,18 +1826,15 @@ void nes_lh51_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_lh53_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		m_irq_count++;
+		if (m_irq_count > 7560)//value from FCEUMM...
 		{
-			m_irq_count++;
-			if (m_irq_count > 7560)//value from FCEUMM...
-			{
-				m_irq_count = 0;
-				set_irq_line(ASSERT_LINE);
-			}
+			m_irq_count = 0;
+			set_irq_line(ASSERT_LINE);
 		}
 	}
 }
@@ -2105,16 +2059,13 @@ uint8_t nes_rt01_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_yung08_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_yung08_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (BIT(m_irq_latch, 0))
 	{
-		if (BIT(m_irq_latch, 0))
-		{
-			m_irq_count = (m_irq_count + 1) & 0x0fff;
-			if (!m_irq_count)
-				set_irq_line(ASSERT_LINE);
-		}
+		m_irq_count = (m_irq_count + 1) & 0x0fff;
+		if (!m_irq_count)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 

@@ -239,6 +239,7 @@
 #define IN_THRUST (1 << 4)
 #define IN_P1 (1 << 5)
 #define IN_P2 (1 << 6)
+/* Options set at P10/P11 */
 #define OPTION_1_PLAYER_GAME_ONLY (1 << 2)
 #define OPTION_2_CREDIT_MINIMUM (1 << 1)
 #define OPTION_CHARGE_BY_ (1 << 0)
@@ -260,15 +261,11 @@ Typically, only the high 2 bits are read.
 
 uint8_t bwidow_state::spacduel_IN3_r(offs_t offset)
 {
-	int res;
-	int res1;
-	int res2;
-	int res3;
-
-	res1 = m_in3->read();
-	res2 = m_in4->read();
-	res3 = m_dsw2.read_safe(0);
-	res = 0x00;
+	int res = 0x00;
+	int res1 = m_in3->read();
+	int res2 = m_in4->read();
+	int res3 = m_dsw2.read_safe(0);
+	int cabinet = m_cabinet.read_safe(0);
 
 	switch (offset & 0x07)
 	{
@@ -301,7 +298,7 @@ uint8_t bwidow_state::spacduel_IN3_r(offs_t offset)
 			if ((res3 & OPTION_2_CREDIT_MINIMUM) == 0) res |= 0x40;
 			break;
 		case 7:
-			res = (0x00 /* upright */ | (0 & 0x40));
+			res = (cabinet | (0 & 0x40));
 			if ((res3 & OPTION_1_PLAYER_GAME_ONLY) == 0) res |= 0x40;
 			break;
 	}
@@ -347,12 +344,14 @@ void bwidow_state::spacduel_coin_counter_w(uint8_t data)
 	if (data == m_lastdata) return;
 	m_leds[0] = BIT(~data, 5); // start lamp
 	m_leds[1] = BIT(~data, 4); // select lamp
-	machine().bookkeeping().coin_lockout_w(0, !BIT(data,3));
-	machine().bookkeeping().coin_lockout_w(1, !BIT(data,3));
-	machine().bookkeeping().coin_lockout_w(2, !BIT(data,3));
-	machine().bookkeeping().coin_counter_w(0, BIT(data,0));
-	machine().bookkeeping().coin_counter_w(1, BIT(data,1));
-	machine().bookkeeping().coin_counter_w(2, BIT(data,2));
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 3));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
+	machine().bookkeeping().coin_lockout_w(2, !BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));
+	m_avg->set_flip_x(BIT(~data, 6));
+	m_avg->set_flip_y(BIT(~data, 7));
 	m_lastdata = data;
 }
 
@@ -416,8 +415,8 @@ void bwidow_state::bwidow_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN3");
 	map(0x8800, 0x8800).portr("IN4");
 	map(0x8800, 0x8800).w(FUNC(bwidow_state::bwidow_misc_w)); // coin counters, LEDs
-	map(0x8840, 0x8840).w("avg", FUNC(avg_device::go_w));
-	map(0x8880, 0x8880).w("avg", FUNC(avg_device::reset_w));
+	map(0x8840, 0x8840).w(m_avg, FUNC(avg_device::go_w));
+	map(0x8880, 0x8880).w(m_avg, FUNC(avg_device::reset_w));
 	map(0x88c0, 0x88c0).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x8900, 0x8900).w(FUNC(bwidow_state::earom_control_w));
 	map(0x8940, 0x897f).w(FUNC(bwidow_state::earom_write));
@@ -432,8 +431,8 @@ void bwidow_state::bwidowp_map(address_map &map)
 	map(0x0810, 0x081f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1000, 0x1000).r(FUNC(bwidow_state::bwidowp_in_r));
 	map(0x1800, 0x1800).portr("IN0");
-	map(0x2000, 0x2000).w("avg", FUNC(avg_device::go_w));
-	map(0x2800, 0x2800).w("avg", FUNC(avg_device::reset_w));
+	map(0x2000, 0x2000).w(m_avg, FUNC(avg_device::go_w));
+	map(0x2800, 0x2800).w(m_avg, FUNC(avg_device::reset_w));
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); // coin counters, LEDs
 	map(0x4000, 0x47ff).ram(); // vector RAM
@@ -454,9 +453,9 @@ void bwidow_state::spacduel_map(address_map &map)
 	map(0x0905, 0x0906).nopw(); // ignore?
 	map(0x0a00, 0x0a00).r(FUNC(bwidow_state::earom_read));
 	map(0x0c00, 0x0c00).w(FUNC(bwidow_state::spacduel_coin_counter_w)); // coin out
-	map(0x0c80, 0x0c80).w("avg", FUNC(avg_device::go_w));
+	map(0x0c80, 0x0c80).w(m_avg, FUNC(avg_device::go_w));
 	map(0x0d00, 0x0d00).nopw(); // watchdog clear
-	map(0x0d80, 0x0d80).w("avg", FUNC(avg_device::reset_w));
+	map(0x0d80, 0x0d80).w(m_avg, FUNC(avg_device::reset_w));
 	map(0x0e00, 0x0e00).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x0e80, 0x0e80).w(FUNC(bwidow_state::earom_control_w));
 	map(0x0f00, 0x0f3f).w(FUNC(bwidow_state::earom_write));
@@ -674,6 +673,13 @@ static INPUT_PORTS_START( spacduel )
 	/* bit 7 is tied to a 3kHz clock */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bwidow_state, clock_r)
 
+	/* Cabinet type.  The cocktail's harness has a jumper between pins
+	   R and P, which maps to bit 7 of address 0x0907 */
+	PORT_START("CABINET")
+	PORT_CONFNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x80, DEF_STR( Cocktail ) )
+
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("D4:!7,!8")
 	PORT_DIPSETTING (  0x01, "3" )
@@ -779,14 +785,12 @@ void bwidow_state::bwidow(machine_config &config)
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 480, 0, 440);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
-
-	avg_device &avg(AVG(config, "avg", 0));
-	avg.set_vector("vector");
-	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
+	AVG(config, m_avg, 0);
+	m_avg->set_vector("vector");
+	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* sound hardware */
 	bwidow_audio(config);
-
 }
 
 void bwidow_state::bwidowp(machine_config &config)

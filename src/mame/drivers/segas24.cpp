@@ -2532,7 +2532,7 @@ void segas24_state::init_gground()
 	m_mlatch_table = nullptr;
 	m_track_size = 0x2d00;
 
-	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
+	m_gground_hack_timer = timer_alloc(FUNC(segas24_state::gground_hack_timer_callback), this);
 }
 
 void segas24_state::init_crkdown()

@@ -43,7 +43,7 @@ void wpc_device::device_start()
 	m_bank_w.resolve_safe();
 	m_dmdbank_w.resolve_safe();
 
-	m_zc_timer = timer_alloc(TIMER_ZEROCROSS);
+	m_zc_timer = timer_alloc(FUNC(wpc_device::zerocross_set), this);
 	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
 }
 
@@ -55,14 +55,9 @@ void wpc_device::device_reset()
 	m_alpha_pos = 0;
 }
 
-void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wpc_device::zerocross_set)
 {
-	switch(id)
-	{
-	case TIMER_ZEROCROSS:
-		m_zerocross = true;
-		break;
-	}
+	m_zerocross = true;
 }
 
 uint8_t wpc_device::read(offs_t offset)

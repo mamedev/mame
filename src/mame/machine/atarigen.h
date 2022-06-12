@@ -28,20 +28,13 @@ protected:
 	// users must call through to these
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// video helpers
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
 
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
-
-	// timer IDs
-	enum
-	{
-		TID_UNHALT_CPU,
-		TID_ATARIGEN_LAST
-	};
+	TIMER_CALLBACK_MEMBER(unhalt_cpu);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -49,6 +42,8 @@ protected:
 	optional_device<screen_device> m_screen;
 
 	std::unique_ptr<u8[]> m_blended_data;
+
+	emu_timer *m_unhalt_cpu_timer;
 };
 
 

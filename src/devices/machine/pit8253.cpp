@@ -112,8 +112,8 @@ void pit8253_device::device_resolve_objects()
 
 void pit_counter_device::device_start()
 {
-	/* initialize timer */
-	m_updatetimer = timer_alloc(TID_UPDATE);
+	/* initialize timers */
+	m_update_timer = timer_alloc(FUNC(pit_counter_device::update_tick), this);
 	adjust_timer(attotime::never);
 
 	/* set up state save values */
@@ -204,7 +204,7 @@ inline void pit_counter_device::adjust_timer(attotime target)
 //  if (target != m_next_update)
 	{
 		m_next_update = target;
-		m_updatetimer->adjust(target - machine().time());
+		m_update_timer->adjust(target - machine().time());
 	}
 }
 
@@ -972,30 +972,15 @@ void pit8254_device::readback_command(uint8_t data)
 			m_counter[timer]->readback(read_command);
 }
 
-void pit_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pit_counter_device::update_tick)
 {
 	update();
-	switch (id)
-	{
-		case TID_UPDATE:
-			break;
-
-		case TID_CONTROL:
-			control_w_deferred(param);
-			break;
-
-		case TID_COUNT:
-			count_w_deferred(param);
-			break;
-
-		case TID_GATE:
-			gate_w_deferred(param);
-			break;
-	}
 }
 
-void pit_counter_device::control_w_deferred(uint8_t data)
+TIMER_CALLBACK_MEMBER(pit_counter_device::control_w_deferred)
 {
+	update();
+	uint8_t data = (uint8_t)param;
 	if (CTRL_ACCESS(data) == 0)
 	{
 		LOG1("write(): readback\n");
@@ -1017,8 +1002,10 @@ void pit_counter_device::control_w_deferred(uint8_t data)
 	}
 }
 
-void pit_counter_device::count_w_deferred(uint8_t data)
+TIMER_CALLBACK_MEMBER(pit_counter_device::count_w_deferred)
 {
+	update();
+	uint8_t data = (uint8_t)param;
 	bool middle_of_a_cycle = (machine().time() > m_last_updated && m_clockin != 0);
 
 	switch (CTRL_ACCESS(m_control))
@@ -1102,8 +1089,10 @@ void pit8253_device::write(offs_t offset, uint8_t data)
 		m_counter[offset]->count_w(data);
 }
 
-void pit_counter_device::gate_w_deferred(int state)
+TIMER_CALLBACK_MEMBER(pit_counter_device::gate_w_deferred)
 {
+	update();
+	int state = param;
 	LOG2("gate_w(): state=%d\n", state);
 
 	if (state != m_gate)

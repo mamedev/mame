@@ -22,15 +22,17 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_start() override;
+
+	TIMER_CALLBACK_MEMBER(toggle_clk);
 
 private:
 	required_ioport_array<16> m_rows;
 	required_device<cpu_device> m_mcu;
 	emu_timer *m_bit_timer = nullptr;
 	u8 m_rxd = 0;
-	int m_row = 0, m_clk_state = 0;
+	int m_row = 0;
+	int m_clk_state = 0;
 };
 
 DECLARE_DEVICE_TYPE(QX10_KEYBOARD, qx10_keyboard_device)

@@ -49,7 +49,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -76,7 +75,9 @@ private:
 	attotime cycles_to_time(uint64_t cycles);
 
 	void lss_start();
-	void lss_sync();
+	TIMER_CALLBACK_MEMBER(lss_sync);
+
+	TIMER_CALLBACK_MEMBER(motor_off);
 
 	floppy_image_device *floppy;
 	int active, bits;

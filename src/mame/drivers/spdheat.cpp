@@ -849,5 +849,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

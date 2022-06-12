@@ -53,16 +53,10 @@ public:
 	void init_triplhnt();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
-	enum
-	{
-		TIMER_HIT
-	};
-
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 
@@ -76,7 +70,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_collision(int code);
+	TIMER_CALLBACK_MEMBER(set_collision);
 
 	void triplhnt_map(address_map &map);
 

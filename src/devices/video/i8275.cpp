@@ -158,9 +158,9 @@ void i8275_device::device_start()
 	m_display_cb.resolve();
 
 	// allocate timers
-	m_hrtc_on_timer = timer_alloc(TIMER_HRTC_ON);
-	m_drq_on_timer = timer_alloc(TIMER_DRQ_ON);
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_hrtc_on_timer = timer_alloc(FUNC(i8275_device::hrtc_on), this);
+	m_drq_on_timer = timer_alloc(FUNC(i8275_device::drq_on), this);
+	m_scanline_timer = timer_alloc(FUNC(i8275_device::scanline_tick), this);
 
 	// state saving
 	save_item(NAME(m_status));
@@ -260,167 +260,99 @@ void i8275_device::dma_start()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
-void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(i8275_device::hrtc_on)
 {
-	//int y = screen().vpos();
-	//int x = screen().hpos();
+	m_write_hrtc(1);
+}
+
+TIMER_CALLBACK_MEMBER(i8275_device::drq_on)
+{
+	m_write_drq(1);
+}
+
+TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
+{
 	int rc = m_scanline / SCANLINES_PER_ROW;
 	int lc = m_scanline % SCANLINES_PER_ROW;
 
-	switch (id)
+	int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
+	m_write_lc(line_counter);
+	m_write_hrtc(0);
+
+	if (m_scanline == 0)
+		vrtc_end();
+
+	if (lc == 0 && m_scanline < m_vrtc_scanline)
 	{
-	case TIMER_HRTC_ON:
-		//LOG("I8275 y %u x %u HRTC 1\n", y, x);
-		m_write_hrtc(1);
-		break;
-
-	case TIMER_DRQ_ON:
-		//LOG("I8275 y %u x %u DRQ 1\n", y, x);
-		m_write_drq(1);
-		break;
-
-	case TIMER_SCANLINE:
-		//LOG("I8275 y %u x %u HRTC 0\n", y, x);
-		int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
-		m_write_lc(line_counter);
-		m_write_hrtc(0);
-
-		if (m_scanline == 0)
-			vrtc_end();
-
-		if (lc == 0 && m_scanline < m_vrtc_scanline)
+		if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
 		{
-			if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
-			{
-				m_status |= ST_DU;
-				m_dma_stop = true;
+			m_status |= ST_DU;
+			m_dma_stop = true;
 
-				// blank screen until after VRTC
-				m_end_of_screen = true;
+			// blank screen until after VRTC
+			m_end_of_screen = true;
 
-				//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
-
-				m_write_drq(0);
-			}
-
-			if (!m_dma_stop)
-			{
-				// swap line buffers
-				m_buffer_dma = !m_buffer_dma;
-
-				if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
-					dma_start();
-			}
+			m_write_drq(0);
 		}
 
-		if ((m_status & ST_IE) && !(m_status & ST_IR) && m_scanline == m_irq_scanline)
-		{
-			//LOG("I8275 y %u x %u IRQ 1\n", y, x);
-			m_status |= ST_IR;
-			m_write_irq(ASSERT_LINE);
-		}
-
-		if (m_scanline == m_vrtc_scanline)
-			vrtc_start();
-
-		if (!m_dma_stop && m_scanline == m_vrtc_drq_scanline)
+		if (!m_dma_stop)
 		{
 			// swap line buffers
 			m_buffer_dma = !m_buffer_dma;
 
-			// start DMA burst
-			dma_start();
+			if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
+				dma_start();
 		}
+	}
 
-		if ((m_status & ST_VE) && m_scanline < m_vrtc_scanline)
+	if ((m_status & ST_IE) && !(m_status & ST_IR) && m_scanline == m_irq_scanline)
+	{
+		m_status |= ST_IR;
+		m_write_irq(ASSERT_LINE);
+	}
+
+	if (m_scanline == m_vrtc_scanline)
+		vrtc_start();
+
+	if (!m_dma_stop && m_scanline == m_vrtc_drq_scanline)
+	{
+		// swap line buffers
+		m_buffer_dma = !m_buffer_dma;
+
+		// start DMA burst
+		dma_start();
+	}
+
+	if ((m_status & ST_VE) && m_scanline < m_vrtc_scanline)
+	{
+		bool end_of_row = false;
+		bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
+		int fifo_idx = 0;
+		m_field_attr = m_stored_attr;
+
+		for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 		{
-			bool end_of_row = false;
-			bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
-			int fifo_idx = 0;
-			m_field_attr = m_stored_attr;
+			int lineattr = 0;
 
-			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
+			uint8_t data = (end_of_row || m_end_of_screen) ? 0 : m_buffer[!m_buffer_dma][sx];
+			uint8_t attr = m_field_attr;
+
+			if ((data & 0xc0) == 0x80)
 			{
-				int lineattr = 0;
+				// field attribute code
+				m_field_attr = data & (FAC_H | FAC_B | FAC_GG | FAC_R | FAC_U);
 
-				uint8_t data = (end_of_row || m_end_of_screen) ? 0 : m_buffer[!m_buffer_dma][sx];
-				uint8_t attr = m_field_attr;
-
-				if ((data & 0xc0) == 0x80)
+				if (!VISIBLE_FIELD_ATTRIBUTE)
 				{
-					// field attribute code
-					m_field_attr = data & (FAC_H | FAC_B | FAC_GG | FAC_R | FAC_U);
+					attr = m_field_attr;
+					data = m_fifo[!m_buffer_dma][fifo_idx];
 
-					if (!VISIBLE_FIELD_ATTRIBUTE)
-					{
-						attr = m_field_attr;
-						data = m_fifo[!m_buffer_dma][fifo_idx];
+					fifo_idx++;
+					fifo_idx &= 0xf;
 
-						fifo_idx++;
-						fifo_idx &= 0xf;
-
-						if (blank_row)
-							attr |= FAC_B;
-						else if (!(m_char_blink < 32))
-							attr &= ~FAC_B;
-						if (lc != UNDERLINE)
-							attr &= ~FAC_U;
-					}
-					else
-					{
-						// simply blank the attribute character itself
-						attr = FAC_B;
-					}
-				}
-				else if (data >= 0xf0 || end_of_row || m_end_of_screen)
-				{
-					// special control character
-					switch (data)
-					{
-					case SCC_END_OF_ROW:
-					case SCC_END_OF_ROW_DMA:
-						end_of_row = true;
-						break;
-
-					case SCC_END_OF_SCREEN:
-					case SCC_END_OF_SCREEN_DMA:
-						m_end_of_screen = true;
-						break;
-					}
-					attr = FAC_B;
-				}
-				else if (data >= 0xc0)
-				{
-					// character attribute code
-					attr = data & (m_char_blink < 32 ? (CA_H | CA_B) : CA_H);
-
-					uint8_t ca;
-					int cccc = (data >> 2) & 0x0f;
-
-					if (lc < UNDERLINE)
-					{
-						ca = character_attribute[0][cccc];
-					}
-					else if (lc == UNDERLINE)
-					{
-						ca = character_attribute[1][cccc];
-					}
-					else
-					{
-						ca = character_attribute[2][cccc];
-					}
-
-					if (ca & CA_LTEN)
-						attr |= FAC_U;
-					if (ca & CA_VSP)
-						attr |= FAC_B;
-					lineattr = ca >> 2;
-				}
-				else
-				{
 					if (blank_row)
 						attr |= FAC_B;
 					else if (!(m_char_blink < 32))
@@ -428,41 +360,98 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 					if (lc != UNDERLINE)
 						attr &= ~FAC_U;
 				}
-
-				if ((rc == m_param[REG_CUR_ROW]) && (sx == m_param[REG_CUR_COL]))
+				else
 				{
-					if ((CURSOR_FORMAT & 0x02) || (m_cursor_blink < 16))
-					{
-						if (CURSOR_FORMAT & 0x01)
-							attr |= (lc == UNDERLINE) ? FAC_U : 0;
-						else
-							attr ^= FAC_R;
-					}
+					// simply blank the attribute character itself
+					attr = FAC_B;
+				}
+			}
+			else if (data >= 0xf0 || end_of_row || m_end_of_screen)
+			{
+				// special control character
+				switch (data)
+				{
+				case SCC_END_OF_ROW:
+				case SCC_END_OF_ROW_DMA:
+					end_of_row = true;
+					break;
+
+				case SCC_END_OF_SCREEN:
+				case SCC_END_OF_SCREEN_DMA:
+					m_end_of_screen = true;
+					break;
+				}
+				attr = FAC_B;
+			}
+			else if (data >= 0xc0)
+			{
+				// character attribute code
+				attr = data & (m_char_blink < 32 ? (CA_H | CA_B) : CA_H);
+
+				uint8_t ca;
+				int cccc = (data >> 2) & 0x0f;
+
+				if (lc < UNDERLINE)
+				{
+					ca = character_attribute[0][cccc];
+				}
+				else if (lc == UNDERLINE)
+				{
+					ca = character_attribute[1][cccc];
+				}
+				else
+				{
+					ca = character_attribute[2][cccc];
 				}
 
-				if (!m_display_cb.isnull())
-				m_display_cb(m_bitmap,
-					sx * m_hpixels_per_column, // x position on screen of starting point
-					m_scanline, // y position on screen
-					line_counter, // current line of char
-					(data & 0x7f),  // char code to be displayed
-					lineattr,  // line attribute code
-					(attr & FAC_U) ? 1 : 0,  // light enable signal
-					(attr & FAC_R) ? 1 : 0,  // reverse video signal
-					(attr & FAC_B) ? 1 : 0, // video suppression
-					(attr & FAC_GG) >> 2,  // general purpose attribute code
-					(attr & FAC_H) ? 1 : 0  // highlight
-				);
+				if (ca & CA_LTEN)
+					attr |= FAC_U;
+				if (ca & CA_VSP)
+					attr |= FAC_B;
+				lineattr = ca >> 2;
+			}
+			else
+			{
+				if (blank_row)
+					attr |= FAC_B;
+				else if (!(m_char_blink < 32))
+					attr &= ~FAC_B;
+				if (lc != UNDERLINE)
+					attr &= ~FAC_U;
 			}
 
-			if ((SCANLINES_PER_ROW - lc) == 1)
-				m_stored_attr = m_field_attr;
+			if ((rc == m_param[REG_CUR_ROW]) && (sx == m_param[REG_CUR_COL]))
+			{
+				if ((CURSOR_FORMAT & 0x02) || (m_cursor_blink < 16))
+				{
+					if (CURSOR_FORMAT & 0x01)
+						attr |= (lc == UNDERLINE) ? FAC_U : 0;
+					else
+						attr ^= FAC_R;
+				}
+			}
+
+			if (!m_display_cb.isnull())
+			m_display_cb(m_bitmap,
+				sx * m_hpixels_per_column, // x position on screen of starting point
+				m_scanline, // y position on screen
+				line_counter, // current line of char
+				(data & 0x7f),  // char code to be displayed
+				lineattr,  // line attribute code
+				(attr & FAC_U) ? 1 : 0,  // light enable signal
+				(attr & FAC_R) ? 1 : 0,  // reverse video signal
+				(attr & FAC_B) ? 1 : 0, // video suppression
+				(attr & FAC_GG) >> 2,  // general purpose attribute code
+				(attr & FAC_H) ? 1 : 0  // highlight
+			);
 		}
 
-		m_scanline++;
-		m_scanline %= ((CHARACTER_ROWS_PER_FRAME + VRTC_ROW_COUNT) * SCANLINES_PER_ROW);
-		break;
+		if ((SCANLINES_PER_ROW - lc) == 1)
+			m_stored_attr = m_field_attr;
 	}
+
+	m_scanline++;
+	m_scanline %= ((CHARACTER_ROWS_PER_FRAME + VRTC_ROW_COUNT) * SCANLINES_PER_ROW);
 }
 
 

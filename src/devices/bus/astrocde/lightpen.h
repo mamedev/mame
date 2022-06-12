@@ -22,16 +22,15 @@ public:
 	astrocade_lightpen_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
 	virtual ~astrocade_lightpen_device();
 
-	DECLARE_INPUT_CHANGED_MEMBER( trigger );
+	DECLARE_INPUT_CHANGED_MEMBER(trigger);
 
 protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	static const device_timer_id TIMER_TRIGGER = 0;
+	TIMER_CALLBACK_MEMBER(trigger_tick);
 
 private:
 	required_ioport m_trigger;

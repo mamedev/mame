@@ -208,7 +208,7 @@ void amico2k_state::ppi_pb_w(uint8_t data)
 void amico2k_state::machine_start()
 {
 	m_digits.resolve();
-	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amico2k_state::led_refresh),this));
+	m_led_refresh_timer = timer_alloc(FUNC(amico2k_state::led_refresh), this);
 
 	// state saving
 	save_item(NAME(m_ls145_p));

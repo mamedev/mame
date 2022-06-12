@@ -11,7 +11,7 @@ System 3 : PinMAME used as reference (couldn't find anything else).
 The only difference seems to be an extra bank of inputs (or something) at 2008-200B.
 
 Status:
-- Superman, Hercules, Roadrunner are playable.
+- All are playable.
 
 ToDo:
 - noise generator sounds like a loud barrrr instead of noise, fortunately it isn't used.
@@ -582,6 +582,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

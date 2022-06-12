@@ -717,7 +717,7 @@ void sb16_lle_device::device_start()
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(sb16_lle_device::timer_tick), this);
 }
 
 
@@ -742,7 +742,7 @@ void sb16_lle_device::device_reset()
 	m_dma8_done = m_dma16_done = false;
 }
 
-void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 {
 	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
 	if(m_mode & 2)
