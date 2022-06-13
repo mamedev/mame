@@ -750,6 +750,7 @@ MACHINES["AIC565"] = true
 MACHINES["AIC580"] = true
 MACHINES["AIC6250"] = true
 MACHINES["VRENDER0"] = true
+MACHINES["AT_MB"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2747,8 +2748,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
-	MAME_DIR .. "src/mame/machine/at.h",
-	MAME_DIR .. "src/mame/machine/at.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")

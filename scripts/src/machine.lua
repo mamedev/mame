@@ -4995,3 +4995,25 @@ if (MACHINES["ARCHIMEDES_KEYB"]~=null) then
 		MAME_DIR .. "src/devices/machine/archimedes_keyb.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cammu.h,MACHINES["CAMMU"] = true
+---------------------------------------------------
+if (MACHINES["CAMMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cammu.cpp",
+		MAME_DIR .. "src/devices/machine/cammu.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/at.h,MACHINES["AT_MB"] = true
+---------------------------------------------------
+if (MACHINES["AT_MB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/at.cpp",
+		MAME_DIR .. "src/devices/machine/at.h",
+	}
+end
