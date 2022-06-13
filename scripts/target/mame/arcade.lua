@@ -3349,8 +3349,6 @@ files {
 	MAME_DIR .. "src/mame/video/playmark.cpp",
 	MAME_DIR .. "src/mame/drivers/powerbal.cpp",
 	MAME_DIR .. "src/mame/drivers/sderby.cpp",
-	MAME_DIR .. "src/mame/includes/sderby.h",
-	MAME_DIR .. "src/mame/video/sderby.cpp",
 	MAME_DIR .. "src/mame/drivers/sslam.cpp",
 	MAME_DIR .. "src/mame/includes/sslam.h",
 	MAME_DIR .. "src/mame/video/sslam.cpp",
