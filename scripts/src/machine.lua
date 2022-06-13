@@ -4973,3 +4973,14 @@ if (MACHINES["NS32382"]~=null) then
 		MAME_DIR .. "src/devices/machine/ns32382.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fm_scsi.h,MACHINES["FM_SCSI"] = true
+---------------------------------------------------
+if (MACHINES["FM_SCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fm_scsi.cpp",
+		MAME_DIR .. "src/devices/machine/fm_scsi.h",
+	}
+end

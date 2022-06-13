@@ -836,6 +836,7 @@ MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
 MACHINES["BITMAP_PRINTER"] = true
 MACHINES["NS32382"] = true
+MACHINES["FM_SCSI"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2544,8 +2545,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/fmtowns.cpp",
 	MAME_DIR .. "src/mame/includes/fmtowns.h",
 	MAME_DIR .. "src/mame/video/fmtowns.cpp",
-	MAME_DIR .. "src/mame/machine/fm_scsi.cpp",
-	MAME_DIR .. "src/mame/machine/fm_scsi.h",
 	MAME_DIR .. "src/mame/machine/fmt_icmem.cpp",
 	MAME_DIR .. "src/mame/machine/fmt_icmem.h",
 	MAME_DIR .. "src/mame/drivers/fm7.cpp",
