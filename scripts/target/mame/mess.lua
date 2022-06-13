@@ -837,6 +837,7 @@ MACHINES["NS32082"] = true
 MACHINES["BITMAP_PRINTER"] = true
 MACHINES["NS32382"] = true
 MACHINES["FM_SCSI"] = true
+MACHINES["ARCHIMEDES_KEYB"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1704,8 +1705,6 @@ files {
 createMESSProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/drivers/aa310.cpp",
-	MAME_DIR .. "src/mame/machine/archimedes_keyb.cpp",
-	MAME_DIR .. "src/mame/machine/archimedes_keyb.h",
 	MAME_DIR .. "src/mame/drivers/accomm.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys1.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys.cpp",

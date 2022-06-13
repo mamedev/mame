@@ -4984,3 +4984,14 @@ if (MACHINES["FM_SCSI"]~=null) then
 		MAME_DIR .. "src/devices/machine/fm_scsi.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/archimedes_keyb.h,MACHINES["ARCHIMEDES_KEYB"] = true
+---------------------------------------------------
+if (MACHINES["ARCHIMEDES_KEYB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.cpp",
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.h",
+	}
+end
