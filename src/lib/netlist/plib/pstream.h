@@ -69,7 +69,7 @@ namespace plib {
 		, m_filename(std::move(rhs.m_filename))
 		{
 		}
-		istream_uptr &operator=(istream_uptr &&) /*noexcept*/ = delete;
+		istream_uptr &operator=(istream_uptr &&) = delete;
 
 		~istream_uptr() = default;
 

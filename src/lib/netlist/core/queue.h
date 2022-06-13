@@ -25,14 +25,6 @@
 
 namespace netlist::detail
 {
-	// Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
-	// This slows down processing by about 35% on a Kaby Lake.
-	// template <class A, class T, bool TS>
-	// using timed_queue = plib::timed_queue_heap<A, T, TS>;
-
-	template <typename A, typename T, bool TS>
-	using timed_queue = plib::timed_queue_linear<A, T, TS>;
-
 	// -----------------------------------------------------------------------------
 	// queue_t
 	// -----------------------------------------------------------------------------
@@ -40,19 +32,19 @@ namespace netlist::detail
 	// We don't need a thread-safe queue currently. Parallel processing of
 	// solvers will update inputs after parallel processing.
 
-	template <typename A, typename O, bool TS>
+	template <typename A, typename O>
 	class queue_base :
-			public timed_queue<A, plib::queue_entry_t<netlist_time_ext, O *>, false>,
+			public config::timed_queue<A, plib::queue_entry_t<netlist_time_ext, O *>>,
 			public plib::state_manager_t::callback_t
 	{
 	public:
 		using entry_t = plib::queue_entry_t<netlist_time_ext, O *>;
-		using base_queue = timed_queue<A, entry_t, false>;
+		using base_queue = config::timed_queue<A, entry_t>;
 		using id_delegate = plib::pmfp<std::size_t (const O *)>;
 		using obj_delegate = plib::pmfp<O * (std::size_t)>;
 
 		explicit queue_base(A &arena, std::size_t size, id_delegate get_id, obj_delegate get_obj)
-		: timed_queue<A, plib::queue_entry_t<netlist_time_ext, O *>, false>(arena, size)
+		: base_queue(arena, size)
 		, m_size(0)
 		, m_times(size)
 		, m_net_ids(size)
@@ -72,7 +64,7 @@ namespace netlist::detail
 
 		void register_state(plib::state_manager_t &manager, const pstring &module) override
 		{
-			manager.save_item(this, m_size, module + "." + "qsize");
+			manager.save_item(this, m_size, module + "." + "size");
 			manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
 			manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
 		}
@@ -103,7 +95,7 @@ namespace netlist::detail
 		obj_delegate m_obj_by_id;
 	};
 
-	using queue_t = queue_base<device_arena, net_t, false>;
+	using queue_t = queue_base<device_arena, net_t>;
 
 } // namespace netlist::detail
 

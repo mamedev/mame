@@ -255,6 +255,25 @@ DISCRETE_SOUND_EXTERN( schaser_discrete );
 
 
 /*******************************************************/
+/* Sidam Invasion                                      */
+/*******************************************************/
+
+class invasion_state : public invaders_state
+{
+public:
+	invasion_state(machine_config const &mconfig, device_type type, char const *tag) :
+		invaders_state(mconfig, type, tag)
+	{
+	}
+
+	void invasion(machine_config &config);
+
+private:
+	void io_map(address_map &map);
+};
+
+
+/*******************************************************/
 /* Darth Vader bootleg                                 */
 /*******************************************************/
 

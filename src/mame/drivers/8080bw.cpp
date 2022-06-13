@@ -1379,10 +1379,11 @@ void _8080bw_state::cosmicmo(machine_config &config)
 
 void invasion_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("IN3");
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).portr("IN3");
 	// That's probably wrong. Sidam Invasion uses a totally redesigned hardware layout. To be done later...
 	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
@@ -1391,62 +1392,80 @@ void invasion_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START( invasion )
+	// DIP switch defaults confirmed from manual
 	PORT_START("IN0")
-	// SW1:5-8 Unused but mapped to port 0 in hw.
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:8" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:6" )
-	// Floating - not connected to anything
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invasion_state, invaders_in1_control_r)
-	// SW1:5-8 Unused but mapped to port 0 in hw.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED ) // floating
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:5" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invasion_state, invaders_in1_control_r)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ???
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN2 )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") /* Default is OFF, OFF (6) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2") /* Default is ON (2500) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNUSED ) // ???
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x00, "2500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invasion_state, invaders_in1_control_r)
-	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )      PORT_DIPLOCATION("SW1:1") /* Default is OFF (Info on) */
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* Port 3 
-			Bit 1 is checked one-shot, at start, in the first seven bytes of code. If set to low the code continues normally to the init code, if set to high the CPU is halted. 
-						I don't know if this is some sort of protection. From PCB, I traced it to pin 12B on edge connector. That pin on the original SIDAM Invasion manual is marked as SPARE.
-			Bit 2 Coin counter protection: If coin counter is disconnected the game stops as described in the original SIDAM user manual:
-						"4. Protezione contatore: il microprocessore controlla che il contatore sia inserito e funzioni regolarmente. Nel caso il contatore venga staccato il
-						programma si arresta e non riprende finchè il contatore non viene regolar-mente ricollegato."
-						In hardware this value is driven by a transistor connected between pin 16A and pin 22A of the edge connector.
-						In software it is handled by the code at address $0079
+	/*
+	  Bit 1 connected to pin 12B on edge connector, called "SPARE" in SIDAM user
+	  manual.  CPU halted on boot if high.
+
+	  Bit 2 Coin counter protection: If coin counter is disconnected, the game
+	  stops.  Described in the SIDAM user manual:
+
+	    4. Protezione contatore: il microprocessore controlla che il contatore
+	    sia inserito e funzioni regolarmente.  Nel caso il contatore venga
+	    staccato il programma si arresta e non riprende finchè il contatore non
+	    viene regolar-mente ricollegato.
+
+	  Driven by a transistor connected between pins 16A and 22A on the edge
+	  connector.  Handled by the code at address $0079.
 	*/
 	PORT_START("IN3")
-	PORT_CONFNAME(0x02, 0x00, "Spare")
-	PORT_CONFSETTING( 0x00, "Low")
-	PORT_CONFSETTING( 0x02, "High/Not connected")
-	PORT_CONFNAME(0x04, 0x04, "Coin counter")
-	PORT_CONFSETTING( 0x00, "Disconnected")
-	PORT_CONFSETTING( 0x04, "Connected")
-	PORT_BIT( 0xf9, IP_ACTIVE_LOW, IPT_UNUSED)	
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Spare")
+	PORT_CONFNAME( 0x04, 0x04, "Coin counter" )
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x04, "Connected" )
+	PORT_BIT( 0xf9, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	// Dummy controls port, P1
+	// P1 controls (connected to IN0, IN1 and IN2)
 	INVADERS_CONTROL_PORT_P1
-
 INPUT_PORTS_END
+
+void invasion_state::invasion(machine_config &config)
+{
+	mw8080bw_root(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &invasion_state::io_map);
+
+	// 60 Hz signal clocks two 'LS161s, terminal count output will reset game
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+
+	// video hardware
+	m_screen->set_screen_update(FUNC(invasion_state::screen_update_invaders));
+
+	// wrong - Sidam Invasion uses totally redesigned sound hardware
+	INVADERS_AUDIO(config, "soundboard");
+}
 
 
 // same as regular invaders without hw shifter
@@ -5901,11 +5920,11 @@ GAMEL(1978, galmonst,    invaders, invaders,  sicv,      sisv_state,     empty_i
 GAMEL(1979, spacecom,    invaders, spacecom,  spacecom,  spacecom_state, init_spacecom, ROT270, "bootleg",                            "Space Combat (bootleg of Space Invaders)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,    invaders, spacerng,  sitv,      _8080bw_state,  empty_init,    ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger",                                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Many modifications
 GAMEL(19??, invasion,    invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg (Sidam)",                    "Invasion (Sidam)",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, invasiona,   invaders, invaders,  invasion,  invaders_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, newer set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
-GAMEL(1979, invasiona2,  invaders, invaders,  invasion,  invaders_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, older set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
-GAMEL(1979, invasionb,   invaders, invaders,  invasion,  invaders_state, empty_init,    ROT270, "bootleg",                            "Invasion (Italian bootleg)",                                      MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, invasionrz,  invaders, invaders,  invasion,  invaders_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 1, R Z SRL Bologna)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
-GAMEL(1979, invasionrza, invaders, invaders,  invasion,  invaders_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 2, R Z SRL Bologna)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
+GAMEL(1979, invasiona,   invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, newer set)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
+GAMEL(1979, invasiona2,  invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, older set)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
+GAMEL(1979, invasionb,   invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg",                            "Invasion (Italian bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, invasionrz,  invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 1, R Z SRL Bologna)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, invasionrza, invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 2, R Z SRL Bologna)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invadersem,  invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "Electromar",                         "Space Invaders (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE, layout_invaders ) // Possibly licensed
 GAMEL(1978, superinv,    invaders, invaders,  superinv,  invaders_state, empty_init,    ROT270, "bootleg",                            "Super Invaders (bootleg set 1)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
 GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (bootleg set 2)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version

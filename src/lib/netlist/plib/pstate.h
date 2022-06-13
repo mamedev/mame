@@ -105,9 +105,9 @@ public:
 		{ }
 
 		template <typename XS>
-		void save_item(XS &xstate, const pstring &item_name)
+		void save_item(XS &some_state, const pstring &item_name)
 		{
-			m_sm.save_item(m_owner, xstate, m_member_name + "." + item_name);
+			m_sm.save_item(m_owner, some_state, m_member_name + "." + item_name);
 		}
 
 		state_manager_t &m_sm;

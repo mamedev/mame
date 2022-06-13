@@ -249,6 +249,31 @@ void macquadra_state::machine_start()
 
 	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_cursor_line));
+	save_item(NAME(m_dafb_int_status));
+	save_item(NAME(m_dafb_scsi1_drq));
+	save_item(NAME(m_dafb_scsi2_drq));
+	save_item(NAME(m_dafb_mode));
+	save_item(NAME(m_dafb_base));
+	save_item(NAME(m_dafb_stride));
+	save_item(NAME(m_dafb_colors));
+	save_item(NAME(m_dafb_count));
+	save_item(NAME(m_dafb_clutoffs));
+	save_item(NAME(m_dafb_montype));
+	save_item(NAME(m_dafb_vbltime));
+	save_item(NAME(m_dafb_palette));
+	save_item(NAME(m_via2_ca1_hack));
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_ca2_data));
+	save_item(NAME(m_overlay));
 }
 
 void macquadra_state::machine_reset()
@@ -1038,4 +1063,4 @@ ROM_START( macqd700 )
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
-COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

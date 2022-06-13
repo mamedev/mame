@@ -161,7 +161,7 @@ namespace netlist::solver
 
 			//# auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
 			//# *tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
-			auto pd = this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0];
+			std::size_t pd = std::size_t(this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0]);
 
 #if COMPRESSED
 			//pstring terms = plib::pfmt("m_A{1} = gt[{2}]")(pd, this->m_gtn.didx(k,0));
@@ -184,7 +184,7 @@ namespace netlist::solver
 #else
 			for (std::size_t i=0; i < net.count(); i++)
 				strm("\tm_A{1} += gt[{2}];\n", pd, this->m_gtn.didx(k,i));
-			//for (std::size_t i = 0; i < railstart; i++)
+			//for (std::size_t i = 0; i < rail_start; i++)
 			//  *tcr_r[i]       += static_cast<FT>(go[i]);
 			for (std::size_t i = 0; i < net.rail_start(); i++)
 			{
@@ -207,9 +207,9 @@ namespace netlist::solver
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto &net = this->m_terms[k];
-			for (std::size_t i = 0; i < net.railstart(); i++)
+			for (std::size_t i = 0; i < net.rail_start(); i++)
 			{
-				auto p = this->m_mat_ptr[k][i] - &this->mat.A[0];
+				std::size_t p = std::size_t(this->m_mat_ptr[k][i] - &this->mat.A[0]);
 				if (!A[p].empty())
 					A[p] += " + ";
 				A[p] += plib::pfmt("go[{1}]")(this->m_gonn.didx(k,i));

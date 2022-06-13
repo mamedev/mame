@@ -130,6 +130,73 @@ Notes:
   numbers are in cyan and text in red (and this arrangement doesn't
   make much sense, different version maybe?).
 
+
+Bomb Bee (Namco, 1979)
+Hardware info by Guru
+---------------------
+
+Bomb Bee is Namco's 2nd game board (the first board was Gee Bee).
+Bomb Bee is essentially the color version of Gee Bee with some playfield
+layout changes and real color (Gee Bee is a b/w game with a color overlay).
+To power the board this game requires 8VAC and 12VAC. These pass through
+on-board bridge rectifiers then go to linear regulators to make all the
+DC voltages.
+The controls are....
+5k-ohm potentiometer for the paddle
+Button to serve. If not pressed, the ball launches automatically after a few seconds.
+Button to start a player 1 game
+Button to start a player 2 game
+In test mode the paddle VOL range is 5 to 211
+A play demo of the real arcade PCB can be seen here....
+https://www.youtube.com/watch?v=3-vIXC09nDA
+
+NAMCO
+21059211
+|------------------------------------------------------------------------|
+|                 LS163  LS368  LS174  LS194   LS157  LS00  18.432MHz SW1|
+|  7905   7812    LS163  LS367  LS174  LS04    LS194  LS74  LS107        |
+|                 LS393  LS367  8212 TMM334.4C LS366  LS32  8224  |---|  |
+|                 LS153  8212                  LS368  LS08        | 8 |  |
+|                 4066          LS367  LS367   LS157  LS139       | 0 |  |
+|                        2114   2114   LS367   LS157  LS367       | 8 |  |
+|                        2114   2114   LS367   LS157  LS367       | 0 |  |
+|                        LS08   LS138  LS86    LS157              |---|  |
+|4                       LS08   LS393  LS86    LS157 TMM333.2K  TMM333.1K|
+|4    MB3712             LS259  LS393  LS86    LS157                     |
+|W         10K_VOL       LS251  LS92   LS86    LS253  DIP24.2M  DIP24.1M |
+|A           LM311       LS128  LS08   LS74    LS00                      |
+|Y                4066   LS138  LS74   LS30    LS367  DIP24.2P  DIP24.1P |
+|                               LS74   LS283   LS365                     |
+|                 NE556         LS10   LS283   LS365  DIP24.2R  DIP24.1R |
+|              UA78MGU1C        LS151  LS163   LS273                     |
+|    |-----------------|   SW3  LS175  LS163   LS273  DIP24.2T  DIP24.1T |
+|FUSE|      D568       | LS251  LS164  LS08           LS366        TMM314|
+|    |ON LARGE HEATSINK|        LS164  LS175          LS368        TMM314|
+|----|-----------------|-------------------------------------------------|
+Notes: (All ICs shown above)
+      8080 - NEC D8080AFC Microprocessor. Clock 2.048MHz [18.432/9]
+     HSync - 15.2880kHz
+     VSync - 60.5610Hz
+    MB3712 - Fujitsu 5.7W Audio Power Amplifier
+     LM311 - Texas Instruments LM311 Differential Comparator
+      4066 - Motorola MC14066 CMOS Quad Bilateral Switch
+ UA78MGU1C - Fairchild UA78MGU1C 4-terminal Adjustable 500mA Voltage Regulator
+      7812 - Texas Instruments LM7812 +12V Linear Regulator
+      7905 - Texas Instruments LM7905 -5V Linear Regulator
+      D568 - NEC D568 60V 7A NPN Transistor
+     NE566 - Signetics NE556 Dual Precision Timer
+       SW1 - Push button for reset
+       SW3 - 8-position DIP Switch
+   10K_VOL - 10k-ohm volume potentiometer
+   DIP24.* - Unpopulated DIP24 positions for ROMs
+      8212 - NEC uPB8212C 8-bit Input/Output Port
+      8224 - NEC uPB8224C Clock Generator and Driver for 8080 CPU
+      2114 - NEC uPD2114 1kBx4-bit SRAM (video RAM)
+    TMM314 - Toshiba TMM314 1kBx4-bit SRAM (main program RAM)
+ TMM334.4C - Toshiba TMM334 2kBx8-bit mask ROM (graphics)
+ TMM333.1K \
+ TMM333.2K / Toshiba TMM333 4kBx8-bit mask ROM (main program)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -906,10 +973,11 @@ ROM_END
 
 ROM_START( bombbee )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bombbee.1k",   0x0000, 0x2000, CRC(9f8cd7af) SHA1(0d6e1ee5519660d1498eb7a093872ed5034423f2) )
+	ROM_LOAD( "tmm333.2k",   0x0000, 0x1000, CRC(a442f22b) SHA1(c31a2a44e71fd0e8b6460a415b9bd8b298e68d6c) )
+	ROM_LOAD( "tmm333.1k",   0x1000, 0x1000, CRC(81f805b3) SHA1(380d68c016400ae5d7f271813bc9726d9be639d1) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
-	ROM_LOAD( "bombbee.4c",   0x0000, 0x0800, CRC(5f37d569) SHA1(d5e3fb4c5a1612a6e568c8970161b0290b88993f) )
+	ROM_LOAD( "tmm334.4c",   0x0000, 0x0800, CRC(5f37d569) SHA1(d5e3fb4c5a1612a6e568c8970161b0290b88993f) )
 ROM_END
 
 ROM_START( cutieq )

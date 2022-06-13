@@ -12778,6 +12778,9 @@ drumsta                         //
 drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
 
+@source:ds90.cpp
+x37                             //
+
 @source:dsb46.cpp
 dsb46                           //
 
@@ -13375,6 +13378,10 @@ ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 
 @source:efdt.cpp
 efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
+
+@source:efg8080.cpp
+blackhol
+foolrace
 
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
@@ -16443,10 +16450,6 @@ hcastlek                        // GX768 (c) 1988
 @source:hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:headonb.cpp
-blackhol
-foolrace                        // bootleg
-
 @source:hec2hrp.cpp
 hec2hr                          //
 hec2hrp                         //
@@ -17299,10 +17302,11 @@ wlcc                            // (c) 1996
 xymg                            // (c) 1996
 
 @source:igs017.cpp
+cpoker2                         // (c) 2000?
 genius6                         // (c) 1998
 genius6a                        // (c) 1997
 genius6b                        // (c) 1997
-happyskl                        // (c) 2001?
+happyskl                        // (c) 2000?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 lhzb2                           // (c) 1998
@@ -17312,13 +17316,12 @@ mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
 slqz2                           // (c) 1998
-spkrform                        // (c) ????
+spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
 tarzan                          // (c) 1999
 tarzana                         // (c) 1999
 tarzanc                         // (c) 1999
 tjsb                            // (c) 1997
-unkigs                          // (c) 2001?
 
 @source:igspc.cpp
 eztouch                         // (c) 200?
@@ -32149,7 +32152,8 @@ nflclsfb                        // 2003.?? NFL Classic Football
 pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
-sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+sekaikh                         // 2004.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
+sekaikha                        // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
@@ -35907,7 +35911,6 @@ poly61                          //
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
-pongf                           // (c) 1972 Atari
 rebound                         //
 
 @source:poolshrk.cpp
@@ -37825,6 +37828,10 @@ slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
 
+@source:segafruit.cpp
+m3001
+m4001
+
 @source:segag80r.cpp
 005                             // (c) 1981
 astrob                          // (c) 1981
@@ -38262,7 +38269,7 @@ titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasm1.cpp
 tinkerbl                        // (c) 1990 Sega
-blicks							// (c) 1991 Sega
+blicks                          // (c) 1991 Sega
 unkm1                           // (c) 1992 Sega
 bingpty                         // (c) 1994 Sega
 
@@ -40484,7 +40491,8 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 suprslam                        // (c) 1995 Banpresto
 
 @source:supstarf.cpp
-supstarf                        //
+supstarf                        // (c) 1986 Recreativos Franco
+supstarfa                       // (c) 1986 Recreativos Franco
 
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
@@ -41944,6 +41952,7 @@ grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading licen
 kbash                           // TP-023 (c) 1993 Toaplan
 kbash2                          // bootleg
 kbashk                          // TP-023 (c) 1993 Toaplan
+kbashp                          // TP-023 (c) 1993 Toaplan
 kingdmgp                        // (c) 1994 Raizing/8ing
 mahoudai                        // (c) 1993 Raizing + Able license
 nprobowl                        // (c) 1996 Zuck + Able license

@@ -32,7 +32,7 @@ std::vector<submenu::option> submenu::misc_options()
 	return std::vector<option>{
 			{ option_type::HEAD, N_("Miscellaneous Options") },
 			{ option_type::UI,   N_("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
-			{ option_type::UI,   N_("Re-select last machine launched"),         OPTION_REMEMBER_LAST },
+			{ option_type::UI,   N_("Re-select last system launched"),          OPTION_REMEMBER_LAST },
 			{ option_type::UI,   N_("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
 			{ option_type::EMU,  N_("Cheats"),                                  OPTION_CHEAT },
 			{ option_type::EMU,  N_("Show mouse pointer"),                      OPTION_UI_MOUSE },
@@ -158,6 +158,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	, m_driver(drv)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
+	set_heading(_(m_options[0].description));
 
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
@@ -443,7 +444,7 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
+	custombottom = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -452,13 +453,6 @@ void submenu::populate(float &customtop, float &custombottom)
 
 void submenu::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const toptext[] = { _(m_options[0].description) };
-	draw_text_box(
-			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
-
 	if (selectedref)
 	{
 		option &selected_sm_option(*reinterpret_cast<option *>(selectedref));

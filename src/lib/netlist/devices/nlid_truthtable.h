@@ -12,8 +12,6 @@
 #include "../nl_setup.h"
 #include "nl_factory.h"
 
-#define USE_TT_ALTERNATIVE (0)
-
 namespace netlist::factory {
 
 	class truth_table_base_element_t : public factory::element_t

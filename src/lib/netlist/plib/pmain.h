@@ -42,7 +42,7 @@ namespace plib {
 
 		virtual pstring usage() = 0;
 
-		/* short version of usage, defaults to usage */
+		// short version of usage, defaults to usage
 		virtual pstring usage_short() { return usage(); }
 
 		virtual int execute() = 0;
