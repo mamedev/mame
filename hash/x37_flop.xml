@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="x37_flop" description="Luxor X37 diskettes">
+
+	<software name="abcenix">
+		<description>ABCenix</description>
+		<year>1985</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="mount1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="mountx37.img" size="655360" crc="351d1a0b" sha1="1ee3f7d4897be1ffe1977bf231e26187ce54a219"/>
+			</dataarea>
+		</part>
+		
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="mount2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="mountx37_disc3.img" size="655360" crc="f13d6da9" sha1="b3cb3fba55c96cd4e08c8758884d02ec73a76e15"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="grund1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_1(7).img" size="655360" crc="bc23eba9" sha1="ff79ba411526571c1478fab91cf3e9e8b310d683"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="grund2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_2(7).img" size="655360" crc="d790e468" sha1="afe44322410d413ee7d632a12ec23211ebb84a9e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="grund3"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_3(7).img" size="655360" crc="fc624bec" sha1="7bb81bdd6c95c7037bb4874b73a400efbc27bcf5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="grund4"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_4(7).img" size="655360" crc="acb9307b" sha1="419f0ebcff5707d8ab934be24a711cb2b90d5032"/>
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="grund5"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_5(7).img" size="655360" crc="f247ee5c" sha1="6300c0b706a02b75bfdeee61124e3af607c29a54"/>
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="grund6"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_6(7).img" size="655360" crc="23dab3a5" sha1="6a371bcf000ade3f92f7b53410bb359fe54043a7"/>
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="grund7"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_GRUND_7(7).img" size="655360" crc="29cb7b76" sha1="b9c406a60cb4dbfabc59aa0f3e66885a7461d0ca"/>
+			</dataarea>
+		</part>
+
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="utv1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_1(9).img" size="655360" crc="8689fbf6" sha1="6478a43a875354fe9e31f715a37bdc6a9b5e37da"/>
+			</dataarea>
+		</part>
+
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="utv2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_2(9).img" size="655360" crc="8104bafa" sha1="7ffd4d5408fa536bcf9f48264ba4fa564fddbad0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="utv3"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_3(9).img" size="655360" crc="295d3316" sha1="eeee396e943e984947550501fcc19604c830bac3"/>
+			</dataarea>
+		</part>
+
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="utv4"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_4(9).img" size="655360" crc="9a99dd58" sha1="69c52a6a41efc3247b14c7d0fbcd06a6426ed487"/>
+			</dataarea>
+		</part>
+
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="utv5"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_5(9).img" size="655360" crc="323d9905" sha1="2ef2ec61f015552ac8f2dff981dbf54643df5069"/>
+			</dataarea>
+		</part>
+
+		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="utv6"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_6(9).img" size="655360" crc="719cea12" sha1="1248e099198ca0908c726bd3b7f76003d31f534b"/>
+			</dataarea>
+		</part>
+
+		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="utv7"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_7(9).img" size="655360" crc="3269f469" sha1="7629b1b302a79a8bd67722e8f186c2150bc4c428"/>
+			</dataarea>
+		</part>
+
+		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="utv8"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_8(9).img" size="655360" crc="fdf66774" sha1="acc3f9514908ed7f6d937537451e955c1fe7a3bf"/>
+			</dataarea>
+		</part>
+
+		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="utv9"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ABCenix_UTV_9(9).img" size="655360" crc="9775cff4" sha1="fc152bff42d626b7be0223ec4f8848937f4cd936"/>
+			</dataarea>
+		</part>
+
+		<part name="flop19" interface="floppy_5_25">
+			<feature name="part_id" value="upp1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="x37uppdateringar1.img" size="655360" crc="baca1b2b" sha1="3e275c6d82c3e47545808f15cbcc71379c5e9486"/>
+			</dataarea>
+		</part>
+
+		<part name="flop20" interface="floppy_5_25">
+			<feature name="part_id" value="upp2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="x37uppdateringar2.img" size="655360" crc="8b0afb94" sha1="370c13aabc546f4b71f47da61be7aee2651c0a77"/>
+			</dataarea>
+		</part>
+
+		<part name="flop21" interface="floppy_5_25">
+			<feature name="part_id" value="etc"/>
+			<dataarea name="flop" size="737280">
+				<rom name="etc_bin_x37_OBS_PC_FORMAT.img" size="737280" crc="0336a022" sha1="57776a18bb868961248945036ff1a39cd0e242e3"/>
+			</dataarea>
+		</part>
+
+	</software>
+
+	<software name="cremount">
+		<description>cremount</description>
+		<year>1985</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="cremount"/>
+			<dataarea name="flop" size="655360">
+				<rom name="cremount.img" size="655360" crc="422dd069" sha1="ffdb0deecc9bf8bca2f233e64b93ef4e88a1e64c"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

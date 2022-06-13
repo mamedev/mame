@@ -2974,6 +2974,7 @@ files {
 	MAME_DIR .. "src/mame/machine/abc1600mac.h",
 	MAME_DIR .. "src/mame/video/abc1600.cpp",
 	MAME_DIR .. "src/mame/video/abc1600.h",
+	MAME_DIR .. "src/mame/drivers/ds90.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "magnavox")

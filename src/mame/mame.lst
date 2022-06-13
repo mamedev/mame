@@ -12778,6 +12778,9 @@ drumsta                         //
 drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
 
+@source:ds90.cpp
+x37                             //
+
 @source:dsb46.cpp
 dsb46                           //
 
