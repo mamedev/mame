@@ -202,7 +202,7 @@ void mame_machine_manager::start_luaengine()
 		std::error_condition const filerr = file.open("boot.lua");
 		if (!filerr)
 		{
-			std::string exppath = osd_subst_env(file.fullpath());
+			const std::string exppath = osd_subst_env(file.fullpath());
 			auto &l(*lua());
 			auto load_result = l.load_script(exppath);
 			if (!load_result.valid())
