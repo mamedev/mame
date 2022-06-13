@@ -163,9 +163,7 @@ DWORD create_path_recursive(TCHAR *path)
 
 std::error_condition osd_file::open(std::string const &orig_path, uint32_t openflags, ptr &file, std::uint64_t &filesize) noexcept
 {
-	std::string path;
-	try { osd_subst_env(path, orig_path); }
-	catch (...) { return std::errc::not_enough_memory; }
+	std::string path = osd_subst_env(orig_path);
 
 	if (win_check_socket_path(path))
 		return win_open_socket(path, openflags, file, filesize);

@@ -719,9 +719,7 @@ void lua_engine::initialize()
 	emu["subst_env"] =
 		[] (const std::string &str)
 		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
+			return osd_subst_env(str);
 		};
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },

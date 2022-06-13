@@ -1708,7 +1708,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 		{
-			osd_subst_env(pluginpath, pluginpath);
+			pluginpath = osd_subst_env(pluginpath);
 			plugin_opts.scan_directory(pluginpath, true);
 		}
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);

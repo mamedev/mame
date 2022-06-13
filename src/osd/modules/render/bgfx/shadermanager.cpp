@@ -116,7 +116,7 @@ std::string shader_manager::make_path_string(osd_options &options, std::string n
 			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 	shader_path += PATH_SEPARATOR;
-	osd_subst_env(shader_path, shader_path);
+	shader_path = osd_subst_env(shader_path);
 
 	return shader_path;
 }
