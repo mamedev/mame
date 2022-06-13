@@ -15,7 +15,7 @@
 #include "config.h"
 #include "wavwrite.h"
 
-
+#include <vector>
 
 //**************************************************************************
 //  DEBUGGING
@@ -560,7 +560,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
 	m_resampling_disabled((flags & STREAM_DISABLE_INPUT_RESAMPLING) != 0),
 	m_sync_timer(nullptr),
-	m_last_update_end(attotime::zero),
+	m_last_update_end_time(attotime::zero),
 	m_input(inputs),
 	m_input_view(inputs),
 	m_empty_buffer(100),
@@ -580,8 +580,9 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
 	auto &save = m_device.machine().save();
 	save.save_item(&m_device, "stream.sound_stream", state_tag.c_str(), 0, NAME(m_sample_rate));
-	save.save_item(&m_device, "stream.sound_stream", state_tag.c_str(), 0, NAME(m_last_update_end));
+	save.save_item(&m_device, "stream.sound_stream", state_tag.c_str(), 0, NAME(m_last_update_end_time));
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
+	save.register_presave(save_prepost_delegate(FUNC(sound_stream::presave), this));
 
 	// initialize all inputs
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
@@ -681,10 +682,7 @@ void sound_stream::update()
 	attotime start = m_output[0].end_time();
 	attotime end = m_device.machine().time();
 	if (start >= end)
-	{
-		m_last_update_end = start;
 		return;
-	}
 
 	// regular update then
 	update_view(start, end);
@@ -702,8 +700,6 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 {
 	sound_assert(start <= end);
 	sound_assert(outputnum < m_output.size());
-
-	m_last_update_end = end;
 
 	// clean up parameters for when the asserts go away
 	if (outputnum >= m_output.size())
@@ -864,17 +860,22 @@ void sound_stream::sample_rate_changed()
 
 void sound_stream::postload()
 {
-	// set the end time of all of our streams to now
+	// set the end time of all of our streams to the value saved in m_last_update_end_time
 	for (auto &output : m_output)
-	{
-		// previous : machine time
-		// output.set_end_time(m_device.machine().time());
-		// printf("postload %s %f\n", name().c_str(), m_last_update_end.as_double());
-		// resampler is zero
-		output.set_end_time(m_last_update_end > attotime::zero ? m_last_update_end : m_device.machine().time());
-	}
+		output.set_end_time(m_last_update_end_time);
+
 	// recompute the sample rate information
 	sample_rate_changed();
+}
+
+//-------------------------------------------------
+//  presave - save/restore callback
+//-------------------------------------------------
+
+void sound_stream::presave()
+{
+	// save the stream end time
+	m_last_update_end_time = m_output[0].end_time();
 }
 
 

@@ -670,6 +670,9 @@ private:
 	// handle updates after a save state load
 	void postload();
 
+	// handle updates before a save state load
+	void presave();
+
 	// re-print the synchronization timer
 	void reprime_sync_timer();
 
@@ -693,7 +696,7 @@ private:
 	bool m_resampling_disabled;                    // is resampling of input streams disabled?
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
-	attotime m_last_update_end;                    // last end_time() in update
+	attotime m_last_update_end_time;               // last end_time() in update
 
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
