@@ -15,7 +15,7 @@
   - # UFO Catcher DX II (1987)
 
   3rd gen - UFO brd
-    * Z80, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C
+    * Z80 (sticker obscures label), 16MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C
   - # Dream Town (1990)
   - New UFO Catcher (1991) (2P) - probably the most popular cabinet of all UFO Catcher series
   - UFO Catcher Mini (1991) (1P)
@@ -23,7 +23,8 @@
   - # School Kids (1993)
 
   4th gen - EX brd
-    * Z80, 2 Sega 315-5296(I/O), 315-5338A, YM3438, NEC uPD71054C, optional NEC uPD7759C
+    * Z80 Z0840008PSC, 8MHz XTAL, 32MHz XTAL, 2 Sega 315-5296(I/O), 315-5338A, YM3438,
+      NEC uPD71054C, optional NEC uPD7759C
   - # Dream Palace (1992)
   - # Dream Kitchen (1994)
   - # UFO Catcher Excellent (1994)
@@ -916,21 +917,21 @@ ROM_END
 
 ROM_START( ufomini )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-14355.bin",   0x000000, 0x010000, CRC(fbc969c5) SHA1(4a99dcd36bc48b6472988e0bc679fd61af17359c) )
+	ROM_LOAD( "epr-14355.ic21",   0x000000, 0x010000, CRC(fbc969c5) SHA1(4a99dcd36bc48b6472988e0bc679fd61af17359c) )
 ROM_END
 
 
 ROM_START( ufo21 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-19063a.bin",  0x000000, 0x010000, CRC(2e13e3e9) SHA1(6908f7db79c1a1da4ebc0456afc50ff18f2e8cf3) )
+	ROM_LOAD( "epr-19063a.ic33",  0x000000, 0x010000, CRC(2e13e3e9) SHA1(6908f7db79c1a1da4ebc0456afc50ff18f2e8cf3) )
 
 	ROM_REGION( 0x40000, "upd", 0 )
-	ROM_LOAD( "epr-19064.bin",   0x000000, 0x040000, CRC(ab62c1f0) SHA1(8791a88546ae69e710e128ffc2ea6e9b464f0631) )
+	ROM_LOAD( "epr-19064.ic32",   0x000000, 0x040000, CRC(ab62c1f0) SHA1(8791a88546ae69e710e128ffc2ea6e9b464f0631) )
 ROM_END
 
 ROM_START( ufo800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-20413a.bin",  0x000000, 0x010000, CRC(36e9da6d) SHA1(8e1dbf8b24bc31be7de28f4d562838c291af7c7b) )
+	ROM_LOAD( "epr-20413a.ic33",  0x000000, 0x010000, CRC(36e9da6d) SHA1(8e1dbf8b24bc31be7de28f4d562838c291af7c7b) )
 ROM_END
 
 
