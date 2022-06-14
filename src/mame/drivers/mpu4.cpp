@@ -415,8 +415,9 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 	m_IC23G2A   = 0;
 	m_IC23G2B   = 0;
 
+	// Bwb Orlando, which uses the bwb_bank address for banking requires the default bank to be 0!
 	if (m_numbanks)
-		m_bank1->set_entry(m_numbanks);
+		m_bank1->set_entry(m_default_to_low_bank ? 0 : m_numbanks);
 
 	m_maincpu->reset();
 }
@@ -458,7 +459,7 @@ used in some cabinets instead of the main control.
 */
 void mpu4_state::bankswitch_w(uint8_t data)
 {
-//  printf("bankswitch_w %02x\n", data);
+	//printf("bankswitch_w %02x\n", data);
 
 	m_pageval = (data & 0x03);
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
@@ -473,7 +474,7 @@ uint8_t mpu4_state::bankswitch_r()
 
 void mpu4_state::bankset_w(uint8_t data)
 {
-//  printf("bankset_w %02x\n", data);
+	//logerror("bankset_w %02x\n", data);
 
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
@@ -1249,7 +1250,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	//Some BWB games use this to drive the bankswitching
 	if (m_bwb_bank)
 	{
-		//printf("pia_gb_cb2_w %d\n", state);
+		// printf("bwb_bank %d\n", state);
 		//m_pageset?
 		m_pageval = state;
 		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
@@ -1474,6 +1475,16 @@ INPUT_PORTS_START( mpu4_invcoin )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mpu4_invimpcoin )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("AUX2")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN2) PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4) PORT_IMPULSE(5)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mpu4_cw )
@@ -1873,7 +1884,7 @@ uint8_t mpu4_state::bwbhack_r()
 	uint8_t* rom = memregion("::maincpu")->base();
 	retval = rom[m_fulladdr];
 
-	if (m_curbank == (m_bwbhack_addr >> 16))
+	if ((m_curbank & 3) == ((m_bwbhack_addr >> 16) & 3))
 	{
 		int pc = m_maincpu->state_int(M6809_PC);
 
@@ -1883,11 +1894,36 @@ uint8_t mpu4_state::bwbhack_r()
 			int xreg = m_maincpu->state_int(M6809_X);
 			printf("hit it %08x %04x (reading address %08x)\n", pc, xreg, m_fulladdr);
 
-			for (int i = 0; i < 0x20; i++)
+			xreg = xreg - 1;
+			xreg |= (m_curbank << 16);
+
+			// the data in ROM for this cheat takes the following form
+			// ZZ = common value, always the same for a given game
+			// k2 = second key value which always appears twice
+			// k1 ZZ k2 ZZ k3 ZZ k2 ZZ ZZ
+
+			uint8_t byte1 = rom[xreg + 0];
+			uint8_t byte2 = rom[xreg + 1];
+			uint8_t byte3 = rom[xreg + 2];
+			uint8_t byte4 = rom[xreg + 3];
+			uint8_t byte5 = rom[xreg + 4];
+			uint8_t byte6 = rom[xreg + 5];
+			uint8_t byte7 = rom[xreg + 6];
+			uint8_t byte8 = rom[xreg + 7];
+			uint8_t byte9 = rom[xreg + 8];
+
+			if ((byte2 == byte4) && (byte2 == byte6) && (byte2 == byte8) && (byte2 == byte9) && (byte3 == byte7))
 			{
-				uint8_t byt = rom[((xreg-0x8)+i) | (m_curbank << 16)];
-				printf("%02x ", byt);
+				//printf("common value %02x | keys %02x%02x%02x%02x\n", byte2, byte1, byte3, byte5, byte7);
+				printf("key\n0x%02x, 0x%02x%02x%02x\n", byte2, byte1, byte3, byte5);
+
 			}
+			else
+			{
+				printf("but key isn't valid?\n");
+				printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x", byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8, byte9);
+			}
+
 			printf("\n");
 		}
 	}
@@ -1950,10 +1986,7 @@ void mpu4_state::init_m4_small_extender()
 	m_lamp_extender = SMALL_CARD;
 }
 
-void mpu4_state::init_m4_large_extender_a()
-{
-	m_lamp_extender = LARGE_CARD_A;
-}
+
 
 void mpu4_state::init_m4_large_extender_b()
 {
@@ -2090,11 +2123,20 @@ void mpu4_state::init_m_oldtmr()
 
 void mpu4_state::init_m_blsbys()
 {
-	m_bwb_bank = 1;
-	// TODOxx: m_bwb_chr_table1 = blsbys_data1;
-	// TODOxx:  m_current_chr_table = blsbys_data;
 	init_m4default_big();
 	init_m4_five_reel_std();
+}
+
+void mpu4_state::init_big_extenda()
+{
+	init_m4default_big();
+	m_lamp_extender = LARGE_CARD_A;
+}
+
+void mpu4_state::init_m4default_big_low()
+{
+	init_m4default_big();
+	m_default_to_low_bank = true;
 }
 
 
@@ -2693,14 +2735,21 @@ void mpu4_state::bwboki(machine_config &config)
 	mpu4_common2(config);
 	mpu4_reels<4, 5>(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
-
-	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
+
+void mpu4_state::bwboki_chr(machine_config &config)
+{
+	bwboki(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
+	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+}
+
+
+
 
 void mpu4_state::mpu4crys(machine_config &config)
 {

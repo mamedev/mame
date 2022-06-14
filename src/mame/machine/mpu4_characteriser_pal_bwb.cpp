@@ -61,8 +61,6 @@ mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mco
 
 mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_current_chr_table(nullptr),
-	m_prot_col(0),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
@@ -135,74 +133,32 @@ void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 	logerror("%s Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
 	m_initval_ready = true;
 
-	if (m_chr_counter > 34)
+	if (m_chr_counter > 35)
 	{
-		m_chr_counter = 35;
-		m_chr_state = 2;
+		m_chr_counter = 36;
 	}
 	else
 	{
 		m_chr_counter++;
 	}
 
-
-
-	if ((offset & 0x3f) == 0)//initialisation is always at 0x800
-	{
-		if (!m_chr_state)
-		{
-			m_chr_state = 1;
-			m_chr_counter = 0;
-		}
-		if (m_call == 0)
-		{
-			m_init_col++;
-		}
-		else
-		{
-			m_init_col = 0;
-		}
-	}
-
-	switch (m_call)
-	{
-	case 0x36:
+	if (m_call == ((m_otherkey>>16)&0xff))
 		m_bwb_return = 0;
+
+	if ((m_call == m_commonkey) || (m_call == ((m_otherkey>>16)&0xff)) || (m_call == ((m_otherkey>>8)&0xff)) || (m_call == ((m_otherkey>>0)&0xff)))
+	{
 		if (m_bwb_return < 16)
 		{
 			m_chr_value = bwb_chr_table_common[m_bwb_return];
-
-		}
-		else
-		{
-			printf("overflow a\n");
 		}
 
 		m_bwb_return++;
-		break;
-
-	case 0x42:
-	case 0x27:
-	case 0x09:
-		if (m_bwb_return < 16 )
-		{
-			m_chr_value = bwb_chr_table_common[m_bwb_return];
-
-		}
-		else
-		{
-			printf("overflow b\n");
-		}
-
-		m_bwb_return++;
-		break;
-
-	default:
+	}
+	else
+	{
 		m_chr_value = machine().rand();
 		m_bwb_return = 0;
 	}
-
-
 }
 
 uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
@@ -217,22 +173,20 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 
 		switch (m_chr_counter)
 		{
-		case 6:
-		case 13:
-		case 20:
-		case 27:
-		case 34:
+		case 7:
+		case 14:
+		case 21:
+		case 28:
+		case 35:
 			printf("%02x ", m_call);
 
-			if (m_chr_counter == 34)
+			if (m_chr_counter == 35)
 				printf("\n\n");
 
 			logerror("m_call %02x\n", m_call);
 
-			if (m_bwb_chr_table1)
-				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];   // this is an init sequence, writes between are 0, the results of these reads stored at 430 in m4blsbys
-			else
-				return machine().rand();
+			// it is unclear what we actually need to return here for normal operation
+			return machine().rand();
 
 		default:
 			return m_chr_value;

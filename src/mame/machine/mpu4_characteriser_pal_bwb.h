@@ -22,11 +22,6 @@ public:
 		m_cpu.set_tag(std::forward<T>(tag));
 	}
 
-	void set_character_table(uint8_t* table)
-	{
-		m_current_chr_table = table;
-	}
-
 	void set_allow_6809_cheat(bool allow)
 	{
 		m_allow_6809_cheat = allow;
@@ -35,6 +30,16 @@ public:
 	void set_allow_68k_cheat(bool allow)
 	{
 		m_allow_68k_cheat = allow;
+	}
+
+	void set_common_key(uint8_t commonkey)
+	{
+		m_commonkey = commonkey;
+	}
+
+	void set_other_key(uint32_t otherkey)
+	{
+		m_otherkey = otherkey;
 	}
 
 	virtual uint8_t read(offs_t offset);
@@ -48,9 +53,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t* m_current_chr_table = nullptr;
-	int m_prot_col;
-
 private:
 
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
@@ -61,17 +63,13 @@ private:
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
-
-	int m_chr_state = 0;
 	int m_chr_counter = 0;
 	int m_chr_value = 0;
 	int m_bwb_return = 0;
-	int m_init_col = 0;
-
-	uint8_t m_call;
-	bool m_initval_ready;
-
-	uint8_t* m_bwb_chr_table1 = nullptr;
+	uint8_t m_call = 0;
+	bool m_initval_ready = false;
+	uint8_t m_commonkey = 0x00;
+	uint32_t m_otherkey = 0x00000000;
 };
 
 

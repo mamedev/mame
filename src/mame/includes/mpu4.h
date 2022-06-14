@@ -87,6 +87,7 @@
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_invcoin );
 INPUT_PORTS_EXTERN( mpu4_impcoin );
+INPUT_PORTS_EXTERN( mpu4_invimpcoin );
 INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
@@ -138,6 +139,7 @@ public:
 	void init_m4default_alt();
 	void init_m4default();
 	void init_m4default_big();
+	void init_m4default_big_low();
 
 
 	void init_m4default_big_aux2inv();
@@ -159,7 +161,6 @@ public:
 	void init_m4_six_reel_alt();
 	void init_m4_seven_reel();
 	void init_m4_small_extender();
-	void init_m4_large_extender_a();
 	void init_m4_large_extender_b();
 	void init_m4_large_extender_c();
 	void init_m4_hopper_tubes();
@@ -172,15 +173,31 @@ public:
 	void init_m4_led_b();
 	void init_m4_led_c();
 	void init_m4_led_simple();
+
+
 	void init_m4_andycp10c();
 	void init_m_blsbys();
 	void init_m_oldtmr();
 	void init_m4tst();
+	void init_big_extenda();
 
 	void init_m4altreels();//legacy, will be removed once things are sorted out
 	void init_m4altreels_big();
 
 	void bwboki(machine_config &config);
+	void bwboki_chr(machine_config &config);
+
+	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
+	{
+		bwboki(config);
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
+		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
+		m_characteriser_bwb->set_other_key(Key[1]);
+	}
+
+	
+
 
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
@@ -534,6 +551,7 @@ protected:
 	int m_card_live = 0;
 	int m_led_extender = 0;
 	int m_bwb_bank = 0;
+	bool m_default_to_low_bank = false;
 
 	int m_pageval = 0;
 	int m_pageset = 0;
