@@ -4498,8 +4498,6 @@ files {
 	MAME_DIR .. "src/mame/video/ojankohs.cpp",
 	MAME_DIR .. "src/mame/drivers/pipedrm.cpp",
 	MAME_DIR .. "src/mame/drivers/rpunch.cpp",
-	MAME_DIR .. "src/mame/includes/rpunch.h",
-	MAME_DIR .. "src/mame/video/rpunch.cpp",
 	MAME_DIR .. "src/mame/drivers/suprslam.cpp",
 	MAME_DIR .. "src/mame/includes/suprslam.h",
 	MAME_DIR .. "src/mame/video/suprslam.cpp",
