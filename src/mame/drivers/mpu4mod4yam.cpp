@@ -1364,10 +1364,6 @@ ROM_START( m4graffd )
 	ROM_LOAD( "grafittirom.bin", 0x0000, 0x010000, CRC(36135d6e) SHA1(e71eedabae36971739f8a6fd56a4a954de29944b) )
 ROM_END
 
-// these are just junk (single value fill for the most part)
-//  ROM_LOAD( "grafittisound.bin", 0x0000, 0x010000, CRC(2d9bfff9) SHA1(ded774bcd2a7e10e4e2fc7b40976c9dcea0de6e3) )
-//  ROM_LOAD( "grafittisound2.bin", 0x0000, 0x010000, CRC(c06c5517) SHA1(9e11f93638d37ba6f7b34a78eea043821ca4e188) )
-
 ROM_START( m4voodoo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
@@ -1375,16 +1371,18 @@ ROM_END
 
 GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
+GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 
-// 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4  (celclb)
-GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
-
-// 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c (shuffle)
 GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
 
-// 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c dc 94 (m435)
 GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
-// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
 GAME(199?, m4graffd,  0,  mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) (Dutch) (MPU4) (DGR 1.3)",GAME_FLAGS ) // ROL D SETUP ALM
 
+ROM_START( m4hslo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hot30", 0x0000, 0x010000, CRC(62f2c420) SHA1(5ae89a1b585738255e8d9ae153c3c63b4a2893e4) )
+ROM_END
+
+// non-standard protection
+GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )

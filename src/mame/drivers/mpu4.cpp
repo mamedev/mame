@@ -2207,7 +2207,7 @@ void mpu4_state::crystal_sound_w(uint8_t data)
 void mpu4_state::init_m_frkstn()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	init_m4default_big();
+	init_m4default();
 	space.install_read_handler(0x0880, 0x0880, read8smo_delegate(*this, FUNC(mpu4_state::crystal_sound_r)));
 	space.install_write_handler(0x0881, 0x0881, write8smo_delegate(*this, FUNC(mpu4_state::crystal_sound_w)));
 }
@@ -2287,7 +2287,7 @@ void mpu4_state::mpu4_memmap_characteriser(address_map &map)
 void mpu4_state::mpu4_memmap_bootleg_characteriser(address_map &map)
 {
 	mpu4_memmap(map);
-	map(0x0800, 0x081f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
+	map(0x0800, 0x087f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
 }
 
 void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)

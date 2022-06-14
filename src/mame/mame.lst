@@ -24467,7 +24467,6 @@ m4crzjwle                       //
 m4crzjwlf                       //
 m4crzjwlg                       //
 m4crzjwlh                       //
-m4czne                          // Cash Zone (Bwb)
 m4dblchn                        // Double Chance (DJE)
 m4ddb                           // Ding Dong Bells (Coinworld)
 m4ddba                          //
@@ -24507,9 +24506,7 @@ m4hirisec                       //
 m4hirised                       //
 m4hirisee                       //
 m4holdtm                        // Hold Timer (Barcrest)
-m4holywd                        // Hollywood (Bwb)
 m4hpyjok                        // Happy Joker (Barcrest)
-m4hslo                          // Unknown MPU4 'HOT 3.0'
 m4hstr                          // Happy Streak (Coinworld)
 m4hstra                         //
 m4hstrb                         //
@@ -24596,13 +24593,11 @@ m4sunscla                       //
 m4sunsclb                       //
 m4sunseta                       //
 m4sunsetb                       //
-m4sunsetc                       //
 m4supbf                         // Super Bucks Fizz Club (Barcrest)
 m4supbfa                        //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4take5                         // Take 5 (Barcrest)
 m4tbplay                        // Turbo Play (Barcrest)
 m4tbplaya                       //
 m4tbplayb                       //
@@ -24626,10 +24621,6 @@ m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
 m4univ                          // Universe (Barcrest)
-m4unkjok                        // Unknown MPU4 'Joker'
-m4unkjoka                       //
-m4unkjokb                       //
-m4unkjokc                       //
 m4vegastg                       //
 m4vivalvd                       //
 m4vivan                         // Viva Las Vegas (Nova)
@@ -26117,6 +26108,7 @@ m4cashmx                        // Cash Matrix (Barcrest)
 m4cashmxa                       //
 m4cashzn                        // Cash Zone (Barcrest)
 m4cashzna                       //
+m4czne                          // Cash Zone (Bwb)
 m4celclb                        // Celebration Club (Barcrest)
 m4centpt                        // Centrepoint (Barcrest)
 m4cheryo                        // Cherryo (Barcrest)
@@ -26180,6 +26172,7 @@ m4hiroll                        // High Roller (Barcrest)
 m4hittp2                        //
 m4hittp2a                       //
 m4holdon                        // Hold On (Barcrest)
+m4holywd                        // Hollywood (Bwb)
 m4intcep                        // Interceptor (Barcrest)
 m4intcepa                       //
 m4intcepb                       //
@@ -26275,6 +26268,7 @@ m4starbr                        // Stars And Bars (Barcrest)
 m4stards                        // Stardust (Barcrest)
 m4stopcl                        // Stop the Clock (Barcrest)
 m4sunset                        // Sunset Boulevard (Barcrest)
+m4sunsetc                       //
 m4sunsetd                       //
 m4sunsete                       //
 m4sunsetf                       //
@@ -26328,6 +26322,10 @@ m4tridic                        // Triple Dice (Barcrest)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
 m4twilgt                        // Twilight (Barcrest)
+m4unkjok                        // Unknown MPU4 'Joker'
+m4unkjoka                       //
+m4unkjokb                       //
+m4unkjokc                       //
 m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
@@ -28924,6 +28922,7 @@ m4supbjca                       //
 m4supbjcb                       //
 m4supbjcc                       //
 m4supbjcd                       //
+m4take5                         // Top Tenner / Take 5 (bootleg)
 m4takepk                        // Take Your Pick (Barcrest)
 m4takepk__0                     //
 m4takepk__1                     //
@@ -29667,6 +29666,7 @@ m4graff                         // Graffiti (Barcrest)
 m4graff__a                      //
 m4graff__b                      //
 m4graffd                        //
+m4hslo                          // Hot Slot (bootleg)
 m4hypclb                        // Hyper Viper Club (Barcrest)
 m4hypclb__a                     //
 m4hypclb__b                     //
