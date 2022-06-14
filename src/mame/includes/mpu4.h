@@ -209,7 +209,7 @@ public:
 	template<uint8_t Type, uint8_t NumberOfReels>
 	void mpu4_reels(machine_config &config);
 
-	template<const uint8_t* Table> void mod2_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
 	{
 		mod2(config);
 
@@ -221,7 +221,7 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
-	template<const uint8_t* Table> void mod2_alt_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config)
 	{
 		mod2_alt(config);
 
@@ -233,7 +233,7 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
-	template<const uint8_t* Table> void mod4oki_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config)
 	{
 		mod4oki(config);
 
@@ -245,7 +245,7 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
-	template<const uint8_t* Table> void mod4oki_alt_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config)
 	{
 		mod4oki_alt(config);
 
@@ -257,7 +257,7 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
-	template<const uint8_t* Table> void mod4yam_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
 	{
 		mod4yam(config);
 
@@ -269,7 +269,7 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
-	template<const uint8_t* Table> void mod4oki_5r_cheatchr_xxxx(machine_config &config)
+	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config)
 	{
 		mod4oki_5r(config);
 
