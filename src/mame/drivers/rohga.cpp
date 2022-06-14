@@ -1018,6 +1018,11 @@ void rohga_state::nitrobal(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
+	DECO146PROT(config.replace(), m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline("audiocpu", 0);
 	m_ioprot->set_interface_scramble_reverse();
 	m_ioprot->set_use_magic_read_address_xor(true);
 }
