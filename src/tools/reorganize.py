@@ -1,163 +1,201 @@
 #!/usr/bin/python
 
-import sys
+import argparse
+import glob
 import os
-
-if len(sys.argv) != 2:
-    print("Usage\n%s mame-cmake" % sys.argv[0])
-    sys.exit(0)
-
-# Build the lists of files
-
-src = sys.argv[1] + '/src/mame/'
-
-for root, subdirs, files in os.walk(src + 'drivers'):
-    assert(len(subdirs) == 0)
-    srcd = files
-
-for root, subdirs, files in os.walk(src + 'audio'):
-    assert(len(subdirs) == 0)
-    srca = files
-
-for root, subdirs, files in os.walk(src + 'video'):
-    assert(len(subdirs) == 0)
-    srcv = files
-
-for root, subdirs, files in os.walk(src + 'machine'):
-    assert(len(subdirs) == 0)
-    srcm = files
-
-for root, subdirs, files in os.walk(src + 'includes'):
-    assert(len(subdirs) == 0)
-    srci = files
+import os.path
+import re
+import subprocess
+import sys
 
 
-# Compute the future name of the files to avoid collisions
-present = {}
-renaming = {}
-
-def add(l, c):
-    global present, renaming
-    for f in l:
-        if f in present:
-            nfx = f.split('.')
-            assert(len(nfx) == 2)
-            nf = nfx[0] + '_' + c + '.' + nfx[1]
-#            print("%s -> %s" % (f, nf))
-            assert(nf not in present)
-        else:
-            nf = f
-        present[nf] = True
-        renaming[c + '/' + f] = nf
-        
-add(srci, "i")
-add(srcd, "d")
-add(srca, "a")
-add(srcv, "v")
-add(srcm, "m")
+def parse_command():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('srcroot', metavar='<srcroot>', help='MAME source root directory')
+    return parser.parse_args()
 
 
-# Update the .lua files, lookup the per-file target names
+def resolve_conflicts(root, *parts):
+    def walk(subdir):
+        for path, subdirs, files in os.walk(os.path.join(root, subdir)):
+            if len(subdirs):
+                raise Exception('Found %d unwanted subdirectories in %s' % (len(subdirs), path))
+            return files
 
-kl = {
-    'includes': 'i',
-    'drivers': 'd',
-    'audio': 'a',
-    'video': 'v',
-    'machine' : 'm'
-}
-
-keys = ['createMAMEProjects', 'createMESSProjects']
-fpmap = {'v/konamiic.txt': 'konami' }
-
-bad = False
-for scr in ['arcade.lua', 'mess.lua', 'ci.lua', 'dummy.lua', 'nl.lua', 'tiny.lua', 'virtual.lua']:
-    fname = sys.argv[1] + '/scripts/target/mame/' + scr
-    lines = open(fname, 'r').readlines()
-    cp = None
-    f = open(fname, 'w')
-    for l in lines:
-        ls = l.rstrip('\r\n')
-        for kk in keys:
-            p = ls.find(kk)
-            if p == 0 or p == 1:
-                p = ls.find('"')+1
-                p2 = ls.find('"', p)
-                cp = ls[p:p2]
-                if cp == 'mameshared':
-                    cp = None
-        p = ls.find('MAME_DIR .. "src/mame/')
-        if p != -1:
-            p2 = ls.find('"', p+22)
-            fn = ls[p+22:p2]
-            fx = fn.split('/')
-            k = kl[fx[0]] + '/' + fx[1]
-            if cp != None:
-                if k in fpmap:
-                    print("Duplicated: %s (%s and %s)" % (fn, cp, fpmap[k]))
-                    bad = True
-                fpmap[k] = cp
-                ap = cp
+    present = set()
+    result = {}
+    for part in parts:
+        c = part[0]
+        for file in walk(part):
+            if file in present:
+                base, ext = os.path.splitext(file)
+                if not ext:
+                    raise Exception('File %s has no extension' % (file, ))
+                nf = base + '_' + c + ext
+                #print('%s -> %s' % (os.path.join(part, file), nf))
+                if nf in present:
+                    raise Exception('File %s still conflicted after renaming from %s' % (nf, file))
             else:
-                if k not in fpmap:
-                    bad = True
-#                    print("Missing in projects and seen in another .lua: %s" % fn)
-                    ap = '?'
-                else:
-                    ap = fpmap[k]
-            ls = ls[:p+22] + ap + '/' + renaming[k] + ls[p2:]
-        print(ls, file=f)
+                nf = file
+            present.add(nf)
+            result[part + '/' + file] = nf
 
-for k in renaming.keys():
-    if k not in fpmap:
-        print("Missing in projects: %s" % k)
-        bad = True
+    return result
 
-if bad:
-    sys.exit(1)
 
-# Create the new subdirectories
-for d in set(fpmap.values()):
-    os.mkdir(src + d)
+def update_projects(root, renaming, *scripts):
+    keys = ('createMAMEProjects', 'createMESSProjects')
+    result = { 'video/konamiic.txt': 'konami' }
 
-# Move the files around, patching the include paths as needed
+    bad = False
 
-ikl = {}
-for p, a in kl.items():
-    ikl[a] = p
-
-for bfs, bfd in renaming.items():
-    bfsx = bfs.split('/')
-    fs = src + ikl[bfsx[0]] + '/' + bfsx[1]
-    fdm = fpmap[bfs]
-    fd = src + fdm + '/' + bfd
-    fdh = open(fd, 'w')
-    for l in open(fs):
-        p0 = 0
-        while l[p0] == ' ' or l[p0] == '\t':
-            p0 += 1
-        if l[p0:p0+8] == '#include':
-            itype = '"'
-            si = l.find('"')
-            if si != -1:
-                si += 1
-                ei = l.find('"', si)
-                fi = l[si:ei]
-                fix = fi.split('/')
-                fik = None
-                if len(fix) == 2 and fix[0] in kl:
-                    fik = kl[fix[0]] + '/' + fix[1]
-                elif len(fix) == 1:
-                    fik = bfsx[0] + '/' + fi
-                if fik != None and fik in fpmap:
-                    fim = fpmap[fik]
-                    if fim == fdm:
-                        nfi = renaming[fik]
+    for script in scripts:
+        fname = os.path.join(root, 'scripts', 'target', 'mame', script)
+        with open(fname, 'r', encoding='utf-8') as infile:
+            lines = infile.readlines()
+        cp = None
+        with open(fname, 'w', encoding='utf-8') as f:
+            for l in lines:
+                ls = l.rstrip('\r\n')
+                for kk in keys:
+                    p = ls.find(kk)
+                    if p == 0 or p == 1:
+                        p = ls.find('"')+1
+                        p2 = ls.find('"', p)
+                        cp = ls[p:p2]
+                        if cp == 'mameshared':
+                            cp = None
+                p = ls.find('MAME_DIR .. "src/mame/')
+                if p != -1:
+                    p2 = ls.find('"', p + 22)
+                    fn = ls[p+22:p2]
+                    if cp is not None:
+                        if fn in result:
+                            print("Duplicated: %s (%s and %s)" % (fn, cp, result[fn]))
+                            bad = True
+                        result[fn] = cp
+                        ap = cp
                     else:
-                        nfi = fim + '/' + renaming[fik]
-                    l = l[:si] + nfi + l[ei:]
-        fdh.write(l)
-    os.remove(fs)
+                        if fn not in result:
+                            bad = True
+                            #print("Missing in projects and seen in another .lua: %s" % fn)
+                            ap = '?'
+                        else:
+                            ap = result[fn]
+                    ls = ls[:p+22] + ap + '/' + renaming[fn] + ls[p2:]
+                print(ls, file=f)
 
-for d in list(kl.keys()):
-    os.rmdir(src + d)
+    for k in renaming:
+        if k not in result:
+            print('Missing in projects: %s' % (k, ))
+            bad = True
+
+    if bad:
+        raise Exception('Error updating project scripts')
+
+    return result
+
+
+def update_driver_list(fname, renaming, projectmap):
+    with open(fname, 'r', encoding='utf-8') as infile:
+        lines = infile.readlines()
+        with open(fname, 'w', encoding='utf-8') as outfile:
+            for l in lines:
+                ls = l.rstrip('\r\n')
+                match = re.match('(.*@source:)([-_0-9a-z]+\\.cpp)\\b(\s*)(.*)', ls)
+                if match:
+                    f = 'drivers/' + match.group(2)
+                    r = projectmap[f] + '/' + renaming.get(f, match.group(2))
+                    if match.group(3):
+                        w = len(match.group(2)) + len(match.group(3))
+                        if len(r) < w:
+                            r = r + (' ' * (w - len(r)))
+                        else:
+                            r = r + ' '
+                    print(match.group(1) + r + match.group(4), file=outfile)
+                else:
+                    print(ls, file=outfile)
+
+
+def update_driver_filter(fname, renaming, projectmap):
+    with open(fname, 'r', encoding='utf-8') as infile:
+        lines = infile.readlines()
+        with open(fname, 'w', encoding='utf-8') as outfile:
+            for l in lines:
+                ls = l.rstrip('\r\n')
+                match = re.match('(.*)(?<![-_0-9a-z])([-_0-9a-z]+\\.cpp)\\b(.*)', ls)
+                if match:
+                    f = 'drivers/' + match.group(2)
+                    b = renaming.get(f, match.group(2))
+                    print(match.group(1) + projectmap[f] + '/' + b + match.group(3), file=outfile)
+                else:
+                    print(ls, file=outfile)
+
+
+def relocate_source(root, filename, destbase, renaming, projectmap):
+    fsx = filename.split('/')
+    destproject = projectmap[filename]
+    sourcepath = os.path.join(root, 'src', 'mame', fsx[0], fsx[1])
+    destpath = os.path.join(root, 'src', 'mame', destproject, destbase)
+    with open(sourcepath, 'r', encoding='utf-8') as infile:
+        lines = infile.readlines()
+    subprocess.run(['git', '-C', root, 'mv', os.path.join('src', 'mame', fsx[0], fsx[1]), os.path.join('src', 'mame', destproject, destbase)])
+
+    # Patch the include paths as needed
+    with open(destpath, 'w', encoding='utf-8') as fdh:
+        for l in lines:
+            p0 = 0
+            while l[p0] == ' ' or l[p0] == '\t':
+                p0 += 1
+            if l[p0:p0+8] == '#include':
+                itype = '"'
+                si = l.find('"')
+                if si != -1:
+                    si += 1
+                    ei = l.find('"', si)
+                    fi = l[si:ei]
+                    fix = fi.split('/')
+                    fik = None
+                    if len(fix) == 2:
+                        fik = fi
+                    elif len(fix) == 1:
+                        fik = fsx[0] + '/' + fi
+                    if (fik is not None) and (fik in projectmap):
+                        fim = fpmap[fik]
+                        if fim == destproject:
+                            nfi = renaming[fik]
+                        else:
+                            nfi = fim + '/' + renaming[fik]
+                        l = l[:si] + nfi + l[ei:]
+            fdh.write(l)
+
+
+if __name__ == '__main__':
+    options = parse_command()
+    src = os.path.join(options.srcroot, 'src', 'mame')
+    areas = ('includes', 'drivers', 'audio', 'video', 'machine')
+
+    # Compute the future name of the files to avoid collisions
+    renaming = resolve_conflicts(src, *areas)
+
+    # Update the .lua files, lookup the per-file target names
+    fpmap = update_projects(options.srcroot, renaming, 'arcade.lua', 'mess.lua', 'ci.lua', 'dummy.lua', 'nl.lua', 'tiny.lua', 'virtual.lua')
+
+    # update .lst list files
+    for flt in glob.glob(os.path.join(src, '*.lst')):
+        update_driver_list(flt, renaming, fpmap)
+
+    # update .flt filter files
+    for flt in glob.glob(os.path.join(src, '*.flt')):
+        update_driver_filter(flt, renaming, fpmap)
+
+    # Create the new subdirectories
+    for d in fpmap.values():
+        os.makedirs(os.path.join(src, d), exist_ok=True)
+
+    # Move the files around
+    for fs, bfd in renaming.items():
+        relocate_source(options.srcroot, fs, bfd, renaming, fpmap)
+
+    for d in areas:
+        os.rmdir(os.path.join(src, d))

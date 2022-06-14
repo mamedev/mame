@@ -557,7 +557,7 @@ if (_OPTIONS["PROJECT"] ~= nil) then
 	end
 	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 end
-if (_OPTIONS["SOURCES"] == nil and _OPTIONS["PROJECT"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["PROJECT"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
@@ -1416,14 +1416,14 @@ if (_OPTIONS["SOURCES"] ~= nil) then
 	local sourceargs = ""
 	for word in string.gmatch(str, '([^,]+)') do
 		if (not os.isfile(path.join(MAME_DIR, word))) then
-			print("File " .. word.. " does not exist")
+			print("File " .. word .. " does not exist")
 			os.exit()
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
 	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter -l " .. MAME_DIR .. "src/" .. _OPTIONS["target"] .. "/" .. _OPTIONS["target"] .. ".lst" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
 end
 
 group "libs"

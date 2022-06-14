@@ -285,45 +285,50 @@ if (STANDALONE~=true) then
 					}
 				},
 			}
+		elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
+			custombuildtask {
+				{
+					MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
+					GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",
+					{ MAME_DIR .. "scripts/build/makedep.py" },
+					{
+						"@echo Building driver list...",
+						PYTHON .. " $(1) driverlist $(<) > $(@)"
+					}
+				},
+			}
 		else
-			if os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
-				custombuildtask {
+			dependency {
+				{ GEN_DIR .. _target .. "/" .. _target .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+			}
+			custombuildtask {
+				{
+					MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst",
+					GEN_DIR .. _target .. "/" .. _target .. "/drivlist.cpp",
+					{  MAME_DIR .. "scripts/build/makedep.py" },
 					{
-						MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
-						GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",
-						{ MAME_DIR .. "scripts/build/makedep.py" },
-						{
-							"@echo Building driver list...",
-							PYTHON .. " $(1) driverlist $(<) > $(@)"
-						}
-					},
-				}
-			else
-				dependency {
-					{ GEN_DIR .. _target .. "/" .. _target .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-				}
-				custombuildtask {
-					{
-						MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst",
-						GEN_DIR .. _target .. "/" .. _target .. "/drivlist.cpp",
-						{  MAME_DIR .. "scripts/build/makedep.py" },
-						{
-							"@echo Building driver list...",
-							PYTHON .. " $(1) driverlist $(<) > $(@)"
-						}
-					},
-				}
-			end
+						"@echo Building driver list...",
+						PYTHON .. " $(1) driverlist $(<) > $(@)"
+					}
+				},
+			}
 		end
 	end
 
 	if (_OPTIONS["SOURCES"] ~= nil) then
 			dependency {
-			{
-				GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+				{ GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
 			}
 			custombuildtask {
-				{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)" }},
+				{
+					GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,
+					GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
+					{ MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  },
+					{
+						"@echo Building driver list...",
+						PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
+					}
+				},
 			}
 	end
 
