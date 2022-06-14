@@ -156,7 +156,6 @@ license:CC0
 				<rom name="etc_bin_x37_OBS_PC_FORMAT.img" size="737280" crc="0336a022" sha1="57776a18bb868961248945036ff1a39cd0e242e3"/>
 			</dataarea>
 		</part>
-
 	</software>
 
 	<software name="cremount">
