@@ -954,8 +954,6 @@ void rohga_state::rohga(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::rohga_map);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
-
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
 	subdevice<screen_device>("screen")->set_palette(m_palette);
 
