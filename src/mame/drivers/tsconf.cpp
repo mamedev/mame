@@ -139,15 +139,13 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8, /* 8 x 8 characters */
-	96,   /* 96 characters */
-	1,    /* 1 bits per pixel */
-	{0},  /* no bitplanes */
-	/* x offsets */
-	{STEP8(0, 1)},
-	/* y offsets */
-	{STEP8(0, 8)},
-	8 * 8 /* every char takes 8 bytes */
+	8, 8,          // 8 x 8 characters */
+	96,            // 96 characters */
+	1,             // 1 bits per pixel */
+	{0},           // no bitplanes
+	{STEP8(0, 1)}, // x offsets
+	{STEP8(0, 8)}, // y offsets
+	8 * 8          // every char takes 8 bytes
 };
 
 static const gfx_layout tsconf_charlayout =
@@ -170,7 +168,7 @@ static const gfx_layout tsconf_tile_16cpp_layout =
 	{STEP4(0, 1)},
 	{STEP8(0, 4)},
 	{STEP8(0, 256 * 8)},
-	// Much more tiles when needed. Because tiles are in RAW formut but we don't know region properties.
+	// Much more tiles when needed. Because tiles are in RAW format but we don't know region properties.
 	8 * 4
 };
 
