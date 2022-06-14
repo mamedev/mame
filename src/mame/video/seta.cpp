@@ -245,13 +245,6 @@ u16 usclssic_state::tile_offset(u16 code)
 	return m_tiles_offset + code;
 }
 
-VIDEO_START_MEMBER(seta_state,oisipuzl)
-{
-	video_start();
-
-	m_tilemaps_flip = 1;
-}
-
 SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 {
 	const int bank = (color & 0x06) >> 1;
@@ -262,8 +255,6 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 
 void seta_state::video_start()
 {
-	m_tilemaps_flip = 0;
-
 	m_samples_bank = -1;    // set the samples bank to an out of range value at start-up
 	if (m_x1_bank != nullptr)
 		m_x1_bank->set_entry(0); // TODO : Unknown init

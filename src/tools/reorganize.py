@@ -99,37 +99,37 @@ def update_projects(root, renaming, *scripts):
 def update_driver_list(fname, renaming, projectmap):
     with open(fname, 'r', encoding='utf-8') as infile:
         lines = infile.readlines()
-        with open(fname, 'w', encoding='utf-8') as outfile:
-            for l in lines:
-                ls = l.rstrip('\r\n')
-                match = re.match('(.*@source:)([-_0-9a-z]+\\.cpp)\\b(\s*)(.*)', ls)
-                if match:
-                    f = 'drivers/' + match.group(2)
-                    r = projectmap[f] + '/' + renaming.get(f, match.group(2))
-                    if match.group(3):
-                        w = len(match.group(2)) + len(match.group(3))
-                        if len(r) < w:
-                            r = r + (' ' * (w - len(r)))
-                        else:
-                            r = r + ' '
-                    print(match.group(1) + r + match.group(4), file=outfile)
-                else:
-                    print(ls, file=outfile)
+    with open(fname, 'w', encoding='utf-8') as outfile:
+        for l in lines:
+            ls = l.rstrip('\r\n')
+            match = re.match('(.*@source:)([-_0-9a-z]+\\.cpp)\\b(\s*)(.*)', ls)
+            if match:
+                f = 'drivers/' + match.group(2)
+                r = projectmap[f] + '/' + renaming.get(f, match.group(2))
+                if match.group(3):
+                    w = len(match.group(2)) + len(match.group(3))
+                    if len(r) < w:
+                        r = r + (' ' * (w - len(r)))
+                    else:
+                        r = r + ' '
+                print(match.group(1) + r + match.group(4), file=outfile)
+            else:
+                print(ls, file=outfile)
 
 
 def update_driver_filter(fname, renaming, projectmap):
     with open(fname, 'r', encoding='utf-8') as infile:
         lines = infile.readlines()
-        with open(fname, 'w', encoding='utf-8') as outfile:
-            for l in lines:
-                ls = l.rstrip('\r\n')
-                match = re.match('(.*)(?<![-_0-9a-z])([-_0-9a-z]+\\.cpp)\\b(.*)', ls)
-                if match:
-                    f = 'drivers/' + match.group(2)
-                    b = renaming.get(f, match.group(2))
-                    print(match.group(1) + projectmap[f] + '/' + b + match.group(3), file=outfile)
-                else:
-                    print(ls, file=outfile)
+    with open(fname, 'w', encoding='utf-8') as outfile:
+        for l in lines:
+            ls = l.rstrip('\r\n')
+            match = re.match('(.*)(?<![-_0-9a-z])([-_0-9a-z]+\\.cpp)\\b(.*)', ls)
+            if match:
+                f = 'drivers/' + match.group(2)
+                b = renaming.get(f, match.group(2))
+                print(match.group(1) + projectmap[f] + '/' + b + match.group(3), file=outfile)
+            else:
+                print(ls, file=outfile)
 
 
 def relocate_source(root, filename, destbase, renaming, projectmap):
