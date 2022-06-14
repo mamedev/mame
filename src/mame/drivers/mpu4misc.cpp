@@ -187,6 +187,18 @@ GAME_CUSTOM( 199?, m4dcrls__n,      m4dcrls,    "dcr_mecca_340_lv.bin",         
 GAME_CUSTOM( 199?, m4dcrls__o,      m4dcrls,    "dcr_std_340_lv.bin",           0x0000, 0x040000, CRC(d9632301) SHA1(19ac680f00e085d94fc45f765c975f3da1ca1eb3), "Qps","Double Crazy Reels (Qps) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4dcrls__p,      m4dcrls,    "70001115.bin",                 0x0000, 0x040000, CRC(26432b07) SHA1(ef7303793252210f3fd07b12f5684b5d2cc828ab), "Qps","Double Crazy Reels (Qps) (MPU4) (set 17)" ) // dcr_data_340_lv.bin
 GAME_CUSTOM( 199?, m4dcrls__q,      m4dcrls,    "70001116.bin",                 0x0000, 0x040000, CRC(522191e8) SHA1(f80656290295b556d4b67c4458d8f856f8b937fb), "Qps","Double Crazy Reels (Qps) (MPU4) (set 18)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DCRLS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4misc_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+
+
+
 GAME_CUSTOM( 199?, m4dcrls__r,      m4dcrls,    "dcr_data_340.bin",             0x0000, 0x010000, CRC(fc12e68f) SHA1(f07a42323651ef9aefac24c3b9296a98068c2dc2), "Qps","Double Crazy Reels (Qps) (MPU4) (set 19)" ) // too small?
 
 
@@ -256,8 +268,8 @@ GAME_CUSTOM( 199?, m4rhnote__y,    m4rhnote,   "rhn_std_110_lv.bin",           0
 
 #define M4RHROCK_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) /* 71000200.hi padded with 0xff as original IntelHex was undersize */ \
-	ROM_LOAD( "71000200.hi", 0x0000, 0x80000, CRC(3054ff83) SHA1(241ab9b634c83d5b388eff2d598e7897aa7dd703) ) \
-	ROM_LOAD( "71000200.lo", 0x0000, 0x80000, CRC(b426e83f) SHA1(c30b3868f2c6a4f84a678e2c5151861619b27905) )
+	ROM_LOAD( "71000200.lo", 0x00000, 0x80000, CRC(b426e83f) SHA1(c30b3868f2c6a4f84a678e2c5151861619b27905) ) \
+	ROM_LOAD( "71000200.hi", 0x80000, 0x80000, CRC(3054ff83) SHA1(241ab9b634c83d5b388eff2d598e7897aa7dd703) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -276,8 +288,8 @@ GAME_CUSTOM( 199?, m4rhrock__a,    m4rhrock,   "rhr_v300_1216_ce52_nlv.bin", 0x0
 // 71000180.lo.hex and  71000180.hi.hex converted
 #define M4RHWHL_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "redhotwheelssnd.p1", 0x0000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) ) \
-	ROM_LOAD( "redhotwheelssnd.p2", 0x0000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) )
+	ROM_LOAD( "redhotwheelssnd.p1", 0x000000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) ) \
+	ROM_LOAD( "redhotwheelssnd.p2", 0x080000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -381,8 +393,9 @@ GAME_CUSTOM( 199?, m4shkwav__a,    m4shkwav,   "swave_v210_11376_0bb3_nlv.bin", 
 GAME_CUSTOM( 199?, m4shkwav__b,    m4shkwav,   "swsplv.bin",                       0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de), "Qps","Shockwave (Qps) (MPU4) (set 3)" )
 //This rom is possibly bad, data content isn't multiple of 0x800, padding with low bits rather than high
 	ROM_START( m4shkwav__c )
-		ROM_REGION( 0x080000, "maincpu", 0 )
-		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) )
+		ROM_REGION( 0x040000, "maincpu", 0 )
+		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x040000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) )
+		ROM_IGNORE(0x40000)
 		M4SHKWAV_EXTRA_ROMS
 	ROM_END
 GAME(199?, m4shkwav__c, m4shkwav, mod4oki, mpu4, mpu4misc_machines_state, init_m4default_big, ROT0, "Qps", "Shockwave (Qps) (MPU4) (set 4)", GAME_FLAGS )

@@ -1981,7 +1981,7 @@ GAME(199?, m4loadmna, m4loadmn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::and
 GAME(199?, m4loadmnb, m4loadmn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (LA 1.1, set 2)",GAME_FLAGS )
 
 // 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 (celclb)
-GAME(199?, m4celclb,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m_ccelbr,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4) (CEL 1.5)",GAME_FLAGS ) // set stake
+GAME(199?, m4celclb,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4) (CEL 1.5)",GAME_FLAGS ) // set stake
 
 // 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c f4 08 d0 cc dc b0 cc (actionbank)
 GAME(199?, m4centpt, 0,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4) (DU 1.3)",GAME_FLAGS )

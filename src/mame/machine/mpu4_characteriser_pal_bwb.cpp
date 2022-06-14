@@ -19,7 +19,6 @@ Said weaknesses (A Cheats Guide according to Project Amber)
 The common initialisation sequence is "00 04 04 0C 0C 1C 14 2C 5C 2C"
                                         0  1  2  3  4  5  6  7  8
 
- - This is the start of a 0x40 long string containing the BWB- filename / code for the version
 
 Using debug search for the first read from said string (best to find it first).
 
@@ -67,17 +66,19 @@ mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mco
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
-	m_current_lamp_table(nullptr),
 	m_protregion(*this, "fakechr")
 {
 }
 
 void mpu4_characteriser_pal_bwb::device_start()
 {
+
+
 }
 
 void mpu4_characteriser_pal_bwb::device_reset()
 {
+
 }
 
 #if 0
@@ -130,15 +131,21 @@ static mpu4_chr_table blsbys_data[8] = {
 
 void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 {
-	int x;
-	int call = data;
+	m_call = data;
 	logerror("%s Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+	m_initval_ready = true;
 
-	if (!m_current_chr_table)
+	if (m_chr_counter > 34)
 	{
-		popmessage("%s No Characteriser Table\n", machine().describe_context());
-		return;
+		m_chr_counter = 35;
+		m_chr_state = 2;
 	}
+	else
+	{
+		m_chr_counter++;
+	}
+
+
 
 	if ((offset & 0x3f) == 0)//initialisation is always at 0x800
 	{
@@ -147,7 +154,7 @@ void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 			m_chr_state = 1;
 			m_chr_counter = 0;
 		}
-		if (call == 0)
+		if (m_call == 0)
 		{
 			m_init_col++;
 		}
@@ -157,33 +164,57 @@ void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 		}
 	}
 
-	m_chr_value = machine().rand();
-	for (x = 0; x < 4; x++)
+	switch (m_call)
 	{
-		if (m_current_chr_table[(x)]/*.call*/ == call)
+	case 0x36:
+		m_bwb_return = 0;
+		if (m_bwb_return < 16)
 		{
-			if (x == 0) // reinit
-			{
-				m_bwb_return = 0;
-			}
-			m_chr_value = bwb_chr_table_common[(m_bwb_return)];
-			m_bwb_return++;
-			break;
+			m_chr_value = bwb_chr_table_common[m_bwb_return];
+
 		}
+		else
+		{
+			printf("overflow a\n");
+		}
+
+		m_bwb_return++;
+		break;
+
+	case 0x42:
+	case 0x27:
+	case 0x09:
+		if (m_bwb_return < 16 )
+		{
+			m_chr_value = bwb_chr_table_common[m_bwb_return];
+
+		}
+		else
+		{
+			printf("overflow b\n");
+		}
+
+		m_bwb_return++;
+		break;
+
+	default:
+		m_chr_value = machine().rand();
+		m_bwb_return = 0;
 	}
+
+
 }
 
 uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 {
 	logerror("%s Characteriser read offset %02x\n", machine().describe_context(), offset);
 
-	if (!m_current_chr_table)
-	{
-		return 0x00;
-	}
 
-	if (offset == 0)
+
+	if ((offset == 0) && m_initval_ready)
 	{
+		m_initval_ready = false;
+
 		switch (m_chr_counter)
 		{
 		case 6:
@@ -191,17 +222,22 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 		case 20:
 		case 27:
 		case 34:
-			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];   // this is an init sequence, writes between are 0
+			printf("%02x ", m_call);
+
+			if (m_chr_counter == 34)
+				printf("\n\n");
+
+			logerror("m_call %02x\n", m_call);
+
+			if (m_bwb_chr_table1)
+				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];   // this is an init sequence, writes between are 0, the results of these reads stored at 430 in m4blsbys
+			else
+				return machine().rand();
 
 		default:
-			if (m_chr_counter > 34)
-			{
-				m_chr_counter = 35;
-				m_chr_state = 2;
-			}
-			m_chr_counter++;
 			return m_chr_value;
 		}
+
 	}
 	else
 	{

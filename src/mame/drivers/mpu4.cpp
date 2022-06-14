@@ -1456,6 +1456,16 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4_impcoin )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("AUX2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_IMPULSE(5)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( mpu4_invcoin )
 	PORT_INCLUDE( mpu4 )
 
@@ -1854,6 +1864,37 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
+uint8_t mpu4_state::bwbhack_r()
+{
+	int m_curbank = m_bank1->entry();
+
+	uint32_t m_fulladdr = (m_bwbhack_addr & 0xffff) | (m_curbank << 16);
+	uint8_t retval = 0x00;
+	uint8_t* rom = memregion("::maincpu")->base();
+	retval = rom[m_fulladdr];
+
+	if (m_curbank == (m_bwbhack_addr >> 16))
+	{
+		int pc = m_maincpu->state_int(M6809_PC);
+
+		uint8_t opvalue = rom[pc | (m_curbank << 16)];
+		if (opvalue == 0x27)
+		{
+			int xreg = m_maincpu->state_int(M6809_X);
+			printf("hit it %08x %04x (reading address %08x)\n", pc, xreg, m_fulladdr);
+
+			for (int i = 0; i < 0x20; i++)
+			{
+				uint8_t byt = rom[((xreg-0x8)+i) | (m_curbank << 16)];
+				printf("%02x ", byt);
+			}
+			printf("\n");
+		}
+	}
+
+	return retval;
+}
+
 MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1862,6 +1903,30 @@ MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 	m_link7a_connected=0;
 	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
+
+	uint8_t* rom = memregion("::maincpu")->base();
+	int bytes = memregion("::maincpu")->bytes();
+
+	int i = 0;
+	for (i = 0; i < bytes - 8; i++)
+	{
+		bool found = true;
+		for (int j = 0; j < 9; j++)
+		{
+			if (rom[i + j] != mpu4_characteriser_pal_bwb::bwb_chr_table_common[j])
+				found = false;
+		}
+
+		if (found == true)
+		{
+			printf("found string at %06x\n", i);
+			m_bwbhack_addr = i;
+		}
+	}
+
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(m_bwbhack_addr & 0xffff, m_bwbhack_addr & 0xffff, read8smo_delegate(*this, FUNC(mpu4_state::bwbhack_r)));
+
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4cry)
@@ -2012,7 +2077,6 @@ void mpu4_state::init_m4_andycp10c()
 {
 	init_m4default();
 	init_m4_small_extender();
-	// TODOxx: m_current_chr_table = andycp10c_data;
 }
 
 void mpu4_state::init_m_oldtmr()
@@ -2021,17 +2085,7 @@ void mpu4_state::init_m_oldtmr()
 	init_m4default_banks();
 }
 
-void mpu4_state::init_m_ccelbr()
-{
-	init_m4default();
-	// TODOxx: m_current_chr_table = ccelbr_data;
-}
 
-void mpu4_state::init_m4gambal()
-{
-	init_m4default();
-	// TODOxx:  m_current_chr_table = gmball_data;
-}
 
 
 void mpu4_state::init_m_blsbys()

@@ -22,11 +22,6 @@ public:
 		m_cpu.set_tag(std::forward<T>(tag));
 	}
 
-	void set_lamp_table(const uint8_t* table)
-	{
-		m_current_lamp_table = table;
-	}
-
 	void set_character_table(uint8_t* table)
 	{
 		m_current_chr_table = table;
@@ -45,6 +40,7 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
+	constexpr static uint8_t bwb_chr_table_common[16] = {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 protected:
 	mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -52,7 +48,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t* m_current_chr_table;
+	uint8_t* m_current_chr_table = nullptr;
 	int m_prot_col;
 
 private:
@@ -62,11 +58,9 @@ private:
 	bool m_allow_6809_cheat;
 	bool m_allow_68k_cheat;
 
-	const uint8_t* m_current_lamp_table;
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
-	constexpr static uint8_t bwb_chr_table_common[10] = {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
 	int m_chr_state = 0;
 	int m_chr_counter = 0;
@@ -74,7 +68,10 @@ private:
 	int m_bwb_return = 0;
 	int m_init_col = 0;
 
-	uint8_t* m_bwb_chr_table1;
+	uint8_t m_call;
+	bool m_initval_ready;
+
+	uint8_t* m_bwb_chr_table1 = nullptr;
 };
 
 

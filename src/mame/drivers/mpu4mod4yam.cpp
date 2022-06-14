@@ -496,7 +496,7 @@ void mpu4mod4yam_machines_state::mod4yam_cheatchr_gambal(machine_config &config)
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4yam_cheatchr_gambal, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
+	GAMEL( year, setname, parent, mod4yam_cheatchr_gambal, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
 
 // 00 0c 50 90 b0 38 d4 a0 (gambal)
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (GBB 2.0)" )

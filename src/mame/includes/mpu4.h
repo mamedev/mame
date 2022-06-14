@@ -86,6 +86,7 @@
 
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_invcoin );
+INPUT_PORTS_EXTERN( mpu4_impcoin );
 INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
@@ -175,8 +176,6 @@ public:
 	void init_m_blsbys();
 	void init_m_oldtmr();
 	void init_m4tst();
-	void init_m_ccelbr();
-	void init_m4gambal();
 
 	void init_m4altreels();//legacy, will be removed once things are sorted out
 	void init_m4altreels_big();
@@ -548,5 +547,8 @@ protected:
 
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
+
+	uint8_t bwbhack_r();
+	uint32_t m_bwbhack_addr;
 };
 
