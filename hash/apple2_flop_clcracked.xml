@@ -48541,4 +48541,61 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="geoocaow">
+		<description>Geography: Our Country and Our World (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2022-06-13"/>
+		<!--"Geography: Our Country and Our World" is a 1988 educational program developed and distributed by Scott, Foresman and Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Question Writer (Bootable)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman test generator (4am crack) disk 1 - question writer.dsk" size="143360" crc="41006aed" sha1="e043d455a536aa553d5be61c7034e9569cdda7a5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Test Storage"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman test generator (4am crack) disk 2 - test storage.dsk" size="143360" crc="e35d7194" sha1="a78065734e80b426077b999b0ee53465db8b2927"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Databases 1-3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - databases units 1-3.dsk" size="143360" crc="2ab73b9c" sha1="0af16e844c3cc3140e13a9f483bd18b8534435d6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Databases 4-6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - databases units 4-6.dsk" size="143360" crc="a601eb13" sha1="537a26529c8ee900596ac2304543c7ecf65f55e5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Test questions intro-chapter 9"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - test questions intro-chapter 9.dsk" size="143360" crc="eb95e972" sha1="07a1770e470e4550ccb26f15273d8395fc9b4634"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Test questions chapters 10-18"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - test questions chapters 10-18.dsk" size="143360" crc="9547cc56" sha1="24f541406c8097426ee7f20769cfeb7b5292cd7e"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Filer Disk - Side A (Bootable)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman filer (4am crack) side a.dsk" size="143360" crc="6801bcd4" sha1="45c0657b2f09b6b0556a565bc27fad3fde47ae67"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Filer Disk - Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman filer (4am crack) side b.dsk" size="143360" crc="b1c0b0a3" sha1="4ea5be1354e67f121c04030cadf0bbf2b9df09e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
