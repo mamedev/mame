@@ -353,7 +353,20 @@ ROM_START( d9final )
 	ROM_LOAD16_BYTE( "4.15h", 0x00000, 0x40000, CRC(859b7105) SHA1(1b36f84706473afaa50b6546d7373a2ee6602b9a) )
 ROM_END
 
+ROM_START( rpanic )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "2.4h",    0x00000, 0x8000, CRC(f3496b10) SHA1(84f33ab519a1f55213d0069d161c07bc99844035)  )
+	ROM_CONTINUE(        0x10000, 0x08000 )
+	ROM_COPY( "maincpu", 0x10000, 0x18000, 0x08000 ) //or just 0xff
+	ROM_LOAD( "1.2h",    0x20000, 0x10000, CRC(901281ec) SHA1(7b4cae343f1b025d988a507141c0fa8229a0fea1)  )
+
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "3.13h", 0x00001, 0x40000, CRC(a907fd4a) SHA1(15590b8c9c1a791f5f995b909df9035ba3721446) )
+	ROM_LOAD16_BYTE( "4.15h", 0x00000, 0x40000, CRC(c5b4d37f) SHA1(e5dbc0251ff288d52637bef93561705403fbe2e2) )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, rpanic,  0,      d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System / Jaleco", "Rolling Panic (v2.33)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, rpanic, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System",          "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

@@ -11805,6 +11805,7 @@ d6809                           //
 
 @source:d9final.cpp
 d9final                         // (c) 1992 Excellent System
+rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:dacholer.cpp
 dacholer                        // (c) 1983
