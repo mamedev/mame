@@ -977,9 +977,6 @@ void rohga_state::wizdfire(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
 
-	DECOCOMN(config, m_decocomn, 0);
-	m_decocomn->set_palette_tag(m_palette);
-
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 
 	DECO_SPRITE(config, m_sprgen[1], 0);
