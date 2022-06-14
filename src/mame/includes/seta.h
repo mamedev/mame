@@ -66,7 +66,6 @@ public:
 	void msgundam(machine_config &config);
 	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
-	void pairlove(machine_config &config);
 	void zingzip(machine_config &config);
 	void wiggie(machine_config &config);
 	void umanclub(machine_config &config);
@@ -97,7 +96,6 @@ public:
 	void init_wiggie();
 	void init_bankx1();
 	void init_eightfrc();
-	void init_pairlove();
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
@@ -134,9 +132,6 @@ protected:
 
 	uPD71054_state m_uPD71054;
 
-	std::unique_ptr<u16[]> m_pairslove_protram;
-	std::unique_ptr<u16[]> m_pairslove_protram_old;
-
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
@@ -147,8 +142,6 @@ protected:
 	u16 thunderl_protection_r();
 	void thunderl_protection_w(u16 data);
 	void utoukond_sound_control_w(u8 data);
-	u16 pairlove_prot_r(offs_t offset);
-	void pairlove_prot_w(offs_t offset, u16 data);
 	u16 extra_r();
 
 	void blandia_palette(palette_device &palette) const;
@@ -199,7 +192,6 @@ protected:
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
-	void pairlove_map(address_map &map);
 	void thunderl_map(address_map &map);
 	void thunderlbl_map(address_map &map);
 	void thunderlbl_sound_map(address_map &map);
@@ -410,11 +402,13 @@ private:
 	u16 coin_r();
 	void prize_w(u16 data);
 	TIMER_CALLBACK_MEMBER(prize_hop_callback);
+
 	void keroppi_map(address_map &map);
+
+	emu_timer *m_prize_hop_timer;
 
 	int m_prize_hop;
 	int m_protection_count;
-	emu_timer *m_prize_hop_timer;
 };
 
 class zombraid_state : public seta_state
@@ -511,6 +505,29 @@ private:
 	uint64_t m_coin_start_cycles;
 
 	void show_outputs();
+};
+
+class pairlove_state : public seta_state
+{
+public:
+	pairlove_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag)
+	{
+	}
+
+	void pairlove(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+protected:
+	u16 prot_r(offs_t offset);
+	void prot_w(offs_t offset, u16 data);
+
+	void pairlove_map(address_map &map);
+
+	std::unique_ptr<u16 []> m_protram;
+	std::unique_ptr<u16 []> m_protram_old;
 };
 
 class jockeyc_state : public seta_state

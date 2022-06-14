@@ -2339,6 +2339,9 @@ void keroppi_state::machine_start()
 
 	m_prize_hop = 0;
 	m_protection_count = 0;
+
+	save_item(NAME(m_prize_hop));
+	save_item(NAME(m_protection_count));
 }
 
 /***************************************************************************
@@ -3178,40 +3181,51 @@ void seta_state::utoukond_map(address_map &map)
                                 Pairs Love
 ***************************************************************************/
 
-u16 seta_state::pairlove_prot_r(offs_t offset)
+u16 pairlove_state::prot_r(offs_t offset)
 {
-	const u16 retdata = m_pairslove_protram[offset];
-	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",m_maincpu->pc(), offset,retdata);
+	const u16 retdata = m_protram[offset];
+	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n", m_maincpu->pc(), offset, retdata);
 	if (!machine().side_effects_disabled())
-		m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
+		m_protram[offset] = m_protram_old[offset];
 	return retdata;
 }
 
-void seta_state::pairlove_prot_w(offs_t offset, u16 data)
+void pairlove_state::prot_w(offs_t offset, u16 data)
 {
-	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",m_maincpu->pc(), offset,data);
-	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
-	m_pairslove_protram[offset] = data;
+	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n", m_maincpu->pc(), offset, data);
+	m_protram_old[offset] = m_protram[offset];
+	m_protram[offset] = data;
 }
 
-void seta_state::pairlove_map(address_map &map)
+void pairlove_state::pairlove_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                             // ROM
-	map(0x100000, 0x100001).nopw();                        // ? 1 (start of interrupts, main loop: watchdog?)
-	map(0x200000, 0x200001).nopw();                        // ? 0/1 (IRQ acknowledge?)
-	map(0x300000, 0x300003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400001, 0x400001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout + Sound Enable (bit 4?)
-	map(0x500000, 0x500001).portr("P1");                 // P1
-	map(0x500002, 0x500003).portr("P2");                 // P2
-	map(0x500004, 0x500005).portr("COINS");              // Coins
-	map(0x900000, 0x9001ff).rw(FUNC(seta_state::pairlove_prot_r), FUNC(seta_state::pairlove_prot_w));
+	map(0x000000, 0x03ffff).rom();                                          // ROM
+	map(0x100000, 0x100001).nopw();                                         // ? 1 (start of interrupts, main loop: watchdog?)
+	map(0x200000, 0x200001).nopw();                                         // ? 0/1 (IRQ acknowledge?)
+	map(0x300000, 0x300003).r(FUNC(pairlove_state::seta_dsw_r));            // DSW
+	map(0x400001, 0x400001).w(FUNC(pairlove_state::seta_coin_lockout_w));   // Coin Lockout + Sound Enable (bit 4?)
+	map(0x500000, 0x500001).portr("P1");                                    // P1
+	map(0x500002, 0x500003).portr("P2");                                    // P2
+	map(0x500004, 0x500005).portr("COINS");                                 // Coins
+	map(0x900000, 0x9001ff).rw(FUNC(pairlove_state::prot_r), FUNC(pairlove_state::prot_w));
 	map(0xa00000, 0xa03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xb00000, 0xb00fff).ram().share("paletteram1");  // Palette
+	map(0xb00000, 0xb00fff).ram().share("paletteram1");                     // Palette
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xd00000, 0xd00001).ram();                             // ? 0x4000
+	map(0xd00000, 0xd00001).ram();                                          // ? 0x4000
 	map(0xe00000, 0xe005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xe00600, 0xe00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-	map(0xf00000, 0xf0ffff).ram();                             // RAM
+	map(0xf00000, 0xf0ffff).ram();                                          // RAM
+}
+
+void pairlove_state::machine_start()
+{
+	seta_state::machine_start();
+
+	m_protram = make_unique_clear<u16 []>(0x200/2);
+	m_protram_old = make_unique_clear<u16 []>(0x200/2);
+
+	save_pointer(NAME(m_protram), 0x200/2);
+	save_pointer(NAME(m_protram_old), 0x200/2);
 }
 
 
@@ -9877,15 +9891,15 @@ void seta_state::zingzipbl(machine_config &config)
                                 Pairs Love
 ***************************************************************************/
 
-void seta_state::pairlove(machine_config &config)
+void pairlove_state::pairlove(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::pairlove_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pairlove_state::pairlove_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(pairlove_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_pairlove);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(pairlove_state::setac_gfxbank_callback));
 	// position kludges
 	m_seta001->set_fg_xoffsets(0, 0); // unknown
 	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
@@ -9897,7 +9911,7 @@ void seta_state::pairlove(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(pairlove_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(2048);   // sprites only
@@ -12417,14 +12431,6 @@ void seta_state::init_rezon()
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-void seta_state::init_pairlove()
-{
-	m_pairslove_protram = make_unique_clear<u16[]>(0x200/2);
-	m_pairslove_protram_old = make_unique_clear<u16[]>(0x200/2);
-	save_pointer(NAME(m_pairslove_protram), 0x200/2);
-	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
-}
-
 void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
@@ -12527,7 +12533,7 @@ GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezo
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena",                    "Pairs Love", 0 )
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
