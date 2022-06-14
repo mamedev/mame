@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* MPU4 BwB games
- - these are Bwb originals, not rebuilds..
+/* MPU4 BWB games
+ - these are BWB originals, not rebuilds..
    typically they have large 0x3f fills in rom..
    some have information about the various set
    types in unused areas
@@ -9,15 +9,64 @@
    some QPS sets also have large 0x3f fills but
    seem to be unrelated.
 
+	----------------------------------------
+	This file is home to the following BWB originals
 
- Excalibur
- Exotic Fruits
- Jumping Jack Flash
- Mad Money Classic
- Orlando Magic
- X-change
- X-s
- X-treme
+	Abracadabra
+	Big Match, ThE
+	Bingo Belle
+	Bingo Belle (Showcase cabinet version)
+	Bingo Club
+	Blues Boys
+	Championship Soccer
+	Cup Final
+	Dancing Diamonds
+	Daytona
+	Excalibur
+	Exotic Fruits
+	Fire & Ice
+	Harlequin
+	Heaven & Hell
+	Indy Cars
+	Jackpot Jokers
+	Jumping Jack Flash
+	Lucky Number 7
+	Mad Money
+	Mad Money Classic
+	Money Mummy Money
+	Orlando Magic
+	Prize Bingo
+	Quids In
+	Quids In (Showcase cabinet version)
+	Rack Em Up
+	Rainbow Gold
+	Red Hot Fever
+	Sinbad
+	Sky Sports
+	Soul Sister
+	Spin The Bottle
+	Stars & Stripes
+	Super League
+	Super Soccer
+	Sure Thing
+	T-Rex
+	Tutti Fruity
+	Volcano
+	Voodoo Express
+	X-change
+	X-s
+	X-treme
+
+	----------------------------------------
+	German games by BWB and Nova also in here
+
+	Blues Boys (Nova, German version)
+	Cup Final (Nova, German version)
+	World Cup (Nova, German version)
+	Excalibur (Nova, German version)
+	Olympic Gold (Nova, German version)
+	Find The Lady (Nova, German version)
+	Sinbad (Nova, German version)
 
 */
 
@@ -43,6 +92,34 @@ public:
 
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+
+/*****************************************************************************************************************************************************************************
+*
+* Abracadabra
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4abra_keys[2] = { 0x11, 0x192703 };
+
+#define M4ABRA_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ABRA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4abra_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
+GAME_CUSTOM( 199?, m4abra,       0,      "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4abra__a,    m4abra, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4abra__b,    m4abra, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "Bwb","Abracadabra (Bwb) (MPU4) (set 4)" )
+
 
 /*****************************************************************************************************************************************************************************
 *
@@ -1521,6 +1598,7 @@ GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr,   "vd_vc___.1_0", 0x0000, 0x040000,
 /*****************************************************************************************************************************************************************************
 *
 * X-change
+* - 3.2 MPU Lamp Drv error
 *
 *****************************************************************************************************************************************************************************/
 
@@ -1567,6 +1645,7 @@ GAME_CUSTOM( 199?, m4xch__k,  m4xch,  "xchange.bin",  0x0000, 0x010000, CRC(c96c
 /*****************************************************************************************************************************************************************************
 *
 * X-s
+* - 3.2 MPU Lamp Drv error
 *
 *****************************************************************************************************************************************************************************/
 
@@ -1597,6 +1676,7 @@ GAME_CUSTOM( 199?, m4xs__f,    m4xs,   "es_sja__.3_0", 0x0000, 0x020000, CRC(590
 /*****************************************************************************************************************************************************************************
 *
 * X-treme
+* - 3.2 MPU Lamp Drv error
 *
 *****************************************************************************************************************************************************************************/
 
@@ -1618,33 +1698,6 @@ static const uint32_t m4xtrm_keys[2] = { 0x36, 0x301210 };
 GAME_CUSTOM( 199?, m4xtrm,       0,      "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "Bwb","X-treme (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xtrm__a,    m4xtrm, "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "Bwb","X-treme (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "Bwb","X-treme (Bwb) (MPU4) (set 3)" )
-
-
-/*****************************************************************************************************************************************************************************
-*
-* Abracadabra
-*
-*****************************************************************************************************************************************************************************/
-
-static const uint32_t m4abra_keys[2] = { 0x11, 0x192703 };
-
-#define M4ABRA_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4ABRA_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4abra_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
-GAME_CUSTOM( 199?, m4abra,       0,      "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4abra__a,    m4abra, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4abra__b,    m4abra, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "Bwb","Abracadabra (Bwb) (MPU4) (set 4)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1739,8 +1792,6 @@ GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11
 *****************************************************************************************************************************************************************************/
 
 static const uint32_t m4excaln_keys[2] = { 0x10, 0x010e20 };
-
-
 
 #define M4EXCALN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
