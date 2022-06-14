@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-
+// copyright-holders:David Haywood, James Wallace
 
 /*
 Characteriser (CHR)
@@ -29,7 +28,6 @@ Apparently, just before the characteriser is checked bit 1 at 0x61DF is checked 
 check is bypassed. This may be something to look at for prototype ROMs and hacks.
 
 */
-
 
 #include "emu.h"
 
@@ -68,51 +66,6 @@ void mpu4_characteriser_pal::device_start()
 void mpu4_characteriser_pal::device_reset()
 {
 }
-
-#if 0
-
-static const uint8_t cybcas_data1[5] = {
-//Magic num4ber 724A
-
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// ??  ?? 20 0F 24 3C 36 27 09
-
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-
-static mpu4_chr_table cybcas_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
-
-/* CHR Tables */
-
-
-static const uint8_t blsbys_data1[5] = {
-//Magic number 724A
-
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// ??  ?? 20 0F 24 3C 36 27 09
-
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-
-static mpu4_chr_table blsbys_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
-
-// set percentage and other options. 2e 20 0f
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// 42  2E 20 0F 24 3C 36 27 09
-	//      6  0  7  0  8  0  7  0  0  8
-//request 36 42 27 42 09 42 27 42 42 09
-//verify  00 04 04 0C 0C 1C 14 2C 5C 2C
-
-#endif
 
 // this is the challenge table used for all official Barcrest games
 // NOTE: some values are repeated, response search continues from last found value
@@ -252,10 +205,10 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 			if (m_temp_debug_write_count == 64)
 			{
-				printf("Characteriser Sequence:\n");
+				printf("Characteriser Sequence:\n"); // DEBUG only, not for release
 				for (int i = 0; i < 64; i++)
 				{
-					printf("%02x ", m_temp_debug_table[i]);
+					printf("%02x ", m_temp_debug_table[i]); // DEBUG only, not for release
 				}
 				printf("\n");
 			}

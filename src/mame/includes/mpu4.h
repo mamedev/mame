@@ -446,14 +446,12 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
-
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
 	uint8_t hack_duart_r()
 	{
 		return machine().rand() & 0x10;
 	}
-
 
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
 
@@ -565,8 +563,5 @@ protected:
 
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
-
-	uint8_t bwbhack_r();
-	uint32_t m_bwbhack_addr;
 };
 

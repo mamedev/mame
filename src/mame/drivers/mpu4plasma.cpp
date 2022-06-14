@@ -4,6 +4,7 @@
 
 /* the Plasma was an oversized DMD, but was rarely used, Big Chief might be the only game with it, at least it's the only dump we have? */
 // http://www.youtube.com/watch?v=PAs8p48u0Jc
+// code currently uses a 'screen' but it has been since decided this is not how to handle such display types in MAME.
 
 #include "emu.h"
 #include "includes/mpu4.h"

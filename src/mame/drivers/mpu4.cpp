@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:James Wallace
+// copyright-holders:David Haywood, James Wallace
 // thanks-to:Chris Wren, Tony Friery, MFME
 
 /*
@@ -459,8 +459,6 @@ used in some cabinets instead of the main control.
 */
 void mpu4_state::bankswitch_w(uint8_t data)
 {
-	//printf("bankswitch_w %02x\n", data);
-
 	m_pageval = (data & 0x03);
 	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 }
@@ -1247,11 +1245,10 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_ca2_w)
 
 WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 {
-	//Some BWB games use this to drive the bankswitching
+	// Some BWB games use this to drive the bankswitching
+	// should the regular bankswitch still work in these cases?
 	if (m_bwb_bank)
 	{
-		// printf("bwb_bank %d\n", state);
-		//m_pageset?
 		m_pageval = state;
 		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 	}
@@ -1875,62 +1872,6 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-uint8_t mpu4_state::bwbhack_r()
-{
-	int m_curbank = m_bank1->entry();
-
-	uint32_t m_fulladdr = (m_bwbhack_addr & 0xffff) | (m_curbank << 16);
-	uint8_t retval = 0x00;
-	uint8_t* rom = memregion("::maincpu")->base();
-	retval = rom[m_fulladdr];
-
-	if ((m_curbank & 3) == ((m_bwbhack_addr >> 16) & 3))
-	{
-		int pc = m_maincpu->state_int(M6809_PC);
-
-		uint8_t opvalue = rom[pc | (m_curbank << 16)];
-		if (opvalue == 0x27)
-		{
-			int xreg = m_maincpu->state_int(M6809_X);
-			printf("hit it %08x %04x (reading address %08x)\n", pc, xreg, m_fulladdr);
-
-			xreg = xreg - 1;
-			xreg |= (m_curbank << 16);
-
-			// the data in ROM for this cheat takes the following form
-			// ZZ = common value, always the same for a given game
-			// k2 = second key value which always appears twice
-			// k1 ZZ k2 ZZ k3 ZZ k2 ZZ ZZ
-
-			uint8_t byte1 = rom[xreg + 0];
-			uint8_t byte2 = rom[xreg + 1];
-			uint8_t byte3 = rom[xreg + 2];
-			uint8_t byte4 = rom[xreg + 3];
-			uint8_t byte5 = rom[xreg + 4];
-			uint8_t byte6 = rom[xreg + 5];
-			uint8_t byte7 = rom[xreg + 6];
-			uint8_t byte8 = rom[xreg + 7];
-			uint8_t byte9 = rom[xreg + 8];
-
-			if ((byte2 == byte4) && (byte2 == byte6) && (byte2 == byte8) && (byte2 == byte9) && (byte3 == byte7))
-			{
-				//printf("common value %02x | keys %02x%02x%02x%02x\n", byte2, byte1, byte3, byte5, byte7);
-				printf("key\n0x%02x, 0x%02x%02x%02x\n", byte2, byte1, byte3, byte5);
-
-			}
-			else
-			{
-				printf("but key isn't valid?\n");
-				printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x", byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8, byte9);
-			}
-
-			printf("\n");
-		}
-	}
-
-	return retval;
-}
-
 MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -1939,30 +1880,6 @@ MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 	m_link7a_connected=0;
 	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
-
-	uint8_t* rom = memregion("::maincpu")->base();
-	int bytes = memregion("::maincpu")->bytes();
-
-	int i = 0;
-	for (i = 0; i < bytes - 8; i++)
-	{
-		bool found = true;
-		for (int j = 0; j < 9; j++)
-		{
-			if (rom[i + j] != mpu4_characteriser_pal_bwb::bwb_chr_table_common[j])
-				found = false;
-		}
-
-		if (found == true)
-		{
-			printf("found string at %06x\n", i);
-			m_bwbhack_addr = i;
-		}
-	}
-
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(m_bwbhack_addr & 0xffff, m_bwbhack_addr & 0xffff, read8smo_delegate(*this, FUNC(mpu4_state::bwbhack_r)));
-
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4cry)
@@ -2201,7 +2118,7 @@ uint8_t mpu4_state::crystal_sound_r()
 //this may be a YMZ280B
 void mpu4_state::crystal_sound_w(uint8_t data)
 {
-	printf("crystal_sound_w %02x\n",data);
+	logerror("crystal_sound_w %02x\n",data);
 }
 
 void mpu4_state::init_m_frkstn()
@@ -2476,9 +2393,6 @@ void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* tabl
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(table);
 }
-
-
-
 
 void mpu4_state::mod2_chr(machine_config &config)
 {
@@ -2767,6 +2681,8 @@ void mpu4_state::mpu4crys(machine_config &config)
 
 ***********************************************************************************************/
 
+// TODO: move this to mpu4_characteriser_bootleg.cpp, it's for a single game that requires
+//       a different 'fixed' value depending on the address
 uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
 {
 	return 0x6a;

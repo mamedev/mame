@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, James Wallace
 
 #ifndef MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
 #define MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
@@ -1411,7 +1411,6 @@ private:
 	uint8_t protection_r();
 	uint8_t lamp_scramble_r();
 
-
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
 
 	bool m_allow_6809_cheat;
@@ -1424,7 +1423,8 @@ private:
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
-	static constexpr bool IDENTIFICATION_HELPER = true;
+	// debugging only!
+	static constexpr bool IDENTIFICATION_HELPER = false;
 	int m_temp_debug_write_count;
 	uint8_t m_temp_debug_table[64];
 };
