@@ -2,7 +2,14 @@
 // copyright-holders:David Haywood
 /*
 
-    Pluto 5
+    Pluto 5 hardware from Heber Ltd.
+      http://www.heber.co.uk/product/pluto-5/
+      Documentation and development kits can be found here: http://www.heber.co.uk/customer-support/download-files/pluto-5calypso-16-download-files/
+    There are different Pluto 5 variants: base, Casino (additional RS232 and RS422/485 ports, etc),
+      with video (Cirrus Logic based), Calypso 16 (3D graphics with a Fujitsu Cremson)...
+
+    Known undumped games on this hardware:
+      Sunny Streak (fruit machine on Pluto 5 Casino from MDM Leisure)
 
     Skeleton Driver - For note keeping
 
@@ -268,7 +275,44 @@ void pluto5_state::pluto5(machine_config &config)
 	// unknown sound
 }
 
-// Electromechanical machine for kids from Sega Amusements USA, Inc.
+/* Electromechanical machine for kids from Sega Amusements USA, Inc.
+  This game uses the standard base Pluto 5 PCB:
+ __________________________________________________________________
+|  ______________________ .....    ....... ........  .... (o) O <-Red LED
+| |:::::::::::::::::::::|                        _________    O <-Green LED
+| ________________________  F       _________   TPIC6B259N        ____|
+||:::::::::::::::::::::::|  U      HCF4069UBE                    |...||
+|                           S  MC7005CT   ___  _____________     |...||
+| ___                       E            |  | | ACTEL      |     |...||
+||..|  ___        ___          OKI M6585->  | | A40MX04    |     |...||
+||..|  74HC253    74HC253                |__| | PL84 0301  |     |...||
+||..|  _________  _________               ___ |            |     |...||
+||..| TPIC6259N| TPIC6259N|              |  | |____________|     |...||
+||..|  _________  _________    OKI M6585->  |          Xtal      |___||
+||..| TPIC6259N| TPIC6259N|              |__|       14.745 MHz        |
+||..|  _________  _________                                           |
+||..| TPIC6259N| TPIC6259N|                                           |
+||..|  _________  _________   __  __  ___                         ____|
+||__| TPIC6259N| TPIC6259N|  | | | | |__|                        |...||
+|                            |_| |_| 7705AC                      |...||
+|·  ___  ___  ___  ___   HCF4094                                 |...||
+|·  ___  ___  ___  ___         __              __________        |...||
+|·  ___  ___  ___  ___        | |  _____      |Motorola |        |...||
+|·  ___  ___  ___  ___        |_| |____|      |MC68340PV16       |...||
+|·     16 x TIP126       HCF4094              |         |        |...||
+|·             _____                          |_________|        |___||
+|·            |____|                                 ___  ___  ____   |
+|·             _____                          Xtal  |__| |__| |___|   |
+|..           |____|     __  ________  _____________  ______          |
+|..                ___  | | |DIPS x8_|| EPROM EMPTY| |TC55257DFL-70L  |
+|.. ___  ___  ___  ___  |_|           |____________|           BATT   |
+|.. ___  ___  ___  ___       ________  _____________  ______          |
+|.. ___  ___  ___  ___      |DIPS x8_|| EPROM      | |TC55257DFL-70L  |
+|.. ___  ___  ___  ___                |____________|         ___  ___ |
+|      17 x TIP126                 _________________        | <-SN75188N
+|   ...............    ·······    |___DB25_________| .....  |__| |_<-SN75188N
+|____________________________________________________RS232____________|
+*/
 ROM_START( hb_junglet )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "rom.u3", 0x00000, 0x080000, CRC(9da464a8) SHA1(5a99b9f202d94d7fb1c9a6082891f1019979107a) )
