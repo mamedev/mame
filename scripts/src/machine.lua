@@ -5017,3 +5017,14 @@ if (MACHINES["AT_MB"]~=null) then
 		MAME_DIR .. "src/devices/machine/at.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/saa7191.h,MACHINES["SAA7191"] = true
+---------------------------------------------------
+if (MACHINES["SAA7191"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa7191.cpp",
+		MAME_DIR .. "src/devices/machine/saa7191.h",
+	}
+end
