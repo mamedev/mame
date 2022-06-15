@@ -215,8 +215,8 @@ private:
 	void UpdateBanks(int first, int last);
 	void SetDefaultTask();
 	void dgn_beta_bank_memory(int offset, int data, int bank);
-	int SelectedKeyrow(dgn_beta_state *state, int Rows);
-	int GetKeyRow(dgn_beta_state *state, int RowNo);
+	int SelectedKeyrow(int Rows);
+	int GetKeyRow(int RowNo);
 	void cpu0_recalc_irq(int state);
 	void cpu0_recalc_firq(int state);
 	void cpu1_recalc_firq(int state);
