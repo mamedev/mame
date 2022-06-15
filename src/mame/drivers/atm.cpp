@@ -9,7 +9,6 @@ Not working because of banking issues.
 *******************************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/specpls3.h"
 
@@ -35,6 +34,7 @@ public:
 	void atmtb2(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -47,6 +47,8 @@ private:
 	void atm_mem(address_map &map);
 	void atm_switch(address_map &map);
 
+	void atm_update_memory();
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -55,7 +57,7 @@ private:
 
 	address_space *m_program;
 	uint8_t *m_p_ram;
-	void atm_update_memory();
+	uint16_t m_rom_selection;
 };
 
 void atm_state::atm_update_memory()
@@ -67,13 +69,13 @@ void atm_state::atm_update_memory()
 	m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
 
 	if (m_beta->started() && m_beta->is_active() && !( m_port_7ffd_data & 0x10 ) )
-		m_ROMSelection = 3;
+		m_rom_selection = 3;
 	else
 		/* ROM switching */
-		m_ROMSelection = BIT(m_port_7ffd_data, 4) ;
+		m_rom_selection = BIT(m_port_7ffd_data, 4) ;
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 }
 
 void atm_state::atm_port_7ffd_w(uint8_t data)
@@ -96,8 +98,8 @@ uint8_t atm_state::beta_neutral_r(offs_t offset)
 
 uint8_t atm_state::beta_enable_r(offs_t offset)
 {
-	if(m_ROMSelection == 1) {
-		m_ROMSelection = 3;
+	if (m_rom_selection == 1) {
+		m_rom_selection = 3;
 		if (m_beta->started()) {
 			m_beta->enable();
 			m_bank1->set_base(&m_p_ram[0x18000]);
@@ -109,9 +111,9 @@ uint8_t atm_state::beta_enable_r(offs_t offset)
 uint8_t atm_state::beta_disable_r(offs_t offset)
 {
 	if (m_beta->started() && m_beta->is_active()) {
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_rom_selection = BIT(m_port_7ffd_data, 4);
 		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 	}
 	return m_program->read_byte(offset + 0x4000);
 }
@@ -143,6 +145,16 @@ void atm_state::atm_switch(address_map &map)
 	map(0x0000, 0x3fff).r(FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
 	map(0x3d00, 0x3dff).r(FUNC(atm_state::beta_enable_r));
 	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
+}
+
+
+void atm_state::machine_start()
+{
+	spectrum_128_state::machine_start();
+
+	m_rom_selection = 0;
+
+	save_item(NAME(m_rom_selection));
 }
 
 void atm_state::machine_reset()

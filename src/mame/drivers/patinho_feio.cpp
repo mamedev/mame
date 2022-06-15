@@ -248,6 +248,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 	PATO_FEIO_CPU(config, m_maincpu, 500000);
 	m_maincpu->rc_read().set_ioport("RC");
 	m_maincpu->buttons_read().set_ioport("BUTTONS");
+	m_maincpu->set_update_panel_cb(FUNC(patinho_feio_state::update_panel));
 
 	/* Printer */
 //  m_maincpu->iodev_write<5>().set(FUNC(patinho_feio_state::printer_data_w));

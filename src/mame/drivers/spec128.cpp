@@ -151,7 +151,6 @@ resulting mess can be seen in the F4 viewer display.
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/spec128.h"
 
 #include "cpu/z80/z80.h"

@@ -4,6 +4,7 @@
 
 /* the Plasma was an oversized DMD, but was rarely used, Big Chief might be the only game with it, at least it's the only dump we have? */
 // http://www.youtube.com/watch?v=PAs8p48u0Jc
+// code currently uses a 'screen' but it has been since decided this is not how to handle such display types in MAME.
 
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -11,8 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 
-#include "mpu4plasma.lh"
-
+namespace {
 
 class mpu4plasma_state : public mpu4_state
 {
@@ -40,7 +40,7 @@ private:
 	void mpu4plasma_map(address_map &map);
 };
 
-INPUT_PORTS_EXTERN( mpu4 );
+#include "mpu4plasma.lh"
 
 void mpu4plasma_state::mpu4plasma_map(address_map &map)
 {
@@ -96,6 +96,12 @@ void mpu4plasma_state::mpu4plasma(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(0x200);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(nullptr);
+
 }
 
 // plasma v0.1
@@ -189,16 +195,22 @@ ROM_START( m4elite )
 	M4ELITE_PLASMA
 ROM_END
 
+} // anonymous namespace
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
+// 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c dc 94 2c cc ec a8 ec a0 30 40 54  (m435)
 GAMEL(199?, m4bigchf,  0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 GAMEL(199?, m4bigchfa, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 GAMEL(199?, m4bigchfb, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 3)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 GAMEL(199?, m4bigchfc, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 4)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 
+// 00 44 44 c4 70 04 c4 50 a4 d4 30 a0 54 20 64 40 64 e4 f4 14 80
 GAMEL(199?, m4click,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Clickity Click (Barcrest) (MPU4 w/ Plasma DMD)",               GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 
 // not confirmed to be plasma, is this an alt version of big chief? maybe it uses the same plasma roms?
+// 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34 38 7c 54  (m4duty sequence)
 GAMEL(199?, m4apach,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Apache (Barcrest) (MPU4 w/ Plasma DMD?)",                      GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 // not confirmed to be plasma, but acts like it
+// 00 30 20 14 2c a0 54 24 3c 9c 9c 9c bc 94 6c 80 58 bc bc 98 9c 9c  (m441)
 GAMEL(199?, m4elite,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Elite (Barcrest) (MPU4 w/ Plasma DMD?)",                       GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )

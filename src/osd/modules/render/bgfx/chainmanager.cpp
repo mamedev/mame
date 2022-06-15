@@ -73,7 +73,7 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	std::string chains_path = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
+	const std::string chains_path  = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
 	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();

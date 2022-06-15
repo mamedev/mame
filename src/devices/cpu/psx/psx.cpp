@@ -1185,16 +1185,16 @@ void psxcpu_device::multiplier_update()
 	case MULTIPLIER_OPERATION_MULT:
 		{
 			int64_t result = mul_32x32( (int32_t)m_multiplier_operand1, (int32_t)m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
 			uint64_t result = mulu_32x32( m_multiplier_operand1, m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 

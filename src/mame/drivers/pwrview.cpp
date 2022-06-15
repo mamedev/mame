@@ -88,7 +88,7 @@ private:
 	u8 m_c080;
 	u8 m_errcode;
 	u16 m_vramwin[2];
-	bool m_dtr;
+	bool m_dtr, m_rtsa, m_rtsb;
 	bool m_rts;
 	emu_timer *m_tmr0ext;
 	emu_timer *m_tmrkbd;
@@ -300,6 +300,9 @@ u8 pwrview_state::unk3_r(offs_t offset)
 		case 2:
 			ret = (m_rts ? 0 : 0x40) | (m_dtr ? 0 : 0x80) | 0x20;
 			break;
+		case 3:
+			ret = m_sio->m1_r();
+			break;
 	}
 	return ret;
 }
@@ -483,7 +486,6 @@ void pwrview_state::pwrview(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrview_state::pwrview_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &pwrview_state::pwrview_fetch_map);
 	m_maincpu->set_addrmap(AS_IO, &pwrview_state::pwrview_io);
-	m_maincpu->irqa_cb().set([this] (int state) { if(state) m_sio->m1_r(); });
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_physical_aspect(3, 4); // Portrait CRT
@@ -494,10 +496,10 @@ void pwrview_state::pwrview(machine_config &config)
 	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
 	m_pit->set_clk<1>(XTAL(16'000'000)/16);
 	m_pit->set_clk<2>(XTAL(16'000'000)/16);
-	m_pit->out_handler<1>().set(m_sio, FUNC(z80sio_device::rxca_w));
-	m_pit->out_handler<1>().append(m_sio, FUNC(z80sio_device::rxcb_w));
-	m_pit->out_handler<1>().append(m_sio, FUNC(z80sio_device::txca_w));
-	m_pit->out_handler<1>().append(m_sio, FUNC(z80sio_device::txcb_w));
+	m_pit->out_handler<1>().set([this](int state){ if (!m_rtsa) m_sio->rxca_w(state); }); //HACK: prevent sdlc_receive from finding sync immediately because wr7 is 0 when rx is enabled
+	m_pit->out_handler<1>().append([this](int state){ if (!m_rtsb) m_sio->rxcb_w(state); });
+	m_pit->out_handler<1>().append([this](int state){ if (!m_rtsa) m_sio->txca_w(state); });
+	m_pit->out_handler<1>().append([this](int state){ if (!m_rtsb) m_sio->txcb_w(state); });
 
 	// floppy disk controller
 	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
@@ -514,6 +516,12 @@ void pwrview_state::pwrview(machine_config &config)
 
 	Z80SIO(config, m_sio, 4000000); // Z8442BPS (SIO/2)
 	m_sio->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+	m_sio->out_txda_callback().set([this](int state){ m_sio->rxa_w(state); }); // TODO: find loopback control reg
+	m_sio->out_rtsa_callback().set([this](int state){ m_rtsa = state; });
+	m_sio->out_txdb_callback().set([this](int state){ m_sio->rxb_w(state); });
+	m_sio->out_rtsb_callback().set([this](int state){ m_rtsb = state; });
+	m_sio->out_wrdya_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w)).invert();
+	m_sio->out_wrdyb_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w)).invert();
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
 	crtc.set_char_width(62);

@@ -227,17 +227,19 @@ public:
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_ef9369(*this, "ef9369"),
-		m_4krow(0),
-		m_4ktable(nullptr)
+		m_ef9369(*this, "ef9369")
 	{
 	}
 
 	void mpu4_vid(machine_config &config);
 	void mpu4_vid_strike(machine_config &config);
+	void mpu4_vid_cheatchr(machine_config &config);
 
 	void bwbvid(machine_config &config);
+
+	void crmaze_base(machine_config &config);
 	void crmaze(machine_config &config);
+
 	void bwbvid_oki(machine_config &config);
 	void bwbvid_oki_bt471(machine_config &config);
 
@@ -246,28 +248,25 @@ public:
 	void mating(machine_config &config);
 	void vid_oki(machine_config &config);
 
-	void init_crmazea();
 	void init_v4barqst2();
 	void init_quidgrid();
 	void init_v4barqst();
 	void init_timemchn();
-	void init_crmaze2a();
 	void init_v4opt3();
 	void init_eyesdown();
-	void init_v4cmazeb();
-	void init_crmaze2();
+
 	void init_crmaze();
+	void init_crmaze_flutter();
+
+
 	void init_prizeinv();
 	void init_strikeit();
 	void init_v4wize();
 	void init_turnover();
 	//void init_adders();
 	void init_mating();
-	void init_crmaze3a();
 	void init_skiltrek();
-	void init_crmaze3();
 	void init_cybcas();
-	void init_v4frfact();
 	void init_bwbhack();
 
 protected:
@@ -303,7 +302,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
 	uint8_t pia_ic5_porta_track_r();
-	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
 	uint16_t mpu4_vid_vidram_r(offs_t offset);
 	void mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -329,10 +327,8 @@ private:
 	void mpu4_6809_map(address_map &map);
 	void mpu4_6809_german_map(address_map &map);
 
-	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
 	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
-	uint8_t m_4krow;
-	uint8_t *m_4ktable;
+
 	void hack_bwb_startup_protection();
 
 	uint8_t mpu4_vid_bt_a00004_r(offs_t offset);
@@ -1889,9 +1885,9 @@ void mpu4vid_state::machine_reset()
 	m_IC23G2A   = 0;
 	m_IC23G2B   = 0;
 
-	m_prot_col  = 0;
-	m_chr_counter    = 0;
-	m_chr_value     = 0;
+	//m_prot_col  = 0;
+	//m_chr_counter    = 0;
+	//m_chr_value     = 0;
 
 	m_m6840_irq_state = 0;
 	m_m6850_irq_state = 0;
@@ -1922,7 +1918,7 @@ void mpu4vid_state::mpu4_68k_map(address_map& map)
 void mpu4vid_state::mpu4_68k_map_strike(address_map& map)
 {
 	mpu4_68k_map_base(map);
-	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_w)).umask16(0x00ff);
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 }
 
 
@@ -2172,18 +2168,42 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
 }
 
+void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
+{
+	mpu4_vid(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("video");
+	m_characteriser->set_allow_68k_cheat(true);
+}
+
 void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 {
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_use_4k_table_sim(true);
 }
 
-void mpu4vid_state::crmaze(machine_config &config)
+
+
+
+
+void mpu4vid_state::crmaze_base(machine_config &config)
 {
 	mpu4_vid(config);
 	m_pia5->readpa_handler().set(FUNC(mpu4vid_state::pia_ic5_porta_track_r));
 	m_pia5->writepa_handler().set_nop();
 	m_pia5->writepb_handler().set_nop();
+}
+
+void mpu4vid_state::crmaze(machine_config& config)
+{
+	crmaze_base(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("video");
+	m_characteriser->set_allow_68k_cheat(true);
+
 }
 
 void mpu4vid_state::vid_oki(machine_config &config)
@@ -2249,96 +2269,32 @@ void mpu4vid_state::bwbvid_oki_bt471_german(machine_config &config)
 }
 
 
-/*
-Characteriser (CHR)
- The question data on the quiz games gets passed through the characteriser, the tables tested at startup are just a
- very specific test with known responses to make sure the device functions properly.  Unless there is extra encryption
- applied to just the question ROMs then the assumptions made here are wrong, because the questions don't decode.
-
- Perhaps the address lines for the question ROMS are scrambled somehow to make things decode, but how?
-
- It seems more likely that the Characteriser (PAL) acts as a challenge / response system, but various writes cause
- 'latching' behavior because if you study the sequence written at startup you can see that the same write value should
- generate different responses.
-
- Note:
- the 'challenge' part of the startup check is always the same
-*/
-
 void mpu4vid_state::vidcharacteriser_w(offs_t offset, uint8_t data)
 {
-	int x;
-	int call=(data&0xff);
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", m_videocpu->pcbase(),offset,data));
-
-	if (!m_current_chr_table)
-	{
-		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
-		return;
-	}
-
-	for (x = m_prot_col; x < 64; x++)
-	{
-		if (call == 0)
-		{
-			m_prot_col = 0;
-		}
-		else
-		{
-			if  (m_current_chr_table[(x)].call == call)
-			{
-				m_prot_col = x;
-				LOG_CHR(("Characteriser find column %02X\n",m_prot_col));
-				break;
-			}
-		}
-	}
+	if (m_characteriser)
+		m_characteriser->write(offset, data);
 }
-
 
 uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", m_videocpu->pcbase(),offset,m_current_chr_table[m_prot_col].response));
-	LOG_CHR(("Characteriser read offset %02X \n",offset));
-	LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
+	uint8_t ret = 0x00;
 
-	if (!m_current_chr_table)
-	{
-		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
-		return 0x00;
-	}
-
+	if (m_characteriser)
+		ret = m_characteriser->read(offset);
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
 	if (m_videocpu->pcbase()==0x283a)
 	{
-		return 0x00;
+		ret = 0x00;
 	}
 
-	return m_current_chr_table[m_prot_col].response;
+	return ret;
 }
 
-
-void mpu4vid_state::vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data)
-{
-	logerror("%04x write to characteriser %02x - %02x\n", m_videocpu->pcbase(), offset, data);
-
-	if (data == 0x00) // reset?
-	{
-		m_4krow = 0;
-		m_prot_col = 0;
-	}
-	else
-	{
-		m_prot_col = data & 0x3f; // 6-bit writes (upper 2 bits unused)
-	}
-}
 
 uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 {
-	uint8_t ret = m_4ktable[m_4krow * 64 + m_prot_col];
-	m_4krow = ret;
-
+	uint8_t ret = m_characteriser->read(offset);
 	// hack for v4strike, otherwise it reports questions as invalid, even if they decode properly
 	// is this a secondary security check, or are they mismatched for the version?
 	// it writes '03' to the characteriser, (the question revision or coincidence?)
@@ -2350,184 +2306,9 @@ uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 			ret = 0x00;
 	}
 
-	logerror("%04x read from characteriser %02x - %02x\n", m_videocpu->pcbase(), offset, ret);
-
-	return ret << 2; // 6-bit reads (lower 2 bits unused)
+	return ret;
 }
 
-
-/*
-static mpu4_chr_table adders_data[64] = {
-    {0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},
-    {0x03, 0x9C}, {0x07, 0xF4}, {0x17, 0x04}, {0x1D, 0xCC}, {0x36, 0x24}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0x94},
-    {0x39, 0x54}, {0x21, 0x0C}, {0x22, 0x74}, {0x25, 0x0C}, {0x2C, 0x34}, {0x29, 0x04}, {0x31, 0x84}, {0x34, 0x84},
-    {0x0A, 0xC4}, {0x1F, 0x84}, {0x06, 0x9C}, {0x0E, 0xE4}, {0x1C, 0x84}, {0x12, 0x84}, {0x1E, 0x84}, {0x0D, 0xD4},
-    {0x14, 0x44}, {0x0A, 0x84}, {0x19, 0xC4}, {0x15, 0x84}, {0x06, 0x9C}, {0x0F, 0xE4}, {0x08, 0x84}, {0x1B, 0x84},
-    {0x1E, 0x84}, {0x04, 0x8C}, {0x01, 0x60}, {0x0C, 0x84}, {0x18, 0x84}, {0x1A, 0x84}, {0x11, 0x84}, {0x0B, 0xC4},
-    {0x03, 0x9C}, {0x17, 0xF4}, {0x10, 0x04}, {0x1D, 0xCC}, {0x0E, 0x24}, {0x07, 0x9C}, {0x12, 0xF4}, {0x09, 0x04},
-    {0x0D, 0x94}, {0x1F, 0x14}, {0x16, 0x44}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
-};
-*/
-
-static mpu4_chr_table crmaze_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x34}, {0x04, 0x14}, {0x10, 0x0C}, {0x18, 0x54}, {0x0F, 0x04}, {0x13, 0x24}, {0x1B, 0x34},
-	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x0C}, {0x1D, 0x5C}, {0x36, 0x6C}, {0x35, 0x44}, {0x2B, 0x24}, {0x28, 0x24},
-	{0x39, 0x3C}, {0x21, 0x6C}, {0x22, 0xCC}, {0x25, 0x4C}, {0x2C, 0xC4}, {0x29, 0xA4}, {0x31, 0x24}, {0x34, 0x24},
-	{0x0A, 0x34}, {0x1F, 0x84}, {0x06, 0xB4}, {0x0E, 0x1C}, {0x1C, 0x64}, {0x12, 0x24}, {0x1E, 0x34}, {0x0D, 0x04},
-	{0x14, 0x24}, {0x0A, 0x34}, {0x19, 0x8C}, {0x15, 0xC4}, {0x06, 0xB4}, {0x0F, 0x1C}, {0x08, 0xE4}, {0x1B, 0x24},
-	{0x1E, 0x34}, {0x04, 0x14}, {0x01, 0x10}, {0x0C, 0x84}, {0x18, 0x24}, {0x1A, 0x34}, {0x11, 0x04}, {0x0B, 0x24},
-	{0x03, 0xB4}, {0x17, 0x04}, {0x10, 0x24}, {0x1D, 0x3C}, {0x0E, 0x74}, {0x07, 0x94}, {0x12, 0x0C}, {0x09, 0xC4},
-	{0x0D, 0xA4}, {0x1F, 0x24}, {0x16, 0x24}, {0x05, 0x34}, {0x13, 0x04}, {0x1C, 0x34}, {0x02, 0x94}, {0x00, 0x00}
-};
-
-static mpu4_chr_table crmazea_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x0C}, {0x04, 0x90}, {0x10, 0xE0}, {0x18, 0xA4}, {0x0F, 0xAC}, {0x13, 0x78}, {0x1B, 0x5C},
-	{0x03, 0xDC}, {0x07, 0xD4}, {0x17, 0xA0}, {0x1D, 0xEC}, {0x36, 0x78}, {0x35, 0x54}, {0x2B, 0x48}, {0x28, 0x50},
-	{0x39, 0xC8}, {0x21, 0xF8}, {0x22, 0xDC}, {0x25, 0x94}, {0x2C, 0xE0}, {0x29, 0x24}, {0x31, 0x0C}, {0x34, 0xD8},
-	{0x0A, 0x5C}, {0x1F, 0xD4}, {0x06, 0x68}, {0x0E, 0x18}, {0x1C, 0x14}, {0x12, 0xC8}, {0x1E, 0x38}, {0x0D, 0x5C},
-	{0x14, 0xDC}, {0x0A, 0x5C}, {0x19, 0xDC}, {0x15, 0xD4}, {0x06, 0x68}, {0x0F, 0x18}, {0x08, 0xD4}, {0x1B, 0x60},
-	{0x1E, 0x0C}, {0x04, 0x90}, {0x01, 0xE8}, {0x0C, 0xF8}, {0x18, 0xD4}, {0x1A, 0x60}, {0x11, 0x44}, {0x0B, 0x4C},
-	{0x03, 0xD8}, {0x17, 0xD4}, {0x10, 0xE8}, {0x1D, 0xF8}, {0x0E, 0x9C}, {0x07, 0xD4}, {0x12, 0xE8}, {0x09, 0x30},
-	{0x0D, 0x48}, {0x1F, 0xD8}, {0x16, 0xDC}, {0x05, 0x94}, {0x13, 0xE8}, {0x1C, 0x38}, {0x02, 0xDC}, {0x00, 0x00}
-};
-
-static mpu4_chr_table crmaze2_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x88}, {0x04, 0x54}, {0x10, 0x40}, {0x18, 0x88}, {0x0F, 0x54}, {0x13, 0x40}, {0x1B, 0x88},
-	{0x03, 0x74}, {0x07, 0x28}, {0x17, 0x30}, {0x1D, 0x60}, {0x36, 0x80}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0xA4},
-	{0x39, 0xC4}, {0x21, 0x8C}, {0x22, 0x74}, {0x25, 0x08}, {0x2C, 0x30}, {0x29, 0x00}, {0x31, 0x80}, {0x34, 0x84},
-	{0x0A, 0xC4}, {0x1F, 0x84}, {0x06, 0xAC}, {0x0E, 0x5C}, {0x1C, 0x90}, {0x12, 0x44}, {0x1E, 0x88}, {0x0D, 0x74},
-	{0x14, 0x00}, {0x0A, 0x80}, {0x19, 0xC4}, {0x15, 0x84}, {0x06, 0xAC}, {0x0F, 0x5C}, {0x08, 0xB0}, {0x1B, 0x24},
-	{0x1E, 0x88}, {0x04, 0x54}, {0x01, 0x08}, {0x0C, 0x30}, {0x18, 0x00}, {0x1A, 0x88}, {0x11, 0x34}, {0x0B, 0x08},
-	{0x03, 0x70}, {0x17, 0x00}, {0x10, 0x80}, {0x1D, 0xC4}, {0x0E, 0x84}, {0x07, 0xAC}, {0x12, 0x34}, {0x09, 0x00},
-	{0x0D, 0xA0}, {0x1F, 0x84}, {0x16, 0x84}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x00}, {0x02, 0xA8}, {0x00, 0x00}
-};
-
-static mpu4_chr_table crmaze3_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x84}, {0x04, 0x94}, {0x10, 0x3C}, {0x18, 0xEC}, {0x0F, 0x5C}, {0x13, 0xEC}, {0x1B, 0x50},
-	{0x03, 0x2C}, {0x07, 0x68}, {0x17, 0x60}, {0x1D, 0xAC}, {0x36, 0x74}, {0x35, 0x00}, {0x2B, 0xAC}, {0x28, 0x58},
-	{0x39, 0xEC}, {0x21, 0x7C}, {0x22, 0xEC}, {0x25, 0x58}, {0x2C, 0xE0}, {0x29, 0x90}, {0x31, 0x18}, {0x34, 0xEC},
-	{0x0A, 0x54}, {0x1F, 0x28}, {0x06, 0x68}, {0x0E, 0x44}, {0x1C, 0x84}, {0x12, 0xB4}, {0x1E, 0x10}, {0x0D, 0x20},
-	{0x14, 0x84}, {0x0A, 0xBC}, {0x19, 0xE8}, {0x15, 0x70}, {0x06, 0x24}, {0x0F, 0x84}, {0x08, 0xB8}, {0x1B, 0xE0},
-	{0x1E, 0x94}, {0x04, 0x14}, {0x01, 0x2C}, {0x0C, 0x64}, {0x18, 0x8C}, {0x1A, 0x50}, {0x11, 0x28}, {0x0B, 0x4C},
-	{0x03, 0x6C}, {0x17, 0x60}, {0x10, 0xA0}, {0x1D, 0xBC}, {0x0E, 0xCC}, {0x07, 0x78}, {0x12, 0xE8}, {0x09, 0x50},
-	{0x0D, 0x20}, {0x1F, 0xAC}, {0x16, 0x74}, {0x05, 0x04}, {0x13, 0xA4}, {0x1C, 0x94}, {0x02, 0x3C}, {0x00, 0x00}
-};
-
-static mpu4_chr_table crmaze3a_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x0C}, {0x04, 0x60}, {0x10, 0x84}, {0x18, 0x34}, {0x0F, 0x08}, {0x13, 0xC0}, {0x1B, 0x14},
-	{0x03, 0xA8}, {0x07, 0xF0}, {0x17, 0x10}, {0x1D, 0xA0}, {0x36, 0x1C}, {0x35, 0xE4}, {0x2B, 0x1C}, {0x28, 0xE4},
-	{0x39, 0x34}, {0x21, 0xA8}, {0x22, 0xF8}, {0x25, 0x64}, {0x2C, 0x8C}, {0x29, 0xF0}, {0x31, 0x30}, {0x34, 0x08},
-	{0x0A, 0xE8}, {0x1F, 0xF8}, {0x06, 0xE4}, {0x0E, 0x3C}, {0x1C, 0x44}, {0x12, 0x8C}, {0x1E, 0x58}, {0x0D, 0xC4},
-	{0x14, 0x3C}, {0x0A, 0x6C}, {0x19, 0x68}, {0x15, 0xC0}, {0x06, 0x9C}, {0x0F, 0x64}, {0x08, 0x04}, {0x1B, 0x0C},
-	{0x1E, 0x48}, {0x04, 0x60}, {0x01, 0xAC}, {0x0C, 0xF8}, {0x18, 0xE4}, {0x1A, 0x14}, {0x11, 0xA8}, {0x0B, 0x78},
-	{0x03, 0xEC}, {0x17, 0xD0}, {0x10, 0xB0}, {0x1D, 0xB0}, {0x0E, 0x38}, {0x07, 0xE4}, {0x12, 0x9C}, {0x09, 0xE4},
-	{0x0D, 0xBC}, {0x1F, 0xE4}, {0x16, 0x1C}, {0x05, 0x64}, {0x13, 0x8C}, {0x1C, 0x58}, {0x02, 0xEC}, {0x00, 0x00}
-};
-
-static mpu4_chr_table mating_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x18}, {0x04, 0xC8}, {0x10, 0xA4}, {0x18, 0x0C}, {0x0F, 0x80}, {0x13, 0x0C}, {0x1B, 0x90},
-	{0x03, 0x34}, {0x07, 0x30}, {0x17, 0x00}, {0x1D, 0x58}, {0x36, 0xC8}, {0x35, 0x84}, {0x2B, 0x4C}, {0x28, 0xA0},
-	{0x39, 0x4C}, {0x21, 0xC0}, {0x22, 0x3C}, {0x25, 0xC8}, {0x2C, 0xA4}, {0x29, 0x4C}, {0x31, 0x80}, {0x34, 0x0C},
-	{0x0A, 0x80}, {0x1F, 0x0C}, {0x06, 0xE0}, {0x0E, 0x1C}, {0x1C, 0x88}, {0x12, 0xA4}, {0x1E, 0x0C}, {0x0D, 0xA0},
-	{0x14, 0x0C}, {0x0A, 0x80}, {0x19, 0x4C}, {0x15, 0xA0}, {0x06, 0x3C}, {0x0F, 0x98}, {0x08, 0xEC}, {0x1B, 0x84},
-	{0x1E, 0x0C}, {0x04, 0xC0}, {0x01, 0x1C}, {0x0C, 0xA8}, {0x18, 0x84}, {0x1A, 0x0C}, {0x11, 0xA0}, {0x0B, 0x5C},
-	{0x03, 0xE8}, {0x17, 0xA4}, {0x10, 0x0C}, {0x1D, 0xD0}, {0x0E, 0x04}, {0x07, 0x38}, {0x12, 0xA8}, {0x09, 0xC4},
-	{0x0D, 0x2C}, {0x1F, 0x90}, {0x16, 0x44}, {0x05, 0x18}, {0x13, 0xE8}, {0x1C, 0x84}, {0x02, 0x3C}, {0x00, 0x00}
-};
-
-static mpu4_chr_table skiltrek_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x1C}, {0x04, 0xCC}, {0x10, 0x64}, {0x18, 0x1C}, {0x0F, 0x4C}, {0x13, 0x64}, {0x1B, 0x1C},
-	{0x03, 0xEC}, {0x07, 0xE4}, {0x17, 0x0C}, {0x1D, 0xD4}, {0x36, 0x84}, {0x35, 0x0C}, {0x2B, 0x44}, {0x28, 0x2C},
-	{0x39, 0xD4}, {0x21, 0x14}, {0x22, 0x34}, {0x25, 0x14}, {0x2C, 0x24}, {0x29, 0x0C}, {0x31, 0x44}, {0x34, 0x0C},
-	{0x0A, 0x44}, {0x1F, 0x1C}, {0x06, 0xEC}, {0x0E, 0x54}, {0x1C, 0x04}, {0x12, 0x0C}, {0x1E, 0x54}, {0x0D, 0x24},
-	{0x14, 0x0C}, {0x0A, 0x44}, {0x19, 0x9C}, {0x15, 0xEC}, {0x06, 0xE4}, {0x0F, 0x1C}, {0x08, 0x6C}, {0x1B, 0x54},
-	{0x1E, 0x04}, {0x04, 0x1C}, {0x01, 0xC8}, {0x0C, 0x64}, {0x18, 0x1C}, {0x1A, 0x4C}, {0x11, 0x64}, {0x0B, 0x1C},
-	{0x03, 0xEC}, {0x17, 0x64}, {0x10, 0x0C}, {0x1D, 0xD4}, {0x0E, 0x04}, {0x07, 0x3C}, {0x12, 0x6C}, {0x09, 0x44},
-	{0x0D, 0x2C}, {0x1F, 0x54}, {0x16, 0x84}, {0x05, 0x1C}, {0x13, 0xEC}, {0x1C, 0x44}, {0x02, 0x3C}, {0x00, 0x00}
-};
-
-static mpu4_chr_table timemchn_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x2C}, {0x04, 0x94}, {0x10, 0x14}, {0x18, 0x04}, {0x0F, 0x0C}, {0x13, 0xC4}, {0x1B, 0x0C},
-	{0x03, 0xD4}, {0x07, 0x64}, {0x17, 0x0C}, {0x1D, 0xB4}, {0x36, 0x04}, {0x35, 0x0C}, {0x2B, 0x84}, {0x28, 0x5C},
-	{0x39, 0xDC}, {0x21, 0x9C}, {0x22, 0xDC}, {0x25, 0x9C}, {0x2C, 0xDC}, {0x29, 0xCC}, {0x31, 0x84}, {0x34, 0x0C},
-	{0x0A, 0x84}, {0x1F, 0x0C}, {0x06, 0xD4}, {0x0E, 0x04}, {0x1C, 0x2C}, {0x12, 0xC4}, {0x1E, 0x0C}, {0x0D, 0xC4},
-	{0x14, 0x0C}, {0x0A, 0x84}, {0x19, 0x1C}, {0x15, 0xDC}, {0x06, 0xDC}, {0x0F, 0x8C}, {0x08, 0xD4}, {0x1B, 0x44},
-	{0x1E, 0x2C}, {0x04, 0x94}, {0x01, 0x20}, {0x0C, 0x0C}, {0x18, 0xA4}, {0x1A, 0x0C}, {0x11, 0xC4}, {0x0B, 0x0C},
-	{0x03, 0xD4}, {0x17, 0x14}, {0x10, 0x14}, {0x1D, 0x54}, {0x0E, 0x04}, {0x07, 0x6C}, {0x12, 0xC4}, {0x09, 0x4C},
-	{0x0D, 0xC4}, {0x1F, 0x0C}, {0x16, 0xC4}, {0x05, 0x2C}, {0x13, 0xC4}, {0x1C, 0x0C}, {0x02, 0xD4}, {0x00, 0x00}
-};
-
-/*
-static mpu4_chr_table strikeit_data[64] = {
-    {0x00, 0x00}, {0x1A, 0xC4}, {0x04, 0xC4}, {0x10, 0x44}, {0x18, 0xC4}, {0x0F, 0x44}, {0x13, 0x44}, {0x1B, 0xC4},
-    {0x03, 0xCC}, {0x07, 0x3C}, {0x17, 0x5C}, {0x1D, 0x7C}, {0x36, 0x54}, {0x35, 0x24}, {0x2B, 0xC4}, {0x28, 0x4C},
-    {0x39, 0xB4}, {0x21, 0x84}, {0x22, 0xCC}, {0x25, 0x34}, {0x2C, 0x04}, {0x29, 0x4C}, {0x31, 0x14}, {0x34, 0x24},
-    {0x0A, 0xC4}, {0x1F, 0x44}, {0x06, 0xCC}, {0x0E, 0x14}, {0x1C, 0x04}, {0x12, 0x44}, {0x1E, 0xC4}, {0x0D, 0x4C},
-    {0x14, 0x1C}, {0x0A, 0x54}, {0x19, 0x2C}, {0x15, 0x1C}, {0x06, 0x7C}, {0x0F, 0xD4}, {0x08, 0x0C}, {0x1B, 0x94},
-    {0x1E, 0x04}, {0x04, 0xC4}, {0x01, 0xC0}, {0x0C, 0x4C}, {0x18, 0x94}, {0x1A, 0x04}, {0x11, 0x44}, {0x0B, 0x44},
-    {0x03, 0xCC}, {0x17, 0x1C}, {0x10, 0x7C}, {0x1D, 0x7C}, {0x0E, 0xD4}, {0x07, 0x8C}, {0x12, 0x1C}, {0x09, 0x5C},
-    {0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x74}, {0x13, 0x04}, {0x1C, 0xC4}, {0x02, 0xCC}, {0x00, 0x00}
-};
-*/
-
-static mpu4_chr_table turnover_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x1C}, {0x04, 0x6C}, {0x10, 0xA4}, {0x18, 0x0C}, {0x0F, 0x24}, {0x13, 0x0C}, {0x1B, 0x34},
-	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x44}, {0x1D, 0x5C}, {0x36, 0x6C}, {0x35, 0x24}, {0x2B, 0x1C}, {0x28, 0xAC},
-	{0x39, 0x64}, {0x21, 0x1C}, {0x22, 0xEC}, {0x25, 0x64}, {0x2C, 0x0C}, {0x29, 0xA4}, {0x31, 0x0C}, {0x34, 0x24},
-	{0x0A, 0x1C}, {0x1F, 0xAC}, {0x06, 0xE4}, {0x0E, 0x1C}, {0x1C, 0x2C}, {0x12, 0xA4}, {0x1E, 0x0C}, {0x0D, 0xA4},
-	{0x14, 0x0C}, {0x0A, 0x24}, {0x19, 0x5C}, {0x15, 0xEC}, {0x06, 0xE4}, {0x0F, 0x1C}, {0x08, 0xAC}, {0x1B, 0x24},
-	{0x1E, 0x1C}, {0x04, 0x6C}, {0x01, 0x60}, {0x0C, 0x0C}, {0x18, 0x34}, {0x1A, 0x04}, {0x11, 0x0C}, {0x0B, 0x24},
-	{0x03, 0x9C}, {0x17, 0xEC}, {0x10, 0xA4}, {0x1D, 0x4C}, {0x0E, 0x24}, {0x07, 0x9C}, {0x12, 0xEC}, {0x09, 0x24},
-	{0x0D, 0x0C}, {0x1F, 0x34}, {0x16, 0x04}, {0x05, 0x1C}, {0x13, 0xEC}, {0x1C, 0x24}, {0x02, 0x9C}, {0x00, 0x00}
-};
-
-static mpu4_chr_table eyesdown_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x0C}, {0x18, 0xC4}, {0x0F, 0x0C}, {0x13, 0x54}, {0x1B, 0x14},
-	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x24}, {0x1D, 0xAC}, {0x36, 0x44}, {0x35, 0x0C}, {0x2B, 0x44}, {0x28, 0x1C},
-	{0x39, 0x7C}, {0x21, 0x6C}, {0x22, 0x74}, {0x25, 0x84}, {0x2C, 0x3C}, {0x29, 0x4C}, {0x31, 0x44}, {0x34, 0x0C},
-	{0x0A, 0x44}, {0x1F, 0x8C}, {0x06, 0x74}, {0x0E, 0x84}, {0x1C, 0x0C}, {0x12, 0x54}, {0x1E, 0x04}, {0x0D, 0x1C},
-	{0x14, 0x7C}, {0x0A, 0xCC}, {0x19, 0x64}, {0x15, 0x0C}, {0x06, 0x74}, {0x0F, 0x84}, {0x08, 0x3C}, {0x1B, 0x5C},
-	{0x1E, 0x4C}, {0x04, 0x64}, {0x01, 0x88}, {0x0C, 0x74}, {0x18, 0x04}, {0x1A, 0x8C}, {0x11, 0x54}, {0x0B, 0x04},
-	{0x03, 0x9C}, {0x17, 0x7C}, {0x10, 0x5C}, {0x1D, 0x7C}, {0x0E, 0xCC}, {0x07, 0x74}, {0x12, 0x04}, {0x09, 0x1C},
-	{0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x6C}, {0x13, 0x54}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
-};
-
-static mpu4_chr_table quidgrid_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x64}, {0x04, 0x64}, {0x10, 0x24}, {0x18, 0x64}, {0x0F, 0x64}, {0x13, 0x24}, {0x1B, 0x64},
-	{0x03, 0x74}, {0x07, 0x54}, {0x17, 0x84}, {0x1D, 0xA4}, {0x36, 0x24}, {0x35, 0x24}, {0x2B, 0x64}, {0x28, 0x24},
-	{0x39, 0xE4}, {0x21, 0x64}, {0x22, 0x74}, {0x25, 0x44}, {0x2C, 0x34}, {0x29, 0x04}, {0x31, 0x24}, {0x34, 0x24},
-	{0x0A, 0x64}, {0x1F, 0x64}, {0x06, 0x74}, {0x0E, 0x44}, {0x1C, 0x64}, {0x12, 0x24}, {0x1E, 0x64}, {0x0D, 0x24},
-	{0x14, 0x24}, {0x0A, 0x64}, {0x19, 0xE4}, {0x15, 0x24}, {0x06, 0x74}, {0x0F, 0x44}, {0x08, 0x34}, {0x1B, 0x14},
-	{0x1E, 0x04}, {0x04, 0x64}, {0x01, 0x60}, {0x0C, 0x24}, {0x18, 0x64}, {0x1A, 0x64}, {0x11, 0x24}, {0x0B, 0x64},
-	{0x03, 0x74}, {0x17, 0x04}, {0x10, 0x24}, {0x1D, 0xE4}, {0x0E, 0x64}, {0x07, 0x74}, {0x12, 0x04}, {0x09, 0x34},
-	{0x0D, 0x04}, {0x1F, 0x64}, {0x16, 0x24}, {0x05, 0x64}, {0x13, 0x24}, {0x1C, 0x64}, {0x02, 0x74}, {0x00, 0x00}
-};
-
-static mpu4_chr_table blank_data[72] = {
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-	{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},{0xff, 0xff},
-};
-
-
-#if 0
-static const bwb_chr_table prizeinv_data1[5] = {
-//This is all wrong, but without BWB Vid booting,
-//I can't find the right values. These should be close though
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-#endif
-
-static mpu4_chr_table prizeinv_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
 
 /*
 void mpu4vid_state::init_adders()
@@ -2540,90 +2321,57 @@ void mpu4vid_state::init_adders()
 void mpu4vid_state::init_crmaze()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = crmaze_data;
 }
 
-void mpu4vid_state::init_crmazea()
-{
-	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = crmazea_data;
-}
-
-void mpu4vid_state::init_crmaze2()
-{
-	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = crmaze2_data;
-}
-
-void mpu4vid_state::init_crmaze2a()
-{
-	m_reels = 0;//currently no hybrid games
-}
-
-void mpu4vid_state::init_crmaze3()
+void mpu4vid_state::init_crmaze_flutter()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
-	m_current_chr_table = crmaze3_data;
-}
-
-void mpu4vid_state::init_crmaze3a()
-{
-	m_reels = 0;//currently no hybrid games
-	m_reel_mux = FLUTTERBOX;
-	m_current_chr_table = crmaze3a_data;
 }
 
 void mpu4vid_state::init_mating()
 {
 	m_reels = 0;//currently no hybrid games
 
-	m_current_chr_table = mating_data;
+	// TODOxx: m_current_chr_table = mating_data;
 }
 
 void mpu4vid_state::init_skiltrek()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = skiltrek_data;
+	// TODOxx: m_current_chr_table = skiltrek_data;
 }
 
 void mpu4vid_state::init_timemchn()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = timemchn_data;
+	// TODOxx: m_current_chr_table = timemchn_data;
 }
 
 void mpu4vid_state::init_strikeit()
 {
 	m_led_extender = SIMPLE_CARD;
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = nullptr;
-	m_4ktable = memregion( "video_prot" )->base();
-	m_4krow = 0;
 }
 
 void mpu4vid_state::init_turnover()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = turnover_data;
+	// TODOxx: m_current_chr_table = turnover_data;
 }
 
 void mpu4vid_state::init_eyesdown()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = eyesdown_data;
+	// TODOxx: m_current_chr_table = eyesdown_data;
 }
 
 void mpu4vid_state::init_quidgrid()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = quidgrid_data;
+	// TODOxx: m_current_chr_table = quidgrid_data;
 }
 
-void mpu4vid_state::init_v4frfact()
-{
-	mpu4vid_char_cheat(0x4f6);
-}
 
 void mpu4vid_state::hack_bwb_startup_protection()
 {
@@ -2662,7 +2410,7 @@ void mpu4vid_state::hack_bwb_startup_protection()
 void mpu4vid_state::init_prizeinv()
 {
 	m_reels = 0;//currently no hybrid games
-	m_current_chr_table = prizeinv_data;
+	// TODOxx: m_current_chr_table = prizeinv_data;
 
 	hack_bwb_startup_protection();
 }
@@ -2744,26 +2492,12 @@ void mpu4vid_state::init_bwbhack()
 }
 
 
-static const bwb_chr_table cybcas_data1[5] = {
-//Magic num4ber 724A
-
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// ??  ?? 20 0F 24 3C 36 27 09
-
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-
-static mpu4_chr_table cybcas_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
 
 void mpu4vid_state::init_cybcas()
 {
 	//no idea what this should be, use blues boys table for now
-	m_bwb_chr_table1 = cybcas_data1;
-	m_current_chr_table = cybcas_data;
+	// TODOxx: m_bwb_chr_table1 = cybcas_data1;
+	// TODOxx: m_current_chr_table = cybcas_data;
 
 	hack_bwb_startup_protection();
 
@@ -2775,40 +2509,22 @@ void mpu4vid_state::init_cybcas()
 }
 
 
-void mpu4vid_state::mpu4vid_char_cheat( int address)
-{
-	uint8_t* cheattable = memregion( "video" )->base()+address;
-	m_current_chr_table = blank_data;
-	for (int i=0;i<72;i++)
-	{
-		m_current_chr_table[i].response = cheattable++[0];
-		m_current_chr_table[i].call = cheattable++[0];
-	}
-}
+
 
 void mpu4vid_state::init_v4barqst()
 {
-	mpu4vid_char_cheat(0x154);
 }
 
 void mpu4vid_state::init_v4barqst2()
 {
-	mpu4vid_char_cheat(0x15c);
 }
 
 void mpu4vid_state::init_v4wize()
 {
-	mpu4vid_char_cheat(0x16c);
-}
-
-void mpu4vid_state::init_v4cmazeb()
-{
-	mpu4vid_char_cheat(0x4c6);
 }
 
 void mpu4vid_state::init_v4opt3()
 {
-	mpu4vid_char_cheat(0x164);
 }
 
 
@@ -4528,7 +4244,7 @@ ROM_START( v4addlad )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
@@ -4554,7 +4270,7 @@ ROM_START( v4addladd )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
@@ -4580,7 +4296,7 @@ ROM_START( v4addlad20 )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
@@ -4610,7 +4326,7 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
@@ -4636,7 +4352,7 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
@@ -4662,7 +4378,7 @@ ROM_START( v4strike2 )
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
@@ -4688,7 +4404,7 @@ ROM_START( v4strike2d )
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
@@ -4791,7 +4507,7 @@ ROM_START( v4barqst )
 	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
 	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
@@ -4815,7 +4531,7 @@ ROM_START( v4barqstd )
 	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
 	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
 
-	ROM_REGION( 0x1000, "video_prot", 0 )
+	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
 	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
 	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
 	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
@@ -8997,27 +8713,27 @@ GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_
 #define GAME_FLAGS MACHINE_NOT_WORKING
 #define GAME_FLAGS_OK (MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
-GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.6
+GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
+GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.6
 
-GAMEL( 1993, v4cmaze_amld,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+GAMEL( 1993, v4cmaze_amld,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
 
-GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
+GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
-GAMEL( 1993, v4cmaze2_amld,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993, v4cmaze2_amld,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 
-GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.6) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.6) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 
-GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
 
 //Year is a guess, based on the use of the 'Coin Man' logo
 GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2
@@ -9025,62 +8741,77 @@ GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mat
 
 /* Quiz games - Questions decoded */
 
+// the v4addlad / v4addladd sets don't do the usual protection check, but still have the device for scrambling questions
+// same sequence as bankrollerclub
+// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
 GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 
+// 00 c4 c4 44 c4 44 44 c4 cc 3c 5c 7c 54 24 c4 4c b4 84 cc 34 04 4c 14 24 c4 44 cc 14 04 44 c4 4c 1c 54 2c 1c 7c d4 0c 94 04 c4 c0 4c 94 04 44 44 cc 1c 7c 7c d4 8c 1c 5c 5c 5c 7c 74 04 c4 cc 00
 GAMEL(  199?, v4strike,   v4bios,   mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 GAMEL(  199?, v4striked,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 GAMEL(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike ) // The '3' is likely a machine type, not a 'version', 68k Pair ROM doesn't change
 GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 
+// 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
 GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
-GAME(  199?, v4turnov,   v4bios,    mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnova,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
-GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
+// 00 1c 6c a4 0c 24 0c 34 94 94 44 5c 6c 24 1c ac 64 1c ec 64 0c a4 0c 24 1c ac e4 1c 2c a4 0c a4 0c 24 5c ec e4 1c ac 24 1c 6c 60 0c 34 04 0c 24 9c ec a4 4c 24 9c ec 24 0c 34 04 1c ec 24 9c 00
+GAME(  199?, v4turnov,   v4bios,    mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
+GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
-GAME(  1990, v4skltrk,   v4bios,    mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+// 00 1c cc 64 1c 4c 64 1c ec e4 0c d4 84 0c 44 2c d4 14 34 14 24 0c 44 0c 44 1c ec 54 04 0c 54 24 0c 44 9c ec e4 1c 6c 54 04 1c c8 64 1c 4c 64 1c ec 64 0c d4 04 3c 6c 44 2c 54 84 1c ec 44 3c 00
+GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 
-GAME(  1989, v4tmach,     v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmachd,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1d,   v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+// 00 2c 94 14 04 0c c4 0c d4 64 0c b4 04 0c 84 5c dc 9c dc 9c dc cc 84 0c 84 0c d4 04 2c c4 0c c4 0c 84 1c dc dc 8c d4 44 2c 94 20 0c a4 0c c4 0c d4 14 14 54 04 6c c4 4c c4 0c c4 2c c4 0c d4 00
+GAME(  1989, v4tmach,     v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmachd,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* Quiz games - Games below are missing question ROMs */
 
-GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
+// winner takes all sequence?
+// 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24 64 24 74 44 6c 94 1c ac 84 24 64 64 6c c4 24 24 64 24 24 64 74 04 6c c4 2c c4 24 64 60 24 64 64 24 64 6c 8c 8c 94 14 4c 8c 9c bc ac 8c 94 14 04 6c 00
+GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
+// 00 8c 64 0c c4 0c 54 14 94 94 24 ac 44 0c 44 1c 7c 6c 74 84 3c 4c 44 0c 44 8c 74 84 0c 54 04 1c 7c cc 64 0c 74 84 3c 5c 4c 64 88 74 04 8c 54 04 9c 7c 5c 7c cc 74 04 1c 5c 5c 7c 6c 54 04 9c 00
+GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4quidgr,   v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
+// similar to the 'Winner Takes All' sequence but not the same
+// 00 64 64 24 64 64 24 64 74 54 84 a4 24 24 64 24 e4 64 74 44 34 04 24 24 64 64 74 44 64 24 64 24 24 64 e4 24 74 44 34 14 04 64 60 24 64 64 24 64 74 04 24 e4 64 74 04 34 04 64 24 64 24 64 74 00
+GAME(  199?, v4quidgr,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
+// 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
+GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid_cheatchr,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
 
+// 00 34 14 84 24 34 04 34 54 54 84 a4 24 24 34 04 b4 14 54 14 44 64 24 24 34 44 74 14 04 24 34 04 24 34 c4 24 74 14 44 34 04 34 10 44 34 04 24 34 54 84 24 b4 94 54 84 e4 24 34 04 34 04 34 54 00
 // again the 2nd '3' seems to indicate a machine type, not a version
-GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wized,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizeb,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizec,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wize,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wized,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeb,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizec,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // older code, 1x 68k ROM is missing in addition to questions being missing
-GAME(  199?, v4wizeo,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeo,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
 // newer? code, only 1x 68k ROM is dumped (and it appears to be slightly corrupt)
-GAME(  199?, v4wizen,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizen,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
 
-
-GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+// 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
+GAME(  1991, v4opt3,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* ----------------------------------------------------------------  */
 /* Games below are newer BWB games and use their own game and revision specific MPU4 base ROMs (which must be correctly paired with video ROMs of the same revision) and sometimes differing hardware setups */
@@ -9499,13 +9230,14 @@ GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 /* Uncertain BIOS */
 // has a Barcrest style Characteriser check, not a BWB one?
-GAME(  199?, v4frfact,   v4bios,   crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacta,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactb,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactc,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactd,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
+// 00 44 44 54 58 24 54 50 58 3c 34 18 7c 34 48 30 58 7c 7c 2c 70 00 04 4c 70 18 3c 64 44 54 00 14 48 70 58 3c 3c 64 04 44 44 44 5c 34 58 74 58 74 58 3c 7c 3c 64 54 58 34 50 18 7c 2c 70 00 5c 00
+GAME(  199?, v4frfact,   v4bios,   crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacta,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactb,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactc,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactd,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BWB video in the BIOS rom tho, Cyber Casino also needs a Jackpot link? */

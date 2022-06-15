@@ -1707,9 +1707,8 @@ void cli_frontend::execute_commands(std::string_view exename)
 		path_iterator iter(m_options.plugins_path());
 		std::string pluginpath;
 		while (iter.next(pluginpath))
-		{
 			plugin_opts.scan_directory(pluginpath, true);
-		}
+
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file_plugin.open("plugin.ini"))
 			throw emu_fatalerror("Unable to create file plugin.ini\n");

@@ -321,9 +321,12 @@ void igs022_device::handle_command_6d()
 	const u32 p2 = (m_sharedprotram[0x29c / 2] << 16) | m_sharedprotram[0x29e / 2];
 
 	std::ostringstream stream;
-	util::stream_format(stream, "%s: IGS022 command 006d: ASIC RAM %04x %04x %04x %04x ~ ", machine().describe_context(),
-		(p1 >> 16) & 0xffff, (p1 >> 0) & 0xffff, (p2 >> 16) & 0xffff, (p2 >> 0) & 0xffff
-	);
+	if (VERBOSE & LOG_CMD_6D)
+	{
+		util::stream_format(stream, "%s: IGS022 command 006d: ASIC RAM %04x %04x %04x %04x ~ ", machine().describe_context(),
+			(p1 >> 16) & 0xffff, (p1 >> 0) & 0xffff, (p2 >> 16) & 0xffff, (p2 >> 0) & 0xffff
+		);
+	}
 
 	switch (p2 & 0xffff)
 	{
@@ -338,8 +341,8 @@ void igs022_device::handle_command_6d()
 			const u32 res   =   data1 + data2;
 
 			write_reg(dst, res);
-
-			util::stream_format(stream, "ADD [%04x] = [%04x] + [%04x] (%08x)\n", dst, src1, src2, res);
+			if (VERBOSE & LOG_CMD_6D)
+				util::stream_format(stream, "ADD [%04x] = [%04x] + [%04x] (%08x)\n", dst, src1, src2, res);
 			break;
 		}
 
@@ -355,7 +358,8 @@ void igs022_device::handle_command_6d()
 
 			write_reg(dst, res);
 
-			util::stream_format(stream, "SUB1 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src1, src2, res);
+			if (VERBOSE & LOG_CMD_6D)
+				util::stream_format(stream, "SUB1 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src1, src2, res);
 			break;
 		}
 
@@ -371,7 +375,8 @@ void igs022_device::handle_command_6d()
 
 			write_reg(dst, res);
 
-			util::stream_format(stream, "SUB2 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src2, src1, res);
+			if (VERBOSE & LOG_CMD_6D)
+				util::stream_format(stream, "SUB2 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src2, src1, res);
 			break;
 		}
 
@@ -383,7 +388,8 @@ void igs022_device::handle_command_6d()
 
 			write_reg(dst, data);
 
-			util::stream_format(stream, "SET [%04x] = {298, 29a} (%08x)\n", dst, data);
+			if (VERBOSE & LOG_CMD_6D)
+				util::stream_format(stream, "SET [%04x] = {298, 29a} (%08x)\n", dst, data);
 			break;
 		}
 
@@ -396,7 +402,8 @@ void igs022_device::handle_command_6d()
 			m_sharedprotram[0x29c / 2] = (data >> 16) & 0xffff;
 			m_sharedprotram[0x29e / 2] = data & 0xffff;
 
-			util::stream_format(stream, "GET {29c, 29e} = [%04x] (%08x)\n", src, data);
+			if (VERBOSE & LOG_CMD_6D)
+				util::stream_format(stream, "GET {29c, 29e} = [%04x] (%08x)\n", src, data);
 			break;
 		}
 	}

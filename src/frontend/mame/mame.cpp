@@ -142,7 +142,7 @@ void mame_machine_manager::start_luaengine()
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 		{
-			// and then scan the directory recursively
+			// scan the directory recursively
 			m_plugins->scan_directory(pluginpath, true);
 		}
 
@@ -199,7 +199,7 @@ void mame_machine_manager::start_luaengine()
 		std::error_condition const filerr = file.open("boot.lua");
 		if (!filerr)
 		{
-			std::string exppath = file.fullpath();
+			const std::string exppath = file.fullpath();
 			auto &l(*lua());
 			auto load_result = l.load_script(exppath);
 			if (!load_result.valid())

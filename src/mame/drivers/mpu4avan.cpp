@@ -5,12 +5,27 @@
 
   split out because there might be hardware differences, and there are an awful lot of them, especially american beauty! ;-)
   I think some might be dual unit setups, some roms are marked top/bottom
+
+  are some of these actually by Concept?
 */
 
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
+namespace {
+
+class mpu4avan_machines_state : public mpu4_state
+{
+public:
+
+	mpu4avan_machines_state(const machine_config& mconfig, device_type type, const char* tag) :
+		mpu4_state(mconfig, type, tag)
+	{
+	}
+};
+
+} // anonymous namespace
+
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
@@ -20,7 +35,7 @@ INPUT_PORTS_EXTERN( mpu4 );
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 // robotica - latvia
@@ -99,7 +114,7 @@ GAME_CUSTOM( 199?, m4robo__0,    m4robo, "rou2b317.bin", 0x0000, 0x010000, CRC(8
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ABEAUT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // ab
 GAME_CUSTOM( 199?, m4abeaut,       0,          "aba305.bin",   0x0000, 0x010000, CRC(ab70802c) SHA1(0cb59947b0bc177b10c55e02a0c8016620e0c346), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 1)" )
@@ -307,7 +322,7 @@ GAME_CUSTOM( 199?, m4abeaut_k2,    m4abeaut,   "a2k0b618.bin", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TRG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 // roms of different sizes again, might also be main / sub setups
@@ -357,7 +372,7 @@ GAME_CUSTOM( 199?, m4trg__4,  m4trg,  "rmtp4cz",      0x0000, 0x010000, CRC(1c5f
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RMTP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4rmtp,       0,      "r4iha202.bin", 0x0000, 0x010000, CRC(b1588632) SHA1(ad21bbc5e99fd6b511e6881e8b20dcad177b937f), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 1)" )
@@ -383,7 +398,7 @@ GAME_CUSTOM( 199?, m4rmtp__g,    m4rmtp, "r4iua205.bin", 0x0000, 0x010000, CRC(4
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RMTPD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 
@@ -450,7 +465,7 @@ GAME_CUSTOM( 199?, m4rmtpd__am, m4rmtpd,    "rduhb511.bin", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MBEL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4mbel,       0,      "mb1.1k",           0x0000, 0x020000, CRC(00763b37) SHA1(2314ea5e8541e2be2492135785317f4fdd998692), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4mbel__a,    m4mbel, "mb1.1kw",          0x0000, 0x010000, CRC(d1ccefe4) SHA1(dba63d0a75fe614e77ac24ae23bfd0d924dd3e9a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 2)" )
@@ -531,7 +546,7 @@ GAME_CUSTOM( 199?, m4mbel__a0,   m4mbel, "mbpl3.3c",         0x0000, 0x020000, C
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CMONT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // cmc
 GAME_CUSTOM( 199?, m4cmont,     0,          "cmc1.7",       0x0000, 0x020000, CRC(aaebab34) SHA1(36145b7d062ad5a740bcf326933f78274b99495c), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 1)" )
@@ -619,7 +634,7 @@ GAME_CUSTOM( 199?, m4cmont_gt3, m4cmont,    "gtr58gaa",     0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLKMGC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 // new - latvia
@@ -646,7 +661,7 @@ GAME_CUSTOM( 199?, m4blkmgc_u6,    m4blkmgc,   "bau1b307.bin", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4AMALAD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4amalad,       0,          "aag1.4",           0x0000, 0x020000, CRC(0da943a1) SHA1(50915ce67687f15a36b5c38b1c1c6773bd3ecf9f), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4amalad__a,    m4amalad,   "aag1.3",           0x0000, 0x020000, CRC(3a9552a9) SHA1(7695899b6ed52d0c7530b5ed0829cfdbb3892fa2), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 2)" )
@@ -677,7 +692,7 @@ GAME_CUSTOM( 199?, m4amalad__n,    m4amalad,   "jpaltst2.dat",     0x0000, 0x020
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BBEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4bben,       0,      "bbc1a102.bin", 0x0000, 0x010000, CRC(c5010bb6) SHA1(f39ab219eafaa391b5b777c2918f059ba67b4504), "Avantime?","Big Ben (Avantime?) (MPU4) (set 1)" )
@@ -704,7 +719,7 @@ GAME_CUSTOM( 199?, m4bben__i,    m4bben, "bbc2b106.bin", 0x0000, 0x010000, CRC(d
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BBOX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 
 GAME_CUSTOM( 199?, m4bbox,       0,      "bbb1.bin",     0x0000, 0x010000, CRC(b668e08e) SHA1(f401405419689ea5ad06dfd815aaef9e1b7ed4e1), "Avantime?","Brain Box (Avantime?) (MPU4) (set 1)" )
@@ -730,7 +745,7 @@ GAME_CUSTOM( 199?, m4bbox__i,    m4bbox, "bbb9.bin",     0x0000, 0x010000, CRC(1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FRNUDG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4frnudg,       0,          "fanhc11.bin",  0x0000, 0x010000, CRC(d2fe9df9) SHA1(7b519e4ed447f8c59fda972fc398f6ff423a8f92), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4frnudg__a,    m4frnudg,   "fanhc12.bin",  0x0000, 0x010000, CRC(2b2176e0) SHA1(9acffc05c02e76a6cbe4cfd708ff2d94ecb6c308), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 2)" )
@@ -750,7 +765,7 @@ GAME_CUSTOM( 199?, m4frnudg__c,    m4frnudg,   "fanhc9.bin",   0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FRMTX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 GAME_CUSTOM( 199?, m4frmtx,     0,          "fm1.bin",      0x0000, 0x010000, CRC(0d11ffee) SHA1(50a3f97cf76855ba503a833e4198c154a57b6847), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4frmtx__a,  m4frmtx,    "fm2.bin",      0x0000, 0x010000, CRC(ab143a49) SHA1(c4ba0671b154707fd69d58fd3bf65f5ba4d2bf53), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4frmtx__b,  m4frmtx,    "fm4.bin",      0x0000, 0x010000, CRC(cbe09e1d) SHA1(00d17c6a189ac1a60ec9acbe2babb5a69dec3711), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 3)" )
@@ -771,7 +786,7 @@ GAME_CUSTOM( 199?, m4frmtx__f,  m4frmtx,    "frmatx3",      0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JOK2K_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 // latvia
 GAME_CUSTOM( 199?, m4jok2k,     0,          "j300 1.512",       0x0000, 0x010000, CRC(3a52da14) SHA1(b2b7f32093938f8b793fa4c425cd5beaeaa83286), "Avantime?","Joker 2000 (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jok2k__a,  m4jok2k,    "j300 2.512",       0x0000, 0x010000, CRC(6d3c6b99) SHA1(b5f34043e3cc93908b7ff969ae2546862a3a79ce), "Avantime?","Joker 2000 (Avantime?) (MPU4) (set 2)" )
@@ -791,7 +806,7 @@ GAME_CUSTOM( 199?, m4jok2k__b,  m4jok2k,    "joker2000.dat",    0x0000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MJP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4mjp,     0,      "code.bin",     0x0000, 0x020000, CRC(c57d0148) SHA1(4d21a501ea64eb4fcf22ae9fba81b8982a55730e), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4mjp__a,  m4mjp,  "mjl02.bin",    0x0000, 0x010000, CRC(014d1765) SHA1(5cc4039e574b3a68be6d639453b217ce9a0841f0), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 2)" )
@@ -813,7 +828,7 @@ GAME_CUSTOM( 199?, m4mjp__g,  m4mjp,  "tl01.bin",     0x0000, 0x010000, CRC(a36a
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MILROU_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4milrou,       0,          "nonp1.dat",    0x0000, 0x020000, CRC(b7503d57) SHA1(dc0ba6073ae278b8406cc7e30e4b4fed21df61c8), "Avantime?","Millennium Roulette (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4milrou__a,    m4milrou,   "p1.dat",       0x0000, 0x020000, CRC(b3f4a2b0) SHA1(01ee5ef5eea0f83791d68b2d9bdb5be6c6495a28), "Avantime?","Millennium Roulette (Avantime?) (MPU4) (set 2)" )
@@ -830,7 +845,7 @@ GAME_CUSTOM( 199?, m4milrou__a,    m4milrou,   "p1.dat",       0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4KINGG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4kingg,     0,          "kgiha101.bin", 0x0000, 0x010000, CRC(4da8bea1) SHA1(63fbad82877f772f3f559026eaddb69e09d6556b), "Avantime?","King George (Avantime?) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4kingg__a,  m4kingg,    "kgiha102.bin", 0x0000, 0x010000, CRC(573687b0) SHA1(eafc90120297201fc1ba40029b592ec25d972690), "Avantime?","King George (Avantime?) (MPU4) (set 2)" )

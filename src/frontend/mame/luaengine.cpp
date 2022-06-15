@@ -716,11 +716,7 @@ void lua_engine::initialize()
 			static_cast<char const *(*)(char const *)>(&lang_translate),
 			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			return osd_subst_env(str);
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });

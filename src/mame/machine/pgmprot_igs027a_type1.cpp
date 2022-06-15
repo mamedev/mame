@@ -66,58 +66,32 @@
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
 
-u16 pgm_arm_type1_state::arm7_type1_protlatch_r(offs_t offset)
+u32 pgm_arm_type1_state::arm7_type1_protlatch_r()
 {
-	if (!machine().side_effects_disabled())
-		machine().scheduler().synchronize(); // force resync
-
-	if (offset & 1)
-		return m_arm_type1_highlatch_68k_w;
-	else
-		return m_arm_type1_lowlatch_68k_w;
+	return m_arm_type1_latch_68k_w;
 }
 
-void pgm_arm_type1_state::arm7_type1_protlatch_w(offs_t offset, u16 data)
+void pgm_arm_type1_state::arm7_type1_protlatch_w(offs_t, u32 data, u32 mem_mask)
 {
-	machine().scheduler().synchronize(); // force resync
-
-	if (offset & 1)
-	{
-		m_arm_type1_highlatch_arm_w = data;
-		m_arm_type1_highlatch_68k_w = 0;
-	}
-	else
-	{
-		m_arm_type1_lowlatch_arm_w = data;
-		m_arm_type1_lowlatch_68k_w = 0;
-	}
+	COMBINE_DATA(&m_arm_type1_latch_arm_w);
+	m_arm_type1_latch_68k_w &= ~mem_mask;
 }
 
 u16 pgm_arm_type1_state::arm7_type1_68k_protlatch_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
-		machine().scheduler().synchronize(); // force resync
-
-	switch (offset)
-	{
-		case 1: return m_arm_type1_highlatch_arm_w;
-		case 0: return m_arm_type1_lowlatch_arm_w;
-	}
-	return -1;
+	return offset ? m_arm_type1_latch_arm_w >> 16 : m_arm_type1_latch_arm_w;
 }
 
 void pgm_arm_type1_state::arm7_type1_68k_protlatch_w(offs_t offset, u16 data)
 {
-	machine().scheduler().synchronize(); // force resync
-
 	switch (offset)
 	{
 		case 1:
-			m_arm_type1_highlatch_68k_w = data;
+			m_arm_type1_latch_68k_w = (m_arm_type1_latch_68k_w & 0x0000ffff) | (data << 16);
 			break;
 
 		case 0:
-			m_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_latch_68k_w = (m_arm_type1_latch_68k_w & 0xffff0000) | data;
 			break;
 	}
 }
@@ -176,7 +150,7 @@ void pgm_arm_type1_state::kov_map(address_map &map)
 	pgm_mem(map);
 	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
 	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_ram_r), FUNC(pgm_arm_type1_state::arm7_type1_ram_w)); /* ARM7 Shared RAM */
-	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
+	map(0x500000, 0x500003).rw(FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
 }
 
 void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
@@ -247,16 +221,12 @@ void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
 
 void pgm_arm_type1_state::arm7_type1_latch_init()
 {
-	m_arm_type1_highlatch_arm_w = 0;
-	m_arm_type1_lowlatch_arm_w = 0;
-	m_arm_type1_highlatch_68k_w = 0;
-	m_arm_type1_lowlatch_68k_w = 0;
+	m_arm_type1_latch_arm_w = 0;
+	m_arm_type1_latch_68k_w = 0;
 	m_arm_type1_counter = 1;
 
-	save_item(NAME(m_arm_type1_highlatch_arm_w));
-	save_item(NAME(m_arm_type1_lowlatch_arm_w));
-	save_item(NAME(m_arm_type1_highlatch_68k_w));
-	save_item(NAME(m_arm_type1_lowlatch_68k_w));
+	save_item(NAME(m_arm_type1_latch_arm_w));
+	save_item(NAME(m_arm_type1_latch_68k_w));
 	save_item(NAME(m_arm_type1_counter));
 }
 
@@ -294,7 +264,7 @@ void pgm_arm_type1_state::kovshp_asic27a_write_word(offs_t offset, u16 data)
 	switch (offset)
 	{
 		case 0:
-			m_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_latch_68k_w = (m_arm_type1_latch_68k_w & 0xffff0000) |data;
 		return;
 
 		case 1:
@@ -341,7 +311,7 @@ void pgm_arm_type1_state::kovshp_asic27a_write_word(offs_t offset, u16 data)
 				case 0xf8: asic_cmd = 0xf3; break;
 			}
 
-			m_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
+			m_arm_type1_latch_68k_w = (m_arm_type1_latch_68k_w & 0x0000ffff) | ((asic_cmd ^ (asic_key | (asic_key << 8))) << 16);
 		}
 		return;
 	}
