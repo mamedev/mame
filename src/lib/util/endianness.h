@@ -13,7 +13,11 @@
 
 #pragma once
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <string_view>
+#include <type_traits>
 
 
 namespace util {
@@ -34,6 +38,24 @@ enum class endianness
 #endif
 };
 
+// helper for accessing data adjusted for endianness
+template <typename In, typename Out, endianness Endian>
+class endian_cast
+{
+private:
+	static inline constexpr std::ptrdiff_t SWIZZLE = (sizeof(In) / sizeof(Out)) - 1;
+
+	static_assert(!(sizeof(In) % sizeof(Out)), "input size must be a multiple of output size");
+	static_assert(!((sizeof(In) / sizeof(Out)) & SWIZZLE), "ratio of input size to output size must be a power of two");
+
+	Out *m_ptr;
+
+public:
+	constexpr endian_cast(In *ptr) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)) { }
+
+	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[i ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+};
+
 
 //**************************************************************************
 //  MACROS AND INLINE FUNCTIONS
@@ -42,10 +64,26 @@ enum class endianness
 constexpr std::string_view endian_to_string_view(endianness e) { using namespace std::literals; return e == endianness::little ? "little"sv : "big"sv; }
 
 // endian-based value: first value is if native endianness is little-endian, second is if native is big-endian
-#define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)  ((util::endianness::native == util::endianness::little) ? (leval) : (beval))
+#define NATIVE_ENDIAN_VALUE_LE_BE(leval, beval)  ((util::endianness::native == util::endianness::little) ? (leval) : (beval))
 
 
 // inline functions for accessing bytes and words within larger chunks
+
+template <typename T, typename U>
+auto big_endian_cast(U *ptr)
+{
+	using requested_const = std::conditional_t<std::is_const_v<U>, std::add_const_t<T>, T>;
+	using requested_cv = std::conditional_t<std::is_volatile_v<U>, std::add_volatile<requested_const>, requested_const>;
+	return endian_cast<U, requested_cv, endianness::big>(ptr);
+}
+
+template <typename T, typename U>
+auto little_endian_cast(U *ptr)
+{
+	using requested_const = std::conditional_t<std::is_const_v<U>, std::add_const_t<T>, T>;
+	using requested_cv = std::conditional_t<std::is_volatile_v<U>, std::add_volatile<requested_const>, requested_const>;
+	return endian_cast<U, requested_cv, endianness::little>(ptr);
+}
 
 // read/write a byte to a 16-bit space
 template <typename T> constexpr T BYTE_XOR_BE(T a) { return a ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0); }

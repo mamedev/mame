@@ -526,8 +526,8 @@ public:
 		switch (sdlevent.type)
 		{
 		case SDL_MOUSEMOTION:
-			mouse.lX += sdlevent.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += sdlevent.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lX += sdlevent.motion.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY += sdlevent.motion.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			{
 				int cx = -1, cy = -1;
@@ -676,8 +676,8 @@ public:
 
 		case SDL_JOYBALLMOTION:
 			//printf("Ball %d %d\n", sdlevent.jball.xrel, sdlevent.jball.yrel);
-			joystick.balls[sdlevent.jball.ball * 2] = sdlevent.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
-			joystick.balls[sdlevent.jball.ball * 2 + 1] = sdlevent.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
+			joystick.balls[sdlevent.jball.ball * 2] = sdlevent.jball.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
+			joystick.balls[sdlevent.jball.ball * 2 + 1] = sdlevent.jball.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
 			break;
 
 		case SDL_JOYHATMOTION:

@@ -45,7 +45,12 @@ class emu_timer
 	~emu_timer();
 
 	// allocation and re-use
-	emu_timer &init(running_machine &machine, timer_expired_delegate &&callback, bool temporary) ATTR_HOT;
+	emu_timer &init(
+			running_machine &machine,
+			timer_expired_delegate &&callback,
+			attotime start_delay,
+			int param,
+			bool temporary) ATTR_HOT;
 	emu_timer &release();
 
 public:
@@ -119,9 +124,15 @@ public:
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback);
 	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]]
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
+	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0)
+	{
+		emu_timer &timer = m_timer_allocator.alloc()->init(machine(), std::move(callback), duration, param, true);
+		assert(!timer.m_expire.is_never()); // this is not handled
+	}
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0)
-	{ m_timer_allocator.alloc()->init(machine(), std::move(callback), true).adjust(attotime::zero, param); }
+	{
+		m_timer_allocator.alloc()->init(machine(), std::move(callback), attotime::zero, param, true);
+	}
 
 	// debugging
 	void dump_timers() const;
@@ -154,6 +165,7 @@ private:
 
 	// list of active timers
 	emu_timer *                 m_timer_list;               // head of the active list
+	emu_timer *                 m_inactive_timers;          // head of the inactive timer list
 	fixed_allocator<emu_timer>  m_timer_allocator;          // allocator for timers
 
 	// other internal states
