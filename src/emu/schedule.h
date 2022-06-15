@@ -126,7 +126,7 @@ public:
 	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]]
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0)
 	{
-		emu_timer &timer = m_timer_allocator.alloc()->init(machine(), std::move(callback), duration, param, true);
+		[[maybe_unused]] emu_timer &timer = m_timer_allocator.alloc()->init(machine(), std::move(callback), duration, param, true);
 		assert(!timer.m_expire.is_never()); // this is not handled
 	}
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0)

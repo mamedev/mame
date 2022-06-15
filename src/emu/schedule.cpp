@@ -87,7 +87,9 @@ emu_timer &emu_timer::init(
 	m_param = param;
 	m_temporary = temporary;
 	m_period = attotime::never;
-	m_start = machine.scheduler().time();
+
+	device_scheduler &scheduler = machine.scheduler();
+	m_start = scheduler.time();
 	m_expire = m_start + start_delay;
 	m_enabled = !m_expire.is_never();
 
@@ -96,7 +98,10 @@ emu_timer &emu_timer::init(
 		register_save();
 
 	// insert into the list
-	machine.scheduler().timer_list_insert(*this);
+	scheduler.timer_list_insert(*this);
+	if (this == scheduler.first_timer())
+		scheduler.abort_timeslice();
+
 	return *this;
 }
 
@@ -620,7 +625,7 @@ void device_scheduler::postload()
 	{
 		emu_timer &timer = *m_timer_list;
 
-		if (timer.m_temporary && !timer.expire().is_never())
+		if (timer.m_temporary)
 		{
 			assert(!timer.expire().is_never());
 
