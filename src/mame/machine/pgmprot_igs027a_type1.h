@@ -64,18 +64,16 @@ private:
 	pgm_arm_sim_command_handler arm_sim_handler{};
 
 	/////////////// emulation
-	u16 m_arm_type1_highlatch_arm_w = 0;
-	u16 m_arm_type1_lowlatch_arm_w = 0;
-	u16 m_arm_type1_highlatch_68k_w = 0;
-	u16 m_arm_type1_lowlatch_68k_w = 0;
+	u32 m_arm_type1_latch_arm_w = 0;
+	u32 m_arm_type1_latch_68k_w = 0;
 	u32 m_arm_type1_counter = 0;
 	optional_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
 	DECLARE_MACHINE_START(pgm_arm_type1);
 
-	u16 arm7_type1_protlatch_r(offs_t offset);
-	void arm7_type1_protlatch_w(offs_t offset, u16 data);
+	u32 arm7_type1_protlatch_r();
+	void arm7_type1_protlatch_w(offs_t offset, u32 data, u32 mem_mask);
 	u16 arm7_type1_68k_protlatch_r(offs_t offset);
 	void arm7_type1_68k_protlatch_w(offs_t offset, u16 data);
 	u16 arm7_type1_ram_r(offs_t offset, u16 mem_mask = ~0);
