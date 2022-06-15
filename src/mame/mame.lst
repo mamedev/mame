@@ -9515,6 +9515,7 @@ mineswpr4                       // [1977 Amutech]
 
 @source:blockch.cpp
 blockch
+tvgm8080
 
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989

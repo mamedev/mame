@@ -341,6 +341,7 @@ void igs022_device::handle_command_6d()
 			const u32 res   =   data1 + data2;
 
 			write_reg(dst, res);
+
 			if (VERBOSE & LOG_CMD_6D)
 				util::stream_format(stream, "ADD [%04x] = [%04x] + [%04x] (%08x)\n", dst, src1, src2, res);
 			break;
