@@ -2304,23 +2304,23 @@ GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_
 
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
-GAME(199?, m4sbx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4sbxa,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4sbxb,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 3)",GAME_FLAGS )
-GAME(199?, m4sbxc,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 4)",GAME_FLAGS )
-GAME(199?, m4sbxd,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 5)",GAME_FLAGS )
-GAME(199?, m4sbxe,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 6)",GAME_FLAGS )
+GAME(199?, m4sbx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4sbxa,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4sbxb,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4sbxc,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 4)",GAME_FLAGS )
+GAME(199?, m4sbxd,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 5)",GAME_FLAGS )
+GAME(199?, m4sbxe,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 6)",GAME_FLAGS )
 
-GAME(199?, m4bclimb,  0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",GAME_FLAGS )
-GAME(199?, m4captb,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",GAME_FLAGS )
-GAME(199?, m4jungj,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4jungja,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4jungjb,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 3)",GAME_FLAGS )
-GAME(199?, m4jungjc,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 4)",GAME_FLAGS )
+GAME(199?, m4bclimb,  0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",GAME_FLAGS )
+GAME(199?, m4captb,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",GAME_FLAGS )
+GAME(199?, m4jungj,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4jungja,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4jungjb,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4jungjc,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 4)",GAME_FLAGS )
 
-GAME(199?, m4fsx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4fsxa,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4fsxb,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4fsx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4fsxa,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4fsxb,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
 
 // Error 42 then 52, 54
 GAME(199?, m4ccop,    0,          mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )

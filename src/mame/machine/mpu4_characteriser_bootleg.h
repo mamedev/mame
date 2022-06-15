@@ -20,17 +20,6 @@ class mpu4_characteriser_bl : public device_t
 public:
 	// construction/destruction
 	mpu4_characteriser_bl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	template <typename T> void set_cpu_tag(T&& tag)
-	{
-		m_cpu.set_tag(std::forward<T>(tag));
-	}
-
-	void set_allow_6809_cheat(bool allow)
-	{
-		m_allow_6809_cheat = allow;
-	}
 
 	void set_bl_fixed_return(uint8_t ret)
 	{
@@ -49,12 +38,12 @@ public:
 	}
 
 protected:
+	mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
-	bool m_allow_6809_cheat;
 	uint8_t m_blfixedreturn = 0;
 };
 

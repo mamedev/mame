@@ -20,9 +20,7 @@ mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, cons
 }
 
 mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_allow_6809_cheat(false)
+	device_t(mconfig, type, tag, owner, clock)
 {
 }
 

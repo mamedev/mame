@@ -145,10 +145,8 @@ public:
 	void init_m4default_big_aux2inv();
 	void init_m4default_806prot();
 
-	void init_crystali();
 	void init_m4tst2();
-	void init_crystal();
-	void init_m_frkstn();
+
 	void init_m4default_banks();
 	void init_m4default_reels();
 	void init_m4_low_volt_alt();
@@ -405,8 +403,7 @@ protected:
 
 	void mpu4_ym2413_w(offs_t offset, uint8_t data);
 	uint8_t mpu4_ym2413_r(offs_t offset);
-	uint8_t crystal_sound_r();
-	void crystal_sound_w(uint8_t data);
+
 	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
