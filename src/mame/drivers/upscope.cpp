@@ -27,12 +27,16 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
+
 #include "cpu/m68000/m68000.h"
+#include "machine/amigafdc.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
+
 #include "speaker.h"
 
+
+namespace {
 
 class upscope_state : public amiga_state
 {
@@ -372,6 +376,8 @@ void upscope_state::init_upscope()
 	// allocate nvram
 	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
+
+} // anonymous namespace
 
 
 

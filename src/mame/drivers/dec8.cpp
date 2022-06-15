@@ -2234,10 +2234,10 @@ void csilver_state::csilver(machine_config &config)
 void dec8_state::oscar(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309(config, m_maincpu, XTAL(12'000'000)/2); /* PCB seen both HD6309 or MC6809, clock verified on pcb */
+	HD6309(config, m_maincpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_map);
 
-	HD6309(config, m_subcpu, XTAL(12'000'000)/2); /* PCB seen both HD6309 or MC6809, clock verified on pcb */
+	HD6309(config, m_subcpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_sub_map);
 
 	DECO_222(config, m_audiocpu, XTAL(12'000'000)/8); // IC labeled "C10707-1"
@@ -2962,8 +2962,8 @@ ROM_START( ghostb3a )
 ROM_END
 
 /*
-Meikyuu Hunter G (also known as Maze Hunter)
-Data East, 1987
+Meikyuu Hunter G (Data East, 1987)
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -3342,8 +3342,8 @@ ROM_END
 
 ROM_START( oscar )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) ) /* Is "DU" code correct for "World" or is   */
-	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) ) /* this set really the first rev Japan set? */
+	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) ) // This label is probably incorrect. The correct label is needed
+	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) ) // for the world set because DU is the code for the Japanese version
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
 	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
@@ -3427,34 +3427,111 @@ ROM_START( oscarj1 )
 	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
 ROM_END
 
+/***************************************************************************
+
+Psycho-Nics Oscar (Data East, 1987)
+Hardware info by Guru
+---------------------
+
+DE-0286-2
+OSCAR 7891-1077 (sticker)
+|--------------------------------------------------------------|
+|       2018(2)     PR-1.F20           |--------|    DU07.A20  |
+|       2018(2)                        |DATAEAST|              |
+|                   PR-0.F18           |MXC 06  |              |
+|RCDM-15                               |        |    DU06.A16  |
+|      SW2                       2018  |--------|              |
+|        DU11.H16   68B09(2)     2018                          |
+|        5864                                        DU05.A14  |
+|J                                     |-----------|           |
+|A       DU10-2.H12              2018  | DATAEAST  |           |
+|M                  68B09(1)           |  BAC 06   | DU04.A11  |
+|M       DU09.H10                      |           |           |
+|A                                     |           |           |
+|                                      |-----------|   8416(1) |
+|      SW1                                             8416(1) |
+|                                        DU-13.C8    DU03.A6   |
+|8416(3)   C10707-1              8416(2)                       |
+|                      DU08.E5                       DU02.A5   |
+|DU12.K5   YM3812                                              |
+|3403 YM3014(1)                                      DU01.A3   |
+|VOL  YM3014(2)                                                |
+|MB3730    YM2203                            12MHz   DU00.A1   |
+|--------------------------------------------------------------|
+Notes:
+    68B09(1) - Motorola MC68B09EP CPU. Clock Q & E 1.500MHz [12/8] (main program CPU)
+    68B09(2) - Motorola MC68B09EP CPU. Clock Q & E 1.500MHz [12/8] (sub program CPU)
+               Note: These are EP types so the clocks are measured on the Q & E quadrature clock inputs
+    C10707-1 - Data East custom CPU marked 'C10707-1'. PCB marked 'DECO 222'. This is actually an encrypted 6502 CPU.
+               Clocks are 1.500MHz on pins 3, 37 & 39
+      YM2203 - Yamaha YM2203 FM Operator Type-N (OPN) sound chip. Clock 1.500MHz [12/8]
+      YM3812 - Yamaha YM3812 FM Operator Type-L II (OPL II) Sound Chip. Clock 3.000MHz [12/4]
+               Note this is fully compatible with YM3526 and either chip can be seen on PCBs in the wild
+   YM3014(1) - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 750kHz [12/4/4]. This is used with the YM3812
+   YM3014(2) - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.000MHz [12/4/3]. This is used with the YM2203
+     8416(1) - Fujitsu MB8416 2kBx8-bit SRAM (background tile RAM)
+     8416(2) - Fujitsu MB8416 2kBx8-bit SRAM (characters / text layer RAM)
+     8416(3) - Fujitsu MB8416 2kBx8-bit SRAM (sound CPU RAM)
+        5864 - Sony CXK5864 8kBx8-bit SRAM (main/sub CPU RAM)
+        2018 - Toshiba TMM2018 2kBx8-bit SRAM (sprite RAM)
+     2018(2) - Toshiba TMM2018 2kBx8-bit SRAM (color RAM)
+       SW1/2 - 8-position DIP switch
+        3403 - NEC uPC3403 Quad Operational Amplifier
+      MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
+     RCDM-15 - Custom SIP package for coin counters
+      MXC 06 - Data East MXC 06 custom sprite generator
+      BAC 06 - Data East BAC 06 custom tile generator
+        PR-1 - MMI PAL16L8
+        PR-0 - MMI PAL10L8
+  DU10-2.H12 - 27C256 32kBx8-bit OTP EPROM (main CPU program)
+    DU09.H10 - 27C512 64kBx8-bit OTP EPROM (main CPU program)
+    DU11.H16 - 27C512 64kBx8-bit OTP EPROM (sub CPU program)
+     DU12.K5 - 27C256 32kBx8-bit OTP EPROM (C10707-1 sound program)
+     DU08.E5 - 27C128 16kBx8-bit OTP EPROM (characters / text layer)
+     DU00.A1 - 27C512 64kBx8-bit OTP EPROM (tiles)
+     DU01.A3 \
+     DU02.A5 | 27C512 64kBx8-bit EPROM (tiles)
+     DU03.A6 /
+    DU04.A11 \ 27C512 64kBx8-bit EPROM (sprites)
+    DU05.A14 /
+    DU06.A16 \ 27C512 64kBx8-bit OTP EPROM (sprites)
+    DU07.A20 /
+    DU-13.C8 - Fujitsu MB7124 512x8-bit Bipolar PROM (priority)
+               Compatible with 82S147. When removed sprites and characters/texts do not show on screen.
+       HSync - 15.6178kHz. Measured on PROM at C8
+       VSync - 57.4184Hz. Measured on logic near the 12MHz xtal
+
+***************************************************************************/
+
+
 ROM_START( oscarj2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "du10-2", 0x08000, 0x08000, CRC(114e898d) SHA1(1072ccabe6d53c50cdfa1e27d5d848ecdd6559cc) )
-	ROM_LOAD( "ed09",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+	ROM_LOAD( "du10-2.h12", 0x08000, 0x08000, CRC(114e898d) SHA1(1072ccabe6d53c50cdfa1e27d5d848ecdd6559cc) )
+	ROM_LOAD( "du09.h10",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
-	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
+	ROM_LOAD( "du11.h16", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
+	ROM_LOAD( "du12.k5", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
+	ROM_LOAD( "du08.e5", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "ed04", 0x00000, 0x10000, CRC(416a791b) SHA1(e6541b713225289a43962363029eb0e22a1ecb4a) )
-	ROM_LOAD( "ed05", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
-	ROM_LOAD( "ed06", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
-	ROM_LOAD( "ed07", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
+	ROM_LOAD( "du04.a11", 0x00000, 0x10000, CRC(416a791b) SHA1(e6541b713225289a43962363029eb0e22a1ecb4a) )
+	ROM_LOAD( "du05.a14", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
+	ROM_LOAD( "du06.a16", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
+	ROM_LOAD( "du07.a20", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "ed01", 0x00000, 0x10000, CRC(d3a58e9e) SHA1(35eda2aa630fc2c11a1aff2b00bcfabe2f3d4249) )
-	ROM_LOAD( "ed03", 0x20000, 0x10000, CRC(4fc4fb0f) SHA1(0906762a3adbffe765e072255262fedaa78bdb2a) )
-	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
-	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
+	ROM_LOAD( "du01.a3", 0x00000, 0x10000, CRC(d3a58e9e) SHA1(35eda2aa630fc2c11a1aff2b00bcfabe2f3d4249) )
+	ROM_LOAD( "du03.a6", 0x20000, 0x10000, CRC(4fc4fb0f) SHA1(0906762a3adbffe765e072255262fedaa78bdb2a) )
+	ROM_LOAD( "du00.a1", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
+	ROM_LOAD( "du02.a5", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
+	ROM_LOAD( "du-13.c8", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
 ROM_END
 
 ROM_START( srdarwin )

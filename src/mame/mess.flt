@@ -257,6 +257,7 @@ dps1.cpp
 dpsv55.cpp
 dragon.cpp
 drumsta.cpp
+ds90.cpp
 dsb46.cpp
 dual68.cpp
 duet16.cpp

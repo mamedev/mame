@@ -62,25 +62,22 @@ void tsconf_state::tsconf_palette(palette_device &palette) const
 
 void tsconf_state::tsconf_update_bank0()
 {
-	if (NW0_MAP)
-	{
-		m_ROMSelection = m_regs[PAGE0];
-	}
-	else
+	u8 page0 = m_regs[PAGE0];
+	if (!NW0_MAP)
 	{
 		/* ROM: 0-SYS, 1-DOS, 2-128, 3-48 */
-		m_ROMSelection = m_beta->started() && m_beta->is_active() ? ROM128 : (0x02 | ROM128);
-		m_ROMSelection |= (m_regs[PAGE0] & 0xfc);
+		page0 = m_beta->started() && m_beta->is_active() ? ROM128 : (0x02 | ROM128);
+		page0 |= (m_regs[PAGE0] & 0xfc);
 	}
 
 	if (W0_RAM)
 	{
-		m_banks[0]->set_entry(m_ROMSelection);
+		m_banks[0]->set_entry(page0);
 		m_bank0_rom.disable();
 	}
 	else
 	{
-		m_banks[4]->set_entry(m_ROMSelection & 0x1f);
+		m_banks[4]->set_entry(page0 & 0x1f);
 		m_bank0_rom.select(0);
 	}
 }
@@ -216,7 +213,7 @@ void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle 
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
 	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
 	{
-		u16 y_offset = (0x200 + OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + (vpos - get_screen_area().top())) & 0x1ff;
+		u16 y_offset = (0x200 + OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
 		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (screen.left() - get_screen_area().left())) & 0x1ff;
 		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
 		u16 *bm = &(bitmap.pix(vpos, screen.left()));
@@ -749,7 +746,7 @@ void tsconf_state::update_frame_timer()
 	else
 		m_frame_irq_timer->adjust(attotime::never);
 
-	m_gfx_y_frame_offset = 0;
+	m_gfx_y_frame_offset = -get_screen_area().top();
 }
 
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
@@ -800,7 +797,9 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 		{
 		case G_Y_OFFS_L:
 		case G_Y_OFFS_H:
-			m_gfx_y_frame_offset = get_screen_area().top() - m_screen->vpos();
+			m_gfx_y_frame_offset = screen_vpos < get_screen_area().top()
+				? -get_screen_area().top()
+				: -screen_vpos;
 			break;
 
 		default:
@@ -817,7 +816,7 @@ u8 tsconf_state::beta_neutral_r(offs_t offset)
 
 u8 tsconf_state::beta_enable_r(offs_t offset)
 {
-	if (m_ROMSelection == 3)
+	if (!W0_RAM && m_banks[4]->entry() == 3)
 	{
 		if (m_beta->started() /*&& !m_beta->is_active()*/)
 		{

@@ -750,6 +750,7 @@ MACHINES["AIC565"] = true
 MACHINES["AIC580"] = true
 MACHINES["AIC6250"] = true
 MACHINES["VRENDER0"] = true
+MACHINES["AT_MB"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2747,8 +2748,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
-	MAME_DIR .. "src/mame/machine/at.h",
-	MAME_DIR .. "src/mame/machine/at.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")
@@ -3349,8 +3348,6 @@ files {
 	MAME_DIR .. "src/mame/video/playmark.cpp",
 	MAME_DIR .. "src/mame/drivers/powerbal.cpp",
 	MAME_DIR .. "src/mame/drivers/sderby.cpp",
-	MAME_DIR .. "src/mame/includes/sderby.h",
-	MAME_DIR .. "src/mame/video/sderby.cpp",
 	MAME_DIR .. "src/mame/drivers/sslam.cpp",
 	MAME_DIR .. "src/mame/includes/sslam.h",
 	MAME_DIR .. "src/mame/video/sslam.cpp",
@@ -4500,8 +4497,6 @@ files {
 	MAME_DIR .. "src/mame/video/ojankohs.cpp",
 	MAME_DIR .. "src/mame/drivers/pipedrm.cpp",
 	MAME_DIR .. "src/mame/drivers/rpunch.cpp",
-	MAME_DIR .. "src/mame/includes/rpunch.h",
-	MAME_DIR .. "src/mame/video/rpunch.cpp",
 	MAME_DIR .. "src/mame/drivers/suprslam.cpp",
 	MAME_DIR .. "src/mame/includes/suprslam.h",
 	MAME_DIR .. "src/mame/video/suprslam.cpp",

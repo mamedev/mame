@@ -1146,6 +1146,7 @@ masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
+mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
 wontame                         // (c) 2008 Capcom
 
@@ -11805,6 +11806,7 @@ d6809                           //
 
 @source:d9final.cpp
 d9final                         // (c) 1992 Excellent System
+rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:dacholer.cpp
 dacholer                        // (c) 1983
@@ -12777,6 +12779,9 @@ drumsta                         //
 @source:drw80pkr.cpp
 drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
+
+@source:ds90.cpp
+x37                             //
 
 @source:dsb46.cpp
 dsb46                           //
@@ -15404,8 +15409,9 @@ genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 @source:geniusiq.cpp
 iq128                           // 1997 Genius IQ 128 (Germany)
 iq128_fr                        // 1997 Genius PC (France)
-iqtv512                         // IQ TV512 (Germany)
-itunlim                         // 199? IT Unlimited
+iqtv512                         // 1998 IQ TV512 (Germany)
+itunlim                         // 1998 IT Unlimited (UK)
+pcunlim                         // 1997 PC Unlimited (USA/Canada)
 
 @source:geniusjr.cpp
 gj4000                          // Genius Junior 4000 (Germany)
@@ -16110,45 +16116,46 @@ vegas                           //
 
 @source:gts3a.cpp
 andretti                        //
-andretti4                       //
+andretti0                       //
 barbwire                        //
 bighurt                         //
 brooks                          //
 cueball                         //
-cueball2                        //
-cueball3                        //
+cueballa                        //
+cueballb                        //
 freddy                          //
-freddy4                         //
+freddy3                         //
 gladiatp                        //
 mac_zois                        //
 rescu911                        //
-sfight2                         //
-sfight2a                        //
-sfight2b                        //
+sfightii                        //
+sfightiia                       //
+sfightiib                       //
 shaqattq                        //
 shaqattq2                       //
-smb                             //
-smb1                            //
-smb2                            //
-smb3                            //
+smbp                            //
+smbpa                           //
+smbpb                           //
+smbpc                           //
 smbmush                         //
 snspares                        //
 snspares1                       //
 snspares2                       //
 stargatp                        //
+stargatp0                       //
 stargatp1                       //
 stargatp2                       //
 stargatp3                       //
 stargatp4                       //
-stargatp5                       //
 teedoffp                        //
+teedoffp0                       //
 teedoffp1                       //
-teedoffp3                       //
 waterwld                        //
 waterwld2                       //
 wcsoccer                        //
-wcsoccerd2                      //
+wcsoccer1a                      //
 wipeout                         //
+wipeout2a                       //
 
 @source:gts80.cpp
 blckhole                        //
@@ -37692,6 +37699,7 @@ scyclone                        // (c) 1980 Taito Corporation
 croupier                        // (c) 1997 Playmark
 croupiera                       // (c) 1997 Playmark
 luckboom                        //
+magictch                        //
 sderby                          // (c) 1996
 sderbya                         // (c) 1996
 shinygld                        //
@@ -40488,7 +40496,8 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 suprslam                        // (c) 1995 Banpresto
 
 @source:supstarf.cpp
-supstarf                        //
+supstarf                        // (c) 1986 Recreativos Franco
+supstarfa                       // (c) 1986 Recreativos Franco
 
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
