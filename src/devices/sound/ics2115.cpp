@@ -1087,14 +1087,20 @@ void ics2115_device::recalc_irq()
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
 {
-	m_irq_pending |= 1 << 0;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 0)))
+	{
+		m_irq_pending |= 1 << 0;
+		recalc_irq();
+	}
 }
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
 {
-	m_irq_pending |= 1 << 1;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 1)))
+	{
+		m_irq_pending |= 1 << 1;
+		recalc_irq();
+	}
 }
 
 void ics2115_device::recalc_timer(int timer)
@@ -1109,6 +1115,7 @@ void ics2115_device::recalc_timer(int timer)
 
 	if (m_timer[timer].period != period)
 	{
+		logerror("Timer %d period %dns (%dHz)\n", timer, period, 1e9/period);
 		m_timer[timer].period = period;
 		// Adjust the timer lengths
 		if (period) // Reset the length
