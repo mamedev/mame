@@ -10,16 +10,16 @@
 
 #pragma once
 
-#include "spectrum.h"
+#include "spec128.h"
+
 #include "machine/beta.h"
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
+
 #include "tilemap.h"
 
-constexpr u16 with_hblank(u16 pixclocks = 0) { return 88 + pixclocks; }
-constexpr u16 with_vblank(u16 pixclocks = 0) { return 32 + pixclocks; }
 
 class tsconf_state : public spectrum_128_state
 {
@@ -41,6 +41,9 @@ public:
 	}
 
 	void tsconf(machine_config &config);
+
+	static constexpr u16 with_hblank(u16 pixclocks) { return 88 + pixclocks; }
+	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
 
 protected:
 	virtual void video_start() override;
