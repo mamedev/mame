@@ -196,7 +196,7 @@ public:
 		m_characteriser_bwb->set_other_key(Key[1]);
 	}
 
-	
+
 
 
 	void mod2(machine_config &config);
@@ -368,7 +368,7 @@ public:
 
 protected:
 	TIMER_CALLBACK_MEMBER(update_ic24);
-	
+
 	void mpu4_memmap(address_map &map);
 	void mpu4_memmap_characteriser(address_map &map);
 	void mpu4_memmap_bootleg_characteriser(address_map &map);

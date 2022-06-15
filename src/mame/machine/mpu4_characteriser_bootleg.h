@@ -15,7 +15,6 @@ DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BL, mpu4_characteriser_bl)
 // but has only been seen on 2 games
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BL_BLASTBANK, mpu4_characteriser_bl_blastbank)
 
-
 class mpu4_characteriser_bl : public device_t
 {
 public:
@@ -59,10 +58,6 @@ private:
 	uint8_t m_blfixedreturn = 0;
 };
 
-
-
-
-
 class mpu4_characteriser_bl_blastbank : public device_t
 {
 public:
@@ -82,7 +77,5 @@ protected:
 
 	int m_prot_col = 0;
 };
-
-
 
 #endif // MAME_MACHINE_MPU4_CHARACTERISER_BL_H

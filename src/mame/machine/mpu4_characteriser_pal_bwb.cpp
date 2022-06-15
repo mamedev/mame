@@ -22,7 +22,7 @@ Using debug search for the first read from said string (best to find it first).
 
  - in m4blsbys this string is at 0x17383 in ROM, which is banked into memory at 0x7383
  - this is first accessed by the code at 50c3, a CMPA $0138,X opcode, where X is 0x724B (0x724B + 0x138 = 0x7383)
- 
+
 
 At this point, the X index on the CPU is at the magic number address.
 

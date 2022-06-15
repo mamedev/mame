@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-
 #include "emu.h"
 
 #include "mpu4_characteriser_bootleg.h"
@@ -10,8 +9,6 @@
 // if it passes, other checks are skipped.
 //
 // this could be a trap, maybe this one is meant to fail and the others are meant to pass
-
-
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BL, mpu4_characteriser_bl, "xmpu4chrpalboot19", "MPU4 bootleg Characteriser (fixed returns)")
 

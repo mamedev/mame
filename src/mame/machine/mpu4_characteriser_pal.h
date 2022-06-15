@@ -318,8 +318,8 @@ public:
 
 	// games with sequence starting
 	// 00 e0 a8 38 94 48 50 60 e4 e8 58 f0 68 14 60 c4 a8 5c f4 28 34 60 a0 e8 1c f0 68 30 04 c0 8c 1c b4 68 14 04 c0 a8 18 d0 0c 14 44 84 a8 5c d4 6c 74 04 c0 e8 38 d4 4c 14 44 e0 e8 3c b4 0c 74 00
-	// Super Hyper Viper           "HVP 3.0" 
-	//                             "HVP 4.0" 
+	// Super Hyper Viper           "HVP 3.0"
+	//                             "HVP 4.0"
 	// Calamari Club               "CAC 0.3"
 	//                             "CA3 0.1"
 	// Hi Jinx                     "JNS 0.2"
@@ -339,7 +339,7 @@ public:
 	// Give Us A Clue              "C20 0.2"
 	//                             "C25 0.4"
 	// Prize Spend Spend Spend     "PS3 0.2"
- 	// Crown Jewels Club           "CJC 1.5"
+	// Crown Jewels Club           "CJC 1.5"
 	//                             "CJN 0.2"
 	// Crown Jewels Mk II Club     "CJ2 1.4"
 	static constexpr uint8_t duty_characteriser_prot[8] = { 0x00, 0x38, 0x24, 0x18, 0x08, 0x34, 0x20, 0x00 };
@@ -1149,7 +1149,7 @@ public:
 	//                           "CO  3.0"
 	//                           "CO  2.4"
 	//                           "CO  4.0"
-//	static constexpr uint8_t copycat_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x30, 0x38, 0x10, 0x18, 0x38 }; // rows 4-8 could be reversed, little evidence
+//  static constexpr uint8_t copycat_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x30, 0x38, 0x10, 0x18, 0x38 }; // rows 4-8 could be reversed, little evidence
 	static constexpr uint8_t copycat_characteriser_prot[8] = { 0x00, 0x68, 0x60, 0x48, 0x40, 0x68, 0x60, 0x40 }; //
 
 
@@ -1190,7 +1190,7 @@ public:
 	// games with sequence starting
 	// 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
 	// Magnificent 7s       "M7  2.0"
-    // Prize Fruit & Loot   "PFR 0.3"
+	// Prize Fruit & Loot   "PFR 0.3"
 	static constexpr uint8_t pfloot_characteriser_prot[8] = { 0x00, 0x58, 0x10, 0x48, 0x40, 0x18, 0x10, 0x00 }; // good?
 
 
@@ -1245,7 +1245,7 @@ public:
 	// games with sequence starting
 	// 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 b4 bc f4 1c d0 98 70 14 b4 b8 f0 3c 50 b0 18 d0 3c 74 b4 18 f0 3c 70 94 18 70 b4 bc f0 98 f0 1c f4 18 f0 b8 74 94 bc 70 94 b8 d4 1c f4 18 f4 00
 	// ** This is an unusual sequence, bit 0x10 always seems to be set, both here and in the lamp results
-	// ** Check if it isn't just one of the other ones but with an output line tied high? 
+	// ** Check if it isn't just one of the other ones but with an output line tied high?
 	// Rocket Money      "ROK 0.6"
 	static constexpr uint8_t rockmn_characteriser_prot[8] = { 0x10, 0x34, 0x14, 0x34, 0x30, 0x30, 0x14, 0x30 };
 

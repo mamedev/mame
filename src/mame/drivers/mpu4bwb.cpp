@@ -9,72 +9,69 @@
    some QPS sets also have large 0x3f fills but
    seem to be unrelated.
 
-	----------------------------------------
-	This file is home to the following BWB originals
+    ----------------------------------------
+    This file is home to the following BWB originals
 
-	Abracadabra
-	Big Match, ThE
-	Bingo Belle
-	Bingo Belle (Showcase cabinet version)
-	Bingo Club
-	Blues Boys
-	Championship Soccer
-	Cup Final
-	Dancing Diamonds
-	Daytona
-	Excalibur
-	Exotic Fruits
-	Fire & Ice
-	Harlequin
-	Heaven & Hell
-	Indy Cars
-	Jackpot Jokers
-	Jumping Jack Flash
-	Lucky Number 7
-	Mad Money
-	Mad Money Classic
-	Money Mummy Money
-	Orlando Magic
-	Prize Bingo
-	Quids In
-	Quids In (Showcase cabinet version)
-	Rack Em Up
-	Rainbow Gold
-	Red Hot Fever
-	Sinbad
-	Sky Sports
-	Soul Sister
-	Spin The Bottle
-	Stars & Stripes
-	Super League
-	Super Soccer
-	Sure Thing
-	T-Rex
-	Tutti Fruity
-	Volcano
-	Voodoo Express
-	X-change
-	X-s
-	X-treme
+    Abracadabra
+    Big Match, ThE
+    Bingo Belle
+    Bingo Belle (Showcase cabinet version)
+    Bingo Club
+    Blues Boys
+    Championship Soccer
+    Cup Final
+    Dancing Diamonds
+    Daytona
+    Excalibur
+    Exotic Fruits
+    Fire & Ice
+    Harlequin
+    Heaven & Hell
+    Indy Cars
+    Jackpot Jokers
+    Jumping Jack Flash
+    Lucky Number 7
+    Mad Money
+    Mad Money Classic
+    Money Mummy Money
+    Orlando Magic
+    Prize Bingo
+    Quids In
+    Quids In (Showcase cabinet version)
+    Rack Em Up
+    Rainbow Gold
+    Red Hot Fever
+    Sinbad
+    Sky Sports
+    Soul Sister
+    Spin The Bottle
+    Stars & Stripes
+    Super League
+    Super Soccer
+    Sure Thing
+    T-Rex
+    Tutti Fruity
+    Volcano
+    Voodoo Express
+    X-change
+    X-s
+    X-treme
 
-	----------------------------------------
-	German games by BWB and Nova also in here
+    ----------------------------------------
+    German games by BWB and Nova also in here
 
-	Blues Boys (Nova, German version)
-	Cup Final (Nova, German version)
-	World Cup (Nova, German version)
-	Excalibur (Nova, German version)
-	Olympic Gold (Nova, German version)
-	Find The Lady (Nova, German version)
-	Sinbad (Nova, German version)
+    Blues Boys (Nova, German version)
+    Cup Final (Nova, German version)
+    World Cup (Nova, German version)
+    Excalibur (Nova, German version)
+    Olympic Gold (Nova, German version)
+    Find The Lady (Nova, German version)
+    Sinbad (Nova, German version)
 
 */
 
 #include "emu.h"
 #include "includes/mpu4.h"
-
-INPUT_PORTS_EXTERN( mpu4 );
-
 
 namespace {
 
@@ -637,7 +634,7 @@ GAME_CUSTOM( 199?, m4harle__x,  m4harle,    "ph_20sk_.1_1", 0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Heaven & Hell
-* - 3.2 MPU Lamp Drv error 
+* - 3.2 MPU Lamp Drv error
 *
 *****************************************************************************************************************************************************************************/
 
@@ -1703,7 +1700,7 @@ GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8
 /*****************************************************************************************************************************************************************************
 *
 * German versions from Nova are below.
-* 
+*
 * Export cabinets were often different despite having the same game name, so not paired with the above UK releases
 *
 *****************************************************************************************************************************************************************************/

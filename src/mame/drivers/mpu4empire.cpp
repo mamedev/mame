@@ -25,7 +25,6 @@ public:
 } // anonymous namespace
 
 
-
 void mpu4empire_machines_state::init_m4apachg()
 {
 	init_m4default();

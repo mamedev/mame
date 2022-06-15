@@ -2203,9 +2203,9 @@ GAME_CUSTOM( 199?, m4redunk,    0,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8d
 
     Sets below have different protection, are they bootlegs?
 
-	Some sources credit a game called Blast-a-Bank to Carfield, is this it?
+    Some sources credit a game called Blast-a-Bank to Carfield, is this it?
 
-	Apart from the protection they do appear to be build off a Barcrest codebase
+    Apart from the protection they do appear to be build off a Barcrest codebase
 
 *********************************************************************************************************/
 

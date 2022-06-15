@@ -205,12 +205,12 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 			if (m_temp_debug_write_count == 64)
 			{
-				printf("Characteriser Sequence:\n"); // DEBUG only, not for release
+				logerror("Characteriser Sequence:\n");
 				for (int i = 0; i < 64; i++)
 				{
-					printf("%02x ", m_temp_debug_table[i]); // DEBUG only, not for release
+					logerror("%02x ", m_temp_debug_table[i]);
 				}
-				printf("\n");
+				logerror("\n");
 			}
 		}
 

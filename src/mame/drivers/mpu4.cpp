@@ -1458,10 +1458,10 @@ INPUT_PORTS_START( mpu4_impcoin )
 	PORT_INCLUDE( mpu4 )
 
 	PORT_MODIFY("AUX2")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_IMPULSE(5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_IMPULSE(5)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(4)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_IMPULSE(4)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_IMPULSE(4)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_IMPULSE(4)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mpu4_invcoin )
@@ -1828,7 +1828,7 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 
 void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
 {
-//	space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
+//  space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2181,7 +2181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 void mpu4_state::mpu4_memmap(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-//	map(0x0800, 0x081f) // optional protection device lives here, see other maps
+//  map(0x0800, 0x081f) // optional protection device lives here, see other maps
 	map(0x0850, 0x0850).rw(FUNC(mpu4_state::bankswitch_r), FUNC(mpu4_state::bankswitch_w));    /* write bank (rom page select) */
 	map(0x08e0, 0x08ef).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)); //Runs hoppers
 	map(0x08ed, 0x08ed).r(FUNC(mpu4_state::hack_duart_r)); // hack until the hopper is hooked up to the duart in games wanting that setup (eg m4ready)
