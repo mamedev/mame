@@ -750,6 +750,7 @@ MACHINES["AIC565"] = true
 MACHINES["AIC580"] = true
 MACHINES["AIC6250"] = true
 MACHINES["VRENDER0"] = true
+MACHINES["AT_MB"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1457,9 +1458,9 @@ createMAMEProjects(_target, _subtarget, "barcrest")
 files {
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
-	MAME_DIR .. "src/mame/machine/mpu4.cpp",
-	MAME_DIR .. "src/mame/includes/mpu4.h",
 	MAME_DIR .. "src/mame/drivers/mpu4.cpp",
+	MAME_DIR .. "src/mame/includes/mpu4.h",
+	MAME_DIR .. "src/mame/drivers/mpu4unsorted.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4avan.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4bwb.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4concept.cpp",
@@ -1469,11 +1470,17 @@ files {
 	MAME_DIR .. "src/mame/drivers/mpu4mdm.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4misc.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4mod2sw.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4mod4oki.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4mod4yam.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4plasma.cpp",
-	MAME_DIR .. "src/mame/drivers/mpu4sw.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4union.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4vid.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.h",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.h",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.h",
 	MAME_DIR .. "src/mame/includes/mpu5.h",
 	MAME_DIR .. "src/mame/drivers/mpu5.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu5sw.cpp",
@@ -2747,8 +2754,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
-	MAME_DIR .. "src/mame/machine/at.h",
-	MAME_DIR .. "src/mame/machine/at.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")
@@ -3349,8 +3354,6 @@ files {
 	MAME_DIR .. "src/mame/video/playmark.cpp",
 	MAME_DIR .. "src/mame/drivers/powerbal.cpp",
 	MAME_DIR .. "src/mame/drivers/sderby.cpp",
-	MAME_DIR .. "src/mame/includes/sderby.h",
-	MAME_DIR .. "src/mame/video/sderby.cpp",
 	MAME_DIR .. "src/mame/drivers/sslam.cpp",
 	MAME_DIR .. "src/mame/includes/sslam.h",
 	MAME_DIR .. "src/mame/video/sslam.cpp",
@@ -4500,8 +4503,6 @@ files {
 	MAME_DIR .. "src/mame/video/ojankohs.cpp",
 	MAME_DIR .. "src/mame/drivers/pipedrm.cpp",
 	MAME_DIR .. "src/mame/drivers/rpunch.cpp",
-	MAME_DIR .. "src/mame/includes/rpunch.h",
-	MAME_DIR .. "src/mame/video/rpunch.cpp",
 	MAME_DIR .. "src/mame/drivers/suprslam.cpp",
 	MAME_DIR .. "src/mame/includes/suprslam.h",
 	MAME_DIR .. "src/mame/video/suprslam.cpp",

@@ -105,6 +105,7 @@ private:
 	void at_dma8237_1_w(offs_t offset, uint8_t data);
 	uint8_t bebox_dma_read_byte(offs_t offset);
 	void bebox_dma_write_byte(offs_t offset, uint8_t data);
+	inline void set_dma_channel(int channel, int state);
 	uint64_t scsi53c810_r(offs_t offset, uint64_t mem_mask = ~0);
 	void scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t bb_slave_64be_r(offs_t offset, uint64_t mem_mask = ~0);

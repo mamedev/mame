@@ -2543,16 +2543,16 @@
 		<element ref="reel_background">
 			<bounds x="397" y="370" width="80" height="80"/>
 		</element>
-		<element name="lamp11" ref="reel_lamp" state="0">
+		<element name="lamp75" ref="reel_lamp" state="0">
 			<bounds x="397.0000" y="370.0000" width="80.0000" height="80.0000"/>
 		</element>
 		<element name="sreel4" ref="reel3" state="0">
 			<bounds x="397" y="370" width="80" height="80"/>
 		</element>
-		<element name="lamp127" ref="lamp_127_1_border" state="0">
+		<element name="lamp63" ref="lamp_127_1_border" state="0">
 			<bounds x="5" y="461" width="85" height="22"/>
 		</element>
-		<element name="lamp127" ref="lamp_127_1" state="0">
+		<element name="lamp63" ref="lamp_127_1" state="0">
 			<bounds x="7" y="463" width="81" height="18"/>
 		</element>
 		<element name="lamp120" ref="lamp_120_1_border" state="0">
@@ -2567,10 +2567,10 @@
 		<element name="lamp122" ref="lamp_122_1" state="0">
 			<bounds x="216" y="259" width="63" height="33"/>
 		</element>
-		<element name="lamp59" ref="lamp_59_1_border" state="0">
+		<element name="lamp123" ref="lamp_59_1_border" state="0">
 			<bounds x="280" y="257" width="67" height="37"/>
 		</element>
-		<element name="lamp59" ref="lamp_59_1" state="0">
+		<element name="lamp123" ref="lamp_59_1" state="0">
 			<bounds x="282" y="259" width="63" height="33"/>
 		</element>
 		<element name="lamp121" ref="lamp_121_1_border" state="0">
@@ -2579,94 +2579,94 @@
 		<element name="lamp121" ref="lamp_121_1" state="0">
 			<bounds x="150" y="259" width="63" height="33"/>
 		</element>
-		<element name="lamp60" ref="lamp_60_1_border" state="0">
+		<element name="lamp124" ref="lamp_60_1_border" state="0">
 			<bounds x="346" y="257" width="67" height="37"/>
 		</element>
-		<element name="lamp60" ref="lamp_60_1" state="0">
+		<element name="lamp124" ref="lamp_60_1" state="0">
 			<bounds x="348" y="259" width="63" height="33"/>
 		</element>
-		<element name="lamp94" ref="lamp_94_1_border" state="0">
+		<element name="lamp62" ref="lamp_94_1_border" state="0">
 			<bounds x="1" y="411" width="52" height="27"/>
 		</element>
-		<element name="lamp94" ref="lamp_94_1" state="0">
+		<element name="lamp62" ref="lamp_94_1" state="0">
 			<bounds x="3" y="413" width="48" height="23"/>
 		</element>
-		<element name="lamp93" ref="lamp_93_1_border" state="0">
+		<element name="lamp61" ref="lamp_93_1_border" state="0">
 			<bounds x="33" y="367" width="52" height="27"/>
 		</element>
-		<element name="lamp93" ref="lamp_93_1" state="0">
+		<element name="lamp61" ref="lamp_93_1" state="0">
 			<bounds x="35" y="369" width="48" height="23"/>
 		</element>
-		<element name="lamp124" ref="lamp_124_1_border" state="0">
+		<element name="lamp60" ref="lamp_124_1_border" state="0">
 			<bounds x="1" y="326" width="52" height="27"/>
 		</element>
-		<element name="lamp124" ref="lamp_124_1" state="0">
+		<element name="lamp60" ref="lamp_124_1" state="0">
 			<bounds x="3" y="328" width="48" height="23"/>
 		</element>
-		<element name="lamp53" ref="lamp_53_1_border" state="0">
+		<element name="lamp85" ref="lamp_53_1_border" state="0">
 			<bounds x="413" y="77" width="67" height="37"/>
 		</element>
-		<element name="lamp53" ref="lamp_53_1" state="0">
+		<element name="lamp85" ref="lamp_53_1" state="0">
 			<bounds x="415" y="79" width="63" height="33"/>
 		</element>
-		<element name="lamp20" ref="lamp_20_1_border" state="0">
+		<element name="lamp84" ref="lamp_20_1_border" state="0">
 			<bounds x="347" y="77" width="67" height="37"/>
 		</element>
-		<element name="lamp20" ref="lamp_20_1" state="0">
+		<element name="lamp84" ref="lamp_20_1" state="0">
 			<bounds x="349" y="79" width="63" height="33"/>
 		</element>
-		<element name="lamp61" ref="lamp_61_1_border" state="0">
+		<element name="lamp93" ref="lamp_61_1_border" state="0">
 			<bounds x="413" y="113" width="67" height="37"/>
 		</element>
-		<element name="lamp61" ref="lamp_61_1" state="0">
+		<element name="lamp93" ref="lamp_61_1" state="0">
 			<bounds x="415" y="115" width="63" height="33"/>
 		</element>
-		<element name="lamp28" ref="lamp_28_1_border" state="0">
+		<element name="lamp92" ref="lamp_28_1_border" state="0">
 			<bounds x="347" y="113" width="67" height="37"/>
 		</element>
-		<element name="lamp28" ref="lamp_28_1" state="0">
+		<element name="lamp92" ref="lamp_28_1" state="0">
 			<bounds x="349" y="115" width="63" height="33"/>
 		</element>
-		<element name="lamp45" ref="lamp_45_1_border" state="0">
+		<element name="lamp77" ref="lamp_45_1_border" state="0">
 			<bounds x="413" y="41" width="67" height="37"/>
 		</element>
-		<element name="lamp45" ref="lamp_45_1" state="0">
+		<element name="lamp77" ref="lamp_45_1" state="0">
 			<bounds x="415" y="43" width="63" height="33"/>
 		</element>
-		<element name="lamp12" ref="lamp_12_1_border" state="0">
+		<element name="lamp76" ref="lamp_12_1_border" state="0">
 			<bounds x="347" y="41" width="67" height="37"/>
 		</element>
-		<element name="lamp12" ref="lamp_12_1" state="0">
+		<element name="lamp76" ref="lamp_12_1" state="0">
 			<bounds x="349" y="43" width="63" height="33"/>
 		</element>
-		<element name="lamp4" ref="lamp_4_1_border" state="0">
+		<element name="lamp68" ref="lamp_4_1_border" state="0">
 			<bounds x="347" y="5" width="67" height="37"/>
 		</element>
-		<element name="lamp4" ref="lamp_4_1" state="0">
+		<element name="lamp68" ref="lamp_4_1" state="0">
 			<bounds x="349" y="7" width="63" height="33"/>
 		</element>
-		<element name="lamp37" ref="lamp_37_1_border" state="0">
+		<element name="lamp69" ref="lamp_37_1_border" state="0">
 			<bounds x="413" y="5" width="67" height="37"/>
 		</element>
-		<element name="lamp37" ref="lamp_37_1" state="0">
+		<element name="lamp69" ref="lamp_37_1" state="0">
 			<bounds x="415" y="7" width="63" height="33"/>
 		</element>
-		<element name="lamp52" ref="lamp_52_1_border" state="0">
+		<element name="lamp116" ref="lamp_52_1_border" state="0">
 			<bounds x="346" y="221" width="67" height="37"/>
 		</element>
-		<element name="lamp52" ref="lamp_52_1" state="0">
+		<element name="lamp116" ref="lamp_52_1" state="0">
 			<bounds x="348" y="223" width="63" height="33"/>
 		</element>
-		<element name="lamp44" ref="lamp_44_1_border" state="0">
+		<element name="lamp108" ref="lamp_44_1_border" state="0">
 			<bounds x="346" y="185" width="67" height="37"/>
 		</element>
-		<element name="lamp44" ref="lamp_44_1" state="0">
+		<element name="lamp108" ref="lamp_44_1" state="0">
 			<bounds x="348" y="187" width="63" height="33"/>
 		</element>
-		<element name="lamp36" ref="lamp_36_1_border" state="0">
+		<element name="lamp100" ref="lamp_36_1_border" state="0">
 			<bounds x="346" y="149" width="67" height="37"/>
 		</element>
-		<element name="lamp36" ref="lamp_36_1" state="0">
+		<element name="lamp100" ref="lamp_36_1" state="0">
 			<bounds x="348" y="151" width="63" height="33"/>
 		</element>
 		<element name="lamp98" ref="lamp_98_1_border" state="0">
@@ -2675,10 +2675,10 @@
 		<element name="lamp98" ref="lamp_98_1" state="0">
 			<bounds x="216" y="151" width="63" height="33"/>
 		</element>
-		<element name="lamp35" ref="lamp_35_1_border" state="0">
+		<element name="lamp99" ref="lamp_35_1_border" state="0">
 			<bounds x="280" y="149" width="67" height="37"/>
 		</element>
-		<element name="lamp35" ref="lamp_35_1" state="0">
+		<element name="lamp99" ref="lamp_35_1" state="0">
 			<bounds x="282" y="151" width="63" height="33"/>
 		</element>
 		<element name="lamp105" ref="lamp_105_1_border" state="0">
@@ -2693,10 +2693,10 @@
 		<element name="lamp97" ref="lamp_97_1" state="0">
 			<bounds x="150" y="151" width="63" height="33"/>
 		</element>
-		<element name="lamp43" ref="lamp_43_1_border" state="0">
+		<element name="lamp107" ref="lamp_43_1_border" state="0">
 			<bounds x="280" y="185" width="67" height="37"/>
 		</element>
-		<element name="lamp43" ref="lamp_43_1" state="0">
+		<element name="lamp107" ref="lamp_43_1" state="0">
 			<bounds x="282" y="187" width="63" height="33"/>
 		</element>
 		<element name="lamp106" ref="lamp_106_1_border" state="0">
@@ -2717,10 +2717,10 @@
 		<element name="lamp114" ref="lamp_114_1" state="0">
 			<bounds x="216" y="223" width="63" height="33"/>
 		</element>
-		<element name="lamp51" ref="lamp_51_1_border" state="0">
+		<element name="lamp115" ref="lamp_51_1_border" state="0">
 			<bounds x="280" y="221" width="67" height="37"/>
 		</element>
-		<element name="lamp51" ref="lamp_51_1" state="0">
+		<element name="lamp115" ref="lamp_51_1" state="0">
 			<bounds x="282" y="223" width="63" height="33"/>
 		</element>
 		<element name="lamp65" ref="lamp_65_1_border" state="0">
@@ -2735,10 +2735,10 @@
 		<element name="lamp66" ref="lamp_66_1" state="0">
 			<bounds x="216" y="7" width="63" height="33"/>
 		</element>
-		<element name="lamp3" ref="lamp_3_1_border" state="0">
+		<element name="lamp67" ref="lamp_3_1_border" state="0">
 			<bounds x="280" y="5" width="67" height="37"/>
 		</element>
-		<element name="lamp3" ref="lamp_3_1" state="0">
+		<element name="lamp67" ref="lamp_3_1" state="0">
 			<bounds x="282" y="7" width="63" height="33"/>
 		</element>
 		<element name="lamp73" ref="lamp_73_1_border" state="0">
@@ -2753,10 +2753,10 @@
 		<element name="lamp74" ref="lamp_74_1" state="0">
 			<bounds x="217" y="43" width="63" height="33"/>
 		</element>
-		<element name="lamp11" ref="lamp_11_1_border" state="0">
+		<element name="lamp75" ref="lamp_11_1_border" state="0">
 			<bounds x="281" y="41" width="67" height="37"/>
 		</element>
-		<element name="lamp11" ref="lamp_11_1" state="0">
+		<element name="lamp75" ref="lamp_11_1" state="0">
 			<bounds x="283" y="43" width="63" height="33"/>
 		</element>
 		<element name="lamp89" ref="lamp_89_1_border" state="0">
@@ -2771,10 +2771,10 @@
 		<element name="lamp90" ref="lamp_90_1" state="0">
 			<bounds x="217" y="115" width="63" height="33"/>
 		</element>
-		<element name="lamp27" ref="lamp_27_1_border" state="0">
+		<element name="lamp91" ref="lamp_27_1_border" state="0">
 			<bounds x="281" y="113" width="67" height="37"/>
 		</element>
-		<element name="lamp27" ref="lamp_27_1" state="0">
+		<element name="lamp91" ref="lamp_27_1" state="0">
 			<bounds x="283" y="115" width="63" height="33"/>
 		</element>
 		<element name="lamp81" ref="lamp_81_1_border" state="0">
@@ -2789,10 +2789,10 @@
 		<element name="lamp82" ref="lamp_82_1" state="0">
 			<bounds x="217" y="79" width="63" height="33"/>
 		</element>
-		<element name="lamp19" ref="lamp_19_1_border" state="0">
+		<element name="lamp83" ref="lamp_19_1_border" state="0">
 			<bounds x="281" y="77" width="67" height="37"/>
 		</element>
-		<element name="lamp19" ref="lamp_19_1" state="0">
+		<element name="lamp83" ref="lamp_19_1" state="0">
 			<bounds x="283" y="79" width="63" height="33"/>
 		</element>
 		<element name="lamp80" ref="lamp_80_1_border" state="0">
@@ -2837,94 +2837,94 @@
 		<element name="lamp64" ref="lamp_64_1" state="0">
 			<bounds x="84" y="7" width="63" height="33"/>
 		</element>
-		<element name="lamp7" ref="lamp_7_1_border" state="0">
+		<element name="lamp71" ref="lamp_7_1_border" state="0">
 			<bounds x="487" y="7" width="90" height="37"/>
 		</element>
-		<element name="lamp7" ref="lamp_7_1" state="0">
+		<element name="lamp71" ref="lamp_7_1" state="0">
 			<bounds x="489" y="9" width="86" height="33"/>
 		</element>
-		<element name="lamp39" ref="lamp_39_1_border" state="0">
+		<element name="lamp103" ref="lamp_39_1_border" state="0">
 			<bounds x="576" y="115" width="90" height="37"/>
 		</element>
-		<element name="lamp39" ref="lamp_39_1" state="0">
+		<element name="lamp103" ref="lamp_39_1" state="0">
 			<bounds x="578" y="117" width="86" height="33"/>
 		</element>
-		<element name="lamp6" ref="lamp_6_1_border" state="0">
+		<element name="lamp102" ref="lamp_6_1_border" state="0">
 			<bounds x="577" y="151" width="90" height="37"/>
 		</element>
-		<element name="lamp6" ref="lamp_6_1" state="0">
+		<element name="lamp102" ref="lamp_6_1" state="0">
 			<bounds x="579" y="153" width="86" height="33"/>
 		</element>
-		<element name="lamp31" ref="lamp_31_1_border" state="0">
+		<element name="lamp95" ref="lamp_31_1_border" state="0">
 			<bounds x="576" y="79" width="90" height="37"/>
 		</element>
-		<element name="lamp31" ref="lamp_31_1" state="0">
+		<element name="lamp95" ref="lamp_31_1" state="0">
 			<bounds x="578" y="81" width="86" height="33"/>
 		</element>
-		<element name="lamp62" ref="lamp_62_1_border" state="0">
+		<element name="lamp94" ref="lamp_62_1_border" state="0">
 			<bounds x="576" y="43" width="90" height="37"/>
 		</element>
-		<element name="lamp62" ref="lamp_62_1" state="0">
+		<element name="lamp94" ref="lamp_62_1" state="0">
 			<bounds x="578" y="45" width="86" height="33"/>
 		</element>
-		<element name="lamp54" ref="lamp_54_1_border" state="0">
+		<element name="lamp86" ref="lamp_54_1_border" state="0">
 			<bounds x="576" y="7" width="90" height="37"/>
 		</element>
-		<element name="lamp54" ref="lamp_54_1" state="0">
+		<element name="lamp86" ref="lamp_54_1" state="0">
 			<bounds x="578" y="9" width="86" height="33"/>
 		</element>
-		<element name="lamp23" ref="lamp_23_1_border" state="0">
+		<element name="lamp87" ref="lamp_23_1_border" state="0">
 			<bounds x="488" y="151" width="90" height="37"/>
 		</element>
-		<element name="lamp23" ref="lamp_23_1" state="0">
+		<element name="lamp87" ref="lamp_23_1" state="0">
 			<bounds x="490" y="153" width="86" height="33"/>
 		</element>
-		<element name="lamp15" ref="lamp_15_1_border" state="0">
+		<element name="lamp79" ref="lamp_15_1_border" state="0">
 			<bounds x="487" y="115" width="90" height="37"/>
 		</element>
-		<element name="lamp15" ref="lamp_15_1" state="0">
+		<element name="lamp79" ref="lamp_15_1" state="0">
 			<bounds x="489" y="117" width="86" height="33"/>
 		</element>
-		<element name="lamp46" ref="lamp_46_1_border" state="0">
+		<element name="lamp78" ref="lamp_46_1_border" state="0">
 			<bounds x="487" y="79" width="90" height="37"/>
 		</element>
-		<element name="lamp46" ref="lamp_46_1" state="0">
+		<element name="lamp78" ref="lamp_46_1" state="0">
 			<bounds x="489" y="81" width="86" height="33"/>
 		</element>
-		<element name="lamp38" ref="lamp_38_1_border" state="0">
+		<element name="lamp70" ref="lamp_38_1_border" state="0">
 			<bounds x="487" y="43" width="90" height="37"/>
 		</element>
-		<element name="lamp38" ref="lamp_38_1" state="0">
+		<element name="lamp70" ref="lamp_38_1" state="0">
 			<bounds x="489" y="45" width="86" height="33"/>
 		</element>
-		<element name="lamp13" ref="lamp_13_1_border" state="0">
+		<element name="lamp109" ref="lamp_13_1_border" state="0">
 			<bounds x="412" y="185" width="67" height="37"/>
 		</element>
-		<element name="lamp13" ref="lamp_13_1" state="0">
+		<element name="lamp109" ref="lamp_13_1" state="0">
 			<bounds x="414" y="187" width="63" height="33"/>
 		</element>
-		<element name="lamp5" ref="lamp_5_1_border" state="0">
+		<element name="lamp101" ref="lamp_5_1_border" state="0">
 			<bounds x="412" y="149" width="67" height="37"/>
 		</element>
-		<element name="lamp5" ref="lamp_5_1" state="0">
+		<element name="lamp101" ref="lamp_5_1" state="0">
 			<bounds x="414" y="151" width="63" height="33"/>
 		</element>
-		<element name="lamp21" ref="lamp_21_1_border" state="0">
+		<element name="lamp117" ref="lamp_21_1_border" state="0">
 			<bounds x="412" y="221" width="67" height="37"/>
 		</element>
-		<element name="lamp21" ref="lamp_21_1" state="0">
+		<element name="lamp117" ref="lamp_21_1" state="0">
 			<bounds x="414" y="223" width="63" height="33"/>
 		</element>
-		<element name="lamp29" ref="lamp_29_1_border" state="0">
+		<element name="lamp125" ref="lamp_29_1_border" state="0">
 			<bounds x="412" y="257" width="67" height="37"/>
 		</element>
-		<element name="lamp29" ref="lamp_29_1" state="0">
+		<element name="lamp125" ref="lamp_29_1" state="0">
 			<bounds x="414" y="259" width="63" height="33"/>
 		</element>
-		<element name="lamp107" ref="lamp_107_1_border" state="0">
+		<element name="lamp43" ref="lamp_107_1_border" state="0">
 			<bounds x="5" y="256" width="67" height="37"/>
 		</element>
-		<element name="lamp107" ref="lamp_107_1" state="0">
+		<element name="lamp43" ref="lamp_107_1" state="0">
 			<bounds x="7" y="258" width="63" height="33"/>
 		</element>
 		<element name="lamp33" ref="lamp_33_1_border" state="0">
@@ -2963,208 +2963,208 @@
 		<element name="lamp42" ref="lamp_42_1" state="0">
 			<bounds x="7" y="114" width="63" height="33"/>
 		</element>
-		<element name="lamp83" ref="lamp_83_1_border" state="0">
+		<element name="lamp19" ref="lamp_83_1_border" state="0">
 			<bounds x="5" y="76" width="67" height="37"/>
 		</element>
-		<element name="lamp83" ref="lamp_83_1" state="0">
+		<element name="lamp19" ref="lamp_83_1" state="0">
 			<bounds x="7" y="78" width="63" height="33"/>
 		</element>
-		<element name="lamp99" ref="lamp_99_1_border" state="0">
+		<element name="lamp35" ref="lamp_99_1_border" state="0">
 			<bounds x="5" y="4" width="67" height="37"/>
 		</element>
-		<element name="lamp99" ref="lamp_99_1" state="0">
+		<element name="lamp35" ref="lamp_99_1" state="0">
 			<bounds x="7" y="6" width="63" height="33"/>
 		</element>
-		<element name="lamp91" ref="lamp_91_1_border" state="0">
+		<element name="lamp27" ref="lamp_91_1_border" state="0">
 			<bounds x="5" y="40" width="67" height="37"/>
 		</element>
-		<element name="lamp91" ref="lamp_91_1" state="0">
+		<element name="lamp27" ref="lamp_91_1" state="0">
 			<bounds x="7" y="42" width="63" height="33"/>
 		</element>
-		<element name="lamp22" ref="lamp_22_1_border" state="0">
+		<element name="lamp118" ref="lamp_22_1_border" state="0">
 			<bounds x="695" y="126" width="82" height="22"/>
 		</element>
-		<element name="lamp22" ref="lamp_22_1" state="0">
+		<element name="lamp118" ref="lamp_22_1" state="0">
 			<bounds x="697" y="128" width="78" height="18"/>
 		</element>
-		<element name="lamp85" ref="lamp_85_1_border" state="0">
+		<element name="lamp53" ref="lamp_85_1_border" state="0">
 			<bounds x="697" y="372" width="72" height="19"/>
 		</element>
-		<element name="lamp85" ref="lamp_85_1" state="0">
+		<element name="lamp53" ref="lamp_85_1" state="0">
 			<bounds x="699" y="374" width="68" height="15"/>
 		</element>
-		<element name="lamp119" ref="lamp_119_1_border" state="0">
+		<element name="lamp55" ref="lamp_119_1_border" state="0">
 			<bounds x="697" y="432" width="72" height="19"/>
 		</element>
-		<element name="lamp119" ref="lamp_119_1" state="0">
+		<element name="lamp55" ref="lamp_119_1" state="0">
 			<bounds x="699" y="434" width="68" height="15"/>
 		</element>
-		<element name="lamp116" ref="lamp_116_1_border" state="0">
+		<element name="lamp52" ref="lamp_116_1_border" state="0">
 			<bounds x="697" y="344" width="72" height="19"/>
 		</element>
-		<element name="lamp116" ref="lamp_116_1" state="0">
+		<element name="lamp52" ref="lamp_116_1" state="0">
 			<bounds x="699" y="346" width="68" height="15"/>
 		</element>
-		<element name="lamp86" ref="lamp_86_1_border" state="0">
+		<element name="lamp54" ref="lamp_86_1_border" state="0">
 			<bounds x="697" y="400" width="72" height="19"/>
 		</element>
-		<element name="lamp86" ref="lamp_86_1" state="0">
+		<element name="lamp54" ref="lamp_86_1" state="0">
 			<bounds x="699" y="402" width="68" height="15"/>
 		</element>
-		<element name="lamp115" ref="lamp_115_1_border" state="0">
+		<element name="lamp51" ref="lamp_115_1_border" state="0">
 			<bounds x="697" y="312" width="72" height="19"/>
 		</element>
-		<element name="lamp115" ref="lamp_115_1" state="0">
+		<element name="lamp51" ref="lamp_115_1" state="0">
 			<bounds x="699" y="314" width="68" height="15"/>
 		</element>
-		<element name="lamp55" ref="lamp_55_1_border" state="0">
+		<element name="lamp119" ref="lamp_55_1_border" state="0">
 			<bounds x="701" y="463" width="65" height="18"/>
 		</element>
-		<element name="lamp55" ref="lamp_55_1" state="0">
+		<element name="lamp119" ref="lamp_55_1" state="0">
 			<bounds x="703" y="465" width="61" height="14"/>
 		</element>
-		<element name="lamp79" ref="lamp_79_1_border" state="0">
+		<element name="lamp15" ref="lamp_79_1_border" state="0">
 			<bounds x="647" y="307" width="42" height="32"/>
 		</element>
-		<element name="lamp79" ref="lamp_79_1" state="0">
+		<element name="lamp15" ref="lamp_79_1" state="0">
 			<bounds x="649" y="309" width="38" height="28"/>
 		</element>
-		<element name="lamp87" ref="lamp_87_1_border" state="0">
+		<element name="lamp23" ref="lamp_87_1_border" state="0">
 			<bounds x="647" y="336" width="42" height="32"/>
 		</element>
-		<element name="lamp87" ref="lamp_87_1" state="0">
+		<element name="lamp23" ref="lamp_87_1" state="0">
 			<bounds x="649" y="338" width="38" height="28"/>
 		</element>
-		<element name="lamp71" ref="lamp_71_1_border" state="0">
+		<element name="lamp7" ref="lamp_71_1_border" state="0">
 			<bounds x="647" y="278" width="42" height="32"/>
 		</element>
-		<element name="lamp71" ref="lamp_71_1" state="0">
+		<element name="lamp7" ref="lamp_71_1" state="0">
 			<bounds x="649" y="280" width="38" height="28"/>
 		</element>
-		<element name="lamp95" ref="lamp_95_1_border" state="0">
+		<element name="lamp31" ref="lamp_95_1_border" state="0">
 			<bounds x="647" y="365" width="42" height="32"/>
 		</element>
-		<element name="lamp95" ref="lamp_95_1" state="0">
+		<element name="lamp31" ref="lamp_95_1" state="0">
 			<bounds x="649" y="367" width="38" height="28"/>
 		</element>
-		<element name="lamp103" ref="lamp_103_1_border" state="0">
+		<element name="lamp39" ref="lamp_103_1_border" state="0">
 			<bounds x="647" y="394" width="42" height="32"/>
 		</element>
-		<element name="lamp103" ref="lamp_103_1" state="0">
+		<element name="lamp39" ref="lamp_103_1" state="0">
 			<bounds x="649" y="396" width="38" height="28"/>
 		</element>
-		<element name="lamp111" ref="lamp_111_1_border" state="0">
+		<element name="lamp47" ref="lamp_111_1_border" state="0">
 			<bounds x="647" y="423" width="42" height="32"/>
 		</element>
-		<element name="lamp111" ref="lamp_111_1" state="0">
+		<element name="lamp47" ref="lamp_111_1" state="0">
 			<bounds x="649" y="425" width="38" height="28"/>
 		</element>
-		<element name="lamp68" ref="lamp_68_1_border" state="0">
+		<element name="lamp4" ref="lamp_68_1_border" state="0">
 			<bounds x="534" y="278" width="38" height="32"/>
 		</element>
-		<element name="lamp68" ref="lamp_68_1" state="0">
+		<element name="lamp4" ref="lamp_68_1" state="0">
 			<bounds x="536" y="280" width="34" height="28"/>
 		</element>
-		<element name="lamp76" ref="lamp_76_1_border" state="0">
+		<element name="lamp12" ref="lamp_76_1_border" state="0">
 			<bounds x="534" y="307" width="38" height="32"/>
 		</element>
-		<element name="lamp76" ref="lamp_76_1" state="0">
+		<element name="lamp12" ref="lamp_76_1" state="0">
 			<bounds x="536" y="309" width="34" height="28"/>
 		</element>
-		<element name="lamp84" ref="lamp_84_1_border" state="0">
+		<element name="lamp20" ref="lamp_84_1_border" state="0">
 			<bounds x="534" y="336" width="38" height="32"/>
 		</element>
-		<element name="lamp84" ref="lamp_84_1" state="0">
+		<element name="lamp20" ref="lamp_84_1" state="0">
 			<bounds x="536" y="338" width="34" height="28"/>
 		</element>
-		<element name="lamp92" ref="lamp_92_1_border" state="0">
+		<element name="lamp28" ref="lamp_92_1_border" state="0">
 			<bounds x="534" y="365" width="38" height="32"/>
 		</element>
-		<element name="lamp92" ref="lamp_92_1" state="0">
+		<element name="lamp28" ref="lamp_92_1" state="0">
 			<bounds x="536" y="367" width="34" height="28"/>
 		</element>
-		<element name="lamp125" ref="lamp_125_1_border" state="0">
+		<element name="lamp29" ref="lamp_125_1_border" state="0">
 			<bounds x="569" y="365" width="38" height="32"/>
 		</element>
-		<element name="lamp125" ref="lamp_125_1" state="0">
+		<element name="lamp29" ref="lamp_125_1" state="0">
 			<bounds x="571" y="367" width="34" height="28"/>
 		</element>
-		<element name="lamp126" ref="lamp_126_1_border" state="0">
+		<element name="lamp30" ref="lamp_126_1_border" state="0">
 			<bounds x="604" y="365" width="38" height="32"/>
 		</element>
-		<element name="lamp126" ref="lamp_126_1" state="0">
+		<element name="lamp30" ref="lamp_126_1" state="0">
 			<bounds x="606" y="367" width="34" height="28"/>
 		</element>
-		<element name="lamp118" ref="lamp_118_1_border" state="0">
+		<element name="lamp22" ref="lamp_118_1_border" state="0">
 			<bounds x="604" y="336" width="38" height="32"/>
 		</element>
-		<element name="lamp118" ref="lamp_118_1" state="0">
+		<element name="lamp22" ref="lamp_118_1" state="0">
 			<bounds x="606" y="338" width="34" height="28"/>
 		</element>
-		<element name="lamp117" ref="lamp_117_1_border" state="0">
+		<element name="lamp21" ref="lamp_117_1_border" state="0">
 			<bounds x="569" y="336" width="38" height="32"/>
 		</element>
-		<element name="lamp117" ref="lamp_117_1" state="0">
+		<element name="lamp21" ref="lamp_117_1" state="0">
 			<bounds x="571" y="338" width="34" height="28"/>
 		</element>
-		<element name="lamp109" ref="lamp_109_1_border" state="0">
+		<element name="lamp13" ref="lamp_109_1_border" state="0">
 			<bounds x="569" y="307" width="38" height="32"/>
 		</element>
-		<element name="lamp109" ref="lamp_109_1" state="0">
+		<element name="lamp13" ref="lamp_109_1" state="0">
 			<bounds x="571" y="309" width="34" height="28"/>
 		</element>
-		<element name="lamp110" ref="lamp_110_1_border" state="0">
+		<element name="lamp14" ref="lamp_110_1_border" state="0">
 			<bounds x="604" y="307" width="38" height="32"/>
 		</element>
-		<element name="lamp110" ref="lamp_110_1" state="0">
+		<element name="lamp14" ref="lamp_110_1" state="0">
 			<bounds x="606" y="309" width="34" height="28"/>
 		</element>
-		<element name="lamp102" ref="lamp_102_1_border" state="0">
+		<element name="lamp6" ref="lamp_102_1_border" state="0">
 			<bounds x="604" y="278" width="38" height="32"/>
 		</element>
-		<element name="lamp102" ref="lamp_102_1" state="0">
+		<element name="lamp6" ref="lamp_102_1" state="0">
 			<bounds x="606" y="280" width="34" height="28"/>
 		</element>
-		<element name="lamp101" ref="lamp_101_1_border" state="0">
+		<element name="lamp5" ref="lamp_101_1_border" state="0">
 			<bounds x="569" y="278" width="38" height="32"/>
 		</element>
-		<element name="lamp101" ref="lamp_101_1" state="0">
+		<element name="lamp5" ref="lamp_101_1" state="0">
 			<bounds x="571" y="280" width="34" height="28"/>
 		</element>
-		<element name="lamp70" ref="lamp_70_1_border" state="0">
+		<element name="lamp38" ref="lamp_70_1_border" state="0">
 			<bounds x="604" y="394" width="38" height="32"/>
 		</element>
-		<element name="lamp70" ref="lamp_70_1" state="0">
+		<element name="lamp38" ref="lamp_70_1" state="0">
 			<bounds x="606" y="396" width="34" height="28"/>
 		</element>
-		<element name="lamp69" ref="lamp_69_1_border" state="0">
+		<element name="lamp37" ref="lamp_69_1_border" state="0">
 			<bounds x="569" y="394" width="38" height="32"/>
 		</element>
-		<element name="lamp69" ref="lamp_69_1" state="0">
+		<element name="lamp37" ref="lamp_69_1" state="0">
 			<bounds x="571" y="396" width="34" height="28"/>
 		</element>
-		<element name="lamp100" ref="lamp_100_1_border" state="0">
+		<element name="lamp36" ref="lamp_100_1_border" state="0">
 			<bounds x="534" y="394" width="38" height="32"/>
 		</element>
-		<element name="lamp100" ref="lamp_100_1" state="0">
+		<element name="lamp36" ref="lamp_100_1" state="0">
 			<bounds x="536" y="396" width="34" height="28"/>
 		</element>
-		<element name="lamp108" ref="lamp_108_1_border" state="0">
+		<element name="lamp44" ref="lamp_108_1_border" state="0">
 			<bounds x="534" y="423" width="38" height="32"/>
 		</element>
-		<element name="lamp108" ref="lamp_108_1" state="0">
+		<element name="lamp44" ref="lamp_108_1" state="0">
 			<bounds x="536" y="425" width="34" height="28"/>
 		</element>
-		<element name="lamp77" ref="lamp_77_1_border" state="0">
+		<element name="lamp45" ref="lamp_77_1_border" state="0">
 			<bounds x="569" y="423" width="38" height="32"/>
 		</element>
-		<element name="lamp77" ref="lamp_77_1" state="0">
+		<element name="lamp45" ref="lamp_77_1" state="0">
 			<bounds x="571" y="425" width="34" height="28"/>
 		</element>
-		<element name="lamp78" ref="lamp_78_1_border" state="0">
+		<element name="lamp46" ref="lamp_78_1_border" state="0">
 			<bounds x="604" y="423" width="38" height="32"/>
 		</element>
-		<element name="lamp78" ref="lamp_78_1" state="0">
+		<element name="lamp46" ref="lamp_78_1" state="0">
 			<bounds x="606" y="425" width="34" height="28"/>
 		</element>
 		<element name="lamp24" ref="colour_button_119_border" state="0" inputtag="BLACK2" inputmask="0x01">
@@ -3327,19 +3327,19 @@
 		<element name="lamp2" ref="debug_lamp_reel" state="0">
 			<bounds x="160" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp3" ref="debug_lamp_standard" state="0">
+		<element name="lamp67" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp4" ref="debug_lamp_standard" state="0">
+		<element name="lamp68" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp5" ref="debug_lamp_standard" state="0">
+		<element name="lamp101" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp6" ref="debug_lamp_standard" state="0">
+		<element name="lamp102" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp7" ref="debug_lamp_standard" state="0">
+		<element name="lamp71" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="32" width="60" height="60"/>
 		</element>
 		<element name="lamp8" ref="debug_lamp_reel" state="0">
@@ -3351,19 +3351,19 @@
 		<element name="lamp10" ref="debug_lamp_reel" state="0">
 			<bounds x="672" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp11" ref="debug_lamp_reel" state="0">
+		<element name="lamp75" ref="debug_lamp_reel" state="0">
 			<bounds x="736" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp12" ref="debug_lamp_standard" state="0">
+		<element name="lamp76" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp13" ref="debug_lamp_standard" state="0">
+		<element name="lamp109" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp14" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp110" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="32" width="60" height="60"/>
 		</element>
-		<element name="lamp15" ref="debug_lamp_standard" state="0">
+		<element name="lamp79" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="32" width="60" height="60"/>
 		</element>
 		<element name="lamp16" ref="debug_lamp_reel" state="0">
@@ -3375,19 +3375,19 @@
 		<element name="lamp18" ref="debug_lamp_reel" state="0">
 			<bounds x="160" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp19" ref="debug_lamp_standard" state="0">
+		<element name="lamp83" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp20" ref="debug_lamp_standard" state="0">
+		<element name="lamp84" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp21" ref="debug_lamp_standard" state="0">
+		<element name="lamp117" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp22" ref="debug_lamp_standard" state="0">
+		<element name="lamp118" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp23" ref="debug_lamp_standard" state="0">
+		<element name="lamp87" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="96" width="60" height="60"/>
 		</element>
 		<element name="lamp24" ref="debug_lamp_button" state="0">
@@ -3399,19 +3399,19 @@
 		<element name="lamp26" ref="debug_lamp_button" state="0">
 			<bounds x="672" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp27" ref="debug_lamp_standard" state="0">
+		<element name="lamp91" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp28" ref="debug_lamp_standard" state="0">
+		<element name="lamp92" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp29" ref="debug_lamp_standard" state="0">
+		<element name="lamp125" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp30" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp126" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="96" width="60" height="60"/>
 		</element>
-		<element name="lamp31" ref="debug_lamp_standard" state="0">
+		<element name="lamp95" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="96" width="60" height="60"/>
 		</element>
 		<element name="lamp32" ref="debug_lamp_button" state="0">
@@ -3423,19 +3423,19 @@
 		<element name="lamp34" ref="debug_lamp_button" state="0">
 			<bounds x="160" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp35" ref="debug_lamp_standard" state="0">
+		<element name="lamp99" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp36" ref="debug_lamp_standard" state="0">
+		<element name="lamp100" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp37" ref="debug_lamp_standard" state="0">
+		<element name="lamp69" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp38" ref="debug_lamp_standard" state="0">
+		<element name="lamp70" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp39" ref="debug_lamp_standard" state="0">
+		<element name="lamp103" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="160" width="60" height="60"/>
 		</element>
 		<element name="lamp40" ref="debug_lamp_button" state="0">
@@ -3447,19 +3447,19 @@
 		<element name="lamp42" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp43" ref="debug_lamp_standard" state="0">
+		<element name="lamp107" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp44" ref="debug_lamp_standard" state="0">
+		<element name="lamp108" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp45" ref="debug_lamp_standard" state="0">
+		<element name="lamp77" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp46" ref="debug_lamp_standard" state="0">
+		<element name="lamp78" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="160" width="60" height="60"/>
 		</element>
-		<element name="lamp47" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp111" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="160" width="60" height="60"/>
 		</element>
 		<element name="lamp48" ref="debug_lamp_standard" state="0">
@@ -3471,19 +3471,19 @@
 		<element name="lamp50" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp51" ref="debug_lamp_standard" state="0">
+		<element name="lamp115" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp52" ref="debug_lamp_standard" state="0">
+		<element name="lamp116" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp53" ref="debug_lamp_standard" state="0">
+		<element name="lamp85" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp54" ref="debug_lamp_standard" state="0">
+		<element name="lamp86" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp55" ref="debug_lamp_standard" state="0">
+		<element name="lamp119" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="224" width="60" height="60"/>
 		</element>
 		<element name="lamp56" ref="debug_lamp_unreferenced" state="0">
@@ -3495,19 +3495,19 @@
 		<element name="lamp58" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp59" ref="debug_lamp_standard" state="0">
+		<element name="lamp123" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp60" ref="debug_lamp_standard" state="0">
+		<element name="lamp124" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp61" ref="debug_lamp_standard" state="0">
+		<element name="lamp93" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp62" ref="debug_lamp_standard" state="0">
+		<element name="lamp94" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="224" width="60" height="60"/>
 		</element>
-		<element name="lamp63" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp127" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="224" width="60" height="60"/>
 		</element>
 		<element name="lamp64" ref="debug_lamp_standard" state="0">
@@ -3519,19 +3519,19 @@
 		<element name="lamp66" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp67" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp3" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp68" ref="debug_lamp_standard" state="0">
+		<element name="lamp4" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp69" ref="debug_lamp_standard" state="0">
+		<element name="lamp37" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp70" ref="debug_lamp_standard" state="0">
+		<element name="lamp38" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp71" ref="debug_lamp_standard" state="0">
+		<element name="lamp7" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="288" width="60" height="60"/>
 		</element>
 		<element name="lamp72" ref="debug_lamp_standard" state="0">
@@ -3543,19 +3543,19 @@
 		<element name="lamp74" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp75" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp11" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp76" ref="debug_lamp_standard" state="0">
+		<element name="lamp12" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp77" ref="debug_lamp_standard" state="0">
+		<element name="lamp45" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp78" ref="debug_lamp_standard" state="0">
+		<element name="lamp46" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="288" width="60" height="60"/>
 		</element>
-		<element name="lamp79" ref="debug_lamp_standard" state="0">
+		<element name="lamp15" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="288" width="60" height="60"/>
 		</element>
 		<element name="lamp80" ref="debug_lamp_standard" state="0">
@@ -3567,19 +3567,19 @@
 		<element name="lamp82" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp83" ref="debug_lamp_standard" state="0">
+		<element name="lamp19" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp84" ref="debug_lamp_standard" state="0">
+		<element name="lamp20" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp85" ref="debug_lamp_standard" state="0">
+		<element name="lamp53" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp86" ref="debug_lamp_standard" state="0">
+		<element name="lamp54" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp87" ref="debug_lamp_standard" state="0">
+		<element name="lamp23" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="352" width="60" height="60"/>
 		</element>
 		<element name="lamp88" ref="debug_lamp_standard" state="0">
@@ -3591,19 +3591,19 @@
 		<element name="lamp90" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp91" ref="debug_lamp_standard" state="0">
+		<element name="lamp27" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp92" ref="debug_lamp_standard" state="0">
+		<element name="lamp28" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp93" ref="debug_lamp_standard" state="0">
+		<element name="lamp61" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp94" ref="debug_lamp_standard" state="0">
+		<element name="lamp62" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="352" width="60" height="60"/>
 		</element>
-		<element name="lamp95" ref="debug_lamp_standard" state="0">
+		<element name="lamp31" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="352" width="60" height="60"/>
 		</element>
 		<element name="lamp96" ref="debug_lamp_standard" state="0">
@@ -3615,19 +3615,19 @@
 		<element name="lamp98" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp99" ref="debug_lamp_standard" state="0">
+		<element name="lamp35" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp100" ref="debug_lamp_standard" state="0">
+		<element name="lamp36" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp101" ref="debug_lamp_standard" state="0">
+		<element name="lamp5" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp102" ref="debug_lamp_standard" state="0">
+		<element name="lamp6" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp103" ref="debug_lamp_standard" state="0">
+		<element name="lamp39" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="416" width="60" height="60"/>
 		</element>
 		<element name="lamp104" ref="debug_lamp_standard" state="0">
@@ -3639,19 +3639,19 @@
 		<element name="lamp106" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp107" ref="debug_lamp_standard" state="0">
+		<element name="lamp43" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp108" ref="debug_lamp_standard" state="0">
+		<element name="lamp44" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp109" ref="debug_lamp_standard" state="0">
+		<element name="lamp13" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp110" ref="debug_lamp_standard" state="0">
+		<element name="lamp14" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="416" width="60" height="60"/>
 		</element>
-		<element name="lamp111" ref="debug_lamp_standard" state="0">
+		<element name="lamp47" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="416" width="60" height="60"/>
 		</element>
 		<element name="lamp112" ref="debug_lamp_standard" state="0">
@@ -3663,19 +3663,19 @@
 		<element name="lamp114" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp115" ref="debug_lamp_standard" state="0">
+		<element name="lamp51" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp116" ref="debug_lamp_standard" state="0">
+		<element name="lamp52" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp117" ref="debug_lamp_standard" state="0">
+		<element name="lamp21" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp118" ref="debug_lamp_standard" state="0">
+		<element name="lamp22" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp119" ref="debug_lamp_standard" state="0">
+		<element name="lamp55" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="480" width="60" height="60"/>
 		</element>
 		<element name="lamp120" ref="debug_lamp_standard" state="0">
@@ -3687,19 +3687,19 @@
 		<element name="lamp122" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp123" ref="debug_lamp_unreferenced" state="0">
+		<element name="lamp59" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp124" ref="debug_lamp_standard" state="0">
+		<element name="lamp60" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp125" ref="debug_lamp_standard" state="0">
+		<element name="lamp29" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp126" ref="debug_lamp_standard" state="0">
+		<element name="lamp30" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="480" width="60" height="60"/>
 		</element>
-		<element name="lamp127" ref="debug_lamp_standard" state="0">
+		<element name="lamp63" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="480" width="60" height="60"/>
 		</element>
 		<element name="lamp128" ref="debug_lamp_unreferenced" state="0">
@@ -4360,7 +4360,7 @@
 		<element ref="reel_background">
 			<bounds x="1520" y="32" width="120" height="240"/>
 		</element>
-		<element name="lamp11" ref="reel_lamp" state="0">
+		<element name="lamp75" ref="reel_lamp" state="0">
 			<bounds x="1520.0000" y="32.0000" width="120.0000" height="240.0000"/>
 		</element>
 		<element name="sreel4" ref="reel3" state="0">

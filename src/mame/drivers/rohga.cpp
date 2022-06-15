@@ -117,11 +117,14 @@
 #include "emu.h"
 #include "includes/rohga.h"
 
-#include "cpu/m68000/m68000.h"
 #include "machine/decocrpt.h"
+
+#include "cpu/m68000/m68000.h"
 #include "sound/ymopm.h"
+
 #include "screen.h"
 #include "speaker.h"
+
 #include <algorithm>
 
 
@@ -295,12 +298,14 @@ void rohga_state::hotb_base_map(address_map &map)
 void rohga_state::schmeisr_map(address_map &map)
 {
 	hotb_base_map(map);
+
 	map(0xff0000, 0xff7fff).ram(); /* Main ram */
 }
 
 void rohga_state::hangzo_map(address_map &map)
 {
 	hotb_base_map(map);
+
 	map(0x3f0000, 0x3f3fff).ram(); /* Main ram */
 }
 
@@ -861,14 +866,13 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	return colour;
 }
 
-void rohga_state::rohga(machine_config &config)
+void rohga_state::rohga_base(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::rohga_map);
+	M68000(config, m_maincpu, 14'000'000);
 	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
 
-	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	H6280(config, m_audiocpu, 32'220'000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
@@ -881,10 +885,7 @@ void rohga_state::rohga(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(rohga_state::screen_update_rohga));
-	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
 	PALETTE(config, m_palette).set_entries(2048);
 
 	DECOCOMN(config, m_decocomn, 0);
@@ -917,8 +918,6 @@ void rohga_state::rohga(machine_config &config)
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
-	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback));
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
@@ -932,170 +931,86 @@ void rohga_state::rohga(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32'220'000/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
 	ymsnd.add_route(0, "lspeaker", 0.36);
 	ymsnd.add_route(1, "rspeaker", 0.36);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 32'220'000/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], 32'220'000/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
-void rohga_state::wizdfire(machine_config &config)
+void rohga_state::rohga(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::wizdfire_map);
-	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
+	rohga_base(config);
 
-	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::rohga_map);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
+	subdevice<screen_device>("screen")->set_palette(m_palette);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
+
+	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
+	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback));
+}
+
+void rohga_state::wizdfire(machine_config &config)
+{
+	rohga_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::wizdfire_map);
+
+	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(rohga_state::screen_update_wizdfire));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_wizdfire));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
-	PALETTE(config, m_palette).set_entries(2048);
 
-	DECOCOMN(config, m_decocomn, 0);
-	m_decocomn->set_palette_tag(m_palette);
-
-	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[1], 0);
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO104PROT(config, m_ioprot, 0);
-	m_ioprot->port_a_cb().set_ioport("INPUTS");
-	m_ioprot->port_b_cb().set_ioport("SYSTEM");
-	m_ioprot->port_c_cb().set_ioport("DSW");
-	m_ioprot->soundlatch_irq_cb().set_inputline("audiocpu", 0);
 	m_ioprot->set_interface_scramble_reverse();
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
-	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.36);
-	ymsnd.add_route(1, "rspeaker", 0.36);
-
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
-
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
 void rohga_state::nitrobal(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::nitrobal_map);
-	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
+	rohga_base(config);
 
-	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::nitrobal_map);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(rohga_state::screen_update_nitrobal));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_nitrobal));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wizdfire);
-	PALETTE(config, m_palette).set_entries(2048);
 
-	DECOCOMN(config, m_decocomn, 0);
-	m_decocomn->set_palette_tag(m_palette);
-
-	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(0);
 	m_deco_tilegen[1]->set_pf1_col_mask(0);
 	m_deco_tilegen[1]->set_pf2_col_mask(0);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[1], 0);
 	m_sprgen[1]->set_gfx_region(4);
@@ -1103,120 +1018,31 @@ void rohga_state::nitrobal(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
-	DECO146PROT(config, m_ioprot, 0);
-	m_ioprot->port_a_cb().set_ioport("INPUTS");
-	m_ioprot->port_b_cb().set_ioport("SYSTEM");
-	m_ioprot->port_c_cb().set_ioport("DSW");
-	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
-	m_ioprot->set_interface_scramble_reverse();
-	m_ioprot->set_use_magic_read_address_xor(true);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
-	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.36);
-	ymsnd.add_route(1, "rspeaker", 0.36);
-
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
-
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
-}
-
-void rohga_state::schmeisr(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::schmeisr_map);
-	m_maincpu->set_vblank_int("screen", FUNC(rohga_state::irq6_line_assert));
-
-	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
-
-	/* video hardware */
-	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(rohga_state::screen_update_rohga));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_schmeisr);
-	PALETTE(config, m_palette).set_entries(2048);
-
-	DECOCOMN(config, m_decocomn, 0);
-	m_decocomn->set_palette_tag(m_palette);
-
-	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
-	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback));  // wire mods on pcb...
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO104PROT(config, m_ioprot, 0);
+	DECO146PROT(config.replace(), m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
 	m_ioprot->soundlatch_irq_cb().set_inputline("audiocpu", 0);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
-	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.36);
-	ymsnd.add_route(1, "rspeaker", 0.36);
-
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
-
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
+	m_ioprot->set_interface_scramble_reverse();
+	m_ioprot->set_use_magic_read_address_xor(true);
 }
 
+void rohga_state::schmeisr(machine_config &config)
+{
+	rohga_base(config);
 
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rohga_state::schmeisr_map);
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
+	subdevice<screen_device>("screen")->set_palette(m_palette);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_schmeisr);
+
+	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
+	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback));  // wire mods on pcb...
+}
 
 void rohga_state::hangzo(machine_config &config)
 {
