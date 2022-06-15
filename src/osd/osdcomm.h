@@ -75,11 +75,6 @@ using s64 = std::int64_t;
     FUNDAMENTAL MACROS
 ***************************************************************************/
 
-// Concatenate/extract 32-bit halves of 64-bit values
-constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | uint32_t(lo); }
-constexpr uint32_t extract_64hi(uint64_t val) { return uint32_t(val >> 32); }
-constexpr uint32_t extract_64lo(uint64_t val) { return uint32_t(val); }
-
 // Macros for normalizing data into big or little endian formats
 constexpr uint16_t swapendian_int16(uint16_t val) { return (val << 8) | (val >> 8); }
 
