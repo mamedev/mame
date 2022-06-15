@@ -403,7 +403,7 @@ Notes:
                     C421 (QFP208)
                     C422 (QFP64)
                     C435 (x2, QFP144)
-                    C444 (QFP136)
+                    C444 (QFP136) This replaces C403 from System 23 but likely integrates the 2x IDT7200 chips used on System 23 inside this custom chip.
                     C447 (QFP256)
 
       Other ICs
@@ -515,7 +515,7 @@ Notes:
                     C421 (QFP208)
                     C422 (QFP64)
                     C435 (x2, QFP144)
-                    C444 (QFP136)
+                    C444 (QFP136) This replaces C403 from System 23 but likely integrates the 2x IDT7200 chips used on System 23 inside this custom chip.
                     C447 (QFP256)
                     C450 (BGAxxx)
                     C451 (QFP208)
@@ -681,7 +681,7 @@ Notes:
       Angler King      AG1  Ver.A (for Super System 23)
       GP500            5GP3 Ver.C (for Super System 23)
       Time Crisis 2    TSS4 Ver.A (for Super System 23)
-      Final Furlong 2  FFS1 Ver.? (for Super System 23)
+      Final Furlong 2  FFS1 Ver.A (for Super System 23)
       Final Furlong 2  FFS2 Ver.? (for Super System 23)
 
 Type 3:
@@ -1457,6 +1457,11 @@ public:
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
@@ -1509,7 +1514,6 @@ private:
 	void c435_state_reset_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
-	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -1557,9 +1561,6 @@ private:
 	void s23iobrdmap(address_map &map);
 	void motoxgo_exio_map(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<mips3_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
@@ -2415,7 +2416,7 @@ void namcos23_state::textchar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 // Video start/update callbacks
 
-VIDEO_START_MEMBER(namcos23_state,s23)
+void namcos23_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos23_state::TextTilemapGetInfo)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -3665,8 +3666,6 @@ void namcos23_state::gorgon(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
-	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -3729,8 +3728,6 @@ void namcos23_state::s23(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
-
-	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3816,8 +3813,6 @@ void namcos23_state::ss23(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
-
-	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -4703,7 +4698,7 @@ ROM_START( finfurl2 )
 	ROM_LOAD16_BYTE( "29f016.ic1",   0x000001, 0x200000, CRC(5b04e4f2) SHA1(8099fc3deab9ed14a2484a774666fbd928330de8) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
+	ROM_LOAD16_WORD_SWAP( "ffs1vera.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
@@ -4744,11 +4739,11 @@ ROM_END
 
 ROM_START( finfurl2j )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_BYTE( "29f016_jap1.ic2", 0x000000, 0x200000, CRC(0215125d) SHA1(a99f601441c152b0b00f4811e5752c71897b1ed4) )
-	ROM_LOAD16_BYTE( "29f016_jap1.ic1", 0x000001, 0x200000, CRC(38c9ae96) SHA1(b50afc7276662267ff6460f82d0e5e8b00b341ea) )
+	ROM_LOAD16_BYTE( "ffs1vera.ic2", 0x000000, 0x200000, CRC(0215125d) SHA1(a99f601441c152b0b00f4811e5752c71897b1ed4) )
+	ROM_LOAD16_BYTE( "ffs1vera.ic1", 0x000001, 0x200000, CRC(38c9ae96) SHA1(b50afc7276662267ff6460f82d0e5e8b00b341ea) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
+	ROM_LOAD16_WORD_SWAP( "ffs1vera.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
@@ -5462,8 +5457,8 @@ GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",             GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
+GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver.A)", GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
 GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
 GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
 GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )

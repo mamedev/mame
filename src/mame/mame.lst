@@ -26318,8 +26318,8 @@ m4suptub                        // Super Tubes (Barcrest)
 m4suptuba                       //
 m4suptwo                        // Super Two (Barcrest)
 m4swpnot                        // Swap-A-Note (Barcrest)
-m4swpnota                       // 
-m4swpnotb                       // 
+m4swpnota                       //
+m4swpnotb                       //
 m4taj                           // Taj Mahal (Barcrest)
 m4take2                         // Take Two (Barcrest)
 m4take2a                        //
@@ -29805,7 +29805,7 @@ m4sss__j                        //
 m4sss__k                        //
 m4sss__l                        //
 m4sstrek                        // Super Streak (bootleg)
-m4stc                           // 
+m4stc                           //
 m4shv                           // Super Hyper Viper (Barcrest)
 m4shv__0
 m4shv__1
@@ -29820,7 +29820,7 @@ m4shv__6
 m4shv__7
 m4shv__8
 m4shv__9
-m4shv__a                        
+m4shv__a
 m4shv__b
 m4shv__c
 m4shv__d
@@ -39089,6 +39089,7 @@ skykids                         // (c) 1985
 @source:skylncr.cpp
 bdream97                        // Bootleg?
 butrfly                         // (c) 1995 Bordun International
+butrflybl                       // Bootleg
 gallag50                        // Bootleg?
 leader                          // Bootleg?
 leadera                         // Bootleg?
@@ -39099,9 +39100,12 @@ neraidou                        // Bootleg?
 olymp                           // Z Games
 rolla                           //
 score5                          // Z Games
+seadevil                        // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
+spcliner                        // Z Games
 speedway                        //
+speedwaya                       //
 sstar97                         // (c) 199? Bordun International
 superb2k                        // Random Games
 tigerslt                        // Bootleg?
