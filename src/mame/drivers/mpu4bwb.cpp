@@ -83,12 +83,66 @@ public:
 		mpu4_state(mconfig, type, tag)
 	{
 	}
+
+	void bwboki(machine_config &config);
+
+	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
+	{
+		bwboki(config);
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb);
+		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
+		m_characteriser_bwb->set_other_key(Key[1]);
+	}
+
+protected:
+
+	void mpu4_memmap_characteriser_bwb(address_map &map);
+
+	void mpu4_install_mod4bwb_space(address_space &space);
+
+	DECLARE_MACHINE_START(mpu4bwb);
+
 };
+
+void mpu4bwb_machines_state::mpu4_install_mod4bwb_space(address_space &space)
+{
+	// does anything else need to go here?
+	mpu4_install_mod4oki_space(space);
+}
+
+MACHINE_START_MEMBER(mpu4bwb_machines_state,mpu4bwb)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	mpu4_config_common();
+
+	m_link7a_connected=0;
+	m_mod_number=4;
+	mpu4_install_mod4bwb_space(space);
+}
+
+void mpu4bwb_machines_state::bwboki(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4bwb_machines_state,mpu4bwb)
+	mpu4_common2(config);
+	mpu4_reels<4, 5>(config);
+
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0800, 0x083f).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
+}
 
 } // anonymous namespace
 
-
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+
 
 /*****************************************************************************************************************************************************************************
 *

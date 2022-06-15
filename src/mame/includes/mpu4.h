@@ -182,30 +182,39 @@ public:
 	void init_m4altreels();//legacy, will be removed once things are sorted out
 	void init_m4altreels_big();
 
-	void bwboki(machine_config &config);
-	void bwboki_chr(machine_config &config);
-
-	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
-	{
-		bwboki(config);
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
-		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
-		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
-		m_characteriser_bwb->set_other_key(Key[1]);
-	}
-
-
-
-
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
 	template<const uint8_t ReelNo, uint8_t Type>
-	void mpu4_add_reel(machine_config& config);
+	void mpu4_add_reel(machine_config &config)
+	{
+		switch (Type)
+		{
+		default:
+		case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
+		case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
+		case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
+		case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
+		case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
+		}
+
+		if (m_reel[ReelNo])
+			m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
+	}
 
 	template<uint8_t Type, uint8_t NumberOfReels>
-	void mpu4_reels(machine_config &config);
+	void mpu4_reels(machine_config &config)
+	{
+		if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
+		if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
+		if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
+		if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
+		if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
+		if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
+		if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
+		if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
+	}
 
 	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
 	{
@@ -361,7 +370,6 @@ public:
 
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
-	void mpu4crys(machine_config &config);
 	void mpu4base(machine_config &config);
 
 protected:
@@ -371,7 +379,6 @@ protected:
 	void mpu4_memmap_characteriser(address_map &map);
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
-	void mpu4_memmap_characteriser_bwb(address_map &map);
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -383,15 +390,12 @@ protected:
 	void update_ay(device_t *device);
 	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
-	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4bwb);
-	DECLARE_MACHINE_START(mpu4cry);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 

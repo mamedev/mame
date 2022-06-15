@@ -22,11 +22,32 @@ public:
 	void init_crystal();
 	void init_m_frkstn();
 
+	void mpu4crys(machine_config &config);
+
 private:
+	DECLARE_MACHINE_START(mpu4cry);
+
 	uint8_t crystal_sound_r();
 	void crystal_sound_w(uint8_t data);
 };
 
+MACHINE_START_MEMBER(mpu4crystal_machines_state,mpu4cry)
+{
+	mpu4_config_common();
+
+	m_link7a_connected=0;
+	m_mod_number=4;
+}
+
+void mpu4crystal_machines_state::mpu4crys(machine_config &config)
+{
+	mod2(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4crystal_machines_state,mpu4cry)
+
+	upd7759_device &upd(UPD7759(config, "upd"));
+	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 uint8_t mpu4crystal_machines_state::crystal_sound_r()
 {

@@ -1826,11 +1826,6 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*this, FUNC(mpu4_state::ic3ss_w)));
 }
 
-void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
-{
-//  space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
-	mpu4_install_mod4oki_space(space);
-}
 
 
 void mpu4_state::mpu4_config_common()
@@ -1872,23 +1867,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	mpu4_config_common();
 
-	m_link7a_connected=0;
-	m_mod_number=4;
-	mpu4_install_mod4bwb_space(space);
-}
-
-MACHINE_START_MEMBER(mpu4_state,mpu4cry)
-{
-	mpu4_config_common();
-
-	m_link7a_connected=0;
-	m_mod_number=4;
-}
 
 
 
@@ -2152,51 +2131,14 @@ void mpu4_state::mpu4_memmap_characteriser(address_map &map)
 void mpu4_state::mpu4_memmap_bootleg_characteriser(address_map &map)
 {
 	mpu4_memmap(map);
-	map(0x0800, 0x087f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
+	// a few sets use 0x840 for protection, 0x850 is where banking maps, so map up to that point
+	map(0x0800, 0x084f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
 }
 
 void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 {
 	mpu4_memmap(map);
 	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
-}
-
-void mpu4_state::mpu4_memmap_characteriser_bwb(address_map &map)
-{
-	mpu4_memmap(map);
-	map(0x0800, 0x083f).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
-}
-
-
-
-template<const uint8_t ReelNo, uint8_t Type>
-void mpu4_state::mpu4_add_reel(machine_config &config)
-{
-	switch (Type)
-	{
-	default:
-	case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
-	case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
-	case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
-	case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
-	case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
-	}
-
-	if (m_reel[ReelNo])
-		m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
-}
-
-template<uint8_t Type, uint8_t NumberOfReels>
-void mpu4_state::mpu4_reels(machine_config &config)
-{
-	if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
-	if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
-	if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
-	if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
-	if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
-	if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
-	if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
-	if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
 }
 
 void mpu4_state::mpu4_common(machine_config &config)
@@ -2584,44 +2526,6 @@ void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
 	mod4oki_5r_cheatchr_table(config, nullptr);
 }
 
-/***********************************************************************************************
-
-  Other configs
-
-***********************************************************************************************/
-
-void mpu4_state::bwboki(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
-	mpu4_common2(config);
-	mpu4_reels<4, 5>(config);
-
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::bwboki_chr(machine_config &config)
-{
-	bwboki(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
-	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
-}
-
-
-
-
-void mpu4_state::mpu4crys(machine_config &config)
-{
-	mod2(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
-
-	upd7759_device &upd(UPD7759(config, "upd"));
-	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
 
 /***********************************************************************************************
 

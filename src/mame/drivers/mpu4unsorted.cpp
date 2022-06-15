@@ -242,7 +242,6 @@ ROM_END
 ROM_START( m4c9c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cncs.p1", 0x0000, 0x010000, CRC(10f15e2a) SHA1(c17ab13764d74302246984245485cb7692913b44) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) // should this set have an OKI?
 ROM_END
 
 #define M4CLBVEG_EXTRAS \
@@ -1982,21 +1981,19 @@ GAME( 198?, m4tst2,   0,          mod2,       mpu4,    mpu4unsorted_state, init_
 GAME( 198?, m4clr,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
 GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
-// other issues, only plays an 'alarm' sound when there's money to payout? wrong sound ROM or something else?
-GAME(199?, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",GAME_FLAGS ) // unprotected
-
 // barcrest, to split
 
-GAME(199?, m4c9c,     0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS ) // doesn't boot
+// requires stake set to boot (just hangs otherwise)
+GAME(199?, m4c9c,     0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu420p,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS )
 
 // corrupt vfd (bwb?)
 GAME(199?, m4clbx,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 2)",GAME_FLAGS )
 GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 3)",GAME_FLAGS )
 
-GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4) (ROF 0.3)",GAME_FLAGS ) // German?
+GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (German) (MPU4) (ROF 0.3)",GAME_FLAGS )
 
-GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4) (GRJ 1.4)",GAME_FLAGS )
+GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
 // play but behavior isn't like barcrest
 GAME(199?, m4crjwl,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 1)",GAME_FLAGS )
@@ -2278,6 +2275,9 @@ GAME(199?, m4stand2,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 
 GAME(199?, m4dblchn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Double Chance (DJE) (MPU4)",GAME_FLAGS ) // Reels spin forever
 
+// other issues, only plays an 'alarm' sound when there's money to payout? wrong sound ROM or something else?
+GAME(2001, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "DJE","Casino Multiplay (MPU4)",GAME_FLAGS ) // unprotected, copyright year / manufacturer found in ROM
+
 /* Unknown stuff that looks like it might be MPU4, but needs further verification, some could be bad */
 
 // PAL FAIL
@@ -2304,23 +2304,23 @@ GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_
 
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
-GAME(199?, m4sbx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4sbxa,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4sbxb,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 3)",GAME_FLAGS )
-GAME(199?, m4sbxc,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 4)",GAME_FLAGS )
-GAME(199?, m4sbxd,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 5)",GAME_FLAGS )
-GAME(199?, m4sbxe,    m4sbx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 6)",GAME_FLAGS )
+GAME(199?, m4sbx,     0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4sbxa,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4sbxb,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4sbxc,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 4)",GAME_FLAGS )
+GAME(199?, m4sbxd,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 5)",GAME_FLAGS )
+GAME(199?, m4sbxe,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 6)",GAME_FLAGS )
 
-GAME(199?, m4bclimb,  0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",GAME_FLAGS )
-GAME(199?, m4captb,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",GAME_FLAGS )
-GAME(199?, m4jungj,   0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4jungja,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4jungjb,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 3)",GAME_FLAGS )
-GAME(199?, m4jungjc,  m4jungj,    mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 4)",GAME_FLAGS )
+GAME(199?, m4bclimb,  0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",GAME_FLAGS )
+GAME(199?, m4captb,   0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",GAME_FLAGS )
+GAME(199?, m4jungj,   0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4jungja,  m4jungj,    mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4jungjb,  m4jungj,    mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4jungjc,  m4jungj,    mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 4)",GAME_FLAGS )
 
-GAME(199?, m4fsx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4fsxa,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4fsxb,    m4fsx,      mpu4crys,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4fsx,     0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4fsxa,    m4fsx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4fsxb,    m4fsx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
 
 // Error 42 then 52, 54
 GAME(199?, m4ccop,    0,          mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )
@@ -2379,9 +2379,9 @@ GAME(199?, m4sunday,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 GAME(199?, m4jp777,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",GAME_FLAGS ) /* Hopper Fault */
 
 // HOPPER FAULT
-GAME(199?, m4dnj,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Double Nudge (unknown) (MPU4) (set 1)",GAME_FLAGS ) /* Hopper Fault */
-GAME(199?, m4dnja,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Double Nudge (unknown) (MPU4) (set 2)",GAME_FLAGS ) /* Hopper Fault */
-GAME(199?, m4dnjb,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Double Nudge (unknown) (MPU4) (set 3)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnj,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnja,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnjb,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 3)",GAME_FLAGS ) /* Hopper Fault */
 
 // PIC CHECK, backwards VFD
 GAME(199?, m4booze,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Extreme","Booze Cruise (Extreme) (MPU4)",GAME_FLAGS )
