@@ -1526,17 +1526,16 @@ Note: on screen copyright is (c)1998 Coinmaster.
 ------------------------------*/
 void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 {
-	uPD71054_state *uPD71054 = &m_uPD71054;
-	u16 max = uPD71054->max[no] & 0xffff;
+	u16 max = m_uPD71054.max[no] & 0xffff;
 
 	if (max != 0)
 	{
 		attotime period = attotime::from_hz(m_maincpu->unscaled_clock()) * (16 * max);
-		uPD71054->timer[no]->adjust( period, no );
+		m_uPD71054.timer[no]->adjust( period, no );
 	}
 	else
 	{
-		uPD71054->timer[no]->adjust( attotime::never, no);
+		m_uPD71054.timer[no]->adjust( attotime::never, no);
 		logerror( "%s: uPD71054 error, timer %d duration is 0\n",
 				machine().describe_context(), no );
 	}
@@ -1558,15 +1557,13 @@ TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 ------------------------------*/
 void seta_state::uPD71054_timer_init()
 {
-	uPD71054_state *uPD71054 = &m_uPD71054;
-
-	uPD71054->write_select = 0;
+	m_uPD71054.write_select = 0;
 
 	for (int no = 0; no < USED_TIMER_NUM; no++)
-		uPD71054->max[no] = 0xffff;
+		m_uPD71054.max[no] = 0xffff;
 
 	for (int no = 0; no < USED_TIMER_NUM; no++)
-		uPD71054->timer[no] = timer_alloc(FUNC(seta_state::uPD71054_timer_callback), this);
+		m_uPD71054.timer[no] = timer_alloc(FUNC(seta_state::uPD71054_timer_callback), this);
 }
 
 
@@ -1575,30 +1572,28 @@ void seta_state::uPD71054_timer_init()
 ------------------------------*/
 void seta_state::timer_regs_w(offs_t offset, u16 data)
 {
-	uPD71054_state *uPD71054 = &m_uPD71054;
-
 	data &= 0xff;
 
-	uPD71054->reg[offset] = data;
+	m_uPD71054.reg[offset] = data;
 
 	switch (offset)
 	{
 	case 0x0000:
 	case 0x0001:
 	case 0x0002:
-		if (uPD71054->write_select == 0)
+		if (m_uPD71054.write_select == 0)
 		{
-			uPD71054->max[offset] = (uPD71054->max[offset] & 0xff00) + data;
-			if (((uPD71054->reg[3] >> 4) & 3) == 3)
+			m_uPD71054.max[offset] = (m_uPD71054.max[offset] & 0xff00) + data;
+			if (((m_uPD71054.reg[3] >> 4) & 3) == 3)
 			{
-				uPD71054->write_select = 1;
+				m_uPD71054.write_select = 1;
 			}
 		}
 		else
 		{
-			uPD71054->max[offset] = (uPD71054->max[offset] & 0x00ff) + (data << 8);
+			m_uPD71054.max[offset] = (m_uPD71054.max[offset] & 0x00ff) + (data << 8);
 		}
-		if (uPD71054->max[offset] != 0)
+		if (m_uPD71054.max[offset] != 0)
 		{
 			uPD71054_update_timer(m_maincpu.target(), offset);
 		}
@@ -1606,9 +1601,9 @@ void seta_state::timer_regs_w(offs_t offset, u16 data)
 	case 0x0003:
 		switch ((data >> 4) & 3)
 		{
-		case 2: uPD71054->write_select = 1; break;
+		case 2: m_uPD71054.write_select = 1; break;
 		case 1:
-		case 3: uPD71054->write_select = 0; break;
+		case 3: m_uPD71054.write_select = 0; break;
 		}
 		break;
 	}
@@ -2264,84 +2259,89 @@ static const u16 keroppi_protection_word[] = {
 };
 
 
-u16 seta_state::keroppi_protection_r()
+u16 keroppi_state::protection_r()
 {
-	const u16 result = keroppi_protection_word[m_keroppi_protection_count];
+	const u16 result = keroppi_protection_word[m_protection_count];
 
 	if (!machine().side_effects_disabled())
 	{
-		m_keroppi_protection_count++;
-		if (m_keroppi_protection_count > 15)
-			m_keroppi_protection_count = 15;
+		m_protection_count++;
+		if (m_protection_count > 15)
+			m_protection_count = 15;
 	}
 	return result;
 }
 
-u16 seta_state::keroppi_protection_init_r()
+u16 keroppi_state::protection_init_r()
 {
 	if (!machine().side_effects_disabled())
-		m_keroppi_protection_count = 0;
+		m_protection_count = 0;
 
 	return 0x00;
 }
 
-u16 seta_state::keroppi_coin_r()
+u16 keroppi_state::coin_r()
 {
 	u16 result = m_coins->read();
 
-	if (m_keroppi_prize_hop == 2)
+	if (m_prize_hop == 2)
 	{
 		result &= ~0x0002;      /* prize hopper */
 		if (!machine().side_effects_disabled())
-			m_keroppi_prize_hop = 0;
+			m_prize_hop = 0;
 	}
 
 	return result;
 }
 
-TIMER_CALLBACK_MEMBER(seta_state::keroppi_prize_hop_callback)
+TIMER_CALLBACK_MEMBER(keroppi_state::prize_hop_callback)
 {
-	m_keroppi_prize_hop = 2;
+	m_prize_hop = 2;
 }
 
-void seta_state::keroppi_prize_w(u16 data)
+void keroppi_state::prize_w(u16 data)
 {
-	if ((data & 0x0010) && !m_keroppi_prize_hop)
+	if ((data & 0x0010) && !m_prize_hop)
 	{
-		m_keroppi_prize_hop = 1;
-		m_keroppi_prize_hop_timer->adjust(attotime::from_seconds(3), 0x20);        /* 3 seconds */
+		m_prize_hop = 1;
+		m_prize_hop_timer->adjust(attotime::from_seconds(3), 0x20);
 	}
 }
 
-void seta_state::keroppi_map(address_map &map)
+void keroppi_state::keroppi_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0xf00000, 0xf0ffff).ram();                             // RAM
-	map(0x100000, 0x100001).r(FUNC(seta_state::keroppi_protection_r));      //
-	map(0x200000, 0x200001).r(FUNC(seta_state::keroppi_protection_init_r)); //
-	map(0x300000, 0x300003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400000, 0x400001).nopw();                        // ?
-	map(0x500000, 0x500001).portr("P1");                 // P1
-	map(0x500002, 0x500003).portr("P2");                 // P2
-	map(0x500004, 0x500005).r(FUNC(seta_state::keroppi_coin_r));            // Coins
-	map(0x8000f0, 0x8000f1).ram();                             // NVRAM
-	map(0x800100, 0x8001ff).ram();                             // NVRAM
-	map(0x900000, 0x900001).nopw();                        // ?
-	map(0x900002, 0x900003).w(FUNC(seta_state::keroppi_prize_w));          //
+	map(0x000000, 0x07ffff).rom();                                      // ROM
+	map(0xf00000, 0xf0ffff).ram();                                      // RAM
+	map(0x100000, 0x100001).r(FUNC(keroppi_state::protection_r));       //
+	map(0x200000, 0x200001).r(FUNC(keroppi_state::protection_init_r));  //
+	map(0x300000, 0x300003).r(FUNC(keroppi_state::seta_dsw_r));         // DSW
+	map(0x400000, 0x400001).nopw();                                     // ?
+	map(0x500000, 0x500001).portr("P1");                                // P1
+	map(0x500002, 0x500003).portr("P2");                                // P2
+	map(0x500004, 0x500005).r(FUNC(keroppi_state::coin_r));             // Coins
+	map(0x8000f0, 0x8000f1).ram();                                      // NVRAM
+	map(0x800100, 0x8001ff).ram();                                      // NVRAM
+	map(0x900000, 0x900001).nopw();                                     // ?
+	map(0x900002, 0x900003).w(FUNC(keroppi_state::prize_w));            //
 	map(0xa00000, 0xa03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
+	map(0xb00000, 0xb003ff).ram().share("paletteram1");                 // Palette
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xd00000, 0xd00001).ram();                             // ? 0x4000
+	map(0xd00000, 0xd00001).ram();                                      // ? 0x4000
 	map(0xe00000, 0xe005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xe00600, 0xe00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 }
 
-MACHINE_START_MEMBER(seta_state,keroppi)
+void keroppi_state::machine_start()
 {
-	m_keroppi_prize_hop_timer = timer_alloc(FUNC(seta_state::keroppi_prize_hop_callback), this);
+	seta_state::machine_start();
 
-	m_keroppi_prize_hop = 0;
-	m_keroppi_protection_count = 0;
+	m_prize_hop_timer = timer_alloc(FUNC(keroppi_state::prize_hop_callback), this);
+
+	m_prize_hop = 0;
+	m_protection_count = 0;
+
+	save_item(NAME(m_prize_hop));
+	save_item(NAME(m_protection_count));
 }
 
 /***************************************************************************
@@ -2503,12 +2503,16 @@ void seta_state::drgnunit_map(address_map &map)
 
 void setaroul_state::machine_start()
 {
+	seta_state::machine_start();
+
 	m_leds.resolve();
 }
 
 // Coin drop
 void setaroul_state::machine_reset()
 {
+	seta_state::machine_reset();
+
 	m_coin_start_cycles = 0;
 }
 
@@ -2774,47 +2778,47 @@ void seta_state::madshark_map(address_map &map)
 }
 
 
-void seta_state::magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask)
+void magspeed_state::lights_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_magspeed_lights[offset]);
+	COMBINE_DATA(&m_lights[offset]);
 
 	for (int i = 0; i < 16; i++)
-		m_leds[offset * 16 + i] = BIT(m_magspeed_lights[offset], i);
+		m_leds[offset * 16 + i] = BIT(m_lights[offset], i);
 
-//  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
+//  popmessage("%04X %04X %04X", m_lights[0], m_lights[1], m_lights[2]);
 }
 
 /* almost identical to kamenrid */
-void seta_state::magspeed_map(address_map &map)
+void magspeed_state::magspeed_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0x1f8000, 0x1f8fff).noprw();                           // NVRAM?
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x500000, 0x500001).portr("P1");                 // P1
-	map(0x500002, 0x500003).portr("P2");                 // P2
-	map(0x500004, 0x500005).portr("COINS");              // Coins
-	map(0x500008, 0x50000b).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x000000, 0x07ffff).rom();                                              // ROM
+	map(0x1f8000, 0x1f8fff).noprw();                                            // NVRAM?
+	map(0x200000, 0x20ffff).ram();                                              // RAM
+	map(0x500000, 0x500001).portr("P1");                                        // P1
+	map(0x500002, 0x500003).portr("P2");                                        // P2
+	map(0x500004, 0x500005).portr("COINS");                                     // Coins
+	map(0x500008, 0x50000b).r(FUNC(magspeed_state::seta_dsw_r));                // DSW
 	map(0x50000c, 0x50000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x500011, 0x500011).w(FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
-	map(0x500015, 0x500015).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
-	map(0x500018, 0x500019).w(FUNC(seta_state::ipl1_ack_w));               // lev 2 irq ack?
-	map(0x50001c, 0x50001d).w(FUNC(seta_state::ipl2_ack_w));               // lev 4 irq ack?
-	map(0x600000, 0x600005).w(FUNC(seta_state::magspeed_lights_w));        // Lights
-	map(0x600006, 0x600007).nopw();                        // ?
-	map(0x700000, 0x7003ff).ram();                             // Palette RAM (tested)
-	map(0x700400, 0x700fff).ram().share("paletteram1");      // Palette
-	map(0x701000, 0x703fff).ram();                             // Palette RAM (tested)
+	map(0x500011, 0x500011).w(FUNC(magspeed_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500015, 0x500015).w(FUNC(magspeed_state::seta_vregs_w));              // Video Registers
+	map(0x500018, 0x500019).w(FUNC(magspeed_state::ipl1_ack_w));                // lev 2 irq ack?
+	map(0x50001c, 0x50001d).w(FUNC(magspeed_state::ipl2_ack_w));                // lev 4 irq ack?
+	map(0x600000, 0x600005).w(FUNC(magspeed_state::lights_w));                  // Lights
+	map(0x600006, 0x600007).nopw();                                             // ?
+	map(0x700000, 0x7003ff).ram();                                              // Palette RAM (tested)
+	map(0x700400, 0x700fff).ram().share("paletteram1");                         // Palette
+	map(0x701000, 0x703fff).ram();                                              // Palette RAM (tested)
 	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM 0&1
-	map(0x804000, 0x807fff).ram();                             // tested
+	map(0x804000, 0x807fff).ram();                                              // tested
 	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // VRAM 2&3
-	map(0x884000, 0x887fff).ram();                             // tested
+	map(0x884000, 0x887fff).ram();                                              // tested
 	map(0x900000, 0x900005).rw(m_layers[0], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 0&1 Ctrl
 	map(0x980000, 0x980005).rw(m_layers[1], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 2&3 Ctrl
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-	map(0xa80000, 0xa80001).ram();                             // ? $4000
+	map(0xa80000, 0xa80001).ram();                                              // ? $4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xb04000, 0xb07fff).ram();                             // tested
+	map(0xb04000, 0xb07fff).ram();                                              // tested
 	map(0xc00000, 0xc00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 }
@@ -3177,40 +3181,51 @@ void seta_state::utoukond_map(address_map &map)
                                 Pairs Love
 ***************************************************************************/
 
-u16 seta_state::pairlove_prot_r(offs_t offset)
+u16 pairlove_state::prot_r(offs_t offset)
 {
-	const u16 retdata = m_pairslove_protram[offset];
-	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",m_maincpu->pc(), offset,retdata);
+	const u16 retdata = m_protram[offset];
+	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n", m_maincpu->pc(), offset, retdata);
 	if (!machine().side_effects_disabled())
-		m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
+		m_protram[offset] = m_protram_old[offset];
 	return retdata;
 }
 
-void seta_state::pairlove_prot_w(offs_t offset, u16 data)
+void pairlove_state::prot_w(offs_t offset, u16 data)
 {
-	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",m_maincpu->pc(), offset,data);
-	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
-	m_pairslove_protram[offset] = data;
+	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n", m_maincpu->pc(), offset, data);
+	m_protram_old[offset] = m_protram[offset];
+	m_protram[offset] = data;
 }
 
-void seta_state::pairlove_map(address_map &map)
+void pairlove_state::pairlove_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                             // ROM
-	map(0x100000, 0x100001).nopw();                        // ? 1 (start of interrupts, main loop: watchdog?)
-	map(0x200000, 0x200001).nopw();                        // ? 0/1 (IRQ acknowledge?)
-	map(0x300000, 0x300003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400001, 0x400001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout + Sound Enable (bit 4?)
-	map(0x500000, 0x500001).portr("P1");                 // P1
-	map(0x500002, 0x500003).portr("P2");                 // P2
-	map(0x500004, 0x500005).portr("COINS");              // Coins
-	map(0x900000, 0x9001ff).rw(FUNC(seta_state::pairlove_prot_r), FUNC(seta_state::pairlove_prot_w));
+	map(0x000000, 0x03ffff).rom();                                          // ROM
+	map(0x100000, 0x100001).nopw();                                         // ? 1 (start of interrupts, main loop: watchdog?)
+	map(0x200000, 0x200001).nopw();                                         // ? 0/1 (IRQ acknowledge?)
+	map(0x300000, 0x300003).r(FUNC(pairlove_state::seta_dsw_r));            // DSW
+	map(0x400001, 0x400001).w(FUNC(pairlove_state::seta_coin_lockout_w));   // Coin Lockout + Sound Enable (bit 4?)
+	map(0x500000, 0x500001).portr("P1");                                    // P1
+	map(0x500002, 0x500003).portr("P2");                                    // P2
+	map(0x500004, 0x500005).portr("COINS");                                 // Coins
+	map(0x900000, 0x9001ff).rw(FUNC(pairlove_state::prot_r), FUNC(pairlove_state::prot_w));
 	map(0xa00000, 0xa03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xb00000, 0xb00fff).ram().share("paletteram1");  // Palette
+	map(0xb00000, 0xb00fff).ram().share("paletteram1");                     // Palette
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xd00000, 0xd00001).ram();                             // ? 0x4000
+	map(0xd00000, 0xd00001).ram();                                          // ? 0x4000
 	map(0xe00000, 0xe005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xe00600, 0xe00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-	map(0xf00000, 0xf0ffff).ram();                             // RAM
+	map(0xf00000, 0xf0ffff).ram();                                          // RAM
+}
+
+void pairlove_state::machine_start()
+{
+	seta_state::machine_start();
+
+	m_protram = make_unique_clear<u16 []>(0x200/2);
+	m_protram_old = make_unique_clear<u16 []>(0x200/2);
+
+	save_pointer(NAME(m_protram), 0x200/2);
+	save_pointer(NAME(m_protram_old), 0x200/2);
 }
 
 
@@ -8178,6 +8193,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::calibr50_interrupt)
 
 void usclssic_state::machine_start()
 {
+	downtown_state::machine_start();
+
 	m_buttonmux->ab_w(0xff);
 
 	save_item(NAME(m_port_select));
@@ -8907,8 +8924,10 @@ void seta_state::gundhara(machine_config &config)
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_START_MEMBER(zombraid_state,zombraid)
+void zombraid_state::machine_start()
 {
+	seta_state::machine_start();
+
 	uPD71054_timer_init();
 	m_gun_recoil.resolve();
 }
@@ -8919,8 +8938,6 @@ void zombraid_state::zombraid(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
-
-	MCFG_MACHINE_START_OVERRIDE(zombraid_state, zombraid)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -9102,17 +9119,15 @@ void seta_state::orbs(machine_config &config)
                   Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
-void seta_state::keroppi(machine_config &config)
+void keroppi_state::keroppi(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::keroppi_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
-
-	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
+	m_maincpu->set_addrmap(AS_PROGRAM, &keroppi_state::keroppi_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(keroppi_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 14318180, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(keroppi_state::setac_gfxbank_callback));
 	// position kludges
 	m_seta001->set_fg_xoffsets(0, 0); // unknown
 	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
@@ -9124,7 +9139,7 @@ void seta_state::keroppi(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(keroppi_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
@@ -9234,26 +9249,31 @@ void seta_state::madshark(machine_config &config)
                                 Magical Speed
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
+void magspeed_state::machine_start()
+{
+	seta_state::machine_start();
+
+	m_leds.resolve();
+
+	save_item(NAME(m_lights));
+}
 
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
-void seta_state::magspeed(machine_config &config)
+void magspeed_state::magspeed(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::magspeed_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &magspeed_state::magspeed_map);
+	m_maincpu->set_vblank_int("screen", FUNC(magspeed_state::irq2_line_assert));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
-
 	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
-	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
+	pit.out_handler<0>().set(FUNC(magspeed_state::pit_out0));
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(magspeed_state::setac_gfxbank_callback));
 	// position kludges
 	m_seta001->set_fg_xoffsets(0, 0); // floating tilemap maybe 1px off in test grid
 	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
@@ -9265,7 +9285,7 @@ void seta_state::magspeed(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(magspeed_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
@@ -9363,7 +9383,7 @@ void seta_state::oisipuzl(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl) // flip is inverted for the tilemaps
+	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9408,7 +9428,7 @@ void seta_state::triplfun(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl) // flip is inverted for the tilemaps
+	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9871,15 +9891,15 @@ void seta_state::zingzipbl(machine_config &config)
                                 Pairs Love
 ***************************************************************************/
 
-void seta_state::pairlove(machine_config &config)
+void pairlove_state::pairlove(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::pairlove_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pairlove_state::pairlove_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(pairlove_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_pairlove);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(pairlove_state::setac_gfxbank_callback));
 	// position kludges
 	m_seta001->set_fg_xoffsets(0, 0); // unknown
 	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
@@ -9891,7 +9911,7 @@ void seta_state::pairlove(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(pairlove_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(2048);   // sprites only
@@ -12411,14 +12431,6 @@ void seta_state::init_rezon()
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-void seta_state::init_pairlove()
-{
-	m_pairslove_protram = make_unique_clear<u16[]>(0x200/2);
-	m_pairslove_protram_old = make_unique_clear<u16[]>(0x200/2);
-	save_pointer(NAME(m_pairslove_protram), 0x200/2);
-	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
-}
-
 void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
@@ -12521,7 +12533,7 @@ GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezo
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena",                    "Pairs Love", 0 )
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
@@ -12576,12 +12588,12 @@ GAME( 1994, kiwame,    0,        kiwame,    kiwame,    kiwame_state,   empty_ini
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 
-GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     empty_init,     ROT0,   "Allumer",                   "Magical Speed", 0 )
+GAME( 1994, magspeed,  0,        magspeed,  magspeed,  magspeed_state, empty_init,     ROT0,   "Allumer",                   "Magical Speed", 0 )
 
 GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     empty_init,     ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
 
-GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
-GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Isshoni Asobou (Japan)", 0 )
+GAME( 1995, keroppi,   0,        keroppi,   keroppi,   keroppi_state,  empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
+GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  keroppi_state,  empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Isshoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     empty_init,     ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 

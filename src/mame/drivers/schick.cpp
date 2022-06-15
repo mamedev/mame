@@ -19,12 +19,15 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 #include "screen.h"
 #include "speaker.h"
 #include "video/resnet.h"
 
+
+namespace {
 
 class schick_state : public driver_device
 {
@@ -44,11 +47,15 @@ public:
 		m_palette(*this, "palette"),
 		m_ay(*this, "ay%u", 1U),
 		m_irq_mask(0)
-	{}
+	{
+	}
 
 	void schick(machine_config &config);
 
 	void init_schick();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -101,7 +108,6 @@ private:
 
 	uint8_t m_irq_mask;
 	uint32_t screen_update_schick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(schick);
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_charbank = 0;
@@ -128,7 +134,7 @@ private:
 #define VBSTART             (224)   /*(224+16)*/
 
 
-VIDEO_START_MEMBER(schick_state,schick)
+void schick_state::machine_start()
 {
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_spritebank));
@@ -606,8 +612,6 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 	screen.screen_vblank().set(FUNC(schick_state::vblank_irq));
 	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_VIDEO_START_OVERRIDE(schick_state, schick)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -786,6 +790,8 @@ ROM_START( schick )
 	ROM_LOAD( "63s081n",   0x000, 0x020, NO_DUMP)
 	ROM_LOAD( "am27s33pc", 0x020, 0x400, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, schick, 0, schick, schick, schick_state, init_schick, ROT90, "Microhard", "Super Chick", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
