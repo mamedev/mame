@@ -140,46 +140,15 @@ public:
 	void init_m4default();
 	void init_m4default_big();
 	void init_m4default_big_low();
-
-
 	void init_m4default_big_aux2inv();
 	void init_m4default_806prot();
-
 	void init_m4tst2();
-
-	void init_m4default_banks();
-	void init_m4default_reels();
-	void init_m4_low_volt_alt();
-
-
-	void init_m4_five_reel_std();
-	void init_m4_five_reel_rev();
-	void init_m4_five_reel_alt();
-	void init_m4_six_reel_std();
-	void init_m4_six_reel_alt();
-	void init_m4_seven_reel();
-	void init_m4_small_extender();
-	void init_m4_large_extender_b();
-	void init_m4_large_extender_c();
-	void init_m4_hopper_tubes();
-	void init_m4_hopper_duart_a();
-	void init_m4_hopper_duart_b();
-	void init_m4_hopper_duart_c();
-	void init_m4_hopper_nonduart_a();
-	void init_m4_hopper_nonduart_b();
-	void init_m4_led_a();
-	void init_m4_led_b();
-	void init_m4_led_c();
-	void init_m4_led_simple();
-
-
 	void init_m4_andycp10c();
-	void init_m_blsbys();
+	void init_m4default_big_fivestd();
 	void init_m_oldtmr();
 	void init_m4tst();
 	void init_big_extenda();
-
-	void init_m4altreels();//legacy, will be removed once things are sorted out
+	void init_m4altreels();
 	void init_m4altreels_big();
 
 	void mod2(machine_config &config);
@@ -311,6 +280,16 @@ public:
 		m_characteriser_bl->set_bl_fixed_return(Fixed);
 	}
 
+	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config)
+	{
+		mod2_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
 	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config)
 	{
 		mod4yam(config);
@@ -373,6 +352,31 @@ public:
 	void mpu4base(machine_config &config);
 
 protected:
+
+	void use_m4_standard_reels();
+	void use_m4_low_volt_alt();
+	void use_m4_five_reel_std();
+	void use_m4_five_reel_rev();
+	void use_m4_five_reel_alt();
+	void use_m4_six_reel_std();
+	void use_m4_six_reel_alt();
+	void use_m4_seven_reel();
+	void use_m4_small_extender();
+	void use_m4_large_extender_b();
+	void use_m4_large_extender_c();
+	void use_m4_hopper_tubes();
+	void use_m4_hopper_duart_a();
+	void use_m4_hopper_duart_b();
+	void use_m4_hopper_duart_c();
+	void use_m4_hopper_nonduart_a();
+	void use_m4_hopper_nonduart_b();
+	void use_m4_led_a();
+	void use_m4_led_b();
+	void use_m4_led_c();
+	void use_m4_led_simple();
+
+	void setup_rom_banks();
+
 	TIMER_CALLBACK_MEMBER(update_ic24);
 
 	void mpu4_memmap(address_map &map);

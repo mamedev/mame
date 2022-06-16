@@ -1867,89 +1867,12 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-
-
-
-
-void mpu4_state::init_m4_low_volt_alt()
-{
-	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect_disable = 1;
-}
-
-void mpu4_state::init_m4_small_extender()
-{
-	m_lamp_extender = SMALL_CARD;
-}
-
-
-
-void mpu4_state::init_m4_large_extender_b()
-{
-	m_lamp_extender = LARGE_CARD_B;
-}
-
-void mpu4_state::init_m4_large_extender_c()
-{
-	m_lamp_extender = LARGE_CARD_C;
-}
-
-void mpu4_state::init_m4_hopper_tubes()
-{
-	m_hopper = TUBES;
-}
-
-void mpu4_state::init_m4_hopper_duart_a()
-{
-	m_hopper = HOPPER_DUART_A;
-}
-
-void mpu4_state::init_m4_hopper_duart_b()
-{
-	m_hopper = HOPPER_DUART_B;
-}
-
-void mpu4_state::init_m4_hopper_duart_c()
-{
-	m_hopper = HOPPER_DUART_C;
-}
-
-void mpu4_state::init_m4_hopper_nonduart_a()
-{
-	m_hopper = HOPPER_NONDUART_A;
-}
-
-void mpu4_state::init_m4_hopper_nonduart_b()
-{
-	m_hopper = HOPPER_NONDUART_B;
-}
-
-void mpu4_state::init_m4_led_a()
-{
-	m_led_extender = CARD_A;
-}
-
-void mpu4_state::init_m4_led_b()
-{
-	m_led_extender = CARD_B;
-}
-
-void mpu4_state::init_m4_led_c()
-{
-	m_led_extender = CARD_C;
-}
-
-void mpu4_state::init_m4_led_simple()
-{
-	m_led_extender = SIMPLE_CARD;
-}
-
 //TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
 void mpu4_state::init_m4altreels()
 {
 	m_reel_mux = SIX_REEL_1TO8;
 	m_reels = 6;
-	init_m4default_banks();
+	setup_rom_banks();
 }
 
 void mpu4_state::init_m4altreels_big()
@@ -1959,68 +1882,23 @@ void mpu4_state::init_m4altreels_big()
 	m_reels = 6;
 }
 
-void mpu4_state::init_m4default_reels()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 4;
-}
-
-void mpu4_state::init_m4_five_reel_std()
-{
-	m_reel_mux = FIVE_REEL_5TO8;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_five_reel_rev()
-{
-	m_reel_mux = FIVE_REEL_8TO5;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_five_reel_alt()
-{
-	m_reel_mux = FIVE_REEL_3TO6;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_six_reel_std()
-{
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::init_m4_six_reel_alt()
-{
-	m_reel_mux = SIX_REEL_5TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::init_m4_seven_reel()
-{
-	m_reel_mux = SEVEN_REEL;
-	m_reels = 7;
-}
-
 
 void mpu4_state::init_m4_andycp10c()
 {
 	init_m4default();
-	init_m4_small_extender();
+	use_m4_small_extender();
 }
 
 void mpu4_state::init_m_oldtmr()
 {
-	init_m4_six_reel_std();
-	init_m4default_banks();
+	use_m4_six_reel_std();
+	setup_rom_banks();
 }
 
-
-
-
-void mpu4_state::init_m_blsbys()
+void mpu4_state::init_m4default_big_fivestd()
 {
 	init_m4default_big();
-	init_m4_five_reel_std();
+	use_m4_five_reel_std();
 }
 
 void mpu4_state::init_big_extenda()
@@ -2035,35 +1913,26 @@ void mpu4_state::init_m4default_big_low()
 	m_default_to_low_bank = true;
 }
 
-
-void mpu4_state::init_m4default_banks()
-{
-	//Initialise paging for non-extended ROM space
-	uint8_t *rom = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
-	membank("bank1")->set_entry(0);
-}
-
 void mpu4_state::init_m4default_alt()
 {
 	m_reel_mux = STANDARD_REEL;
 	m_reels = 8;
-	init_m4default_banks();
+	setup_rom_banks();
 
 	m_bwb_bank=0;
 }
 
 void mpu4_state::init_m4default()
 {
-	init_m4default_reels();
+	use_m4_standard_reels();
 	m_bwb_bank = 0;
-	init_m4default_banks();
+	setup_rom_banks();
 }
 
 
 void mpu4_state::init_m4default_big()
 {
-	init_m4default_reels();
+	use_m4_standard_reels();
 
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
@@ -2088,6 +1957,129 @@ void mpu4_state::init_m4default_big()
 	// about the way the regular banking behaves, not related to the CB2 stuff
 	m_bank1->set_entry(m_numbanks);
 
+}
+
+
+// these are not 'init' functions in their own right, they can be called from init functions
+void mpu4_state::use_m4_standard_reels()
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 4;
+}
+
+void mpu4_state::use_m4_five_reel_std()
+{
+	m_reel_mux = FIVE_REEL_5TO8;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_five_reel_rev()
+{
+	m_reel_mux = FIVE_REEL_8TO5;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_five_reel_alt()
+{
+	m_reel_mux = FIVE_REEL_3TO6;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_six_reel_std()
+{
+	m_reel_mux = SIX_REEL_1TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::use_m4_six_reel_alt()
+{
+	m_reel_mux = SIX_REEL_5TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::use_m4_seven_reel()
+{
+	m_reel_mux = SEVEN_REEL;
+	m_reels = 7;
+}
+
+void mpu4_state::use_m4_low_volt_alt()
+{
+	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
+	m_low_volt_detect_disable = 1;
+}
+
+void mpu4_state::use_m4_small_extender()
+{
+	m_lamp_extender = SMALL_CARD;
+}
+
+void mpu4_state::use_m4_large_extender_b()
+{
+	m_lamp_extender = LARGE_CARD_B;
+}
+
+void mpu4_state::use_m4_large_extender_c()
+{
+	m_lamp_extender = LARGE_CARD_C;
+}
+
+void mpu4_state::use_m4_hopper_tubes()
+{
+	m_hopper = TUBES;
+}
+
+void mpu4_state::use_m4_hopper_duart_a()
+{
+	m_hopper = HOPPER_DUART_A;
+}
+
+void mpu4_state::use_m4_hopper_duart_b()
+{
+	m_hopper = HOPPER_DUART_B;
+}
+
+void mpu4_state::use_m4_hopper_duart_c()
+{
+	m_hopper = HOPPER_DUART_C;
+}
+
+void mpu4_state::use_m4_hopper_nonduart_a()
+{
+	m_hopper = HOPPER_NONDUART_A;
+}
+
+void mpu4_state::use_m4_hopper_nonduart_b()
+{
+	m_hopper = HOPPER_NONDUART_B;
+}
+
+void mpu4_state::use_m4_led_a()
+{
+	m_led_extender = CARD_A;
+}
+
+void mpu4_state::use_m4_led_b()
+{
+	m_led_extender = CARD_B;
+}
+
+void mpu4_state::use_m4_led_c()
+{
+	m_led_extender = CARD_C;
+}
+
+void mpu4_state::use_m4_led_simple()
+{
+	m_led_extender = SIMPLE_CARD;
+}
+
+void mpu4_state::setup_rom_banks()
+{
+	//Initialise paging for non-extended ROM space
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
+	membank("bank1")->set_entry(0);
 }
 
 /* generate a 50 Hz signal (based on an RC time) */

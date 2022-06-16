@@ -28,6 +28,7 @@
     Cloud Nine
     Copy Cat
     Cosmic Casinos
+	Crown Jewels Club
     Dennis The Menace
     Duty Free
     Duty Free (Prize version)
@@ -163,7 +164,7 @@ public:
 	void init_thestreak()
 	{
 		init_m4default();
-		init_m4_small_extender();
+		use_m4_small_extender();
 	}
 
 };
@@ -229,9 +230,9 @@ void mpu4mod4oki_machines_state::init_m4andycp()
 {
 	//Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4_small_extender();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_small_extender();
+	use_m4_standard_reels();
 	//PCKEY =9
 	//STKEY =0
 	//JPKEY =0
@@ -782,9 +783,9 @@ void mpu4mod4oki_machines_state::init_m4andyge()
 {
 	//Derived from Andy's_Great_Escape_(Barcrest)_[C02_1024_10jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4_small_extender();
-	init_m4_five_reel_std();
+	use_m4_hopper_tubes();
+	use_m4_small_extender();
+	use_m4_five_reel_std();
 
 	//PCKEY =1
 	//STKEY =3
@@ -4838,8 +4839,8 @@ void mpu4mod4oki_machines_state::init_m4tenten()
 	init_m4default();
 //  init_m4default();
 	//Derived from 10_x_10_(Barcrest)_[C01_v1-0_1024_10jp].gam
-	init_m4_hopper_duart_a();
-	init_m4default_reels();
+	use_m4_hopper_duart_a();
+	use_m4_standard_reels();
 	//PCKEY =9
 	//STKEY =3
 	//JPKEY =7
@@ -4976,8 +4977,8 @@ void mpu4mod4oki_machines_state::init_m4andyfh()
 	//Derived from Andy's_Full_House_(Barcrest)_[C01_800_10jp].gam
 	init_m4default();
 //  init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 	//PCKEY =b
 	//STKEY =2
 	//JPKEY =7
@@ -5971,8 +5972,8 @@ void mpu4mod4oki_machines_state::init_m4actbnk()
 {
 	//Derived from Action_Bank_(Barcrest)_[C04_1024_8jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 	//PCKEY =a
 	//STKEY =2
 	//JPKEY =6
@@ -6616,9 +6617,9 @@ void mpu4mod4oki_machines_state::init_m4andybt()
 {
 	init_m4default_big();
 	//Derived from Andy's_Big_Time_(Barcrest)_[C03_800_250jp]_[c].gam
-	init_m4_hopper_tubes();
-	init_m4_large_extender_b();
-	init_m4_five_reel_rev();
+	use_m4_hopper_tubes();
+	use_m4_large_extender_b();
+	use_m4_five_reel_rev();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -7423,3 +7424,65 @@ GAME(199?, m4supbjcb, m4supbjc,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 GAME(199?, m4supbjcc, m4supbjc,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 3.1, set 4)",GAME_FLAGS )
 GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 2.0)",GAME_FLAGS )
 
+/*****************************************************************************************************************************************************************************
+*
+* Crown Jewels Club
+*
+*****************************************************************************************************************************************************************************/
+
+#define M4CRJWL2_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cjcs1.hex", 0x000000, 0x080000, CRC(2ac3ba9f) SHA1(3332f29f81918c34aeec3da6f7d001dc9922840d) ) \
+	ROM_LOAD( "cjcs2.hex", 0x080000, 0x080000, CRC(89838a9d) SHA1(502243cc0a14e63882b537f05c4cc0eb852e4a0c) )
+
+ROM_START( m4crjwl2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cj214f.p1", 0x0000, 0x010000, CRC(7ee4d30c) SHA1(2bf702bc925c473f7e9eaeb5b3ae0b00e124161a) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwl2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cj214d.p1", 0x0000, 0x010000, CRC(359e2a73) SHA1(c85eeebafca14e6f975953f5daf2772a62693051) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwl2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cj214s.hex", 0x0000, 0x010000, CRC(296aa885) SHA1(045b02848b37e8a04d950d54301dc6888d6178ad) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjcf.p1", 0x0000, 0x010000, CRC(7feccc74) SHA1(4d1c7c6d2085492ee4205a7383ad7dc1de4e8d60) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjcd.p1", 0x0000, 0x010000, CRC(cb83f226) SHA1(f09996436b3db3c8f0fe237884d9125be2b7855e) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwlb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjcs.p1", 0x0000, 0x010000, CRC(1054e02d) SHA1(067705f20862f6cfc4334c74e0fab1a1016d427c) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwlc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjn02.p1", 0x0000, 0x010000, CRC(a3d50e20) SHA1(15698e74a37d5f95a5634d48ae2a9a5d19faa2b6) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+// these don't read from the lamp scramble, is this really a 'club' machine, it only has 3 primary reels + 1 secondary
+GAME(199?, m4crjwl2,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 1)",GAME_FLAGS )
+GAME(199?, m4crjwl2a, m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 2)",GAME_FLAGS )
+GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (CJ2 1.4, set 3)",GAME_FLAGS )
+// these do read from lamp scramble
+GAME(199?, m4crjwl,   m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 1)",GAME_FLAGS )
+GAME(199?, m4crjwla,  m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 2)",GAME_FLAGS )
+GAME(199?, m4crjwlb,  m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJC 1.5, set 3)",GAME_FLAGS )
+GAME(199?, m4crjwlc,  m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::duty_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (CJN 0.2)",GAME_FLAGS )

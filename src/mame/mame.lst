@@ -24467,13 +24467,6 @@ m4clbxa                         //
 m4clbxb                         //
 m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
-m4crjwl                         // Crown Jewels Club (Barcrest)
-m4crjwl2                        // Crown Jewels Mk II Club (Barcrest)
-m4crjwl2a                       //
-m4crjwl2b                       //
-m4crjwla                        //
-m4crjwlb                        //
-m4crjwlc                        //
 m4crzcav                        // Crazy Cavern (Nova)
 m4crzcsn                        // Crazy Casino (Nova)
 m4crzjk                         // Crazy Jokers (Barcrest)
@@ -24604,8 +24597,6 @@ m4stakex                        // Stake X (Leisurama)
 m4stakexa                       // Stake X (Leisurama)
 m4stand2                        // Stand To Deliver (DJE)
 m4steptm                        // Step Timer (Barcrest)
-m4sunclb                        // Sun Club (Bwb)
-m4sunclba                       //
 m4sunday                        // Sunday Sport
 m4sunscl                        // Sunset Club (Bwb)
 m4sunscla                       //
@@ -26286,6 +26277,8 @@ m4stakeua                       //
 m4starbr                        // Stars And Bars (Barcrest)
 m4stards                        // Stardust (Barcrest)
 m4stopcl                        // Stop the Clock (Barcrest)
+m4sunclb                        // Sun Club (Bwb)
+m4sunclba                       //
 m4sunset                        // Sunset Boulevard (Barcrest)
 m4sunsetc                       //
 m4sunsetd                       //
@@ -27142,6 +27135,13 @@ m4crdome__k                     //
 m4crdome__l                     //
 m4crdome__m                     //
 m4crdome__n                     //
+m4crjwl                         // Crown Jewels Club (Barcrest)
+m4crjwl2                        // Crown Jewels Mk II Club (Barcrest)
+m4crjwl2a                       //
+m4crjwl2b                       //
+m4crjwla                        //
+m4crjwlb                        //
+m4crjwlc                        //
 m4crmaze                        // Crystal Maze (Barcrest)
 m4crmaze__c                     //
 m4crmaze__d                     //

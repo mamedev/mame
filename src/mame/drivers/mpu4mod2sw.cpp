@@ -50,7 +50,7 @@ void mpu4mod2_machines_state::init_connect4()
 {
 	m_reels = 0; //reel-free game
 	m_led_lamp = 1;
-	init_m4default_banks();
+	setup_rom_banks();
 }
 
 
@@ -299,9 +299,9 @@ ROM_END
 void mpu4mod2_machines_state::init_m4actpak()
 {
 	//Derived from Action_Pack_(Barcrest)_[C02_800_4jp].gam
-	init_m4_hopper_tubes();
-	init_m4default_reels();
-	init_m4default_banks();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
+	setup_rom_banks();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -344,8 +344,8 @@ void mpu4mod2_machines_state::init_m4alladv()
 {
 	//Derived from All_Cash_Advance_(Barcrest)_[C01_800_4jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -907,8 +907,8 @@ void mpu4mod2_machines_state::init_m4alpha()
 {
 	//Derived from Alphabet_(Barcrest)_[C03_1024_4jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -1181,8 +1181,8 @@ void mpu4mod2_machines_state::init_m4actclb()
 {
 	//Derived from Action_Club_(Barcrest)_[C03_800_150jp]_[c].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -1682,6 +1682,17 @@ ROM_START( m4brktak )
 	ROM_LOAD( "b-t v1-0 p2", 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
 ROM_END
 
+ROM_START( m4sunclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sucxe__0.2", 0x0000, 0x010000, CRC(fd702a6f) SHA1(0f6d553fcb096ca4874bb971425dabfbe18db31d) )
+ROM_END
+
+ROM_START( m4sunclba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sucxed_0.2", 0x0000, 0x010000, CRC(70802bc3) SHA1(69b36f716cb608931f933cb58e47232b18064f9d) )
+ROM_END
+
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 GAME(199?, m4rsg,     0,          mod2_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type) (RSG 1.2)",GAME_FLAGS )
@@ -2092,6 +2103,11 @@ GAME(199?, m4btclok,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            
 
 // protection has been hacked
 GAME(199?, m4brktak,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Break & Take (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
+
+// runs if you set a stake, missing an extender for the credits display?
+GAME(199?, m4sunclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (SUC 0.2, set 1)",GAME_FLAGS )
+GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (SUC 0.2, set 2)",GAME_FLAGS )
+
 
 // these were found in with mod4oki sets, but don't attempt to play samples, only use the AY
 

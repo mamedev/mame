@@ -44,8 +44,8 @@ void mpu4mod4yam_machines_state::init_m4addr()
 {
 	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 
 	//PCKEY =0
 	//STKEY =0
