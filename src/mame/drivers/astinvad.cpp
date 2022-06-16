@@ -19,108 +19,148 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL(2'000'000)
-#define VIDEO_CLOCK          XTAL(4'915'200)
+namespace {
 
-
-/* sample sound IDs - must match sample file name table below */
-enum
-{
-	SND_UFO = 0,
-	SND_SHOT,
-	SND_BASEHIT,
-	SND_INVADERHIT,
-	SND_FLEET1,
-	SND_FLEET2,
-	SND_FLEET3,
-	SND_FLEET4,
-	SND_UFOHIT,
-	SND_BONUS
-};
-
-
-class astinvad_state : public driver_device
+class base_state : public driver_device
 {
 public:
-	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
+	base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ppi8255_0(*this, "ppi8255_0")
-		, m_ppi8255_1(*this, "ppi8255_1")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
 		, m_samples(*this, "samples")
 		, m_screen(*this, "screen")
 		, m_color_prom(*this, "proms")
+		, m_cabinet(*this, "CABINET")
 	{ }
 
-	void spcking2(machine_config &config);
-	void spaceint(machine_config &config);
-	void kamikaze(machine_config &config);
+protected:
+	void plot_byte(bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color);
 
-	void init_kamikaze();
-	void init_spcking2();
+	uint8_t m_sound_state[2]{};
+	uint8_t m_screen_flip = 0;
 
-	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
-
-private:
-	void color_latch_w(uint8_t data);
-	void spaceint_videoram_w(offs_t offset, uint8_t data);
-	uint8_t kamikaze_ppi_r(offs_t offset);
-	void kamikaze_ppi_w(offs_t offset, uint8_t data);
-	void spaceint_sound1_w(uint8_t data);
-	void spaceint_sound2_w(uint8_t data);
-	void kamikaze_sound1_w(uint8_t data);
-	void kamikaze_sound2_w(uint8_t data);
-	void spcking2_sound1_w(uint8_t data);
-	void spcking2_sound2_w(uint8_t data);
-	void spcking2_sound3_w(uint8_t data);
-	DECLARE_MACHINE_START(kamikaze);
-	DECLARE_MACHINE_RESET(kamikaze);
-	DECLARE_MACHINE_START(spaceint);
-	DECLARE_MACHINE_RESET(spaceint);
-	DECLARE_VIDEO_START(spaceint);
-	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
-	TIMER_CALLBACK_MEMBER(kamikaze_int_gen);
-
-	void kamikaze_map(address_map &map);
-	void kamikaze_portmap(address_map &map);
-	void spaceint_map(address_map &map);
-	void spaceint_portmap(address_map &map);
-
-	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
-
-	std::unique_ptr<uint8_t[]>    m_colorram{};
-	emu_timer   *m_int_timer = nullptr;
-	emu_timer   *m_int_off_timer = nullptr;
-	uint8_t      m_sound_state[2]{};
-	uint8_t      m_screen_flip = 0;
-	uint8_t      m_screen_red = 0;
-	uint8_t      m_flip_yoffs = 0;
-	uint8_t      m_color_latch = 0;
-	bool         m_player = false;
+	// sample sound IDs - must match sample file name table below
+	enum
+	{
+		SND_UFO = 0,
+		SND_SHOT,
+		SND_BASEHIT,
+		SND_INVADERHIT,
+		SND_FLEET1,
+		SND_FLEET2,
+		SND_FLEET3,
+		SND_FLEET4,
+		SND_UFOHIT,
+		SND_BONUS
+	};
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<i8255_device>  m_ppi8255_0;
-	optional_device<i8255_device>  m_ppi8255_1;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint8_t> m_color_prom;
+
+	required_ioport m_cabinet;
 };
 
+class kamikaze_state : public base_state
+{
+public:
+	kamikaze_state(const machine_config &mconfig, device_type type, const char *tag)
+		: base_state(mconfig, type, tag)
+		, m_ppi8255(*this, "ppi8255_%u", 0U)
+	{ }
+
+	void kamikaze(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device_array<i8255_device, 2>  m_ppi8255;
+	uint8_t m_flip_yoffs = 32; // the flip screen logic adds 32 to the Y after flipping
+	uint8_t m_screen_red = 0;
+
+private:
+	uint8_t ppi_r(offs_t offset);
+	void ppi_w(offs_t offset, uint8_t data);
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(int_off);
+	TIMER_CALLBACK_MEMBER(int_gen);
+
+	void prg_map(address_map &map);
+	void port_map(address_map &map);
+
+	emu_timer *m_int_timer = nullptr;
+	emu_timer *m_int_off_timer = nullptr;
+};
+
+class spcking2_state : public kamikaze_state
+{
+public:
+	spcking2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kamikaze_state(mconfig, type, tag)
+	{ m_flip_yoffs = 0; } // don't have the schematics, but the blanking must center the screen here
+
+	void spcking2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void sound3_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool m_player = false;
+};
+
+class spaceint_state : public base_state
+{
+public:
+	spaceint_state(const machine_config &mconfig, device_type type, const char *tag)
+		: base_state(mconfig, type, tag)
+		, m_colorram(*this, "colorram", 0x2000, ENDIANNESS_LITTLE)
+	{ }
+
+	void spaceint(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	void color_latch_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
+	void port_map(address_map &map);
+
+	memory_share_creator<uint8_t> m_colorram;
+	uint8_t m_color_latch = 0;
+};
 
 /*************************************
  *
@@ -128,55 +168,39 @@ private:
  *
  *************************************/
 
-VIDEO_START_MEMBER(astinvad_state,spaceint)
+void spaceint_state::video_start()
 {
-	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
-
 	save_item(NAME(m_color_latch));
-	save_pointer(NAME(m_colorram), m_videoram.bytes());
 }
 
 
-void astinvad_state::color_latch_w(uint8_t data)
+void spaceint_state::color_latch_w(uint8_t data)
 {
 	m_color_latch = data & 0x0f;
 }
 
 
-void astinvad_state::spaceint_videoram_w(offs_t offset, uint8_t data)
+void spaceint_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset] = m_color_latch;
 }
 
 
-
-/*************************************
- *
- *  Spaceint color RAM handling
- *
- *************************************/
-
-void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color )
+void base_state::plot_byte(bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color)
 {
 	uint8_t flip_xor = m_screen_flip & 7;
 
-	bitmap.pix(y, x + (0 ^ flip_xor)) = (data & 0x01) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (1 ^ flip_xor)) = (data & 0x02) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (2 ^ flip_xor)) = (data & 0x04) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (3 ^ flip_xor)) = (data & 0x08) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (4 ^ flip_xor)) = (data & 0x10) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (5 ^ flip_xor)) = (data & 0x20) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (6 ^ flip_xor)) = (data & 0x40) ? m_palette->pen_color(color) : rgb_t::black();
-	bitmap.pix(y, x + (7 ^ flip_xor)) = (data & 0x80) ? m_palette->pen_color(color) : rgb_t::black();
+	for (int i = 0; i < 8; i++)
+		bitmap.pix(y, x + (i ^ flip_xor)) = BIT(data, i) ? m_palette->pen_color(color) : rgb_t::black();
 }
 
 
-uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kamikaze_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
-	/* render the visible pixels */
+	// render the visible pixels
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
@@ -189,7 +213,7 @@ uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spcking2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
@@ -206,14 +230,13 @@ uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spaceint_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y;
-
 	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		uint8_t data = m_videoram[offs];
 		uint8_t color = m_colorram[offs];
+		uint8_t x, y;
 
 		if (m_screen_flip)
 		{
@@ -226,7 +249,7 @@ uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rg
 			x = offs >> 8 << 3;
 		}
 
-		/* this is almost certainly wrong */
+		// this is almost certainly wrong
 		offs_t n = ((offs >> 5) & 0xf0) | color;
 		color = m_color_prom[n] & 0x07;
 
@@ -244,36 +267,36 @@ uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
+TIMER_CALLBACK_MEMBER(kamikaze_state::int_off)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_gen)
+TIMER_CALLBACK_MEMBER(kamikaze_state::int_gen)
 {
-	/* interrupts are asserted on every state change of the 128V line */
+	// interrupts are asserted on every state change of the 128V line
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 	param ^= 128;
 	m_int_timer->adjust(m_screen->time_until_pos(param), param);
 
-	/* an RC circuit turns the interrupt off after a short amount of time */
+	// an RC circuit turns the interrupt off after a short amount of time
 	m_int_off_timer->adjust(attotime::from_double(300 * 0.1e-6));
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,kamikaze)
+void kamikaze_state::machine_start()
 {
-	m_int_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_gen), this);
+	m_int_timer = timer_alloc(FUNC(kamikaze_state::int_gen), this);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
-	m_int_off_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_off), this);
+	m_int_off_timer = timer_alloc(FUNC(kamikaze_state::int_off), this);
 
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_screen_red));
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
+void kamikaze_state::machine_reset()
 {
 	m_screen_flip = 0;
 	m_screen_red = 0;
@@ -282,13 +305,13 @@ MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,spaceint)
+void spaceint_state::machine_start()
 {
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,spaceint)
+void spaceint_state::machine_reset()
 {
 	m_screen_flip = 0;
 	m_sound_state[0] = 0;
@@ -297,9 +320,17 @@ MACHINE_RESET_MEMBER(astinvad_state,spaceint)
 }
 
 
-INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
+void spcking2_state::machine_start()
 {
-	/* coin insertion causes an NMI */
+	kamikaze_state::machine_start();
+
+	save_item(NAME(m_player));
+}
+
+
+INPUT_CHANGED_MEMBER(spaceint_state::coin_inserted)
+{
+	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -311,26 +342,26 @@ INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
  *
  *************************************/
 
-uint8_t astinvad_state::kamikaze_ppi_r(offs_t offset)
+uint8_t kamikaze_state::ppi_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
-	/* the address lines are used for /CS; yes, they can overlap! */
+	// the address lines are used for /CS; yes, they can overlap!
 	if (!(offset & 4))
-		result &= m_ppi8255_0->read(offset);
+		result &= m_ppi8255[0]->read(offset);
 	if (!(offset & 8))
-		result &= m_ppi8255_1->read(offset);
+		result &= m_ppi8255[1]->read(offset);
 	return result;
 }
 
 
-void astinvad_state::kamikaze_ppi_w(offs_t offset, uint8_t data)
+void kamikaze_state::ppi_w(offs_t offset, uint8_t data)
 {
-	/* the address lines are used for /CS; yes, they can overlap! */
+	// the address lines are used for /CS; yes, they can overlap!
 	if (!(offset & 4))
-		m_ppi8255_0->write(offset, data);
+		m_ppi8255[0]->write(offset, data);
 	if (!(offset & 8))
-		m_ppi8255_1->write(offset, data);
+		m_ppi8255[1]->write(offset, data);
 }
 
 
@@ -342,9 +373,9 @@ void astinvad_state::kamikaze_ppi_w(offs_t offset, uint8_t data)
  *************************************/
 
 // Kamikaze
-void astinvad_state::kamikaze_sound1_w(uint8_t data)
+void kamikaze_state::sound1_w(uint8_t data)
 {
-	// d0: ufo sound generator
+	// d0: UFO sound generator
 	// d1: fire sound generator
 	// d2: tank explosion sound generator
 	// d3: invader destroyed sound generator
@@ -365,11 +396,11 @@ void astinvad_state::kamikaze_sound1_w(uint8_t data)
 	machine().sound().system_mute(!BIT(data, 5));
 }
 
-void astinvad_state::kamikaze_sound2_w(uint8_t data)
+void kamikaze_state::sound2_w(uint8_t data)
 {
 	// d0: red screen -> to video board
 	// d1: invaders advancing sound generator
-	// d4: ufo destroyed sound generator
+	// d4: UFO destroyed sound generator
 	// d5: flip screen -> to video board
 	// other bits: unused
 
@@ -379,12 +410,12 @@ void astinvad_state::kamikaze_sound2_w(uint8_t data)
 	if (bits_gone_hi & 0x02) m_samples->start(5, SND_FLEET1);
 	if (bits_gone_hi & 0x10) m_samples->start(4, SND_UFOHIT);
 
-	m_screen_flip = (ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
+	m_screen_flip = (m_cabinet->read() & data & 0x20) ? 0xff : 0x00;
 	m_screen_red = data & 0x01;
 }
 
 // Space King 2
-void astinvad_state::spcking2_sound1_w(uint8_t data)
+void spcking2_state::sound1_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -399,7 +430,7 @@ void astinvad_state::spcking2_sound1_w(uint8_t data)
 	m_screen_red = data & 0x04; // ?
 }
 
-void astinvad_state::spcking2_sound2_w(uint8_t data)
+void spcking2_state::sound2_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -410,17 +441,17 @@ void astinvad_state::spcking2_sound2_w(uint8_t data)
 	if (bits_gone_hi & 0x08) m_samples->start(5, SND_FLEET4);
 	if (bits_gone_hi & 0x10) m_samples->start(4, SND_UFOHIT);
 
-	m_screen_flip = (ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
+	m_screen_flip = (m_cabinet->read() & data & 0x20) ? 0xff : 0x00;
 	m_player = BIT(data, 5);
 }
 
-void astinvad_state::spcking2_sound3_w(uint8_t data)
+void spcking2_state::sound3_w(uint8_t data)
 {
 	// ?
 }
 
 // Space Intruder
-void astinvad_state::spaceint_sound1_w(uint8_t data)
+void spaceint_state::sound1_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -437,7 +468,7 @@ void astinvad_state::spaceint_sound1_w(uint8_t data)
 	if (bits_gone_hi & 0x80) m_samples->start(5, SND_FLEET4);
 }
 
-void astinvad_state::spaceint_sound2_w(uint8_t data)
+void spaceint_state::sound2_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -446,7 +477,7 @@ void astinvad_state::spaceint_sound2_w(uint8_t data)
 
 	if (bits_gone_hi & 0x04) m_samples->start(3, SND_INVADERHIT);
 
-	m_screen_flip = (ioport("CABINET")->read() & data & 0x80) ? 0xff : 0x00;
+	m_screen_flip = (m_cabinet->read() & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -457,38 +488,38 @@ void astinvad_state::spaceint_sound2_w(uint8_t data)
  *
  *************************************/
 
-void astinvad_state::kamikaze_map(address_map &map)
+void kamikaze_state::prg_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x1bff).rom();
 	map(0x1c00, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().share("videoram");
+	map(0x2000, 0x3fff).ram().share(m_videoram);
 }
 
 
-void astinvad_state::spaceint_map(address_map &map)
+void spaceint_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x5fff).ram().w(FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(spaceint_state::videoram_w)).share(m_videoram);
 }
 
 
-void astinvad_state::kamikaze_portmap(address_map &map)
+void kamikaze_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+	map(0x00, 0xff).rw(FUNC(kamikaze_state::ppi_r), FUNC(kamikaze_state::ppi_w));
 }
 
 
-void astinvad_state::spaceint_portmap(address_map &map)
+void spaceint_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).w(FUNC(astinvad_state::spaceint_sound1_w));
-	map(0x03, 0x03).w(FUNC(astinvad_state::color_latch_w));
-	map(0x04, 0x04).w(FUNC(astinvad_state::spaceint_sound2_w));
+	map(0x02, 0x02).w(FUNC(spaceint_state::sound1_w));
+	map(0x03, 0x03).w(FUNC(spaceint_state::color_latch_w));
+	map(0x04, 0x04).w(FUNC(spaceint_state::sound2_w));
 }
 
 
@@ -585,17 +616,17 @@ static INPUT_PORTS_START( spaceint )
 
 	PORT_START("IN1")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )            /* code at 0x0d4a */
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )            // code at 0x0d4a
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
-//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
+	PORT_DIPSETTING(    0x06, "5" )                         // duplicate settings
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astinvad_state,spaceint_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, spaceint_state, coin_inserted, 0)
 
 	PORT_START("CABINET")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
@@ -607,11 +638,11 @@ static INPUT_PORTS_START( spaceintj )
 	PORT_INCLUDE( spaceint )
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )            /* code at 0x0d37 */
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )            // code at 0x0d37
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-//  PORT_DIPSETTING(    0x04, "5" )                         /* duplicate settings */
-//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
+	PORT_DIPSETTING(    0x04, "5" )                         // duplicate settings
+	PORT_DIPSETTING(    0x06, "5" )                         // duplicate settings
 INPUT_PORTS_END
 
 
@@ -645,33 +676,30 @@ static const char *const astinvad_sample_names[] =
  *
  *************************************/
 
-void astinvad_state::kamikaze(machine_config &config)
+void kamikaze_state::kamikaze(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::kamikaze_map);
-	m_maincpu->set_addrmap(AS_IO, &astinvad_state::kamikaze_portmap);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kamikaze_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &kamikaze_state::port_map);
 
-	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
-	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
+	I8255A(config, m_ppi8255[0]);
+	m_ppi8255[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi8255[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi8255[0]->in_pc_callback().set_ioport("IN2");
 
-	I8255A(config, m_ppi8255_0);
-	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
-	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
-	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
+	I8255A(config, m_ppi8255[1]);
+	m_ppi8255[1]->out_pa_callback().set(FUNC(kamikaze_state::sound1_w));
+	m_ppi8255[1]->out_pb_callback().set(FUNC(kamikaze_state::sound2_w));
 
-	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::kamikaze_sound1_w));
-	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::kamikaze_sound2_w));
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_astinvad));
+	m_screen->set_raw(XTAL(4'915'200), 320, 0, 256, 256, 32, 256);
+	m_screen->set_screen_update(FUNC(kamikaze_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -680,43 +708,38 @@ void astinvad_state::kamikaze(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void astinvad_state::spcking2(machine_config &config)
+void spcking2_state::spcking2(machine_config &config)
 {
 	kamikaze(config);
 
-	/* basic machine hardware */
-	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::spcking2_sound1_w));
-	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::spcking2_sound2_w));
-	m_ppi8255_1->out_pc_callback().set(FUNC(astinvad_state::spcking2_sound3_w));
+	// basic machine hardware
+	m_ppi8255[1]->out_pa_callback().set(FUNC(spcking2_state::sound1_w));
+	m_ppi8255[1]->out_pb_callback().set(FUNC(spcking2_state::sound2_w));
+	m_ppi8255[1]->out_pc_callback().set(FUNC(spcking2_state::sound3_w));
 
-	/* video hardware */
-	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spcking2));
+	// video hardware
+	m_screen->set_raw(XTAL(4'915'200), 320, 0, 256, 256, 16, 240);
+	m_screen->set_screen_update(FUNC(spcking2_state::screen_update));
 }
 
-void astinvad_state::spaceint(machine_config &config)
+void spaceint_state::spaceint(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);        /* a guess */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::spaceint_map);
-	m_maincpu->set_addrmap(AS_IO, &astinvad_state::spaceint_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(astinvad_state::irq0_line_hold));
+	// basic machine hardware
+	Z80(config, m_maincpu, 2'000'000);        // a guess
+	m_maincpu->set_addrmap(AS_PROGRAM, &spaceint_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &spaceint_state::port_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spaceint_state::irq0_line_hold));
 
-	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
-	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(astinvad_state, spaceint)
-
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spaceint));
+	m_screen->set_screen_update(FUNC(spaceint_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -741,7 +764,7 @@ ROM_START( kamikaze )
 	ROM_LOAD( "km04",         0x1800, 0x0800, CRC(494e1f6d) SHA1(f9626072d80897a977c10fe9523a8b608f1f7b7c) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "ai_vid_c.rom", 0x0000, 0x0400, BAD_DUMP CRC(b45287ff) SHA1(7e558eaf402641d7ff60171f854030219fbf9a59)  )
+	ROM_LOAD( "ai_vid_c.rom", 0x0000, 0x0400, BAD_DUMP CRC(b45287ff) SHA1(7e558eaf402641d7ff60171f854030219fbf9a59) )
 ROM_END
 
 ROM_START( astinvad )
@@ -770,6 +793,20 @@ ROM_START( kosmokil )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "40.bin", 0x0000, 0x0400,  CRC(d62a3e62) SHA1(00d42988203fbf167791cf5b887f06d1d015e942) )
+ROM_END
+
+ROM_START( betafrce ) // 3 ROMs are identical to the kosmokil ones
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b1", 0x0000, 0x0400, CRC(d5e4ce6b) SHA1(19d8b9df8cbfe674ea45b0137d98951117a4b890) )
+	ROM_LOAD( "2k", 0x0400, 0x0400, CRC(786599d2) SHA1(70db8dae052c3556948d75b741ef4346aa947479) )
+	ROM_LOAD( "3k", 0x0800, 0x0400, CRC(12621222) SHA1(062b1dff3e129dff23e55bef0d29c72ac5f212c4) )
+	ROM_LOAD( "4k", 0x0c00, 0x0400, CRC(0c5b8988) SHA1(a77fd2c58ee640973653b8af34b7ed3d81cae935) )
+	ROM_LOAD( "5k", 0x1000, 0x0400, CRC(5e8b2b6f) SHA1(ec8499325d5a3dcb0d10e9f12b9d3a03f629bbfd) )
+	ROM_LOAD( "6k", 0x1400, 0x0400, CRC(20cd429b) SHA1(a7d3216c005a7905b3549a4eee6c47fc5a9621fc) )
+	ROM_LOAD( "7k", 0x1800, 0x0400, CRC(637bf292) SHA1(baf40f5a04331c4cf2b83830f3203bd65a2bb271) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "40.bin", 0x0000, 0x0400, BAD_DUMP CRC(d62a3e62) SHA1(00d42988203fbf167791cf5b887f06d1d015e942) ) // not dumped for this set, taken from kosmokil
 ROM_END
 
 ROM_START( spcking2 )
@@ -809,29 +846,7 @@ ROM_START( spaceintj )
 	ROM_LOAD( "clr",          0x0000, 0x0100, BAD_DUMP CRC(13c1803f) SHA1(da59bf63d9e84aca32904c107674bc89974648eb) )
 ROM_END
 
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-void astinvad_state::init_kamikaze()
-{
-	/* the flip screen logic adds 32 to the Y after flipping */
-	m_flip_yoffs = 32;
-}
-
-
-void astinvad_state::init_spcking2()
-{
-	/* don't have the schematics, but the blanking must center the screen here */
-	m_flip_yoffs = 0;
-
-	save_item(NAME(m_player));
-}
-
+} // anonymous namespace
 
 
 /*************************************
@@ -840,9 +855,10 @@ void astinvad_state::init_spcking2()
  *
  *************************************/
 
-GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979,  spcking2,  0,        spcking2, spcking2,  astinvad_state, init_spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceint,  0,        spaceint, spaceint,  astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceintj, spaceint, spaceint, spaceintj, astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, different revision of game tho.
+GAME( 1980?, betafrce,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (Omni)", "Beta Force", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  spcking2,  0,        spcking2, spcking2,  spcking2_state, empty_init, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceint,  0,        spaceint, spaceint,  spaceint_state, empty_init, ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceintj, spaceint, spaceint, spaceintj, spaceint_state, empty_init, ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

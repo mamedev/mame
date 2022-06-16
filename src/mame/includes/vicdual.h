@@ -206,6 +206,7 @@ public:
 		vicdual_state(mconfig, type, tag)
 	{ }
 
+	void brdrlinet(machine_config &config);
 	void tranqgun(machine_config &config);
 
 protected:
@@ -218,9 +219,13 @@ private:
 	uint8_t tranqgun_prot_r(offs_t offset);
 	void tranqgun_prot_w(offs_t offset, uint8_t data);
 
+	void brdrlinet_dualgame_map(address_map &map);
 	void tranqgun_dualgame_map(address_map &map);
 
 	uint8_t m_tranqgun_prot_return = 0;
+
+	uint8_t brdrlinet_prot_r();
+	void brdrlinet_prot_w(uint8_t data);
 };
 
 class nsub_state : public vicdual_state
