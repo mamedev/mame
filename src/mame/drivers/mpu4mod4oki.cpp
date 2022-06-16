@@ -7536,3 +7536,21 @@ ROM_END
 GAME(199?, m4lazy,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big,ROT0,"BWB","Lazy Bones (BWB) (MPU4) (LBD 1.0)",GAME_FLAGS )
 GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big,ROT0,"BWB","Lazy Bones (BWB) (MPU4) (LBD 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big,ROT0,"BWB","Lazy Bones (BWB) (MPU4) (LBD 1.2, set 2)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Turbo Play (Brooklyn?)
+* - the display identifies this as Turbo Play, but the set was called Brooklyn?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4brook )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "brkl10.epr", 0x0000, 0x010000, CRC(857255b3) SHA1(cfd77918a19b2532a02b8bb3fa8e2716db31fb0e) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "brkl_snd.epr", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+ROM_END
+
+// has (c)1998 BARCREST Development BV4 in the ROM
+GAME(1998, m4brook,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4altreels, ROT0,   "Barcrest","Turbo Play / Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
