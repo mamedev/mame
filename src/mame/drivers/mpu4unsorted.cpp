@@ -157,66 +157,6 @@ ROM_START( m4crzjk )
 	ROM_LOAD( "crjok2.04.bin", 0x0000, 0x010000, CRC(838336d6) SHA1(6f36de20c930cbbff479af2667c11152c6adb43e) )
 ROM_END
 
-#define M4CRZJWL_EXTRAS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
-	ROM_LOAD( "cjsound1.bin", 0x000000, 0x080000, CRC(b023f6b9) SHA1(04c362c6511442d3ab775a5ff2051bfe26d5e624) ) \
-	ROM_LOAD( "cjsound2.bin", 0x080000, 0x080000, CRC(02563a43) SHA1(dfcee4e0fdf81c726c8e13278e7950459bcaab18) ) \
-	ROM_LOAD( "cjsound3.bin", 0x100000, 0x080000, CRC(e722e438) SHA1(070f3772920fa64d5214843c313b27a5b2a4c105) )
-
-ROM_START( m4crzjwle )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cj11bin", 0x0000, 0x020000, CRC(208fda73) SHA1(8b15c197693ea7749bc961fe4e5e36b317f9f6f8) ) // crown jewels (german)
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwla )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjexlow", 0x0000, 0x020000, CRC(07c227c1) SHA1(286341ed44ef7cd08ca411f2b3e6936b5e83a5f3) ) // crown jewels (german)
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwlb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjgerman", 0x0000, 0x020000, CRC(b090e690) SHA1(bdbe4041085c995761306280c15f782ea3bdc110) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwlc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjj54.bin", 0x0000, 0x020000, CRC(16dc92e7) SHA1(b791535054d5864c7053243408a54accfa014bd1) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwld )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gcn11", 0x0000, 0x020000, CRC(51493500) SHA1(901e60c1a7e9e628d723e199579fc82cf2e433e6) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwl )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gcn111", 0x0000, 0x020000, CRC(b1152ce6) SHA1(1d236bad57ad38b11215efe44008bb8e4014939e) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwlf )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gjv4", 0x0000, 0x020000, CRC(df63105d) SHA1(56e28adef9ec8921da7ab8045859e834731196c5) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwlg )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gjv5", 0x0000, 0x020000, CRC(e4f0bab2) SHA1(1a13d97ff2c4fbae39327f2a5a8b110f2617857e) )
-	M4CRZJWL_EXTRAS
-ROM_END
-
-ROM_START( m4crzjwlh )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(1f4743bf) SHA1(f9a0da2ed9cad5e6685c8a6d1d09e5d4bbcfacec) )    // Crown Jewels Deluxe (german)
-	M4CRZJWL_EXTRAS
-ROM_END
-
 
 
 
@@ -1680,18 +1620,6 @@ GAME(199?, m4drac,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
 
-GAME(199?, m4crzjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 1.1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 2)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (GCN 0.9, set 3)",GAME_FLAGS ) // DM1 SW ALM
-//
-GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS ) // DM1 SW ALM
-// not standard protection
-GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_bootleg_fixedret<0x46>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"bootleg","Crown Jewels (Barcrest) (bootleg) (German) (MPU4) (GCN 1.1, set 1)",GAME_FLAGS )
-GAME(199?, m4crzjwla, m4crzjwl,   mod4oki_bootleg_fixedret<0x46>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"bootleg","Crown Jewels (Barcrest) (bootleg) (German) (MPU4) (GCN 0.9, set 1)",GAME_FLAGS )
-GAME(199?, m4crzjwlb, m4crzjwl,   mod4oki_bootleg_fixedret<0x46>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"bootleg","Crown Jewels (Barcrest) (bootleg) (German) (MPU4) (GCN 0.9, set 2)",GAME_FLAGS )
-// different protection again
-GAME(199?, m4crzjwld, m4crzjwl,   mod4oki_bootleg_fixedret<0x28>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"bootleg","Crown Jewels (Barcrest) (bootleg) (German) (MPU4) (GCN 1.1, set 2)",GAME_FLAGS )
 
 GAME(199?, m4vegastg, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
